@@ -1,14 +1,14 @@
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://${S2_DB_HOST:10.0.12.252}:${S2_DB_PORT:5438}/${S2_DB_DATABASE:supersonic}?stringtype=unspecified
-    username: ${S2_DB_USER:metricsys}
+    url: jdbc:postgresql://${S2_DB_HOST:10.0.12.252}:${S2_DB_PORT:5439}/${S2_DB_DATABASE:supersonic}?stringtype=unspecified
+    username: ${S2_DB_USER:supersonic}
     password: ${S2_DB_PASSWORD:postgres}
   sql:
     init:
       continue-on-error: true
       mode: always
-      username: ${S2_DB_USER:metricsys}
+      username: ${S2_DB_USER:supersonic}
       password: ${S2_DB_PASSWORD:postgres}
       schema-locations: classpath:db/schema-postgres.sql,classpath:db/schema-postgres-demo.sql
       data-locations: classpath:db/data-postgres.sql,classpath:db/data-postgres-demo.sql
@@ -19,8 +19,8 @@ s2:
       provider: PGVECTOR
       base:
         url: ${S2_DB_HOST:10.0.12.252}
-      port: ${S2_DB_PORT:5438}
+      port: ${S2_DB_PORT:5439}
       databaseName: ${S2_DB_DATABASE:supersonic}
-      user: ${S2_DB_USER:metricsys}
+      user: ${S2_DB_USER:supersonic}
       password: ${S2_DB_PASSWORD:postgres}
       dimension: 512
