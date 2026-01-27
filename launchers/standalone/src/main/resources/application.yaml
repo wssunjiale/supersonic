@@ -1,5 +1,5 @@
 server:
-  port: 9080
+  port: 9090
   compression:
     enabled: true
     min-response-size: 1024
@@ -7,7 +7,7 @@ server:
 
 spring:
   profiles:
-    active: ${S2_DB_TYPE:h2}
+    active: ${S2_DB_TYPE:postgres}
   application:
     name: chat
   config:
