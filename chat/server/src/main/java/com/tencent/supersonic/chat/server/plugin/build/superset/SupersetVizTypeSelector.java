@@ -677,6 +677,22 @@ public class SupersetVizTypeSelector {
         return fallback;
     }
 
+    public static String resolveCategory(String vizType) {
+        if (StringUtils.isBlank(vizType)) {
+            return null;
+        }
+        List<VizTypeItem> items = VIZTYPE_CATALOG.getItems();
+        if (items == null || items.isEmpty()) {
+            return null;
+        }
+        for (VizTypeItem item : items) {
+            if (item != null && StringUtils.equalsIgnoreCase(item.getVizType(), vizType)) {
+                return item.getCategory();
+            }
+        }
+        return null;
+    }
+
     private static VizTypeItem resolveFallbackItem(String vizType, List<VizTypeItem> candidates) {
         VizTypeItem resolved = resolveItemByVizType(vizType, candidates);
         if (resolved != null) {

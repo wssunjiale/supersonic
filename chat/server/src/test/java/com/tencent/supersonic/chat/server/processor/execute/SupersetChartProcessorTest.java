@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,9 +45,9 @@ public class SupersetChartProcessorTest {
         datasetInfo.setMetrics(Collections.singletonList(buildMetric("amount")));
 
         Map<String, Object> formData =
-                processor.buildFormData(config, parseInfo, datasetInfo, "bar");
+                processor.buildFormData(config, parseInfo, datasetInfo, "pie");
 
-        Assertions.assertEquals(Collections.singletonList("amount"), formData.get("metrics"));
+        Assertions.assertEquals("amount", formData.get("metric"));
         Assertions.assertEquals(Collections.singletonList("category"), formData.get("groupby"));
         Assertions.assertEquals("aggregate", formData.get("query_mode"));
     }
@@ -62,10 +61,11 @@ public class SupersetChartProcessorTest {
                 .add(SchemaElement.builder().bizName("category").name("品类").build());
         SupersetDatasetInfo datasetInfo = new SupersetDatasetInfo();
         datasetInfo.setColumns(Arrays.asList(buildColumn("category", "STRING", true, false),
-                buildColumn("amount", "DECIMAL", false, false)));
+                buildColumn("amount", "DECIMAL", false, false),
+                buildColumn("ds", "DATE", false, true)));
 
         Map<String, Object> formData =
-                processor.buildFormData(config, parseInfo, datasetInfo, "bar");
+                processor.buildFormData(config, parseInfo, datasetInfo, "echarts_timeseries_line");
 
         Object metrics = formData.get("metrics");
         Assertions.assertTrue(metrics instanceof List);
@@ -76,6 +76,24 @@ public class SupersetChartProcessorTest {
         Assertions.assertEquals("SIMPLE", metric.get("expressionType"));
         Assertions.assertEquals("SUM", metric.get("aggregate"));
         Assertions.assertEquals("aggregate", formData.get("query_mode"));
+        Assertions.assertEquals("ds", formData.get("granularity_sqla"));
+    }
+
+    @Test
+    public void testBuildFormDataMissingHeatmapDimensionsThrows() {
+        SupersetChartProcessor processor = new SupersetChartProcessor();
+        SupersetPluginConfig config = new SupersetPluginConfig();
+        SemanticParseInfo parseInfo = new SemanticParseInfo();
+        parseInfo.getMetrics().add(SchemaElement.builder().bizName("amount").name("金额").build());
+        parseInfo.getDimensions()
+                .add(SchemaElement.builder().bizName("category").name("品类").build());
+        SupersetDatasetInfo datasetInfo = new SupersetDatasetInfo();
+        datasetInfo.setColumns(Arrays.asList(buildColumn("category", "STRING", true, false),
+                buildColumn("amount", "DECIMAL", false, false)));
+        datasetInfo.setMetrics(Collections.singletonList(buildMetric("amount")));
+
+        Assertions.assertThrows(IllegalStateException.class,
+                () -> processor.buildFormData(config, parseInfo, datasetInfo, "heatmap_v2"));
     }
 
     private SupersetDatasetColumn buildColumn(String name, String type, boolean groupby,

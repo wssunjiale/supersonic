@@ -300,35 +300,64 @@ public class SupersetChartProcessor implements ExecuteResultProcessor {
             }
             String vizType = candidate.getVizType();
             String candidateChartName = buildCandidateChartName(chartName, vizType, i);
-            Map<String, Object> formData =
-                    buildFormData(config, executeContext.getParseInfo(), datasetInfo, vizType);
-            log.debug(
-                    "superset chart formData prepared, vizType={}, keys={}, size={}, datasetColumns={}, datasetMetrics={}, parseMetrics={}, parseDimensions={}",
-                    vizType, formData.keySet(), formData.size(),
-                    datasetInfo == null || datasetInfo.getColumns() == null ? 0
-                            : datasetInfo.getColumns().size(),
-                    datasetInfo == null || datasetInfo.getMetrics() == null ? 0
-                            : datasetInfo.getMetrics().size(),
-                    executeContext.getParseInfo() == null
-                            || executeContext.getParseInfo().getMetrics() == null ? 0
-                                    : executeContext.getParseInfo().getMetrics().size(),
-                    executeContext.getParseInfo() == null
-                            || executeContext.getParseInfo().getDimensions() == null ? 0
-                                    : executeContext.getParseInfo().getDimensions().size());
-            SupersetChartInfo chartInfo = client.createEmbeddedChart(sql, candidateChartName,
-                    vizType, formData, resolvedDatasetId, databaseId, schema, dashboardTags);
-            if (resolvedDatasetId == null && chartInfo.getDatasetId() != null) {
-                resolvedDatasetId = chartInfo.getDatasetId();
+            try {
+                Map<String, Object> formData =
+                        buildFormData(config, executeContext.getParseInfo(), datasetInfo, vizType);
+                log.debug(
+                        "superset chart formData prepared, vizType={}, keys={}, size={}, datasetColumns={}, datasetMetrics={}, parseMetrics={}, parseDimensions={}",
+                        vizType, formData.keySet(), formData.size(),
+                        datasetInfo == null || datasetInfo.getColumns() == null ? 0
+                                : datasetInfo.getColumns().size(),
+                        datasetInfo == null || datasetInfo.getMetrics() == null ? 0
+                                : datasetInfo.getMetrics().size(),
+                        executeContext.getParseInfo() == null
+                                || executeContext.getParseInfo().getMetrics() == null ? 0
+                                        : executeContext.getParseInfo().getMetrics().size(),
+                        executeContext.getParseInfo() == null
+                                || executeContext.getParseInfo().getDimensions() == null ? 0
+                                        : executeContext.getParseInfo().getDimensions().size());
+                SupersetChartInfo chartInfo = client.createEmbeddedChart(sql, candidateChartName,
+                        vizType, formData, resolvedDatasetId, databaseId, schema, dashboardTags);
+                if (resolvedDatasetId == null && chartInfo.getDatasetId() != null) {
+                    resolvedDatasetId = chartInfo.getDatasetId();
+                }
+                SupersetChartCandidate chartCandidate = new SupersetChartCandidate();
+                chartCandidate.setVizType(vizType);
+                chartCandidate.setVizName(candidate.getName());
+                chartCandidate.setChartId(chartInfo.getChartId());
+                chartCandidate.setChartUuid(chartInfo.getChartUuid());
+                chartCandidate.setGuestToken(chartInfo.getGuestToken());
+                chartCandidate.setEmbeddedId(chartInfo.getEmbeddedId());
+                chartCandidate.setSupersetDomain(buildSupersetDomain(config));
+                results.add(chartCandidate);
+            } catch (Exception ex) {
+                log.warn("superset chart candidate skipped, vizType={}, reason={}", vizType,
+                        ex.getMessage());
+                log.debug("superset chart candidate error", ex);
             }
-            SupersetChartCandidate chartCandidate = new SupersetChartCandidate();
-            chartCandidate.setVizType(vizType);
-            chartCandidate.setVizName(candidate.getName());
-            chartCandidate.setChartId(chartInfo.getChartId());
-            chartCandidate.setChartUuid(chartInfo.getChartUuid());
-            chartCandidate.setGuestToken(chartInfo.getGuestToken());
-            chartCandidate.setEmbeddedId(chartInfo.getEmbeddedId());
-            chartCandidate.setSupersetDomain(buildSupersetDomain(config));
-            results.add(chartCandidate);
+        }
+        boolean hasTableCandidate = containsVizTypeCandidate(candidates, "table");
+        if (results.isEmpty() && !hasTableCandidate) {
+            String fallbackVizType = "table";
+            try {
+                Map<String, Object> formData = buildFormData(config, executeContext.getParseInfo(),
+                        datasetInfo, fallbackVizType);
+                SupersetChartInfo chartInfo =
+                        client.createEmbeddedChart(sql, chartName, fallbackVizType, formData,
+                                resolvedDatasetId, databaseId, schema, dashboardTags);
+                SupersetChartCandidate fallback = new SupersetChartCandidate();
+                fallback.setVizType(fallbackVizType);
+                fallback.setVizName(fallbackVizType);
+                fallback.setChartId(chartInfo.getChartId());
+                fallback.setChartUuid(chartInfo.getChartUuid());
+                fallback.setGuestToken(chartInfo.getGuestToken());
+                fallback.setEmbeddedId(chartInfo.getEmbeddedId());
+                fallback.setSupersetDomain(buildSupersetDomain(config));
+                results.add(fallback);
+            } catch (Exception ex) {
+                log.warn("superset table fallback failed, reason={}", ex.getMessage());
+                log.debug("superset table fallback error", ex);
+            }
         }
         return results;
     }
@@ -371,7 +400,51 @@ public class SupersetChartProcessor implements ExecuteResultProcessor {
      */
     private Map<String, Object> buildAutoFormData(SemanticParseInfo parseInfo,
             SupersetDatasetInfo datasetInfo, String vizType) {
-        Map<String, Object> formData = new HashMap<>();
+        FormDataContext context = buildFormDataContext(parseInfo, datasetInfo);
+        FormDataProfile profile = resolveFormDataProfile(vizType);
+        switch (profile) {
+            case TABLE:
+                return buildTableFormData(context);
+            case TIME_SERIES:
+                return buildTimeSeriesFormData(context, false);
+            case TIME_SERIES_MULTI:
+                return buildTimeSeriesFormData(context, true);
+            case KPI:
+                return buildKpiFormData(context, false);
+            case KPI_TIME:
+                return buildKpiFormData(context, true);
+            case PROPORTION:
+                return buildProportionFormData(context);
+            case RANKING:
+                return buildRankingFormData(context);
+            case DISTRIBUTION:
+                return buildDistributionFormData(context);
+            case HISTOGRAM:
+                return buildHistogramFormData(context);
+            case HEATMAP:
+                return buildHeatmapFormData(context);
+            case CALENDAR:
+                return buildCalendarFormData(context);
+            case BUBBLE:
+                return buildBubbleFormData(context);
+            case FLOW:
+                return buildFlowFormData(context);
+            case MAP_LATLON:
+                return buildMapLatLonFormData(context);
+            case MAP_REGION:
+                return buildMapRegionFormData(context);
+            case GANTT:
+                return buildGanttFormData(context);
+            case HANDLEBARS:
+                return buildHandlebarsFormData(context);
+            case GENERIC:
+            default:
+                return buildGenericFormData(context);
+        }
+    }
+
+    private FormDataContext buildFormDataContext(SemanticParseInfo parseInfo,
+            SupersetDatasetInfo datasetInfo) {
         List<SupersetDatasetColumn> datasetColumns =
                 datasetInfo == null ? Collections.emptyList() : datasetInfo.getColumns();
         List<String> columnNames = resolveDatasetColumns(datasetColumns);
@@ -379,46 +452,481 @@ public class SupersetChartProcessor implements ExecuteResultProcessor {
         List<String> dimensionColumns = resolveDimensionColumns(parseInfo, columnMap);
         List<Object> metrics = resolveMetrics(parseInfo, datasetInfo, columnMap);
         String timeColumn = resolveTimeColumn(parseInfo, datasetInfo, columnMap);
-        if (isTableVizType(vizType)) {
-            if (!metrics.isEmpty() || !dimensionColumns.isEmpty()) {
-                formData.put("query_mode", "aggregate");
-                if (!metrics.isEmpty()) {
-                    formData.put("metrics", metrics);
-                }
-                if (!dimensionColumns.isEmpty()) {
-                    formData.put("groupby", dimensionColumns);
-                }
-                if (StringUtils.isNotBlank(timeColumn)) {
-                    formData.put("granularity_sqla", timeColumn);
-                }
-                return formData;
-            }
-            if (!columnNames.isEmpty()) {
-                formData.put("query_mode", "raw");
-                formData.put("all_columns", columnNames);
-                formData.put("columns", columnNames);
-            }
-            return formData;
+        List<String> timeColumns = resolveTimeColumns(datasetColumns, datasetInfo);
+        List<String> numericColumns = resolveNumericColumns(datasetColumns);
+        return new FormDataContext(datasetColumns, columnNames, dimensionColumns, metrics,
+                timeColumn, timeColumns, numericColumns);
+    }
+
+    private FormDataProfile resolveFormDataProfile(String vizType) {
+        String normalized = StringUtils.lowerCase(StringUtils.trimToEmpty(vizType));
+        if (StringUtils.isBlank(normalized)) {
+            return FormDataProfile.TABLE;
         }
-        if (!metrics.isEmpty()) {
-            formData.put("metrics", metrics);
+        if (isTableVizType(normalized)) {
+            return FormDataProfile.TABLE;
         }
-        if (!dimensionColumns.isEmpty()) {
-            formData.put("groupby", dimensionColumns);
+        if ("mixed_timeseries".equals(normalized)) {
+            return FormDataProfile.TIME_SERIES_MULTI;
         }
-        if (StringUtils.isNotBlank(timeColumn)) {
-            formData.put("granularity_sqla", timeColumn);
+        if ("pop_kpi".equals(normalized)) {
+            return FormDataProfile.KPI_TIME;
         }
-        if (!formData.isEmpty()) {
+        if ("histogram_v2".equals(normalized)) {
+            return FormDataProfile.HISTOGRAM;
+        }
+        if ("horizon".equals(normalized)) {
+            return FormDataProfile.TIME_SERIES;
+        }
+        if ("heatmap_v2".equals(normalized)) {
+            return FormDataProfile.HEATMAP;
+        }
+        if ("cal_heatmap".equals(normalized)) {
+            return FormDataProfile.CALENDAR;
+        }
+        if ("paired_ttest".equals(normalized)) {
+            return FormDataProfile.DISTRIBUTION;
+        }
+        if ("bubble".equals(normalized) || "bubble_v2".equals(normalized)) {
+            return FormDataProfile.BUBBLE;
+        }
+        if ("gantt_chart".equals(normalized)) {
+            return FormDataProfile.GANTT;
+        }
+        if ("handlebars".equals(normalized)) {
+            return FormDataProfile.HANDLEBARS;
+        }
+        if ("mapbox".equals(normalized)) {
+            return FormDataProfile.MAP_LATLON;
+        }
+        if ("world_map".equals(normalized) || "country_map".equals(normalized)) {
+            return FormDataProfile.MAP_REGION;
+        }
+        if ("sankey_v2".equals(normalized) || "chord".equals(normalized)
+                || "graph_chart".equals(normalized)) {
+            return FormDataProfile.FLOW;
+        }
+        String category = SupersetVizTypeSelector.resolveCategory(vizType);
+        if ("Evolution".equalsIgnoreCase(category)) {
+            return FormDataProfile.TIME_SERIES;
+        }
+        if ("KPI".equalsIgnoreCase(category)) {
+            return FormDataProfile.KPI;
+        }
+        if ("Part of a Whole".equalsIgnoreCase(category)) {
+            return FormDataProfile.PROPORTION;
+        }
+        if ("Ranking".equalsIgnoreCase(category)) {
+            return FormDataProfile.RANKING;
+        }
+        if ("Flow".equalsIgnoreCase(category)) {
+            return FormDataProfile.FLOW;
+        }
+        if ("Map".equalsIgnoreCase(category)) {
+            return FormDataProfile.MAP_REGION;
+        }
+        if ("Distribution".equalsIgnoreCase(category)) {
+            return FormDataProfile.DISTRIBUTION;
+        }
+        if ("Correlation".equalsIgnoreCase(category)) {
+            return FormDataProfile.HEATMAP;
+        }
+        return FormDataProfile.GENERIC;
+    }
+
+    private Map<String, Object> buildTableFormData(FormDataContext context) {
+        Map<String, Object> formData = new HashMap<>();
+        if (!context.metrics.isEmpty() || !context.dimensions.isEmpty()) {
             formData.put("query_mode", "aggregate");
+            if (!context.metrics.isEmpty()) {
+                formData.put("metrics", context.metrics);
+            }
+            if (!context.dimensions.isEmpty()) {
+                formData.put("groupby", context.dimensions);
+            }
+            if (StringUtils.isNotBlank(context.timeColumn)) {
+                formData.put("granularity_sqla", context.timeColumn);
+            }
             return formData;
         }
-        if (!columnNames.isEmpty()) {
+        if (!context.columns.isEmpty()) {
             formData.put("query_mode", "raw");
-            formData.put("all_columns", columnNames);
-            formData.put("columns", columnNames);
+            formData.put("all_columns", context.columns);
+            formData.put("columns", context.columns);
+            return formData;
+        }
+        throw new IllegalStateException("vizType requires columns");
+    }
+
+    private Map<String, Object> buildTimeSeriesFormData(FormDataContext context,
+            boolean requireSecondMetric) {
+        Object metric = requireSingleMetric(context, "timeseries");
+        if (StringUtils.isBlank(context.timeColumn)) {
+            throw new IllegalStateException("vizType requires time column");
+        }
+        Map<String, Object> formData = new HashMap<>();
+        formData.put("query_mode", "aggregate");
+        formData.put("granularity_sqla", context.timeColumn);
+        if (requireSecondMetric) {
+            if (context.metrics.size() < 2) {
+                throw new IllegalStateException("vizType requires at least 2 metrics");
+            }
+            formData.put("metrics", Collections.singletonList(metric));
+            formData.put("metrics_b", Collections.singletonList(context.metrics.get(1)));
+        } else {
+            formData.put("metrics", context.metrics);
+        }
+        if (!context.dimensions.isEmpty()) {
+            formData.put("groupby", context.dimensions);
         }
         return formData;
+    }
+
+    private Map<String, Object> buildKpiFormData(FormDataContext context, boolean requireTime) {
+        Object metric = requireSingleMetric(context, "kpi");
+        if (requireTime && StringUtils.isBlank(context.timeColumn)) {
+            throw new IllegalStateException("vizType requires time column");
+        }
+        Map<String, Object> formData = new HashMap<>();
+        formData.put("query_mode", "aggregate");
+        formData.put("metric", metric);
+        if (StringUtils.isNotBlank(context.timeColumn)) {
+            formData.put("granularity_sqla", context.timeColumn);
+        }
+        return formData;
+    }
+
+    private Map<String, Object> buildProportionFormData(FormDataContext context) {
+        Object metric = requireSingleMetric(context, "proportion");
+        requireDimensions(context, 1, "proportion");
+        List<String> groupby = context.dimensions;
+        Map<String, Object> formData = new HashMap<>();
+        formData.put("query_mode", "aggregate");
+        formData.put("metric", metric);
+        formData.put("groupby", groupby);
+        return formData;
+    }
+
+    private Map<String, Object> buildRankingFormData(FormDataContext context) {
+        Object metric = requireSingleMetric(context, "ranking");
+        requireDimensions(context, 1, "ranking");
+        List<String> groupby = context.dimensions;
+        Map<String, Object> formData = new HashMap<>();
+        formData.put("query_mode", "aggregate");
+        formData.put("metric", metric);
+        formData.put("groupby", groupby);
+        return formData;
+    }
+
+    private Map<String, Object> buildDistributionFormData(FormDataContext context) {
+        requireMetrics(context, "distribution");
+        Map<String, Object> formData = new HashMap<>();
+        formData.put("query_mode", "aggregate");
+        formData.put("metrics", context.metrics);
+        if (!context.dimensions.isEmpty()) {
+            formData.put("groupby", context.dimensions);
+        }
+        return formData;
+    }
+
+    private Map<String, Object> buildHistogramFormData(FormDataContext context) {
+        String column = requireNumericColumn(context, "histogram");
+        Map<String, Object> formData = new HashMap<>();
+        formData.put("query_mode", "aggregate");
+        formData.put("column", column);
+        if (!context.dimensions.isEmpty()) {
+            formData.put("groupby", context.dimensions);
+        }
+        return formData;
+    }
+
+    private Map<String, Object> buildHeatmapFormData(FormDataContext context) {
+        Object metric = requireSingleMetric(context, "heatmap");
+        List<String> groupby = requireDimensions(context, 2, "heatmap");
+        Map<String, Object> formData = new HashMap<>();
+        formData.put("query_mode", "aggregate");
+        formData.put("metric", metric);
+        formData.put("x_axis", groupby.get(0));
+        formData.put("y_axis", groupby.get(1));
+        formData.put("all_columns_x", groupby.get(0));
+        formData.put("all_columns_y", groupby.get(1));
+        return formData;
+    }
+
+    private Map<String, Object> buildCalendarFormData(FormDataContext context) {
+        Object metric = requireSingleMetric(context, "cal_heatmap");
+        if (StringUtils.isBlank(context.timeColumn)) {
+            throw new IllegalStateException("vizType requires time column");
+        }
+        Map<String, Object> formData = new HashMap<>();
+        formData.put("query_mode", "aggregate");
+        formData.put("metric", metric);
+        formData.put("granularity_sqla", context.timeColumn);
+        return formData;
+    }
+
+    private Map<String, Object> buildBubbleFormData(FormDataContext context) {
+        List<String> numericColumns = context.numericColumns;
+        if (numericColumns.size() < 2) {
+            throw new IllegalStateException("vizType requires at least 2 numeric columns");
+        }
+        Map<String, Object> formData = new HashMap<>();
+        formData.put("query_mode", "aggregate");
+        formData.put("x", numericColumns.get(0));
+        formData.put("y", numericColumns.get(1));
+        if (!context.metrics.isEmpty()) {
+            formData.put("size", context.metrics.get(0));
+            formData.put("metric", context.metrics.get(0));
+        } else if (numericColumns.size() > 2) {
+            formData.put("size", numericColumns.get(2));
+        }
+        if (!context.dimensions.isEmpty()) {
+            formData.put("groupby", context.dimensions);
+        }
+        return formData;
+    }
+
+    private Map<String, Object> buildFlowFormData(FormDataContext context) {
+        Object metric = requireSingleMetric(context, "flow");
+        List<String> groupby = requireDimensions(context, 2, "flow");
+        Map<String, Object> formData = new HashMap<>();
+        formData.put("query_mode", "aggregate");
+        formData.put("source", groupby.get(0));
+        formData.put("target", groupby.get(1));
+        formData.put("metric", metric);
+        return formData;
+    }
+
+    private Map<String, Object> buildMapLatLonFormData(FormDataContext context) {
+        String latitude = resolveLatitudeColumn(context.datasetColumns);
+        String longitude = resolveLongitudeColumn(context.datasetColumns);
+        if (StringUtils.isBlank(latitude) || StringUtils.isBlank(longitude)) {
+            throw new IllegalStateException("vizType requires latitude/longitude columns");
+        }
+        Map<String, Object> formData = new HashMap<>();
+        formData.put("query_mode", "aggregate");
+        formData.put("latitude", latitude);
+        formData.put("longitude", longitude);
+        formData.put("all_columns_x", longitude);
+        formData.put("all_columns_y", latitude);
+        if (!context.metrics.isEmpty()) {
+            formData.put("metric", context.metrics.get(0));
+        }
+        return formData;
+    }
+
+    private Map<String, Object> buildMapRegionFormData(FormDataContext context) {
+        Object metric = requireSingleMetric(context, "map");
+        requireDimensions(context, 1, "map");
+        String region = resolveRegionColumn(context.dimensions);
+        Map<String, Object> formData = new HashMap<>();
+        formData.put("query_mode", "aggregate");
+        formData.put("entity", region);
+        formData.put("metric", metric);
+        return formData;
+    }
+
+    private Map<String, Object> buildGanttFormData(FormDataContext context) {
+        if (context.timeColumns.size() < 2) {
+            throw new IllegalStateException("vizType requires start/end time columns");
+        }
+        List<String> groupby = requireDimensions(context, 1, "gantt");
+        Map<String, Object> formData = new HashMap<>();
+        formData.put("query_mode", "aggregate");
+        formData.put("start", context.timeColumns.get(0));
+        formData.put("end", context.timeColumns.get(1));
+        formData.put("groupby", groupby);
+        return formData;
+    }
+
+    private Map<String, Object> buildHandlebarsFormData(FormDataContext context) {
+        if (context.columns.isEmpty()) {
+            throw new IllegalStateException("vizType requires columns");
+        }
+        Map<String, Object> formData = new HashMap<>();
+        formData.put("query_mode", "raw");
+        formData.put("all_columns", context.columns);
+        formData.put("columns", context.columns);
+        return formData;
+    }
+
+    private Map<String, Object> buildGenericFormData(FormDataContext context) {
+        Object metric = requireSingleMetric(context, "generic");
+        requireDimensions(context, 1, "generic");
+        List<String> groupby = context.dimensions;
+        Map<String, Object> formData = new HashMap<>();
+        formData.put("query_mode", "aggregate");
+        formData.put("metric", metric);
+        formData.put("groupby", groupby);
+        if (StringUtils.isNotBlank(context.timeColumn)) {
+            formData.put("granularity_sqla", context.timeColumn);
+        }
+        return formData;
+    }
+
+    private Object requireSingleMetric(FormDataContext context, String label) {
+        requireMetrics(context, label);
+        return context.metrics.get(0);
+    }
+
+    private void requireMetrics(FormDataContext context, String label) {
+        if (context.metrics.isEmpty()) {
+            throw new IllegalStateException("vizType requires metrics: " + label);
+        }
+    }
+
+    private List<String> requireDimensions(FormDataContext context, int count, String label) {
+        if (context.dimensions.size() < count) {
+            throw new IllegalStateException("vizType requires dimensions: " + label);
+        }
+        if (count == 1) {
+            return Collections.singletonList(context.dimensions.get(0));
+        }
+        return context.dimensions.subList(0, count);
+    }
+
+    private String requireNumericColumn(FormDataContext context, String label) {
+        if (context.numericColumns.isEmpty()) {
+            throw new IllegalStateException("vizType requires numeric column: " + label);
+        }
+        return context.numericColumns.get(0);
+    }
+
+    private List<String> resolveNumericColumns(List<SupersetDatasetColumn> columns) {
+        if (CollectionUtils.isEmpty(columns)) {
+            return Collections.emptyList();
+        }
+        List<String> numericColumns = new ArrayList<>();
+        for (SupersetDatasetColumn column : columns) {
+            if (column == null || StringUtils.isBlank(column.getColumnName())) {
+                continue;
+            }
+            if (isNumericType(column.getType())) {
+                numericColumns.add(column.getColumnName());
+            }
+        }
+        return numericColumns;
+    }
+
+    private List<String> resolveTimeColumns(List<SupersetDatasetColumn> columns,
+            SupersetDatasetInfo datasetInfo) {
+        List<String> timeColumns = new ArrayList<>();
+        if (datasetInfo != null && StringUtils.isNotBlank(datasetInfo.getMainDttmCol())) {
+            timeColumns.add(datasetInfo.getMainDttmCol());
+        }
+        if (CollectionUtils.isEmpty(columns)) {
+            return timeColumns;
+        }
+        for (SupersetDatasetColumn column : columns) {
+            if (column == null || StringUtils.isBlank(column.getColumnName())) {
+                continue;
+            }
+            if (Boolean.TRUE.equals(column.getIsDttm())
+                    && !timeColumns.contains(column.getColumnName())) {
+                timeColumns.add(column.getColumnName());
+            }
+        }
+        return timeColumns;
+    }
+
+    private String resolveLatitudeColumn(List<SupersetDatasetColumn> columns) {
+        return resolveGeoColumn(columns, new String[] {"lat", "latitude", "纬度"});
+    }
+
+    private String resolveLongitudeColumn(List<SupersetDatasetColumn> columns) {
+        return resolveGeoColumn(columns, new String[] {"lon", "lng", "longitude", "经度"});
+    }
+
+    private String resolveGeoColumn(List<SupersetDatasetColumn> columns, String[] tokens) {
+        if (CollectionUtils.isEmpty(columns)) {
+            return null;
+        }
+        for (SupersetDatasetColumn column : columns) {
+            if (column == null || StringUtils.isBlank(column.getColumnName())) {
+                continue;
+            }
+            String name = normalizeName(column.getColumnName());
+            for (String token : tokens) {
+                String normalized = normalizeName(token);
+                if (name.equals(normalized) || name.endsWith("_" + normalized)
+                        || name.contains(normalized)) {
+                    return column.getColumnName();
+                }
+            }
+        }
+        return null;
+    }
+
+    private String resolveRegionColumn(List<String> dimensions) {
+        if (dimensions == null || dimensions.isEmpty()) {
+            return null;
+        }
+        for (String dimension : dimensions) {
+            String name = normalizeName(dimension);
+            if (name.contains("country") || name.contains("region") || name.contains("state")
+                    || name.contains("province") || name.contains("city") || name.contains("nation")
+                    || name.contains("国家") || name.contains("省") || name.contains("市")) {
+                return dimension;
+            }
+        }
+        return dimensions.get(0);
+    }
+
+    private boolean containsVizTypeCandidate(List<SupersetVizTypeSelector.VizTypeItem> candidates,
+            String vizType) {
+        if (candidates == null || candidates.isEmpty()) {
+            return false;
+        }
+        for (SupersetVizTypeSelector.VizTypeItem candidate : candidates) {
+            if (candidate != null
+                    && StringUtils.equalsIgnoreCase(candidate.getVizType(), vizType)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static class FormDataContext {
+        private final List<SupersetDatasetColumn> datasetColumns;
+        private final List<String> columns;
+        private final List<String> dimensions;
+        private final List<Object> metrics;
+        private final String timeColumn;
+        private final List<String> timeColumns;
+        private final List<String> numericColumns;
+
+        private FormDataContext(List<SupersetDatasetColumn> datasetColumns, List<String> columns,
+                List<String> dimensions, List<Object> metrics, String timeColumn,
+                List<String> timeColumns, List<String> numericColumns) {
+            this.datasetColumns = datasetColumns;
+            this.columns = columns;
+            this.dimensions = dimensions;
+            this.metrics = metrics;
+            this.timeColumn = timeColumn;
+            this.timeColumns = timeColumns;
+            this.numericColumns = numericColumns;
+        }
+    }
+
+    private enum FormDataProfile {
+        TABLE,
+        TIME_SERIES,
+        TIME_SERIES_MULTI,
+        KPI,
+        KPI_TIME,
+        PROPORTION,
+        RANKING,
+        DISTRIBUTION,
+        HISTOGRAM,
+        HEATMAP,
+        CALENDAR,
+        BUBBLE,
+        FLOW,
+        MAP_LATLON,
+        MAP_REGION,
+        GANTT,
+        HANDLEBARS,
+        GENERIC
     }
 
     private List<String> resolveDatasetColumns(List<SupersetDatasetColumn> columns) {

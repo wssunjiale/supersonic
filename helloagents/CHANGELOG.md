@@ -16,6 +16,10 @@
 - **[webapp-chat-sdk]**: 嵌入看板高度改为基于消息容器与 iframe scrollHeight 多次同步，提升自适应稳定性
   - 方案: [202602040218_superset-embed-chat](archive/2026-02/202602040218_superset-embed-chat/)
 
+### 新增
+- **[chat-server]**: 基于 viztype.json 全量生成 form_data 模板，缺失必填字段时跳过候选并允许回退 table
+  - 方案: [202602041730_superset-formdata-templates](archive/2026-02/202602041730_superset-formdata-templates/)
+
 ## [0.9.10] - 2026-02-03
 
 ### 新增
