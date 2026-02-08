@@ -609,15 +609,42 @@ public class SupersetChartProcessor implements ExecuteResultProcessor {
             if (StringUtils.isNotBlank(context.timeColumn)) {
                 formData.put("granularity_sqla", context.timeColumn);
             }
+            applyTableDefaults(formData);
             return formData;
         }
         if (!context.columns.isEmpty()) {
             formData.put("query_mode", "raw");
             formData.put("all_columns", context.columns);
             formData.put("columns", context.columns);
+            applyTableDefaults(formData);
             return formData;
         }
         throw new IllegalStateException("vizType requires columns");
+    }
+
+    private void applyTableDefaults(Map<String, Object> formData) {
+        if (formData == null) {
+            return;
+        }
+        formData.putIfAbsent("all_columns", Collections.emptyList());
+        formData.putIfAbsent("percent_metrics", Collections.emptyList());
+        formData.putIfAbsent("adhoc_filters", Collections.emptyList());
+        formData.putIfAbsent("order_by_cols", Collections.emptyList());
+        formData.putIfAbsent("extra_filters", Collections.emptyList());
+        formData.putIfAbsent("label_colors", Collections.emptyMap());
+        formData.putIfAbsent("shared_label_colors", Collections.emptyList());
+        formData.putIfAbsent("map_label_colors", Collections.emptyMap());
+        formData.putIfAbsent("temporal_columns_lookup", Collections.emptyMap());
+        formData.putIfAbsent("order_desc", true);
+        formData.putIfAbsent("row_limit", 10000);
+        formData.putIfAbsent("server_page_length", 10);
+        formData.putIfAbsent("percent_metric_calculation", "row_limit");
+        formData.putIfAbsent("table_timestamp_format", "smart_date");
+        formData.putIfAbsent("allow_render_html", true);
+        formData.putIfAbsent("show_cell_bars", true);
+        formData.putIfAbsent("color_pn", true);
+        formData.putIfAbsent("comparison_color_scheme", "Green");
+        formData.putIfAbsent("comparison_type", "values");
     }
 
     private Map<String, Object> buildTimeSeriesFormData(FormDataContext context,

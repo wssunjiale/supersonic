@@ -53,7 +53,6 @@ const SupersetChart: React.FC<Props> = ({ id, data, triggerResize }) => {
   const embedContainerRef = useRef<HTMLDivElement>(null);
   const embedInstanceRef = useRef<EmbedInstance | null>(null);
   const backgroundColorRef = useRef<string>();
-  const initialGuestTokenRef = useRef<string | undefined>(undefined);
   const response = data.response as SupersetChartResponseType;
   const webPage = response?.webPage;
   const vizTypeCandidates = useMemo(() => {
@@ -98,45 +97,6 @@ const SupersetChart: React.FC<Props> = ({ id, data, triggerResize }) => {
     }
     return '';
   };
-  const resolveJwtExp = (token: string) => {
-    if (!token || typeof token !== 'string') {
-      return null;
-    }
-    const parts = token.split('.');
-    if (parts.length < 2) {
-      return null;
-    }
-    try {
-      const normalized = parts[1].replace(/-/g, '+').replace(/_/g, '/');
-      const padding = normalized.length % 4 === 0 ? '' : '='.repeat(4 - (normalized.length % 4));
-      const payload = JSON.parse(atob(`${normalized}${padding}`));
-      const exp = payload?.exp;
-      if (typeof exp !== 'number') {
-        return null;
-      }
-      return exp > 1000000000000 ? exp : exp * 1000;
-    } catch (error) {
-      return null;
-    }
-  };
-  const isTokenExpiringSoon = (token: string) => {
-    const exp = resolveJwtExp(token);
-    if (!exp) {
-      return false;
-    }
-    return exp - Date.now() < 60000;
-  };
-  const guestToken = activeCandidate ? activeCandidate.guestToken : response?.guestToken;
-
-  const buildParamValue = (value: any) => {
-    if (value === null || value === undefined) {
-      return '';
-    }
-    if (typeof value === 'string') {
-      return value;
-    }
-    return JSON.stringify(value);
-  };
 
   const params = useMemo(() => {
     const rawParams = webPage?.params || webPage?.paramOptions || [];
@@ -153,10 +113,6 @@ const SupersetChart: React.FC<Props> = ({ id, data, triggerResize }) => {
     }
     return numericValue;
   }, [params]);
-
-  useEffect(() => {
-    initialGuestTokenRef.current = guestToken;
-  }, [guestToken]);
 
   useEffect(() => {
     setCandidateIndex(0);
@@ -181,18 +137,6 @@ const SupersetChart: React.FC<Props> = ({ id, data, triggerResize }) => {
     response?.embeddedId,
     response?.supersetDomain,
   ]);
-
-  const valueParams = useMemo(() => {
-    return (params || [])
-      .filter((option: any) => option.paramType !== 'FORWARD')
-      .reduce((result: any, item: any) => {
-        if (item.key === 'guestToken') {
-          return result;
-        }
-        result[item.key] = buildParamValue(item.value);
-        return result;
-      }, {});
-  }, [params]);
 
   useEffect(() => {
     setHeight(minHeight);
@@ -326,14 +270,6 @@ const SupersetChart: React.FC<Props> = ({ id, data, triggerResize }) => {
     embedInstanceRef.current = null;
     embedContainerRef.current.replaceChildren();
     const fetchGuestToken = async () => {
-      let initialToken: string | undefined;
-      if (initialGuestTokenRef.current) {
-        initialToken = initialGuestTokenRef.current;
-        initialGuestTokenRef.current = undefined;
-        if (!isTokenExpiringSoon(initialToken)) {
-          return initialToken;
-        }
-      }
       const responseToken = await fetchSupersetGuestToken({
         pluginId: response?.pluginId,
         embeddedId: embedInfo.embedId,
@@ -361,7 +297,6 @@ const SupersetChart: React.FC<Props> = ({ id, data, triggerResize }) => {
         hideTab: true,
         hideChartControls: false,
         filters: { visible: false, expanded: false },
-        urlParams: Object.keys(valueParams || {}).length > 0 ? valueParams : undefined,
       },
     })
       .then(instance => {
@@ -409,7 +344,7 @@ const SupersetChart: React.FC<Props> = ({ id, data, triggerResize }) => {
       embedInstanceRef.current?.unmount();
       embedInstanceRef.current = null;
     };
-  }, [embedInfo, resolveBackgroundColor, response?.pluginId, syncHeight, syncTheme, valueParams]);
+  }, [embedInfo, resolveBackgroundColor, response?.pluginId, syncHeight, syncTheme]);
 
   useEffect(() => {
     if (Array.isArray(response?.dashboards)) {

@@ -20,16 +20,6 @@ const buildData = (response: any) =>
     queryResults: [],
   } as any);
 
-const buildJwt = (payload: Record<string, any>) => {
-  const base64 = (value: Record<string, any>) =>
-    Buffer.from(JSON.stringify(value))
-      .toString('base64')
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=+$/g, '');
-  return `${base64({ alg: 'none', typ: 'JWT' })}.${base64(payload)}.`;
-};
-
 const ensureEmbedDashboardMock = () => {
   const { embedDashboard } = require('@superset-ui/embedded-sdk');
   embedDashboard.mockResolvedValue({ unmount: jest.fn() });
@@ -69,7 +59,6 @@ describe('SupersetChart', () => {
       pluginId: 1,
       embeddedId: 'uuid-456',
       supersetDomain: 'https://superset.example.com',
-      guestToken: 'token-456',
     });
     const { embedDashboard } = require('@superset-ui/embedded-sdk');
     render(<SupersetChart id={1} data={data} />);
@@ -81,7 +70,7 @@ describe('SupersetChart', () => {
     expect(args.supersetDomain).toBe('https://superset.example.com');
     expect(args.iframeTitle).toBe('supersetIframe');
     expect(args.dashboardUiConfig.hideChartControls).toBe(false);
-    await expect(args.fetchGuestToken()).resolves.toBe('token-456');
+    await expect(args.fetchGuestToken()).resolves.toBe('token-default');
   });
 
   test('switches embed when viz type candidates change', async () => {
@@ -96,7 +85,6 @@ describe('SupersetChart', () => {
           vizName: 'Bar Chart',
           embeddedId: 'embed-1',
           supersetDomain: 'https://superset.example.com',
-          guestToken: 'token-1',
           chartId: 11,
         },
         {
@@ -104,7 +92,6 @@ describe('SupersetChart', () => {
           vizName: 'Line Chart',
           embeddedId: 'embed-2',
           supersetDomain: 'https://superset.example.com',
-          guestToken: 'token-2',
           chartId: 22,
         },
       ],
@@ -120,7 +107,7 @@ describe('SupersetChart', () => {
     });
     const args = embedDashboard.mock.calls[1][0];
     expect(args.id).toBe('embed-2');
-    await expect(args.fetchGuestToken()).resolves.toBe('token-2');
+    await expect(args.fetchGuestToken()).resolves.toBe('token-default');
   });
 
   test('fetches guest token from response wrapper', async () => {
@@ -159,17 +146,15 @@ describe('SupersetChart', () => {
     await expect(args.fetchGuestToken()).resolves.toBe('token-555');
   });
 
-  test('refreshes guest token when initial token is expiring', async () => {
+  test('always fetches guest token from api', async () => {
     const { embedDashboard } = require('@superset-ui/embedded-sdk');
     const { fetchSupersetGuestToken } = require('../../../service');
     fetchSupersetGuestToken.mockResolvedValue({ data: { token: 'token-new' } });
-    const expiredToken = buildJwt({ exp: Math.floor(Date.now() / 1000) - 10 });
     const data = buildData({
       webPage: { url: '', params: [] },
       pluginId: 1,
       embeddedId: 'uuid-expired',
       supersetDomain: 'https://superset.example.com',
-      guestToken: expiredToken,
     });
     render(<SupersetChart id={1} data={data} />);
     await waitFor(() => {
