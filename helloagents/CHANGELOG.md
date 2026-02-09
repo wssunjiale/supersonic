@@ -9,6 +9,11 @@
 - **[webapp-chat-sdk]**: Superset 嵌入支持候选图表切换与按候选推送
   - 方案: [202602040217_superset-viztype-candidates](archive/2026-02/202602040217_superset-viztype-candidates/)
   - 决策: superset-viztype-candidates#D001(前端提供候选切换入口)
+- **[docs]**: 生成 Superset 6.0.0 controlPanel 抽取版 viztype_6.0.0.json
+- **[docs]**: 修正 controlPanel 抽取逻辑，补齐 mapbox 等别名配置控件的必填项解析
+- **[docs]**: 合并 Superset 6.0.0 抽取结果到 docs/viztype.json
+- **[chat-server]**: Superset 选图候选尽量覆盖不同类别并附加 table 兜底类型
+- **[chat-server]**: 修复 viztype.json 必填字段解析与候选列表不可变导致的运行时异常
 
 ### 修复
 - **[chat-server]**: 打包后可从 classpath 读取 docs/viztype.json，避免选图退化为 table
@@ -19,6 +24,10 @@
   - 方案: [202602040217_superset-viztype-candidates](archive/2026-02/202602040217_superset-viztype-candidates/)
 - **[chat-server]**: Superset 绘图场景恢复执行 SQL 查询用于选图
   - 方案: [202602040217_superset-viztype-candidates](archive/2026-02/202602040217_superset-viztype-candidates/)
+- **[chat-server]**: 单图 dashboard line 类型默认高度提升至 300px，其他类型维持 260px（可用 `s2.superset.height` 覆盖）
+- **[chat-server]**: LLM form_data 校验对齐 viztype.json 必填规则，并支持 tooltip_metrics/secondary_metric/select_country/time_series_option 等关键字段
+- **[chat-server]**: Superset 选图候选优先同类图表（同 profile/分类），减少不相关类型扩散
+- **[chat-server]**: LLM 选图时生成中文图表名，并用于 Superset chart 命名与候选展示
 - **[headless-server]**: 新增 Superset dataset 注册表（SQL 规范化 hash 去重、物理/虚拟区分）并支持增量同步
   - 方案: [202602060045_superset-sql-dataset](plan/202602060045_superset-sql-dataset/)
 - **[common]**: 新增 SQL 规范化工具用于 Superset dataset 去重
@@ -31,6 +40,7 @@
 ### 修复
 - **[chat-server]**: Superset chart form_data 基于 dataset + 语义解析生成，指标缺失时构建 adhoc metric，避免与 dataset 不一致
   - 方案: [202602041326_superset-form-data-dataset](archive/2026-02/202602041326_superset-form-data-dataset/)
+- **[chat-server]**: 基于 Superset 6.0.0 controlPanel 补全 docs/viztype.json 表单字段与必填项规则，供 LLM 生成 form_data
 - **[chat-server]**: 对话绘图链路不再执行 SQL，仅生成 SQL + QueryColumns 并由 Superset 执行
   - 方案: [202602060045_superset-sql-dataset](plan/202602060045_superset-sql-dataset/)
 - **[chat-server]**: Superset 绘图改为仅做 SQL 翻译，使用最终执行 SQL 注册 dataset，避免数据集名被误当表名
@@ -63,6 +73,9 @@
   - 方案: [202602081133_superset-dashboard-access-token](archive/2026-02/202602081133_superset-dashboard-access-token/)
 - **[chat-server]**: 按 Superset 前端 buildQuery 规则对齐各 vizType 的 query_context 关键字段，提升嵌入 chart payload 一致性
 - **[chat-server]**: 补齐 legacy vizType 的 query_context 模板（mapbox/partition/rose/para 等），完善 metrics/columns/orderby/time_offsets 对齐
+- **[chat-server]**: 维度解析优先映射到 dataset 实际列名（忽略空白差异），避免 groupby 与 columns 不一致导致 guest payload 校验失败
+- **[chat-server]**: 规范化 adhoc metric 的 optionName（移除空白），确保 params/query_context/queryObject 一致
+- **[chat-server]**: timeseries query_context columns 对齐 Superset normalizeTimeColumn（BASE_AXIS adhoc column）
 - **[supersonic-fe]**: superset-embed-test.html 增加 Supersonic API Base 与错误提示，修复 dashboard 列表为空
   - 方案: [202602080832_superset-dashboard-list](archive/2026-02/202602080832_superset-dashboard-list/)
 
@@ -80,6 +93,9 @@
 - **[supersonic-fe]**: superset-embed-test.html 调整看板容器为 1000x720 并支持自适应高度
   - 类型: 微调（无方案包）
   - 文件: webapp/packages/supersonic-fe/public/superset-embed-test.html:13-19
+- **[webapp-chat-sdk]**: Superset 看板列表为空时仍尝试拉取，确保“推送到看板”可用
+  - 类型: 微调（无方案包）
+  - 文件: webapp/packages/chat-sdk/src/components/ChatMsg/SupersetChart/index.tsx:367-377; webapp/packages/chat-sdk/src/components/ChatMsg/SupersetChart/index.test.tsx:189-199
 
 ## [0.9.10] - 2026-02-03
 
@@ -92,4 +108,24 @@
   - 方案: [202602040218_superset-embed-chat](archive/2026-02/202602040218_superset-embed-chat/)
   - 决策: superset-embed-chat#D001(容器高度+getScrollSize混合自适应策略)
 - **[chat-sdk]**: 基于消息容器可用区域计算高度并加强嵌入后同步，提升 iframe 自适应稳定性
+  - 方案: [202602040218_superset-embed-chat](archive/2026-02/202602040218_superset-embed-chat/)
+- **[chat-sdk]**: Superset 嵌入在存在 height 参数时锁定高度，贴合 ECharts 固定高度表现
+  - 方案: [202602040218_superset-embed-chat](archive/2026-02/202602040218_superset-embed-chat/)
+- **[chat-server]**: Superset 单图 dashboard 默认高度对齐 ECharts（260px）
+  - 方案: [202602040218_superset-embed-chat](archive/2026-02/202602040218_superset-embed-chat/)
+- **[chat-server]**: 单图 dashboard 布局补齐背景元数据并强制全宽
+  - 方案: [202602040218_superset-embed-chat](archive/2026-02/202602040218_superset-embed-chat/)
+- **[chat-server]**: 单图 dashboard 注入全高 CSS 并隐藏图表标题
+  - 方案: [202602040218_superset-embed-chat](archive/2026-02/202602040218_superset-embed-chat/)
+- **[chat-server]**: 单图 dashboard 布局强制关闭图表标题显示
+  - 方案: [202602040218_superset-embed-chat](archive/2026-02/202602040218_superset-embed-chat/)
+- **[chat-server]**: 单图 dashboard CSS 隐藏 dashboard 标题栏
+  - 方案: [202602040218_superset-embed-chat](archive/2026-02/202602040218_superset-embed-chat/)
+- **[chat-server]**: 单图 dashboard CSS 隐藏图表菜单与编辑入口
+  - 方案: [202602040218_superset-embed-chat](archive/2026-02/202602040218_superset-embed-chat/)
+- **[chat-server]**: 单图 dashboard 标题使用查询语句并清理 supersonic 后缀
+  - 方案: [202602040218_superset-embed-chat](archive/2026-02/202602040218_superset-embed-chat/)
+- **[chat-server]**: 单图 dashboard 恢复显示标题与菜单，保留无滚动布局
+  - 方案: [202602040218_superset-embed-chat](archive/2026-02/202602040218_superset-embed-chat/)
+- **[chat-server]**: dashboard 标题清理 supersonic/superset 及数字后缀
   - 方案: [202602040218_superset-embed-chat](archive/2026-02/202602040218_superset-embed-chat/)

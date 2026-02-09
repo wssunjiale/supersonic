@@ -76,6 +76,26 @@ public class SupersetChartProcessorTest {
     }
 
     @Test
+    public void testBuildFormDataNormalizesDimensionNameToDatasetColumn() {
+        SupersetChartProcessor processor = new SupersetChartProcessor();
+        SupersetPluginConfig config = new SupersetPluginConfig();
+        SemanticParseInfo parseInfo = new SemanticParseInfo();
+        parseInfo.getMetrics().add(SchemaElement.builder().bizName("count").name("访问人数").build());
+        parseInfo.getDimensions()
+                .add(SchemaElement.builder().bizName("访 问人数").name("访问人数").build());
+        SupersetDatasetInfo datasetInfo = new SupersetDatasetInfo();
+        datasetInfo.setColumns(Collections.singletonList(
+                buildColumn("访问人数", "INT", true, false)));
+        datasetInfo.setMetrics(Collections.singletonList(buildMetric("count")));
+
+        Map<String, Object> formData =
+                processor.buildFormData(config, parseInfo, null, datasetInfo, "table", null,
+                        null);
+
+        Assertions.assertEquals(Collections.singletonList("访问人数"), formData.get("groupby"));
+    }
+
+    @Test
     public void testBuildFormDataBuildsAdhocMetricWhenDatasetMetricMissing() {
         SupersetChartProcessor processor = new SupersetChartProcessor();
         SupersetPluginConfig config = new SupersetPluginConfig();
@@ -159,6 +179,28 @@ public class SupersetChartProcessorTest {
         Assertions.assertEquals("NUMBER", columns.get(0).getShowType());
         Assertions.assertEquals("DATE", columns.get(1).getShowType());
         Assertions.assertEquals("CATEGORY", columns.get(2).getShowType());
+    }
+
+    @Test
+    public void testResolveDashboardHeightPrefersConfigAndLineFallback() throws Exception {
+        SupersetChartProcessor processor = new SupersetChartProcessor();
+        Method method = SupersetChartProcessor.class.getDeclaredMethod("resolveDashboardHeight",
+                SupersetPluginConfig.class, String.class);
+        method.setAccessible(true);
+
+        SupersetPluginConfig config = new SupersetPluginConfig();
+        config.setHeight(420);
+        Integer configuredHeight = (Integer) method.invoke(processor, config,
+                "echarts_timeseries_line");
+        Assertions.assertEquals(420, configuredHeight);
+
+        SupersetPluginConfig defaultConfig = new SupersetPluginConfig();
+        Integer lineHeight = (Integer) method.invoke(processor, defaultConfig,
+                "echarts_timeseries_line");
+        Assertions.assertEquals(300, lineHeight);
+
+        Integer defaultHeight = (Integer) method.invoke(processor, defaultConfig, "bar");
+        Assertions.assertEquals(260, defaultHeight);
     }
 
     private SupersetDatasetColumn buildColumn(String name, String type, boolean groupby,

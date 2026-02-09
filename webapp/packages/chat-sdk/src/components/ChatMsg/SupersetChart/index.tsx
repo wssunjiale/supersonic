@@ -113,6 +113,11 @@ const SupersetChart: React.FC<Props> = ({ id, data, triggerResize }) => {
     }
     return numericValue;
   }, [params]);
+  const hasFixedHeight = useMemo(() => {
+    return params?.some(
+      (option: any) => option.paramType === 'FORWARD' && option.key === 'height'
+    );
+  }, [params]);
 
   useEffect(() => {
     setCandidateIndex(0);
@@ -213,6 +218,9 @@ const SupersetChart: React.FC<Props> = ({ id, data, triggerResize }) => {
     if (typeof window === 'undefined') {
       return minHeight;
     }
+    if (hasFixedHeight) {
+      return minHeight;
+    }
     const rect = embedContainerRef.current?.getBoundingClientRect();
     const top = rect ? rect.top : 0;
     const padding = 24;
@@ -227,7 +235,7 @@ const SupersetChart: React.FC<Props> = ({ id, data, triggerResize }) => {
     const viewportHeight = window.innerHeight || document.documentElement.clientHeight || minHeight;
     const available = viewportHeight - Math.max(top, 0) - padding;
     return Math.max(available, minHeight);
-  }, [minHeight]);
+  }, [hasFixedHeight, minHeight]);
 
   const getDashboardScrollHeight = useCallback(async () => {
     const instance = embedInstanceRef.current;
@@ -255,11 +263,15 @@ const SupersetChart: React.FC<Props> = ({ id, data, triggerResize }) => {
   }, []);
 
   const syncHeight = useCallback(async () => {
+    if (hasFixedHeight) {
+      setHeight(prev => (prev === minHeight ? prev : minHeight));
+      return;
+    }
     const baseHeight = computeAvailableHeight();
     const scrollHeight = await getDashboardScrollHeight();
     const nextHeight = scrollHeight && scrollHeight > baseHeight ? scrollHeight : baseHeight;
     setHeight(prev => (prev === nextHeight ? prev : nextHeight));
-  }, [computeAvailableHeight, getDashboardScrollHeight]);
+  }, [computeAvailableHeight, getDashboardScrollHeight, hasFixedHeight, minHeight]);
 
   useEffect(() => {
     if (!embedInfo || !embedContainerRef.current) {
@@ -353,7 +365,9 @@ const SupersetChart: React.FC<Props> = ({ id, data, triggerResize }) => {
   }, [response?.dashboards]);
 
   useEffect(() => {
-    const shouldFetch = response?.dashboards === undefined && response?.pluginId;
+    const shouldFetch =
+      Boolean(response?.pluginId) &&
+      (!Array.isArray(response?.dashboards) || response.dashboards.length === 0);
     if (!shouldFetch) {
       return;
     }

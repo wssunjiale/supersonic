@@ -186,6 +186,20 @@ describe('SupersetChart', () => {
     expect(getByText('推送到看板')).toBeTruthy();
   });
 
+  test('fetches dashboards when response list is empty', async () => {
+    const { fetchSupersetDashboards } = require('../../../service');
+    const data = buildData({
+      webPage: { url: '', params: [] },
+      pluginId: 1,
+      chartId: 2,
+      dashboards: [],
+    });
+    render(<SupersetChart id={1} data={data} />);
+    await waitFor(() => {
+      expect(fetchSupersetDashboards).toHaveBeenCalledWith(1);
+    });
+  });
+
   test('filters temporary dashboards by supersonic prefix', () => {
     const dashboards = [
       { id: 10, title: 'supersonic_Plugin_123' },
