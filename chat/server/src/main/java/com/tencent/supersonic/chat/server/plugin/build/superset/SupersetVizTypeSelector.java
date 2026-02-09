@@ -57,8 +57,9 @@ public class SupersetVizTypeSelector {
             + "5. If dimensionCount>=1 and metricCount==1, prefer Bar; allow Pie/Partition only when rowCount<=10.\n"
             + "6. Avoid table-type charts (Table/Time-series Table/Pivot Table) unless no other candidate fits.\n"
             + "7. Return JSON only, no extra text.\n"
-            + "8. Output fields: viz_type, alternatives (array), reason.\n"
+            + "8. Output fields: viz_type, chart_name, alternatives (array of {viz_type, chart_name}), reason.\n"
             + "9. alternatives length should be {{top_n}} and ordered by preference.\n"
+            + "10. chart_name should be a concise Chinese title (no extra explanation).\n"
             + "#UserInstruction: {{instruction}}\n" + "#DataProfile: {{data_profile}}\n"
             + "#Signals: {{signals}}\n" + "#AvailableVizTypes: {{candidates}}\n" + "#Response:";
     private static final Set<String> NUMBER_TYPES =
@@ -106,13 +107,18 @@ public class SupersetVizTypeSelector {
         int topN = resolveTopN(safeConfig);
         List<String> ordered = new ArrayList<>();
 
+        Map<String, String> nameOverrides = Collections.emptyMap();
         if (safeConfig.isVizTypeLlmEnabled()) {
-            Optional<List<String>> llmCandidates = selectByLlmCandidates(safeConfig, queryResult,
+            Optional<LlmSelection> llmSelection = selectByLlmCandidates(safeConfig, queryResult,
                     queryText, candidates, decisionContext, agent);
-            if (llmCandidates.isPresent()) {
+            if (llmSelection.isPresent()) {
+                LlmSelection selection = llmSelection.get();
                 List<String> guarded =
-                        guardLlmCandidates(llmCandidates.get(), decisionContext, candidates);
+                        guardLlmCandidates(selection.getOrdered(), decisionContext, candidates);
                 addOrderedCandidates(ordered, guarded, topN);
+                if (!selection.getNames().isEmpty()) {
+                    nameOverrides = selection.getNames();
+                }
             }
         }
 
@@ -127,16 +133,18 @@ public class SupersetVizTypeSelector {
             hardChoice.ifPresent(choice -> addOrderedCandidate(ordered, choice, topN));
         }
 
-        if (ordered.isEmpty()) {
+        List<String> expanded = expandCandidates(ordered, decisionContext, candidates);
+        List<String> diversified = diversifyCandidates(expanded, candidates, topN);
+        if (diversified.isEmpty()) {
             String fallback = resolveFallback(candidates, decisionContext);
-            addOrderedCandidate(ordered, fallback, topN);
+            addOrderedCandidate(diversified, fallback, topN);
         }
 
-        List<VizTypeItem> resolved = resolveCandidateItems(ordered, candidates);
+        List<VizTypeItem> resolved = resolveCandidateItems(diversified, candidates, nameOverrides);
         if (resolved.isEmpty()) {
             return Collections.singletonList(resolveFallbackItem(DEFAULT_VIZ_TYPE, candidates));
         }
-        return resolved;
+        return ensureTableCandidate(resolved, candidates);
     }
 
     private static boolean isNumber(QueryColumn column) {
@@ -182,6 +190,144 @@ public class SupersetVizTypeSelector {
         return Optional.empty();
     }
 
+    private static List<String> resolvePreferredCandidates(DecisionContext context,
+            List<VizTypeItem> candidates) {
+        if (context == null || candidates == null || candidates.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<String> preferred = new ArrayList<>();
+        if (context.getMetricCount() == 1 && context.getColumnCount() == 1
+                && context.getRowCount() == 1) {
+            preferred.add("Big Number");
+            preferred.add("Big Number with Trendline");
+            preferred.add("Big Number Total");
+        } else if (context.getTimeCount() >= 1 && context.getMetricCount() > 1) {
+            preferred.add("Mixed Chart");
+            preferred.add("Line Chart");
+            preferred.add("Smooth Line");
+            preferred.add("Area Chart");
+            preferred.add("Generic Chart");
+        } else if (context.getTimeCount() >= 1 && context.getMetricCount() >= 1) {
+            preferred.add("Line Chart");
+            preferred.add("Smooth Line");
+            preferred.add("Area Chart");
+            preferred.add("Generic Chart");
+            preferred.add("Mixed Chart");
+        } else if (context.getDimensionCount() >= 1 && context.getMetricCount() == 1) {
+            preferred.add("Bar Chart");
+            preferred.add("Pie Chart");
+            preferred.add("Partition Chart");
+        } else if (context.getDimensionCount() >= 1 && context.getMetricCount() > 1) {
+            preferred.add("Pivot Table");
+        }
+        return resolveCandidates(preferred, candidates);
+    }
+
+    private static List<String> expandCandidates(List<String> ordered, DecisionContext context,
+            List<VizTypeItem> candidates) {
+        List<String> expanded = new ArrayList<>();
+        addOrderedCandidates(expanded, ordered, Integer.MAX_VALUE);
+        addOrderedCandidates(expanded, resolvePreferredCandidates(context, candidates),
+                Integer.MAX_VALUE);
+        if (candidates != null) {
+            for (VizTypeItem item : candidates) {
+                if (item == null || StringUtils.isBlank(item.getVizType())
+                        || isTableCandidate(item)) {
+                    continue;
+                }
+                addOrderedCandidate(expanded, item.getVizType(), Integer.MAX_VALUE);
+            }
+        }
+        return expanded;
+    }
+
+    private static List<String> diversifyCandidates(List<String> ordered,
+            List<VizTypeItem> candidates, int limit) {
+        if (ordered == null || ordered.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<String> diversified = new ArrayList<>();
+        String anchor = null;
+        for (String candidate : ordered) {
+            if (StringUtils.isNotBlank(candidate)) {
+                anchor = candidate;
+                break;
+            }
+        }
+        if (StringUtils.isBlank(anchor)) {
+            addOrderedCandidates(diversified, ordered, limit);
+            return diversified;
+        }
+        addOrderedCandidate(diversified, anchor, limit);
+        String anchorCategory = resolveCategoryByVizType(anchor, candidates);
+        String anchorProfile = resolveProfileByVizType(anchor, candidates);
+        for (String candidate : ordered) {
+            if (diversified.size() >= limit) {
+                break;
+            }
+            if (StringUtils.isBlank(candidate) || StringUtils.equalsIgnoreCase(candidate, anchor)) {
+                continue;
+            }
+            if (isRelatedCandidate(candidate, anchorCategory, anchorProfile, candidates)) {
+                addOrderedCandidate(diversified, candidate, limit);
+            }
+        }
+        for (String candidate : ordered) {
+            if (diversified.size() >= limit) {
+                break;
+            }
+            addOrderedCandidate(diversified, candidate, limit);
+        }
+        return diversified;
+    }
+
+    private static String resolveCategoryByVizType(String vizType,
+            List<VizTypeItem> candidates) {
+        if (StringUtils.isBlank(vizType)) {
+            return null;
+        }
+        if (candidates != null) {
+            for (VizTypeItem item : candidates) {
+                if (item != null && StringUtils.equalsIgnoreCase(item.getVizType(), vizType)) {
+                    return item.getCategory();
+                }
+            }
+        }
+        return resolveCategory(vizType);
+    }
+
+    private static String resolveProfileByVizType(String vizType,
+            List<VizTypeItem> candidates) {
+        if (StringUtils.isBlank(vizType)) {
+            return null;
+        }
+        VizTypeItem item = resolveItemByVizType(vizType, candidates);
+        if (item == null || item.getFormDataRules() == null) {
+            return null;
+        }
+        return item.getFormDataRules().getProfile();
+    }
+
+    private static boolean isRelatedCandidate(String vizType, String anchorCategory,
+            String anchorProfile, List<VizTypeItem> candidates) {
+        if (StringUtils.isBlank(vizType)) {
+            return false;
+        }
+        if (StringUtils.isNotBlank(anchorProfile)) {
+            String profile = resolveProfileByVizType(vizType, candidates);
+            if (StringUtils.isNotBlank(profile)
+                    && StringUtils.equalsIgnoreCase(anchorProfile, profile)) {
+                return true;
+            }
+        }
+        if (StringUtils.isNotBlank(anchorCategory)) {
+            String category = resolveCategoryByVizType(vizType, candidates);
+            return StringUtils.isNotBlank(category)
+                    && StringUtils.equalsIgnoreCase(anchorCategory, category);
+        }
+        return false;
+    }
+
     private static Optional<String> selectByHeuristics(DecisionContext context,
             List<Map<String, Object>> results, List<VizTypeItem> candidates) {
         if (context == null) {
@@ -219,7 +365,7 @@ public class SupersetVizTypeSelector {
         return Optional.empty();
     }
 
-    private static Optional<List<String>> selectByLlmCandidates(SupersetPluginConfig config,
+    private static Optional<LlmSelection> selectByLlmCandidates(SupersetPluginConfig config,
             QueryResult queryResult, String queryText, List<VizTypeItem> candidates,
             DecisionContext decisionContext, Agent agent) {
         Integer chatModelId = resolveChatModelId(config, agent);
@@ -251,8 +397,10 @@ public class SupersetVizTypeSelector {
         String answer =
                 response == null || response.content() == null ? null : response.content().text();
         log.info("superset viztype llm req:\n{} \nresp:\n{}", prompt.text(), answer);
-        List<String> resolved = resolveCandidatesFromModelResponse(answer, candidates);
-        return resolved.isEmpty() ? Optional.empty() : Optional.of(resolved);
+        LlmSelection resolved = resolveLlmSelectionFromModelResponse(answer, candidates);
+        return resolved == null || resolved.getOrdered().isEmpty()
+                ? Optional.empty()
+                : Optional.of(resolved);
     }
 
     static Integer resolveChatModelId(SupersetPluginConfig config, Agent agent) {
@@ -317,42 +465,110 @@ public class SupersetVizTypeSelector {
     }
 
     static String resolveFromModelResponse(String response, List<VizTypeItem> candidates) {
-        List<String> resolved = resolveCandidatesFromModelResponse(response, candidates);
-        return resolved.isEmpty() ? null : resolved.get(0);
+        LlmSelection resolved = resolveLlmSelectionFromModelResponse(response, candidates);
+        return resolved == null || resolved.getOrdered().isEmpty()
+                ? null
+                : resolved.getOrdered().get(0);
     }
 
     static List<String> resolveCandidatesFromModelResponse(String response,
             List<VizTypeItem> candidates) {
+        LlmSelection resolved = resolveLlmSelectionFromModelResponse(response, candidates);
+        return resolved == null ? Collections.emptyList() : resolved.getOrdered();
+    }
+
+    private static LlmSelection resolveLlmSelectionFromModelResponse(String response,
+            List<VizTypeItem> candidates) {
         if (StringUtils.isBlank(response) || candidates == null || candidates.isEmpty()) {
-            return Collections.emptyList();
+            return null;
         }
         String payload = extractJsonPayload(response);
         if (StringUtils.isBlank(payload)) {
-            return Collections.emptyList();
+            return null;
         }
         JSONObject json;
         try {
             json = JSONObject.parseObject(payload);
         } catch (Exception ex) {
             log.warn("superset viztype llm response parse failed", ex);
-            return Collections.emptyList();
+            return null;
         }
-        List<String> ordered = new ArrayList<>();
+        List<LlmChoice> ordered = new ArrayList<>();
         String primary =
                 StringUtils.defaultIfBlank(json.getString("viz_type"), json.getString("vizType"));
+        String primaryName = resolveChartName(json);
         if (StringUtils.isNotBlank(primary)) {
-            ordered.add(primary);
+            ordered.add(new LlmChoice(primary, primaryName));
         }
         JSONArray alternatives = json.getJSONArray("alternatives");
         if (alternatives != null) {
             for (int i = 0; i < alternatives.size(); i++) {
-                String value = alternatives.getString(i);
-                if (StringUtils.isNotBlank(value)) {
-                    ordered.add(value);
+                Object value = alternatives.get(i);
+                if (value == null) {
+                    continue;
+                }
+                if (value instanceof JSONObject) {
+                    JSONObject item = (JSONObject) value;
+                    String vizType = StringUtils.defaultIfBlank(item.getString("viz_type"),
+                            item.getString("vizType"));
+                    String name = resolveChartName(item);
+                    if (StringUtils.isNotBlank(vizType)) {
+                        ordered.add(new LlmChoice(vizType, name));
+                    }
+                } else {
+                    String vizType = String.valueOf(value);
+                    if (StringUtils.isNotBlank(vizType)) {
+                        ordered.add(new LlmChoice(vizType, null));
+                    }
                 }
             }
         }
-        return resolveCandidates(ordered, candidates);
+        return resolveLlmSelection(ordered, candidates);
+    }
+
+    private static String resolveChartName(JSONObject json) {
+        if (json == null) {
+            return null;
+        }
+        String name = json.getString("chart_name");
+        if (StringUtils.isBlank(name)) {
+            name = json.getString("chartName");
+        }
+        if (StringUtils.isBlank(name)) {
+            name = json.getString("name");
+        }
+        if (StringUtils.isBlank(name)) {
+            name = json.getString("title");
+        }
+        return StringUtils.trimToNull(name);
+    }
+
+    private static LlmSelection resolveLlmSelection(List<LlmChoice> ordered,
+            List<VizTypeItem> candidates) {
+        if (ordered == null || ordered.isEmpty()) {
+            return null;
+        }
+        Map<String, String> lookup = buildLookup(candidates);
+        List<String> resolved = new ArrayList<>();
+        Map<String, String> names = new HashMap<>();
+        for (LlmChoice choice : ordered) {
+            if (choice == null || StringUtils.isBlank(choice.getVizType())) {
+                continue;
+            }
+            String resolvedValue = resolveCandidateValue(choice.getVizType(), candidates, lookup);
+            if (StringUtils.isBlank(resolvedValue) || resolved.contains(resolvedValue)) {
+                continue;
+            }
+            resolved.add(resolvedValue);
+            if (StringUtils.isNotBlank(choice.getChartName())
+                    && !names.containsKey(resolvedValue)) {
+                names.put(resolvedValue, choice.getChartName());
+            }
+        }
+        if (resolved.isEmpty()) {
+            return null;
+        }
+        return new LlmSelection(resolved, names);
     }
 
     private static List<String> resolveCandidates(List<String> ordered,
@@ -641,7 +857,7 @@ public class SupersetVizTypeSelector {
     }
 
     private static List<VizTypeItem> resolveCandidateItems(List<String> ordered,
-            List<VizTypeItem> candidates) {
+            List<VizTypeItem> candidates, Map<String, String> nameOverrides) {
         if (ordered == null || ordered.isEmpty()) {
             return Collections.emptyList();
         }
@@ -651,12 +867,50 @@ public class SupersetVizTypeSelector {
             if (item != null && StringUtils.isNotBlank(item.getVizType())
                     && resolved.stream().noneMatch(existing -> StringUtils
                             .equalsIgnoreCase(existing.getVizType(), item.getVizType()))) {
-                resolved.add(item);
+                VizTypeItem resolvedItem = item;
+                String override = nameOverrides == null ? null : nameOverrides.get(item.getVizType());
+                if (StringUtils.isNotBlank(override)) {
+                    resolvedItem = cloneItem(item);
+                    resolvedItem.setLlmName(override);
+                }
+                resolved.add(resolvedItem);
             }
         }
         return resolved;
     }
 
+    private static VizTypeItem cloneItem(VizTypeItem item) {
+        if (item == null) {
+            return null;
+        }
+        VizTypeItem clone = new VizTypeItem();
+        clone.setVizKey(item.getVizKey());
+        clone.setVizType(item.getVizType());
+        clone.setName(item.getName());
+        clone.setCategory(item.getCategory());
+        clone.setDescription(item.getDescription());
+        clone.setSourcePath(item.getSourcePath());
+        clone.setFormDataRules(item.getFormDataRules());
+        return clone;
+    }
+
+    private static List<VizTypeItem> ensureTableCandidate(List<VizTypeItem> resolved,
+            List<VizTypeItem> candidates) {
+        if (resolved == null || resolved.isEmpty()) {
+            return resolved;
+        }
+        for (VizTypeItem item : resolved) {
+            if (isTableCandidate(item)) {
+                return resolved;
+            }
+        }
+        List<VizTypeItem> withTable = new ArrayList<>(resolved);
+        VizTypeItem table = resolveFallbackItem(DEFAULT_VIZ_TYPE, candidates);
+        if (table != null) {
+            withTable.add(table);
+        }
+        return withTable;
+    }
     public static VizTypeItem resolveItemByVizType(String vizType, List<VizTypeItem> candidates) {
         if (StringUtils.isBlank(vizType)) {
             return null;
@@ -1037,14 +1291,78 @@ public class SupersetVizTypeSelector {
         private boolean timeGrainDetected;
     }
 
+    private static class LlmChoice {
+        private final String vizType;
+        private final String chartName;
+
+        private LlmChoice(String vizType, String chartName) {
+            this.vizType = vizType;
+            this.chartName = chartName;
+        }
+
+        private String getVizType() {
+            return vizType;
+        }
+
+        private String getChartName() {
+            return chartName;
+        }
+    }
+
+    private static class LlmSelection {
+        private final List<String> ordered;
+        private final Map<String, String> names;
+
+        private LlmSelection(List<String> ordered, Map<String, String> names) {
+            this.ordered = ordered == null ? Collections.emptyList() : ordered;
+            this.names = names == null ? Collections.emptyMap() : names;
+        }
+
+        private List<String> getOrdered() {
+            return ordered;
+        }
+
+        private Map<String, String> getNames() {
+            return names;
+        }
+    }
+
     @Data
     public static class VizTypeItem {
         private String vizKey;
         private String vizType;
         private String name;
+        private String llmName;
         private String category;
         private String description;
         private String sourcePath;
+        private FormDataRules formDataRules;
+    }
+
+    @Data
+    public static class FormDataRules {
+        private String profile;
+        private List<String> required = Collections.emptyList();
+        private List<List<FormDataField>> requiredAnyOf = Collections.emptyList();
+        private List<FormDataField> fields = Collections.emptyList();
+        private List<FormDataSource> sources = Collections.emptyList();
+    }
+
+    @Data
+    public static class FormDataField {
+        private String key;
+        private String type;
+        private String description;
+        private String source;
+    }
+
+    @Data
+    public static class FormDataSource {
+        private String type;
+        private String name;
+        private String url;
+        private String path;
+        private String note;
     }
 
     @Data

@@ -186,7 +186,8 @@ final class SupersetQueryContextTemplates {
             }
             columns.addAll(groupby);
             if (!columns.isEmpty()) {
-                query.put("columns", dedupe(columns));
+                List<Object> deduped = dedupe(columns);
+                query.put("columns", applyBaseAxisColumn(deduped, xAxis));
             }
             if (!groupby.isEmpty()) {
                 query.put("series_columns", groupby);
@@ -860,5 +861,34 @@ final class SupersetQueryContextTemplates {
             return "";
         }
         return value.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private static List<Object> applyBaseAxisColumn(List<Object> columns, Object xAxis) {
+        if (xAxis == null || columns == null || columns.isEmpty()) {
+            return columns;
+        }
+        if (!(xAxis instanceof String)) {
+            return columns;
+        }
+        String axis = (String) xAxis;
+        List<Object> updated = new ArrayList<>();
+        for (Object column : columns) {
+            if (axis.equals(column)) {
+                updated.add(buildBaseAxisColumn(axis));
+            } else {
+                updated.add(column);
+            }
+        }
+        return updated;
+    }
+
+    private static Map<String, Object> buildBaseAxisColumn(String axis) {
+        Map<String, Object> column = new HashMap<>();
+        column.put("columnType", "BASE_AXIS");
+        column.put("sqlExpression", axis);
+        column.put("label", axis);
+        column.put("expressionType", "SQL");
+        column.put("isColumnReference", true);
+        return column;
     }
 }

@@ -26,6 +26,19 @@ public class SupersetApiClient {
     private static final String CHART_API = "/api/v1/chart/";
     private static final String GUEST_TOKEN_API = "/api/v1/security/guest_token/";
     private static final String DASHBOARD_API = "/api/v1/dashboard/";
+    private static final int DEFAULT_SINGLE_CHART_HEIGHT = 260;
+    private static final int DASHBOARD_GRID_UNIT = 8;
+    private static final String DASHBOARD_ROOT_ID = "ROOT_ID";
+    private static final String DASHBOARD_GRID_ID = "GRID_ID";
+    private static final String DASHBOARD_ROW_ID = "ROW-1";
+    private static final String DASHBOARD_CHART_PREFIX = "CHART-";
+    private static final String SINGLE_CHART_DASHBOARD_CSS =
+            "html, body, #app { height: 100%; overflow: hidden; } "
+                    + ".dashboard-content, .dashboard-content > div, .grid-container { height: 100%; } "
+                    + ".dashboard-content { padding: 0 !important; } "
+                    + ".dashboard-component-chart-holder, .dashboard-component-chart-holder > div, "
+                    + ".chart-container, .chart-container .chart, .slice_container { height: 100% !important; } "
+                    + ".dashboard-component-chart-holder { margin: 0 !important; }";
     private static final String EMBEDDED_UI_CONFIG = "3";
     private static final String TAG_API = "/api/v1/tag/";
     private static final String LOGIN_API = "/api/v1/security/login";
@@ -78,7 +91,7 @@ public class SupersetApiClient {
 
     public SupersetChartInfo createEmbeddedChart(String sql, String chartName, String vizType,
             Map<String, Object> formData, Long datasetId, Long databaseId, String schema,
-            List<String> dashboardTags) {
+            List<String> dashboardTags, Integer dashboardHeight, String dashboardTitle) {
         log.debug(
                 "superset createEmbeddedChart start, datasetId={}, databaseId={}, schema={}, vizType={}, chartName={}",
                 datasetId, databaseId, schema, vizType, chartName);
@@ -89,10 +102,12 @@ public class SupersetApiClient {
         Map<String, Object> mergedFormData = mergeTemplateFormData(formData, template);
         Long chartId = createChart(datasetId, vizType, mergedFormData, chartName);
         String chartUuid = fetchChartUuid(chartId);
-        Long dashboardId = createDashboard(chartName);
+        Long dashboardId = createDashboard(
+                StringUtils.defaultIfBlank(dashboardTitle, chartName));
         addChartToDashboard(dashboardId, chartId);
         ensureDashboardChartLinked(dashboardId, chartId);
         updateChartParams(chartId, dashboardId, mergedFormData, vizType, datasetId, template);
+        updateDashboardLayout(dashboardId, chartId, dashboardHeight);
         addTagsToDashboard(dashboardId, dashboardTags);
         String embeddedUuid = ensureEmbeddedDashboardUuid(dashboardId);
         String guestToken = createGuestToken("dashboard", embeddedUuid);
@@ -172,6 +187,75 @@ public class SupersetApiClient {
         put(CHART_API + chartId, payload);
     }
 
+    void updateDashboardLayout(Long dashboardId, Long chartId, Integer dashboardHeight) {
+        if (dashboardId == null || chartId == null) {
+            return;
+        }
+        Map<String, Object> position = buildDashboardPosition(chartId, dashboardHeight);
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("position_json", JsonUtil.toString(position));
+        payload.put("css", SINGLE_CHART_DASHBOARD_CSS);
+        try {
+            put(DASHBOARD_API + dashboardId, payload);
+        } catch (HttpStatusCodeException ex) {
+            log.warn("superset dashboard layout update failed, dashboardId={}, chartId={}",
+                    dashboardId, chartId, ex);
+        }
+    }
+
+    Map<String, Object> buildDashboardPosition(Long chartId, Integer dashboardHeight) {
+        int gridHeight = resolveDashboardGridHeight(dashboardHeight);
+        String chartKey = DASHBOARD_CHART_PREFIX + chartId;
+        Map<String, Object> root = new HashMap<>();
+        root.put("type", "ROOT");
+        root.put("id", DASHBOARD_ROOT_ID);
+        root.put("meta", buildTransparentMeta());
+        root.put("children", Collections.singletonList(DASHBOARD_GRID_ID));
+        Map<String, Object> grid = new HashMap<>();
+        grid.put("type", "GRID");
+        grid.put("id", DASHBOARD_GRID_ID);
+        grid.put("meta", buildTransparentMeta());
+        grid.put("children", Collections.singletonList(DASHBOARD_ROW_ID));
+        Map<String, Object> row = new HashMap<>();
+        row.put("type", "ROW");
+        row.put("id", DASHBOARD_ROW_ID);
+        Map<String, Object> rowMeta = buildTransparentMeta();
+        rowMeta.put("width", 12);
+        rowMeta.put("height", gridHeight);
+        row.put("meta", rowMeta);
+        row.put("children", Collections.singletonList(chartKey));
+        Map<String, Object> chart = new HashMap<>();
+        chart.put("type", "CHART");
+        chart.put("id", chartKey);
+        chart.put("children", Collections.emptyList());
+        Map<String, Object> meta = new HashMap<>();
+        meta.put("chartId", chartId);
+        meta.put("width", 12);
+        meta.put("height", gridHeight);
+        meta.put("show_title", false);
+        chart.put("meta", meta);
+        Map<String, Object> position = new HashMap<>();
+        position.put(DASHBOARD_ROOT_ID, root);
+        position.put(DASHBOARD_GRID_ID, grid);
+        position.put(DASHBOARD_ROW_ID, row);
+        position.put(chartKey, chart);
+        return position;
+    }
+
+    private Map<String, Object> buildTransparentMeta() {
+        Map<String, Object> meta = new HashMap<>();
+        meta.put("background", "BACKGROUND_TRANSPARENT");
+        return meta;
+    }
+
+    int resolveDashboardGridHeight(Integer dashboardHeight) {
+        int height =
+                dashboardHeight == null || dashboardHeight <= 0 ? DEFAULT_SINGLE_CHART_HEIGHT
+                        : dashboardHeight;
+        int gridHeight = Math.round(height / (float) DASHBOARD_GRID_UNIT);
+        return Math.max(1, gridHeight);
+    }
+
     private void updateChartParams(Long chartId, Long dashboardId, Map<String, Object> formData,
             String vizType, Long datasetId, ChartTemplateSnapshot template) {
         if (chartId == null) {
@@ -195,6 +279,8 @@ public class SupersetApiClient {
         if (StringUtils.isNotBlank(vizType)) {
             merged.put("viz_type", vizType);
         }
+        merged.put("show_title", false);
+        merged.put("show_chart_title", false);
         if (datasetId != null) {
             merged.put("datasource", datasetId + "__" + getDatasourceType());
         }
@@ -212,12 +298,14 @@ public class SupersetApiClient {
         resolvedUrlParams.put("expand_filters", "false");
         merged.put("url_params", resolvedUrlParams);
         normalizeAccessFields(merged);
+        sanitizeMetricOptionNames(merged);
         Map<String, Object> payload = new HashMap<>();
         payload.put("params", JsonUtil.toString(merged));
         Map<String, Object> templateContext = template == null ? null : template.queryContext;
         Map<String, Object> queryContext =
                 buildQueryContext(merged, datasetId, vizType, templateContext);
         if (queryContext != null) {
+            sanitizeQueryContext(queryContext);
             payload.put("query_context", JsonUtil.toString(queryContext));
             payload.put("query_context_generation", true);
         }
@@ -263,6 +351,7 @@ public class SupersetApiClient {
             templated = queries;
         }
         context.put("queries", templated);
+        sanitizeQueryContext(context);
         return context;
     }
 
@@ -345,6 +434,81 @@ public class SupersetApiClient {
                 formData.put("orderby", orderby);
             }
         }
+    }
+
+    private void sanitizeMetricOptionNames(Map<String, Object> formData) {
+        if (formData == null) {
+            return;
+        }
+        sanitizeMetricContainer(formData.get("metrics"));
+        sanitizeMetricContainer(formData.get("metric"));
+        sanitizeMetricContainer(formData.get("metrics_b"));
+        sanitizeOrderBy(formData.get("orderby"));
+    }
+
+    private void sanitizeQueryContext(Map<String, Object> queryContext) {
+        if (queryContext == null) {
+            return;
+        }
+        Object formData = queryContext.get("form_data");
+        if (formData instanceof Map) {
+            sanitizeMetricOptionNames((Map<String, Object>) formData);
+        }
+        Object queriesObj = queryContext.get("queries");
+        if (queriesObj instanceof List) {
+            for (Object item : (List<?>) queriesObj) {
+                if (item instanceof Map) {
+                    Map<String, Object> query = (Map<String, Object>) item;
+                    sanitizeMetricContainer(query.get("metrics"));
+                    sanitizeOrderBy(query.get("orderby"));
+                }
+            }
+        }
+    }
+
+    private void sanitizeMetricContainer(Object value) {
+        if (value instanceof List) {
+            for (Object item : (List<?>) value) {
+                if (item instanceof Map) {
+                    sanitizeMetricMap((Map<String, Object>) item);
+                }
+            }
+            return;
+        }
+        if (value instanceof Map) {
+            sanitizeMetricMap((Map<String, Object>) value);
+        }
+    }
+
+    private void sanitizeMetricMap(Map<String, Object> metric) {
+        if (metric == null) {
+            return;
+        }
+        Object optionName = metric.get("optionName");
+        if (optionName instanceof String) {
+            metric.put("optionName", normalizeMetricOptionName((String) optionName));
+        }
+    }
+
+    private void sanitizeOrderBy(Object orderby) {
+        if (!(orderby instanceof List)) {
+            return;
+        }
+        for (Object entry : (List<?>) orderby) {
+            if (entry instanceof List) {
+                List<?> order = (List<?>) entry;
+                if (!order.isEmpty() && order.get(0) instanceof Map) {
+                    sanitizeMetricMap((Map<String, Object>) order.get(0));
+                }
+            }
+        }
+    }
+
+    private String normalizeMetricOptionName(String value) {
+        if (StringUtils.isBlank(value)) {
+            return value;
+        }
+        return value.replaceAll("\\s+", "");
     }
 
     private List<Object> resolveMetricsForAccess(Map<String, Object> formData) {
@@ -739,7 +903,7 @@ public class SupersetApiClient {
 
 
     private Long createDashboard(String dashboardTitle) {
-        String title = StringUtils.defaultIfBlank(dashboardTitle, "supersonic_dashboard");
+        String title = sanitizeDashboardTitle(dashboardTitle);
         Map<String, Object> payload = new HashMap<>();
         payload.put("dashboard_title", title);
         log.debug("superset dashboard create payload, title={}, payload={}", title,
@@ -854,6 +1018,19 @@ public class SupersetApiClient {
 
     private Map<String, Object> post(String path, Object body) {
         return request(HttpMethod.POST, path, body);
+    }
+
+    private String sanitizeDashboardTitle(String dashboardTitle) {
+        String title = StringUtils.defaultIfBlank(dashboardTitle, "supersonic_dashboard");
+        String trimmed = title.trim();
+        if (trimmed.startsWith("supersonic_")) {
+            trimmed = trimmed.substring("supersonic_".length());
+        }
+        trimmed = trimmed.replaceAll("(?i)_supersonic(_|$)", "_");
+        trimmed = trimmed.replaceAll("(?i)_superset(_|$)", "_");
+        trimmed = trimmed.replaceAll("_(\\d+)(?:_\\d+)?$", "");
+        trimmed = trimmed.replace('_', ' ').trim();
+        return StringUtils.defaultIfBlank(trimmed, "supersonic_dashboard");
     }
 
     private Map<String, Object> put(String path, Object body) {

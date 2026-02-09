@@ -19,6 +19,7 @@ import java.lang.reflect.Field;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,6 +76,27 @@ public class SupersetApiClientTest {
         Assertions.assertEquals("supersonic-guest", userMap.get("username"));
         Assertions.assertEquals("Supersonic", userMap.get("first_name"));
         Assertions.assertEquals("Guest", userMap.get("last_name"));
+    }
+
+    @Test
+    public void testBuildDashboardPositionUsesFullWidth() {
+        SupersetApiClient client = new SupersetApiClient(new SupersetPluginConfig());
+        Map<String, Object> position = client.buildDashboardPosition(12L, 260);
+        Map<?, ?> root = (Map<?, ?>) position.get("ROOT_ID");
+        Map<?, ?> rootMeta = (Map<?, ?>) root.get("meta");
+        Assertions.assertEquals("BACKGROUND_TRANSPARENT", rootMeta.get("background"));
+        Map<?, ?> chart = (Map<?, ?>) position.get("CHART-12");
+        Map<?, ?> meta = (Map<?, ?>) chart.get("meta");
+        Assertions.assertEquals(12, meta.get("width"));
+        Assertions.assertEquals(Math.max(1, Math.round(260 / 8f)), meta.get("height"));
+        Assertions.assertEquals(false, meta.get("show_title"));
+    }
+
+    @Test
+    public void testSanitizeDashboardTitleRemovesSupersetSuffixes() {
+        SupersetApiClient client = new SupersetApiClient(new SupersetPluginConfig());
+        String title = client.sanitizeDashboardTitle("访问人数趋势图_supersonic_Superset_90_1");
+        Assertions.assertEquals("访问人数趋势图", title);
     }
 
     @Test
@@ -161,7 +183,18 @@ public class SupersetApiClientTest {
         List<?> queries = (List<?>) context.get("queries");
         Map<?, ?> query = (Map<?, ?>) queries.get(0);
         List<?> columns = (List<?>) query.get("columns");
-        Assertions.assertTrue(columns.contains("imp_date"));
+        boolean hasAxis = false;
+        for (Object column : columns) {
+            if (column instanceof Map) {
+                Object sqlExpression = ((Map<?, ?>) column).get("sqlExpression");
+                Object columnType = ((Map<?, ?>) column).get("columnType");
+                if ("imp_date".equals(sqlExpression) && "BASE_AXIS".equals(columnType)) {
+                    hasAxis = true;
+                    break;
+                }
+            }
+        }
+        Assertions.assertTrue(hasAxis);
         Assertions.assertTrue(columns.contains("city"));
         Assertions.assertEquals(Arrays.asList("city"), query.get("series_columns"));
         Assertions.assertEquals(Boolean.TRUE, query.get("is_timeseries"));
@@ -279,6 +312,30 @@ public class SupersetApiClientTest {
         Map<?, ?> query = (Map<?, ?>) queries.get(0);
         List<?> timeOffsets = (List<?>) query.get("time_offsets");
         Assertions.assertTrue(timeOffsets.contains("1 year"));
+    }
+
+    @Test
+    public void testBuildQueryContextSanitizesMetricOptionName() {
+        SupersetPluginConfig config = new SupersetPluginConfig();
+        SupersetApiClient client = new SupersetApiClient(config);
+        Map<String, Object> metric = new HashMap<>();
+        metric.put("optionName", "metric_ 访问人数");
+        metric.put("expressionType", "SIMPLE");
+        metric.put("label", "SUM(访问人数)");
+        metric.put("column", Collections.singletonMap("column_name", "访问人数"));
+        Map<String, Object> formData = new HashMap<>();
+        formData.put("metrics", Collections.singletonList(metric));
+
+        Map<String, Object> context = client.buildQueryContext(formData, 12L, "table");
+        Map<?, ?> formDataOut = (Map<?, ?>) context.get("form_data");
+        List<?> metrics = (List<?>) formDataOut.get("metrics");
+        Map<?, ?> metricOut = (Map<?, ?>) metrics.get(0);
+        Assertions.assertEquals("metric_访问人数", metricOut.get("optionName"));
+        List<?> queries = (List<?>) context.get("queries");
+        Map<?, ?> query = (Map<?, ?>) queries.get(0);
+        List<?> queryMetrics = (List<?>) query.get("metrics");
+        Map<?, ?> queryMetric = (Map<?, ?>) queryMetrics.get(0);
+        Assertions.assertEquals("metric_访问人数", queryMetric.get("optionName"));
     }
 
     private void replaceRestTemplate(SupersetApiClient client, RestTemplate restTemplate)
