@@ -56,3 +56,8 @@ knife4j:
     default:
       title: ChatBI API Documents
       description: ChatBI API Documents
+
+s2:
+  agent:
+    service:
+      response-timeout-minutes: ${S2_AGENT_SERVICE_RESPONSE_TIMEOUT_MINUTES:5}

@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS `s2_available_date_info` (
 
 
 CREATE TABLE IF NOT EXISTS `s2_chat` (
-                                         `chat_id` bigint(8) NOT NULL AUTO_INCREMENT,
+    `chat_id` bigint(8) NOT NULL AUTO_INCREMENT,
     `agent_id` int(11) DEFAULT NULL,
     `chat_name` varchar(300) DEFAULT NULL,
     `create_time` datetime DEFAULT NULL,
@@ -60,6 +60,12 @@ CREATE TABLE IF NOT EXISTS `s2_chat` (
     `is_delete` tinyint DEFAULT '0' COMMENT 'is deleted',
     `is_top` tinyint DEFAULT '0' COMMENT 'is top',
     PRIMARY KEY (`chat_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE IF NOT EXISTS `s2_chat_sessionid` (
+    `chat_id` bigint(20) NOT NULL,
+    `agent_id` bigint(20) NOT NULL,
+    `conversation_id` varchar(64) DEFAULT NULL,
+    UNIQUE KEY `uniq_chat_id` (`chat_id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `s2_chat_config` (

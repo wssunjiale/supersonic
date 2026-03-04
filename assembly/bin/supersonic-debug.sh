@@ -10,4 +10,6 @@ export S2_DB_USER=supersonic
 export S2_DB_PASSWORD=lsOOas!09243@kaAgla
 export S2_DB_DATABASE=supersonic
 
+export S2_AGENT_SERVICE_RESPONSE_TIMEOUT_MINUTES=10
+
 mvn spring-boot:run -pl launchers/standalone -Dspotless.skip=true
