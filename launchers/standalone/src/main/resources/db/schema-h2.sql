@@ -25,6 +25,13 @@ CREATE TABLE IF NOT EXISTS `s2_chat`
     ) ;
 
 
+CREATE TABLE IF NOT EXISTS `s2_chat_sessionid`
+(
+    `chat_id` BIGINT NOT NULL,
+    `agent_id` BIGINT NOT NULL,
+    `conversation_id` varchar(64) DEFAULT NULL,
+    UNIQUE (`chat_id`)
+    );
 CREATE TABLE IF NOT EXISTS `s2_chat_query`
 (
     `question_id`             BIGINT  NOT NULL AUTO_INCREMENT,

@@ -12,3 +12,8 @@ spring:
       password: ${S2_DB_PASSWORD:}
       schema-locations: classpath:db/schema-mysql.sql,classpath:db/schema-mysql-demo.sql
       data-locations: classpath:db/data-mysql.sql,classpath:db/data-mysql-demo.sql
+
+s2:
+  agent:
+    service:
+      response-timeout-minutes: ${S2_AGENT_SERVICE_RESPONSE_TIMEOUT_MINUTES:5}

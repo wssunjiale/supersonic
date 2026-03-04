@@ -53,7 +53,8 @@ public class ChatManageServiceImpl implements ChatManageService {
         chatDO.setLastQuestion("Hello, welcome to using supersonic");
         chatDO.setIsTop(0);
         chatDO.setAgentId(agentId);
-        return chatRepository.createChat(chatDO);
+        Long chatId = chatRepository.createChat(chatDO);
+        return chatId;
     }
 
     @Override

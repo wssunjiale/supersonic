@@ -61,6 +61,12 @@ CREATE TABLE IF NOT EXISTS `s2_chat` (
    `is_top` tinyint DEFAULT '0' COMMENT 'is top',
    PRIMARY KEY (`chat_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+CREATE TABLE IF NOT EXISTS `s2_chat_sessionid` (
+    `chat_id` bigint(20) NOT NULL,
+    `agent_id` bigint(20) NOT NULL,
+    `conversation_id` varchar(64) DEFAULT NULL,
+    UNIQUE KEY `uniq_chat_id` (`chat_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `s2_chat_config` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,

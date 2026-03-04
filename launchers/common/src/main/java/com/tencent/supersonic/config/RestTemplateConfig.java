@@ -1,8 +1,13 @@
 package com.tencent.supersonic.config;
 
+
+
+import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.LaxRedirectStrategy;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.core5.util.Timeout;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -14,6 +19,9 @@ import java.nio.charset.StandardCharsets;
 @Configuration
 public class RestTemplateConfig {
 
+    @Value("${s2.agent.service.response-timeout-minutes}")
+    private long agentServiceResponseTimeoutMinutes;
+
     @Bean
     public RestTemplate restTemplate() {
 
@@ -24,13 +32,37 @@ public class RestTemplateConfig {
                 HttpClientBuilder.create().setRedirectStrategy(new LaxRedirectStrategy()) // 使用宽松重定向策略
                         .build();
 
-        HttpComponentsClientHttpRequestFactory httpRequestFactory = new HttpComponentsClientHttpRequestFactory(
-                httpClient);
+        HttpComponentsClientHttpRequestFactory httpRequestFactory =
+                new HttpComponentsClientHttpRequestFactory(httpClient);
         httpRequestFactory.setConnectionRequestTimeout(2000);
         httpRequestFactory.setConnectTimeout(10000);
 
         RestTemplate restTemplate = new RestTemplate(httpRequestFactory);
-        restTemplate.getMessageConverters().set(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
+        restTemplate.getMessageConverters().set(1,
+                new StringHttpMessageConverter(StandardCharsets.UTF_8));
+        return restTemplate;
+    }
+
+    @Bean(name = "agentRestTemplate")
+    public RestTemplate agentRestTemplate() {
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setConnectionRequestTimeout(Timeout.ofMilliseconds(2000))
+                .setConnectTimeout(Timeout.ofMilliseconds(10000))
+                .setResponseTimeout(Timeout.ofMinutes(agentServiceResponseTimeoutMinutes)).build();
+        CloseableHttpClient httpClient =
+                // HttpClientBuilder.create().setRedirectStrategy(new DefaultRedirectStrategy()) //
+                // 使用宽松重定向策略
+                HttpClientBuilder.create().setRedirectStrategy(new LaxRedirectStrategy()) // 使用宽松重定向策略
+                        .setDefaultRequestConfig(requestConfig).build();
+
+        HttpComponentsClientHttpRequestFactory httpRequestFactory =
+                new HttpComponentsClientHttpRequestFactory(httpClient);
+        httpRequestFactory.setConnectionRequestTimeout(2000);
+        httpRequestFactory.setConnectTimeout(10000);
+
+        RestTemplate restTemplate = new RestTemplate(httpRequestFactory);
+        restTemplate.getMessageConverters().set(1,
+                new StringHttpMessageConverter(StandardCharsets.UTF_8));
         return restTemplate;
     }
 }

@@ -14,6 +14,9 @@ spring:
       data-locations: classpath:db/data-postgres.sql,classpath:db/data-postgres-demo.sql
 
 s2:
+  agent:
+    service:
+      response-timeout-minutes: ${S2_AGENT_SERVICE_RESPONSE_TIMEOUT_MINUTES:5}
   embedding:
     store:
       provider: PGVECTOR

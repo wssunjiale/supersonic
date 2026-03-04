@@ -56,6 +56,12 @@ CREATE TABLE IF NOT EXISTS s2_chat (
     is_top smallint DEFAULT 0
 );
 
+CREATE TABLE IF NOT EXISTS s2_chat_sessionid (
+    chat_id bigint NOT NULL,
+    agent_id bigint NOT NULL,
+    conversation_id varchar(64) DEFAULT NULL,
+    UNIQUE(chat_id)
+);
 CREATE TABLE IF NOT EXISTS s2_chat_config (
     id SERIAL PRIMARY KEY,
     model_id bigint DEFAULT NULL,
