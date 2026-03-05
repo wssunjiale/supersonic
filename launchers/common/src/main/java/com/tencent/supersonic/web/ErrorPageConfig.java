@@ -29,9 +29,10 @@ public class ErrorPageConfig implements ErrorPageRegistrar, HandlerExceptionReso
     }
 
     @Override
-    public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object handler,
-            Exception ex) {
-        if (handler instanceof ResourceHttpRequestHandler && ex instanceof NoResourceFoundException) {
+    public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response,
+            Object handler, Exception ex) {
+        if (handler instanceof ResourceHttpRequestHandler
+                && ex instanceof NoResourceFoundException) {
             ModelAndView modelAndView = new ModelAndView("/webapp/index.html");
             response.setStatus(HttpStatus.OK.value());
             return modelAndView;

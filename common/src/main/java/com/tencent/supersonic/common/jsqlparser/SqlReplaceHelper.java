@@ -479,19 +479,37 @@ public class SqlReplaceHelper {
 
     public static String replaceAliasFieldName(String sql, Map<String, String> fieldNameMap) {
         Select selectStatement = SqlSelectHelper.getSelect(sql);
-        if (!(selectStatement instanceof PlainSelect)) {
+        if (selectStatement == null) {
             return sql;
         }
-        PlainSelect plainSelect = (PlainSelect) selectStatement;
-        FieldAliasReplaceNameVisitor visitor = new FieldAliasReplaceNameVisitor(fieldNameMap);
-        for (SelectItem selectItem : plainSelect.getSelectItems()) {
-            selectItem.accept(visitor);
+
+        List<PlainSelect> plainSelects =
+                SqlSelectHelper.getPlainSelects(SqlSelectHelper.getPlainSelect(selectStatement));
+        if (CollectionUtils.isEmpty(plainSelects)) {
+            return selectStatement.toString();
         }
-        Map<String, String> aliasToActualExpression = visitor.getAliasToActualExpression();
-        if (Objects.nonNull(aliasToActualExpression) && !aliasToActualExpression.isEmpty()) {
-            return replaceFields(selectStatement.toString(), aliasToActualExpression, true);
+
+        Map<String, String> aliasToActualExpression = new HashMap<>();
+        for (PlainSelect plainSelect : plainSelects) {
+            if (plainSelect == null || CollectionUtils.isEmpty(plainSelect.getSelectItems())) {
+                continue;
+            }
+            FieldAliasReplaceNameVisitor visitor = new FieldAliasReplaceNameVisitor(fieldNameMap);
+            for (SelectItem selectItem : plainSelect.getSelectItems()) {
+                selectItem.accept(visitor);
+            }
+            Map<String, String> subAliasToActualExpression = visitor.getAliasToActualExpression();
+            if (Objects.nonNull(subAliasToActualExpression)
+                    && !subAliasToActualExpression.isEmpty()) {
+                aliasToActualExpression.putAll(subAliasToActualExpression);
+            }
         }
-        return selectStatement.toString();
+
+        String replaced = selectStatement.toString();
+        if (aliasToActualExpression.isEmpty()) {
+            return replaced;
+        }
+        return replaceFields(replaced, aliasToActualExpression, true);
     }
 
     public static String replaceAliasWithBackticks(String sql) {

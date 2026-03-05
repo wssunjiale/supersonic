@@ -11,6 +11,17 @@ import java.util.List;
 class SqlSelectHelperTest {
 
     @Test
+    void testGetAllSelectFieldsIncludesJoinOnAndUsing() {
+        List<String> allFields = SqlSelectHelper.getAllSelectFields(
+                "SELECT a.x FROM t1 a JOIN t2 b ON a.id = b.id WHERE a.ds = '2026-03-05'");
+        Assert.assertTrue(allFields.contains("id"));
+        Assert.assertTrue(allFields.contains("ds"));
+
+        allFields = SqlSelectHelper.getAllSelectFields("SELECT a.x FROM t1 a JOIN t2 b USING (id)");
+        Assert.assertTrue(allFields.contains("id"));
+    }
+
+    @Test
     void testGetWhereFilterExpression() {
 
         Select selectStatement = SqlSelectHelper

@@ -367,6 +367,20 @@ class SqlReplaceHelperTest {
     }
 
     @Test
+    void testReplaceAliasFieldNameWithWith() {
+        Map<String, String> map = new HashMap<>();
+        map.put("总销售金额", "total_sales_amount");
+        String sql =
+                "WITH 产品销售额 AS (SELECT product_key, SUM(sales_amount) AS 总销售金额 FROM t GROUP BY product_key) "
+                        + "SELECT product_key, 总销售金额 FROM 产品销售额 ORDER BY 总销售金额 DESC";
+        String replaceSql = SqlReplaceHelper.replaceAliasFieldName(sql, map);
+        Assert.assertEquals(
+                "WITH 产品销售额 AS (SELECT product_key, SUM(sales_amount) AS total_sales_amount FROM t GROUP BY product_key) "
+                        + "SELECT product_key, total_sales_amount FROM 产品销售额 ORDER BY total_sales_amount DESC",
+                replaceSql);
+    }
+
+    @Test
     void testReplaceAggAliasOrderbyField() {
         String sql = "SELECT SUM(访问次数) AS top10总播放量 FROM (SELECT 部门, SUM(访问次数) AS 访问次数 FROM 超音数  "
                 + "GROUP BY 部门 ORDER BY SUM(访问次数) DESC LIMIT 10) AS top10";

@@ -318,11 +318,10 @@ public class SupersetSyncService {
                                             "superset dataset fetch failed after create, skip update, id={}",
                                             createdId);
                                 } else {
-                                SupersetDatasetInfo merged =
-                                        mergeDatasetSchema(expected, current,
-                                                properties.getSync().isRebuild());
-                                syncClient.updateDataset(createdId, merged);
-                            }
+                                    SupersetDatasetInfo merged = mergeDatasetSchema(expected,
+                                            current, properties.getSync().isRebuild());
+                                    syncClient.updateDataset(createdId, merged);
+                                }
                             }
                             stats.incCreated();
                             registryService.updateSyncInfo(dataset.getId(), createdId, new Date());

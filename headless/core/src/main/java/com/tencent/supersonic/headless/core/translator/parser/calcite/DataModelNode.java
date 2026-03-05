@@ -66,6 +66,29 @@ public class DataModelNode extends SemanticNode {
         return buildAs(dataModel.getName(), source);
     }
 
+    static String normalizePostgresqlTableQuery(String tableQuery) {
+        if (tableQuery == null) {
+            return null;
+        }
+        String trimmed = tableQuery.trim();
+        if (trimmed.isEmpty()) {
+            return trimmed;
+        }
+        // PostgreSQL does not support 3-part identifiers (db.schema.table). If a table query is
+        // configured as 3-part, drop the catalog/db prefix and keep schema.table.
+        List<String> parts =
+                Arrays.stream(trimmed.split("\\.")).filter(p -> p != null && !p.isBlank())
+                        .map(String::trim).collect(Collectors.toList());
+        if (parts.size() == 1) {
+            // default to public schema when only table name is provided
+            return "public." + parts.get(0);
+        }
+        if (parts.size() == 2) {
+            return parts.get(0) + "." + parts.get(1);
+        }
+        return parts.get(parts.size() - 2) + "." + parts.get(parts.size() - 1);
+    }
+
     private static void addSchema(SqlValidatorScope scope, ModelResp datasource, String table)
             throws Exception {
         Map<String, Set<String>> sqlTable = SqlSelectHelper.getFieldsWithSubQuery(table);

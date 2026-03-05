@@ -45,12 +45,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -58,6 +61,9 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 public class SqlSelectHelper {
+
+    private static final Pattern USING_CLAUSE_PATTERN =
+            Pattern.compile("(?i)\\bUSING\\s*\\(([^)]*)\\)");
 
     public static List<FieldExpression> getFilterExpression(String sql) {
         List<PlainSelect> plainSelectList = getPlainSelect(sql);
@@ -223,12 +229,27 @@ public class SqlSelectHelper {
     }
 
     public static Select getSelect(String sql) {
-        Statement statement = null;
+        Statement statement;
         try {
             statement = CCJSqlParserUtil.parse(sql);
-        } catch (JSQLParserException e) {
-            log.error("parse error, sql:{}", sql, e);
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            // JSqlParser may throw RuntimeException (e.g. IndexOutOfBoundsException) for some SQL
+            // dialect fragments. One known case is JOIN ... USING (...). For our parsing-only
+            // usage,
+            // rewrite USING to a noop ON clause and extract USING columns separately.
+            if (containsUsingClause(sql)) {
+                String rewrittenSql = rewriteUsingToOnNoop(sql);
+                try {
+                    statement = CCJSqlParserUtil.parse(rewrittenSql);
+                } catch (Exception retryException) {
+                    log.error("parse error (rewrite USING fallback failed), sql:{}", sql,
+                            retryException);
+                    throw new RuntimeException(retryException);
+                }
+            } else {
+                log.error("parse error, sql:{}", sql, e);
+                throw new RuntimeException(e);
+            }
         }
 
         if (statement instanceof ParenthesedSelect) {
@@ -292,6 +313,9 @@ public class SqlSelectHelper {
             results.addAll(fields);
             aliases.addAll(subaliases);
         }
+        // Ensure fields referenced by JOIN ... USING (...) are included even when the SQL is
+        // rewritten for parser compatibility.
+        results.addAll(extractUsingColumns(sql));
         // do not account in aliases
         results.removeAll(aliases);
         return new ArrayList<>(
@@ -323,6 +347,10 @@ public class SqlSelectHelper {
         getHavingFields(plainSelect, havingFields);
         havingFields.removeAll(aliases);
 
+        Set<String> joinFields = Sets.newHashSet();
+        getJoinFields(plainSelect, joinFields);
+        joinFields.removeAll(aliases);
+
         Set<String> lateralFields = Sets.newHashSet();
         getLateralViewsFields(plainSelect, lateralFields);
         lateralFields.removeAll(aliases);
@@ -333,6 +361,7 @@ public class SqlSelectHelper {
         results.addAll(orderByFields);
         results.addAll(whereFields);
         results.addAll(havingFields);
+        results.addAll(joinFields);
         results.addAll(lateralFields);
         return new ArrayList<>(results);
     }
@@ -353,6 +382,89 @@ public class SqlSelectHelper {
                 }
             });
         }
+    }
+
+    private static void getJoinFields(PlainSelect plainSelect, Set<String> result) {
+        List<Join> joinList = plainSelect.getJoins();
+        if (CollectionUtils.isEmpty(joinList)) {
+            return;
+        }
+        FieldAcquireVisitor fieldAcquireVisitor = new FieldAcquireVisitor(result);
+        for (Join join : joinList) {
+            if (join == null) {
+                continue;
+            }
+            try {
+                Collection<Expression> onExpressions = join.getOnExpressions();
+                if (!CollectionUtils.isEmpty(onExpressions)) {
+                    for (Expression onExpression : onExpressions) {
+                        if (onExpression != null) {
+                            onExpression.accept(fieldAcquireVisitor);
+                        }
+                    }
+                } else if (join.getOnExpression() != null) {
+                    join.getOnExpression().accept(fieldAcquireVisitor);
+                }
+
+                // Some versions of JSqlParser may throw RuntimeException when accessing USING
+                // columns. Since this helper is best-effort for field extraction, treat such cases
+                // as "no USING columns" and rely on regex extraction fallback in
+                // getAllSelectFields().
+                List<Column> usingColumns = join.getUsingColumns();
+                if (!CollectionUtils.isEmpty(usingColumns)) {
+                    usingColumns.stream().filter(Objects::nonNull).map(Column::getColumnName)
+                            .forEach(result::add);
+                }
+            } catch (RuntimeException ignored) {
+                // ignore
+            }
+        }
+    }
+
+    private static boolean containsUsingClause(String sql) {
+        if (StringUtils.isBlank(sql)) {
+            return false;
+        }
+        return USING_CLAUSE_PATTERN.matcher(sql).find();
+    }
+
+    private static String rewriteUsingToOnNoop(String sql) {
+        if (StringUtils.isBlank(sql)) {
+            return sql;
+        }
+        return USING_CLAUSE_PATTERN.matcher(sql).replaceAll("ON 1 = 1");
+    }
+
+    private static Set<String> extractUsingColumns(String sql) {
+        Set<String> columns = Sets.newHashSet();
+        if (StringUtils.isBlank(sql)) {
+            return columns;
+        }
+        Matcher matcher = USING_CLAUSE_PATTERN.matcher(sql);
+        while (matcher.find()) {
+            String inside = matcher.group(1);
+            if (StringUtils.isBlank(inside)) {
+                continue;
+            }
+            for (String raw : inside.split(",")) {
+                if (raw == null) {
+                    continue;
+                }
+                String col = raw.trim();
+                if (col.isEmpty()) {
+                    continue;
+                }
+                col = col.replace("`", "").replace("\"", "").replace("[", "").replace("]", "");
+                int dotIndex = col.lastIndexOf('.');
+                if (dotIndex >= 0 && dotIndex < col.length() - 1) {
+                    col = col.substring(dotIndex + 1);
+                }
+                if (!col.isEmpty()) {
+                    columns.add(col);
+                }
+            }
+        }
+        return columns;
     }
 
     public static List<Expression> getHavingExpression(String sql) {

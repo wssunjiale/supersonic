@@ -58,8 +58,13 @@ public class MetricExpressionParser implements QueryParser {
         semanticSchema.getModelResps().forEach(modelResp -> {
             allFields.addAll(modelResp.getFieldList());
             if (modelResp.getModelDetail().getMeasures() != null) {
-                modelResp.getModelDetail().getMeasures()
-                        .forEach(measure -> allMeasures.put(measure.getBizName(), measure));
+                modelResp.getModelDetail().getMeasures().forEach(measure -> {
+                    if (StringUtils.isBlank(measure.getBizName())) {
+                        return;
+                    }
+                    allMeasures.put(measure.getBizName(), measure);
+                    allMeasures.put(measure.getBizName().toLowerCase(Locale.ROOT), measure);
+                });
             }
         });
 
@@ -105,16 +110,22 @@ public class MetricExpressionParser implements QueryParser {
                         break;
                     case MEASURE:
                         // if defineType=MEASURE, field should be the bizName of its measure
-                        if (allMeasures.containsKey(field)) {
-                            Measure measure = allMeasures.get(field);
-                            String expr = metricExpr;
-                            if (StringUtils.isNotBlank(measure.getAgg())) {
-                                expr = String.format("%s (%s)", measure.getAgg(), metricExpr);
-                            }
-                            replace.put(field, expr);
+                        Measure measure = getMeasure(allMeasures, field);
+                        if (measure != null) {
+                            replace.put(field, buildMeasureExpr(measure, true));
                         }
                         break;
                     case FIELD:
+                        // if defineType=FIELD, field should be the physical field name; however,
+                        // some
+                        // expressions may still reference measure bizName (e.g. from UI tokens). In
+                        // that
+                        // case, replace it with its physical expression without adding aggregation.
+                        Measure measureInField = getMeasure(allMeasures, field);
+                        if (measureInField != null) {
+                            replace.put(field, buildMeasureExpr(measureInField, false));
+                        }
+                        break;
                     default:
                         break;
                 }
@@ -126,6 +137,34 @@ public class MetricExpressionParser implements QueryParser {
             }
         }
         return metricExpr;
+    }
+
+    private Measure getMeasure(Map<String, Measure> allMeasures, String field) {
+        if (allMeasures == null || StringUtils.isBlank(field)) {
+            return null;
+        }
+        Measure measure = allMeasures.get(field);
+        if (measure != null) {
+            return measure;
+        }
+        return allMeasures.get(field.toLowerCase(Locale.ROOT));
+    }
+
+    /**
+     * Build the physical expression for a measure. When {@code withAgg} is true, use the measure's
+     * aggregation function (if configured) on top of {@code measure.expr}. Note: measure.bizName is
+     * a semantic identifier and may not exist as a physical column name.
+     */
+    private String buildMeasureExpr(Measure measure, boolean withAgg) {
+        if (measure == null) {
+            return "";
+        }
+        String physicalExpr = StringUtils.defaultIfBlank(measure.getExpr(), measure.getBizName());
+        physicalExpr = String.format("(%s)", physicalExpr);
+        if (withAgg && StringUtils.isNotBlank(measure.getAgg())) {
+            return String.format("%s(%s)", measure.getAgg().trim(), physicalExpr);
+        }
+        return physicalExpr;
     }
 
 }

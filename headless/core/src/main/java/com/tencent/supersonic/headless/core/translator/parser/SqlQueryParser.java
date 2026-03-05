@@ -182,6 +182,7 @@ public class SqlQueryParser implements QueryParser {
         log.debug("dataSetId:{},convert name to bizName before:{}", queryStatement.getDataSetId(),
                 sql);
         sql = SqlReplaceHelper.replaceFields(sql, fieldNameToBizNameMap, true);
+        sql = SqlReplaceHelper.replaceAliasFieldName(sql, fieldNameToBizNameMap);
         log.debug("dataSetId:{},convert name to bizName after:{}", queryStatement.getDataSetId(),
                 sql);
         sql = SqlReplaceHelper.replaceTable(sql,
