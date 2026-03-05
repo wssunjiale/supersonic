@@ -159,7 +159,10 @@ public class MetricExpressionParser implements QueryParser {
         if (measure == null) {
             return "";
         }
-        String physicalExpr = StringUtils.defaultIfBlank(measure.getExpr(), measure.getBizName());
+        // Prefer measure.expr (physical expression) and fall back to alias if expr is missing.
+        // measure.bizName is a semantic identifier and should be used only as the last resort.
+        String physicalExpr = StringUtils.defaultIfBlank(measure.getExpr(),
+                StringUtils.defaultIfBlank(measure.getAlias(), measure.getBizName()));
         physicalExpr = String.format("(%s)", physicalExpr);
         if (withAgg && StringUtils.isNotBlank(measure.getAgg())) {
             return String.format("%s(%s)", measure.getAgg().trim(), physicalExpr);

@@ -483,6 +483,8 @@ public class SupersetDatasetRegistryServiceImpl
                 }
                 SupersetDatasetColumn column = new SupersetDatasetColumn();
                 column.setColumnName(name);
+                column.setVerboseName(element.getName());
+                column.setDescription(element.getDescription());
                 column.setGroupby(true);
                 column.setFilterable(true);
                 if (element.isPartitionTime()) {
@@ -503,6 +505,8 @@ public class SupersetDatasetRegistryServiceImpl
                 }
                 SupersetDatasetColumn column = new SupersetDatasetColumn();
                 column.setColumnName(name);
+                column.setVerboseName(element.getName());
+                column.setDescription(element.getDescription());
                 column.setGroupby(false);
                 column.setFilterable(false);
                 column.setType("NUMBER");
@@ -527,7 +531,8 @@ public class SupersetDatasetRegistryServiceImpl
             }
             SupersetDatasetMetric metric = new SupersetDatasetMetric();
             metric.setMetricName(name);
-            metric.setExpression(name);
+            String agg = StringUtils.defaultIfBlank(element.getDefaultAgg(), "SUM").toUpperCase();
+            metric.setExpression(agg + "(" + name + ")");
             metric.setMetricType("SQL");
             metric.setVerboseName(element.getName());
             metric.setDescription(element.getDescription());
@@ -540,10 +545,10 @@ public class SupersetDatasetRegistryServiceImpl
         if (element == null) {
             return null;
         }
-        if (StringUtils.isNotBlank(element.getName())) {
-            return element.getName();
+        if (StringUtils.isNotBlank(element.getBizName())) {
+            return element.getBizName();
         }
-        return element.getBizName();
+        return element.getName();
     }
 
     private String resolveMainDttmCol(List<SupersetDatasetColumn> columns) {

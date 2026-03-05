@@ -27,3 +27,7 @@ authentication:
     http:
       header:
         key: Authorization
+
+s2:
+  mapper:
+    strategy: LLM

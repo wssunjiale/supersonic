@@ -46,8 +46,12 @@ public class TimeCorrector extends BaseSemanticCorrector {
                 || Objects.isNull(dataSetSchema.getPartitionDimension().getName())) {
             return;
         }
-        String partitionDimension = dataSetSchema.getPartitionDimension().getName();
-        if (CollectionUtils.isEmpty(whereFields) || !whereFields.contains(partitionDimension)) {
+        String partitionName = dataSetSchema.getPartitionDimension().getName();
+        String partitionBizName = dataSetSchema.getPartitionDimension().getBizName();
+        boolean hasPartitionCond = !CollectionUtils.isEmpty(whereFields)
+                && (whereFields.contains(partitionName) || (StringUtils.isNotBlank(partitionBizName)
+                        && whereFields.contains(partitionBizName)));
+        if (!hasPartitionCond) {
             TimeDefaultConfig timeConfig;
             QueryConfig queryConfig = dataSetSchema.getQueryConfig();
             if (QueryType.AGGREGATE.equals(semanticParseInfo.getQueryType())) {
@@ -63,6 +67,14 @@ public class TimeCorrector extends BaseSemanticCorrector {
                 correctS2SQL = SqlAddHelper.addParenthesisToWhere(correctS2SQL);
                 String startDateLeft = dateRange.getLeft();
                 String endDateRight = dateRange.getRight();
+                // Keep the time field token consistent with the existing SQL: prefer bizName when
+                // the SQL already uses bizName somewhere, otherwise fall back to name.
+                String partitionDimension = partitionName;
+                if (StringUtils.isNotBlank(partitionBizName) && (correctS2SQL
+                        .contains(partitionBizName)
+                        || (whereFields != null && whereFields.contains(partitionBizName)))) {
+                    partitionDimension = partitionBizName;
+                }
                 String condExpr = String.format(" ( %s >= '%s'  and %s <= '%s' )",
                         partitionDimension, startDateLeft, partitionDimension, endDateRight);
                 correctS2SQL = addConditionToSQL(correctS2SQL, condExpr);
@@ -72,6 +84,10 @@ public class TimeCorrector extends BaseSemanticCorrector {
     }
 
     private void addLowerBoundDate(SemanticParseInfo semanticParseInfo) {
+        if (semanticParseInfo == null || semanticParseInfo.getDateInfo() == null
+                || StringUtils.isBlank(semanticParseInfo.getDateInfo().getDateField())) {
+            return;
+        }
         String correctS2SQL = semanticParseInfo.getSqlInfo().getCorrectedS2SQL();
         DateBoundInfo dateBoundInfo = SqlDateSelectHelper.getDateBoundInfo(correctS2SQL,
                 semanticParseInfo.getDateInfo().getDateField());

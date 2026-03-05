@@ -33,6 +33,7 @@ s2:
           key: Authorization
 
   mapper:
+    strategy: LLM
     name:
       threshold: 0.30
       min:
