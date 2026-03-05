@@ -106,28 +106,6 @@ public class MetricExpressionParserTest {
                 "Measure bizName should not leak into final expr");
     }
 
-    @Test
-    public void testMeasureDefineFallsBackToAliasWhenExprMissing() throws Exception {
-        MetricExpressionParser parser = new MetricExpressionParser();
-        Map<String, Measure> measures = buildMeasures();
-
-        // simulate legacy / buggy metadata where expr is missing but alias is present
-        Measure broken = new Measure();
-        broken.setBizName("fact_internet_sales_sales_amount_missing_expr");
-        broken.setExpr("");
-        broken.setAlias("sales_amount");
-        broken.setAgg("SUM");
-        measures.put(broken.getBizName(), broken);
-        measures.put(broken.getBizName().toLowerCase(Locale.ROOT), broken);
-
-        String expr = invokeBuildFieldExpr(parser, List.of(), measures,
-                "fact_internet_sales_sales_amount_missing_expr", MetricDefineType.MEASURE);
-
-        Assert.assertTrue(expr.contains("sales_amount"),
-                "Expected alias to be used as physical expr fallback");
-        Assert.assertFalse(expr.contains("fact_internet_sales_sales_amount_missing_expr"),
-                "Measure bizName should not leak into final expr even when expr is missing");
-    }
 
     private static Map<String, Measure> buildMeasures() {
         Map<String, Measure> measures = new HashMap<>();

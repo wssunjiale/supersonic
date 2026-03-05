@@ -155,6 +155,12 @@ public class SupersetSemanticDatasetMapper {
             if (dim == null || StringUtils.isBlank(dim.getBizName())) {
                 continue;
             }
+            if (!isValidSemanticIdentifier(dim.getBizName())) {
+                log.warn(
+                        "superset semantic dataset ignore invalid dimension bizName, dataSetId={}, bizName={}",
+                        dataSetId, dim.getBizName());
+                continue;
+            }
             String dimKey = dim.getBizName().toLowerCase(Locale.ROOT);
             if (!seenColumnNamesLower.add(dimKey)) {
                 continue;
@@ -180,6 +186,9 @@ public class SupersetSemanticDatasetMapper {
             if (StringUtils.isBlank(field)) {
                 continue;
             }
+            if (!isValidSemanticIdentifier(field)) {
+                continue;
+            }
             String fieldKey = field.toLowerCase(Locale.ROOT);
             if (!seenColumnNamesLower.add(fieldKey)) {
                 continue;
@@ -203,9 +212,7 @@ public class SupersetSemanticDatasetMapper {
             return null;
         }
 
-        List<String> selectSqlItems = selectItems.stream().map(this::toS2SelectItem)
-                .collect(Collectors.toList());
-        String s2sql = "SELECT " + String.join(", ", selectSqlItems) + " FROM t_" + dataSetId;
+        String s2sql = "SELECT " + String.join(", ", selectItems) + " FROM t_" + dataSetId;
         String translatedSql = translateToPhysicalSql(dataSetId, s2sql, user);
         if (StringUtils.isBlank(translatedSql)) {
             log.warn("superset semantic dataset skip, translate failed, dataSetId={}", dataSetId);
@@ -300,23 +307,20 @@ public class SupersetSemanticDatasetMapper {
         if ("_".equals(token)) {
             return false;
         }
-        if (!token.matches("[A-Za-z_][A-Za-z0-9_]*")) {
+        if (!isValidSemanticIdentifier(token)) {
             return false;
         }
         return !DEPENDENCY_TOKEN_IGNORE.contains(token.toLowerCase(Locale.ROOT));
     }
 
-    private String toS2SelectItem(String columnName) {
-        String name = StringUtils.trimToNull(columnName);
-        if (name == null) {
-            return null;
+    private boolean isValidSemanticIdentifier(String token) {
+        if (StringUtils.isBlank(token)) {
+            return false;
         }
-        if (name.matches("[A-Za-z_][A-Za-z0-9_]*")) {
-            return name;
+        if ("_".equals(token)) {
+            return false;
         }
-        // Backticks match existing semantic SQL style in the translator logs.
-        String escaped = name.replace("`", "``");
-        return "`" + escaped + "`";
+        return token.matches("[A-Za-z_][A-Za-z0-9_]*");
     }
 
     private String translateToPhysicalSql(Long dataSetId, String s2sql, User user) {

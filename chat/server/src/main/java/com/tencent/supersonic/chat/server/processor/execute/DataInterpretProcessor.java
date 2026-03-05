@@ -6,6 +6,7 @@ import com.tencent.supersonic.chat.server.pojo.ExecuteContext;
 import com.tencent.supersonic.common.pojo.ChatApp;
 import com.tencent.supersonic.common.pojo.enums.AppModule;
 import com.tencent.supersonic.common.util.ChatAppManager;
+import com.tencent.supersonic.headless.api.pojo.response.QueryState;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.input.Prompt;
@@ -15,6 +16,7 @@ import dev.langchain4j.provider.ModelProvider;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,6 +36,9 @@ public class DataInterpretProcessor implements ExecuteResultProcessor {
             + "result data queried from the databases, please interpret the data and organize a brief answer."
             + "\n#Rules: " + "\n1.ALWAYS respond in the use the same language as the `#Question`."
             + "\n2.ALWAYS reference some key data in the `#Answer`."
+            + "\n3.If `#Data` is empty or contains no data rows, clearly state that no data was found, "
+            + "briefly explain that a summary cannot be computed, and suggest how to adjust the query. "
+            + "Do NOT output placeholder templates."
             + "\n#Question:{{question}} #Data:{{data}} #Answer:";
 
     public DataInterpretProcessor() {
@@ -52,6 +57,20 @@ public class DataInterpretProcessor implements ExecuteResultProcessor {
     @Override
     public void process(ExecuteContext executeContext) {
         QueryResult queryResult = executeContext.getResponse();
+        if (queryResult == null) {
+            return;
+        }
+
+        if (queryResult.getQueryState() != QueryState.SUCCESS) {
+            return;
+        }
+
+        if (CollectionUtils.isEmpty(queryResult.getQueryResults())) {
+            queryResult
+                    .setTextSummary(buildNoDataSummary(executeContext.getRequest().getQueryText()));
+            return;
+        }
+
         Agent agent = executeContext.getAgent();
         ChatApp chatApp = agent.getChatAppConfig().get(APP_KEY);
 
@@ -69,5 +88,31 @@ public class DataInterpretProcessor implements ExecuteResultProcessor {
         if (StringUtils.isNotBlank(anwser)) {
             queryResult.setTextSummary(anwser);
         }
+    }
+
+    private String buildNoDataSummary(String question) {
+        if (containsCjk(question)) {
+            return "本次查询未返回任何数据行，因此无法进行统计总结。建议：放宽时间范围或筛选条件、核对维度/指标口径与取值、确认数据源是否有数据或权限。";
+        }
+        return "This query returned no data rows, so there is nothing to summarize. "
+                + "Try relaxing the time range/filters, verifying dimension/metric definitions and values, "
+                + "or checking data availability/permissions.";
+    }
+
+    private boolean containsCjk(String text) {
+        if (StringUtils.isBlank(text)) {
+            return false;
+        }
+        for (int i = 0; i < text.length(); i++) {
+            Character.UnicodeBlock block = Character.UnicodeBlock.of(text.charAt(i));
+            if (block == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS
+                    || block == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A
+                    || block == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B
+                    || block == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS
+                    || block == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS_SUPPLEMENT) {
+                return true;
+            }
+        }
+        return false;
     }
 }

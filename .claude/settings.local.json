@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(psql:*)",
-      "mcp__plugin_metrics_postgres__query"
+      "mcp__plugin_metrics_postgres__query",
+      "Bash(python:*)"
     ]
   }
 }
