@@ -23,11 +23,13 @@ import com.tencent.supersonic.headless.api.pojo.response.MetricResp;
 import com.tencent.supersonic.headless.server.persistence.dataobject.DataSetDO;
 import com.tencent.supersonic.headless.server.persistence.mapper.DataSetDOMapper;
 import com.tencent.supersonic.headless.server.service.*;
+import com.tencent.supersonic.headless.server.sync.superset.semantic.SupersetSemanticDatasetChangedEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -52,6 +54,9 @@ public class DataSetServiceImpl extends ServiceImpl<DataSetDOMapper, DataSetDO>
     @Autowired
     private MetricService metricService;
 
+    @Autowired(required = false)
+    private ApplicationEventPublisher eventPublisher;
+
     @Override
     public DataSetResp save(DataSetReq dataSetReq, User user) {
         dataSetReq.createdBy(user.getName());
@@ -61,6 +66,7 @@ public class DataSetServiceImpl extends ServiceImpl<DataSetDOMapper, DataSetDO>
         DataSetResp dataSetResp = convert(dataSetDO);
         save(dataSetDO);
         dataSetResp.setId(dataSetDO.getId());
+        publishSemanticDatasetChangedEvent(dataSetDO.getId(), user);
         return dataSetResp;
     }
 
@@ -71,7 +77,19 @@ public class DataSetServiceImpl extends ServiceImpl<DataSetDOMapper, DataSetDO>
         DataSetResp dataSetResp = convert(dataSetDO);
         // conflictCheck(dataSetResp);
         updateById(dataSetDO);
+        publishSemanticDatasetChangedEvent(dataSetDO.getId(), user);
         return dataSetResp;
+    }
+
+    private void publishSemanticDatasetChangedEvent(Long dataSetId, User user) {
+        if (eventPublisher == null || dataSetId == null) {
+            return;
+        }
+        try {
+            eventPublisher.publishEvent(new SupersetSemanticDatasetChangedEvent(dataSetId, user));
+        } catch (Exception ex) {
+            log.debug("publish semantic dataset changed event failed, dataSetId={}", dataSetId, ex);
+        }
     }
 
     @Override

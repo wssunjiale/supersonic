@@ -148,6 +148,7 @@ public class SupersetSyncApiClient implements SupersetSyncClient {
             }
             SupersetDatasetInfo info = new SupersetDatasetInfo();
             info.setId(parseLong(resolveValue(item, "id")));
+            info.setDescription(resolveString(item, "description"));
             info.setTableName(resolveString(item, "table_name"));
             info.setSchema(resolveString(item, "schema"));
             info.setSql(resolveString(item, "sql"));
@@ -172,6 +173,7 @@ public class SupersetSyncApiClient implements SupersetSyncClient {
         }
         SupersetDatasetInfo info = new SupersetDatasetInfo();
         info.setId(parseLong(resolveValue(result, "id")));
+        info.setDescription(resolveString(result, "description"));
         info.setTableName(resolveString(result, "table_name"));
         info.setSchema(resolveString(result, "schema"));
         info.setSql(resolveString(result, "sql"));
@@ -189,6 +191,10 @@ public class SupersetSyncApiClient implements SupersetSyncClient {
         payload.put("database", datasetInfo.getDatabaseId());
         payload.put("schema", datasetInfo.getSchema());
         payload.put("table_name", datasetInfo.getTableName());
+        String description = StringUtils.trimToNull(datasetInfo.getDescription());
+        if (StringUtils.isNotBlank(description)) {
+            payload.put("description", description);
+        }
         String sql = StringUtils.trimToNull(datasetInfo.getSql());
         if (StringUtils.isNotBlank(sql)) {
             payload.put("sql", sql);
@@ -524,6 +530,10 @@ public class SupersetSyncApiClient implements SupersetSyncClient {
         payload.put("database_id", datasetInfo.getDatabaseId());
         payload.put("schema", datasetInfo.getSchema());
         payload.put("table_name", datasetInfo.getTableName());
+        String description = StringUtils.trimToNull(datasetInfo.getDescription());
+        if (StringUtils.isNotBlank(description)) {
+            payload.put("description", description);
+        }
         String sql = StringUtils.trimToNull(datasetInfo.getSql());
         if (StringUtils.isNotBlank(sql)) {
             payload.put("sql", sql);

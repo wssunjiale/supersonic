@@ -35,8 +35,15 @@ public class SupersetSyncProperties {
     public static class Sync {
         private boolean enabled = true;
         private long intervalMs = 60 * 60 * 1000L;
+        private long datasetIntervalMs = 60 * 1000L;
         private long retryIntervalMs = 60 * 1000L;
         private int maxRetries = 3;
         private boolean rebuild = false;
+        /**
+         * Whether auto-migrate Supersonic metadata DB schema for {@code s2_superset_dataset} on
+         * startup. When enabled, Supersonic will attempt to add missing columns/indexes required by
+         * Superset dataset registry syncing.
+         */
+        private boolean autoMigrateRegistrySchema = true;
     }
 }

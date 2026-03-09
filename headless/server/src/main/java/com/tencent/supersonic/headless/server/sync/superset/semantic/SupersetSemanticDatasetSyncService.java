@@ -18,7 +18,9 @@ import com.tencent.supersonic.headless.server.sync.superset.SupersetDatasetType;
 import com.tencent.supersonic.headless.server.sync.superset.SupersetSyncClient;
 import com.tencent.supersonic.headless.server.sync.superset.SupersetSyncProperties;
 import com.tencent.supersonic.headless.server.sync.superset.SupersetSyncResult;
+import com.tencent.supersonic.headless.server.sync.superset.SupersetSyncService;
 import com.tencent.supersonic.headless.server.sync.superset.SupersetSyncStats;
+import com.tencent.supersonic.headless.server.sync.superset.SupersetSyncTrigger;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -50,19 +52,21 @@ public class SupersetSemanticDatasetSyncService {
     private final SupersetSemanticDatasetMapper mapper;
     private final SupersetSemanticDatasetRegistry registry;
     private final SupersetDatasetRegistryService registryService;
+    private final SupersetSyncService supersetSyncService;
     private final SupersetSyncClient syncClient;
     private final SupersetSyncProperties properties;
 
     public SupersetSemanticDatasetSyncService(DataSetService dataSetService,
             DatabaseService databaseService, SupersetSemanticDatasetMapper mapper,
             SupersetSemanticDatasetRegistry registry,
-            SupersetDatasetRegistryService registryService, SupersetSyncClient syncClient,
-            SupersetSyncProperties properties) {
+            SupersetDatasetRegistryService registryService, SupersetSyncService supersetSyncService,
+            SupersetSyncClient syncClient, SupersetSyncProperties properties) {
         this.dataSetService = dataSetService;
         this.databaseService = databaseService;
         this.mapper = mapper;
         this.registry = registry;
         this.registryService = registryService;
+        this.supersetSyncService = supersetSyncService;
         this.syncClient = syncClient;
         this.properties = properties;
     }
@@ -111,97 +115,20 @@ public class SupersetSemanticDatasetSyncService {
                     System.currentTimeMillis() - start, stats);
         }
 
-        Set<Long> databaseIds = records.stream().map(SupersetDatasetDO::getDatabaseId)
+        Set<Long> registryIds = records.stream().map(SupersetDatasetDO::getId)
                 .filter(Objects::nonNull).collect(Collectors.toSet());
-        Map<Long, Long> databaseMapping = ensureDatabaseMapping(databaseIds);
-        if (databaseMapping.isEmpty()) {
-            return SupersetSyncResult.failure("Superset 数据库映射失败",
+        SupersetSyncResult result =
+                supersetSyncService.triggerDatasetSync(registryIds, SupersetSyncTrigger.MANUAL);
+        if (result == null) {
+            return SupersetSyncResult.failure("Superset 语义数据集同步失败",
                     System.currentTimeMillis() - start, stats);
         }
-
-        List<SupersetDatasetInfo> remoteDatasets = syncClient.listDatasets();
-        Map<Long, SupersetDatasetInfo> datasetIdMap = remoteDatasets.stream()
-                .filter(item -> item != null && item.getId() != null)
-                .collect(Collectors.toMap(SupersetDatasetInfo::getId, item -> item, (l, r) -> l));
-        Map<String, SupersetDatasetInfo> datasetKeyMap = remoteDatasets.stream()
-                .filter(item -> item != null && item.getDatabaseId() != null
-                        && StringUtils.isNotBlank(item.getTableName()))
-                .collect(Collectors.toMap(this::datasetKey, item -> item, (l, r) -> l));
-
-        for (SupersetDatasetDO record : records) {
-            stats.incTotal();
-            Long localDatabaseId = record.getDatabaseId();
-            Long supersetDatabaseId = databaseMapping.get(localDatabaseId);
-            if (supersetDatabaseId == null) {
-                stats.incFailed();
-                continue;
-            }
-            SupersetDatasetInfo expected = buildDatasetInfo(record, supersetDatabaseId);
-            if (expected == null) {
-                stats.incSkipped();
-                continue;
-            }
-            SupersetDatasetInfo existing = record.getSupersetDatasetId() == null ? null
-                    : datasetIdMap.get(record.getSupersetDatasetId());
-            if (existing == null) {
-                existing = datasetKeyMap.get(datasetKey(expected));
-            }
-
-            if (existing == null) {
-                try {
-                    Long createdId = syncClient.createDataset(expected);
-                    if (createdId == null) {
-                        stats.incFailed();
-                        continue;
-                    }
-                    expected.setId(createdId);
-                    SupersetDatasetInfo current = syncClient.fetchDataset(createdId);
-                    SupersetDatasetInfo merged = mergeDatasetSchema(expected, current, true);
-                    syncClient.updateDataset(createdId, merged);
-                    stats.incCreated();
-                    registryService.updateSyncInfo(record.getId(), createdId, new Date());
-                    continue;
-                } catch (HttpStatusCodeException ex) {
-                    stats.incFailed();
-                    log.warn(
-                            "superset semantic dataset create failed, dataSetId={}, tableName={}, status={}, body={}",
-                            record.getDataSetId(), record.getTableName(), ex.getStatusCode(),
-                            abbreviateErrorBody(ex));
-                    continue;
-                } catch (Exception ex) {
-                    stats.incFailed();
-                    log.warn("superset semantic dataset create failed, dataSetId={}, tableName={}",
-                            record.getDataSetId(), record.getTableName(), ex);
-                    continue;
-                }
-            }
-
-            try {
-                SupersetDatasetInfo current = syncClient.fetchDataset(existing.getId());
-                expected.setId(existing.getId());
-                SupersetDatasetInfo merged = mergeDatasetSchema(expected, current, true);
-                syncClient.updateDataset(existing.getId(), merged);
-                stats.incUpdated();
-                registryService.updateSyncInfo(record.getId(), existing.getId(), new Date());
-            } catch (HttpStatusCodeException ex) {
-                stats.incFailed();
-                log.warn(
-                        "superset semantic dataset update failed, dataSetId={}, tableName={}, supersetId={}, status={}, body={}",
-                        record.getDataSetId(), record.getTableName(), existing.getId(),
-                        ex.getStatusCode(), abbreviateErrorBody(ex));
-            } catch (Exception ex) {
-                stats.incFailed();
-                log.warn(
-                        "superset semantic dataset update failed, dataSetId={}, tableName={}, supersetId={}",
-                        record.getDataSetId(), record.getTableName(), existing.getId(), ex);
-            }
-        }
-
-        boolean success = stats.getFailed() == 0;
-        String message = success ? "Superset 语义数据集同步完成" : "Superset 语义数据集同步失败";
-        return success
-                ? SupersetSyncResult.success(message, System.currentTimeMillis() - start, stats)
-                : SupersetSyncResult.failure(message, System.currentTimeMillis() - start, stats);
+        String message = result.isSuccess() ? "Superset 语义数据集同步完成" : "Superset 语义数据集同步失败";
+        return result.isSuccess()
+                ? SupersetSyncResult.success(message, System.currentTimeMillis() - start,
+                        result.getStats())
+                : SupersetSyncResult.failure(message, System.currentTimeMillis() - start,
+                        result.getStats());
     }
 
     private Map<Long, Long> ensureDatabaseMapping(Set<Long> databaseIds) {

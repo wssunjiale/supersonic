@@ -24,7 +24,10 @@ assembly/build/*-SNAPSHOT
 webapp/supersonic-webapp
 helloagents/
 helloagents/CHANGELOG.md
-
+.playwright-cli/
+.helloagents/
+output/
+scripts/
 **/.tmp*
 
 *.class

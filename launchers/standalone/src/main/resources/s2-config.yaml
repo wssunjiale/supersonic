@@ -65,7 +65,9 @@ s2:
     guest-token-user-last-name: ${S2_SUPERSET_GUEST_USER_LAST_NAME:Guest}
     sync:
       enabled: ${S2_SUPERSET_SYNC_ENABLED:true}
+      auto-migrate-registry-schema: ${S2_SUPERSET_SYNC_AUTO_MIGRATE_REGISTRY_SCHEMA:true}
       interval-ms: ${S2_SUPERSET_SYNC_INTERVAL_MS:3600000}
+      dataset-interval-ms: ${S2_SUPERSET_SYNC_DATASET_INTERVAL_MS:60000}
       retry-interval-ms: ${S2_SUPERSET_SYNC_RETRY_INTERVAL_MS:60000}
       max-retries: ${S2_SUPERSET_SYNC_MAX_RETRIES:3}
       rebuild: ${S2_SUPERSET_SYNC_REBUILD:false}

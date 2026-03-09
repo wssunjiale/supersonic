@@ -25,6 +25,13 @@ public interface SupersetDatasetRegistryService {
 
     void updateSyncInfo(Long id, Long supersetDatasetId, Date syncedAt);
 
+    void updateSyncAttempt(Long id, Date attemptAt);
+
+    void markSyncFailed(Long id, String errorType, String errorMsg, Date attemptAt,
+            Date nextRetryAt, Integer retryCount);
+
+    void markSyncPending(Long id, User user);
+
     PageInfo<SupersetDatasetResp> querySupersetDataset(SupersetDatasetQueryReq queryReq, User user);
 
     void deleteSupersetDataset(Long id, User user);

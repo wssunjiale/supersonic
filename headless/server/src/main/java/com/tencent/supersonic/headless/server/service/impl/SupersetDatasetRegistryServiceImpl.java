@@ -30,6 +30,9 @@ import com.tencent.supersonic.headless.server.service.ModelService;
 import com.tencent.supersonic.headless.server.service.SupersetDatasetRegistryService;
 import com.tencent.supersonic.headless.server.sync.superset.SupersetDatasetColumn;
 import com.tencent.supersonic.headless.server.sync.superset.SupersetDatasetMetric;
+import com.tencent.supersonic.headless.server.sync.superset.SupersetDatasetSourceType;
+import com.tencent.supersonic.headless.server.sync.superset.SupersetDatasetSyncErrorType;
+import com.tencent.supersonic.headless.server.sync.superset.SupersetDatasetSyncState;
 import com.tencent.supersonic.headless.server.sync.superset.SupersetDatasetType;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.schema.Table;
@@ -116,11 +119,26 @@ public class SupersetDatasetRegistryServiceImpl
             record.setUpdatedAt(now);
             record.setUpdatedBy(safeUser.getName());
             record.setSyncedAt(null);
+            record.setSourceType(SupersetDatasetSourceType.CHAT_SQL.name());
+            record.setSyncState(SupersetDatasetSyncState.PENDING.name());
+            record.setSyncAttemptAt(null);
+            record.setNextRetryAt(null);
+            record.setRetryCount(0);
+            record.setSyncErrorType(null);
+            record.setSyncErrorMsg(null);
             save(record);
         } else if (changed) {
             record.setUpdatedAt(now);
             record.setUpdatedBy(safeUser.getName());
             record.setSyncedAt(null);
+            record.setSourceType(StringUtils.defaultIfBlank(record.getSourceType(),
+                    SupersetDatasetSourceType.CHAT_SQL.name()));
+            record.setSyncState(SupersetDatasetSyncState.PENDING.name());
+            record.setSyncAttemptAt(null);
+            record.setNextRetryAt(null);
+            record.setRetryCount(0);
+            record.setSyncErrorType(null);
+            record.setSyncErrorMsg(null);
             updateById(record);
         }
         return record;
@@ -162,7 +180,20 @@ public class SupersetDatasetRegistryServiceImpl
         LambdaQueryWrapper<SupersetDatasetDO> wrapper = new LambdaQueryWrapper<>();
         if (!CollectionUtils.isEmpty(ids)) {
             wrapper.in(SupersetDatasetDO::getId, ids);
+            return list(wrapper);
         }
+        Date now = new Date();
+        wrapper.and(w -> w
+                .eq(SupersetDatasetDO::getSyncState, SupersetDatasetSyncState.PENDING.name())
+                .or(inner -> inner
+                        .eq(SupersetDatasetDO::getSyncState, SupersetDatasetSyncState.FAILED.name())
+                        .eq(SupersetDatasetDO::getSyncErrorType,
+                                SupersetDatasetSyncErrorType.RETRYABLE.name())
+                        .and(t -> t.isNull(SupersetDatasetDO::getNextRetryAt).or()
+                                .le(SupersetDatasetDO::getNextRetryAt, now)))
+                .or(inner -> inner.isNull(SupersetDatasetDO::getSyncState)
+                        .and(t -> t.isNull(SupersetDatasetDO::getSyncedAt).or()
+                                .isNull(SupersetDatasetDO::getSupersetDatasetId))));
         return list(wrapper);
     }
 
@@ -174,7 +205,63 @@ public class SupersetDatasetRegistryServiceImpl
         LambdaUpdateWrapper<SupersetDatasetDO> wrapper = new LambdaUpdateWrapper<>();
         wrapper.eq(SupersetDatasetDO::getId, id)
                 .set(SupersetDatasetDO::getSupersetDatasetId, supersetDatasetId)
-                .set(SupersetDatasetDO::getSyncedAt, syncedAt);
+                .set(SupersetDatasetDO::getSyncedAt, syncedAt)
+                .set(SupersetDatasetDO::getSyncState, SupersetDatasetSyncState.SUCCESS.name())
+                .set(SupersetDatasetDO::getSyncAttemptAt, syncedAt)
+                .set(SupersetDatasetDO::getNextRetryAt, null)
+                .set(SupersetDatasetDO::getRetryCount, 0)
+                .set(SupersetDatasetDO::getSyncErrorType, null)
+                .set(SupersetDatasetDO::getSyncErrorMsg, null);
+        update(wrapper);
+    }
+
+    @Override
+    public void updateSyncAttempt(Long id, Date attemptAt) {
+        if (id == null) {
+            return;
+        }
+        LambdaUpdateWrapper<SupersetDatasetDO> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(SupersetDatasetDO::getId, id).set(SupersetDatasetDO::getSyncAttemptAt,
+                attemptAt);
+        update(wrapper);
+    }
+
+    @Override
+    public void markSyncFailed(Long id, String errorType, String errorMsg, Date attemptAt,
+            Date nextRetryAt, Integer retryCount) {
+        if (id == null) {
+            return;
+        }
+        String safeType = StringUtils.defaultIfBlank(errorType,
+                SupersetDatasetSyncErrorType.RETRYABLE.name());
+        LambdaUpdateWrapper<SupersetDatasetDO> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(SupersetDatasetDO::getId, id)
+                .set(SupersetDatasetDO::getSyncState, SupersetDatasetSyncState.FAILED.name())
+                .set(SupersetDatasetDO::getSyncErrorType, safeType)
+                .set(SupersetDatasetDO::getSyncErrorMsg, StringUtils.abbreviate(errorMsg, 1000))
+                .set(SupersetDatasetDO::getSyncAttemptAt, attemptAt)
+                .set(SupersetDatasetDO::getNextRetryAt, nextRetryAt)
+                .set(SupersetDatasetDO::getRetryCount, retryCount);
+        update(wrapper);
+    }
+
+    @Override
+    public void markSyncPending(Long id, User user) {
+        if (id == null) {
+            return;
+        }
+        User safeUser = user == null ? User.getDefaultUser() : user;
+        Date now = new Date();
+        LambdaUpdateWrapper<SupersetDatasetDO> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(SupersetDatasetDO::getId, id)
+                .set(SupersetDatasetDO::getSyncState, SupersetDatasetSyncState.PENDING.name())
+                .set(SupersetDatasetDO::getSyncAttemptAt, null)
+                .set(SupersetDatasetDO::getNextRetryAt, null)
+                .set(SupersetDatasetDO::getRetryCount, 0)
+                .set(SupersetDatasetDO::getSyncErrorType, null)
+                .set(SupersetDatasetDO::getSyncErrorMsg, null)
+                .set(SupersetDatasetDO::getSyncedAt, null).set(SupersetDatasetDO::getUpdatedAt, now)
+                .set(SupersetDatasetDO::getUpdatedBy, safeUser.getName());
         update(wrapper);
     }
 
@@ -239,11 +326,30 @@ public class SupersetDatasetRegistryServiceImpl
         if (StringUtils.isNotBlank(request.getCreatedBy())) {
             wrapper.eq(SupersetDatasetDO::getCreatedBy, request.getCreatedBy());
         }
+        if (StringUtils.isNotBlank(request.getSourceType())) {
+            wrapper.eq(SupersetDatasetDO::getSourceType, request.getSourceType());
+        }
+        if (StringUtils.isNotBlank(request.getSyncState())) {
+            wrapper.eq(SupersetDatasetDO::getSyncState, request.getSyncState());
+        }
         if (request.getSynced() != null) {
             if (Boolean.TRUE.equals(request.getSynced())) {
                 wrapper.isNotNull(SupersetDatasetDO::getSyncedAt);
             } else {
                 wrapper.isNull(SupersetDatasetDO::getSyncedAt);
+            }
+        }
+        if (request.getNeedSync() != null) {
+            if (Boolean.TRUE.equals(request.getNeedSync())) {
+                wrapper.and(w -> w.isNull(SupersetDatasetDO::getSyncState)
+                        .and(inner -> inner.isNull(SupersetDatasetDO::getSyncedAt).or()
+                                .isNull(SupersetDatasetDO::getSupersetDatasetId))
+                        .or().in(SupersetDatasetDO::getSyncState,
+                                List.of(SupersetDatasetSyncState.PENDING.name(),
+                                        SupersetDatasetSyncState.FAILED.name())));
+            } else {
+                wrapper.eq(SupersetDatasetDO::getSyncState,
+                        SupersetDatasetSyncState.SUCCESS.name());
             }
         }
         wrapper.orderByDesc(SupersetDatasetDO::getUpdatedAt, SupersetDatasetDO::getCreatedAt);

@@ -441,6 +441,13 @@ CREATE TABLE IF NOT EXISTS `s2_superset_dataset` (
     `superset_dataset_id` BIGINT DEFAULT NULL,
     `columns` longtext DEFAULT NULL,
     `metrics` longtext DEFAULT NULL,
+    `source_type` varchar(50) DEFAULT NULL,
+    `sync_state` varchar(20) DEFAULT NULL,
+    `sync_attempt_at` datetime DEFAULT NULL,
+    `next_retry_at` datetime DEFAULT NULL,
+    `retry_count` int DEFAULT 0,
+    `sync_error_type` varchar(20) DEFAULT NULL,
+    `sync_error_msg` text DEFAULT NULL,
     `created_at` datetime DEFAULT NULL,
     `created_by` varchar(100) DEFAULT NULL,
     `updated_at` datetime DEFAULT NULL,
@@ -448,3 +455,12 @@ CREATE TABLE IF NOT EXISTS `s2_superset_dataset` (
     `synced_at` datetime DEFAULT NULL,
     PRIMARY KEY (`id`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--20260306
+ALTER TABLE s2_superset_dataset add column `source_type` varchar(50) DEFAULT NULL;
+ALTER TABLE s2_superset_dataset add column `sync_state` varchar(20) DEFAULT NULL;
+ALTER TABLE s2_superset_dataset add column `sync_attempt_at` datetime DEFAULT NULL;
+ALTER TABLE s2_superset_dataset add column `next_retry_at` datetime DEFAULT NULL;
+ALTER TABLE s2_superset_dataset add column `retry_count` int DEFAULT 0;
+ALTER TABLE s2_superset_dataset add column `sync_error_type` varchar(20) DEFAULT NULL;
+ALTER TABLE s2_superset_dataset add column `sync_error_msg` text DEFAULT NULL;

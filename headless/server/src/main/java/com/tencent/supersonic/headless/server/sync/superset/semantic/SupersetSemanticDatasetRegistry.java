@@ -6,6 +6,8 @@ import com.tencent.supersonic.common.pojo.User;
 import com.tencent.supersonic.common.util.JsonUtil;
 import com.tencent.supersonic.headless.server.persistence.dataobject.SupersetDatasetDO;
 import com.tencent.supersonic.headless.server.persistence.mapper.SupersetDatasetMapper;
+import com.tencent.supersonic.headless.server.sync.superset.SupersetDatasetSourceType;
+import com.tencent.supersonic.headless.server.sync.superset.SupersetDatasetSyncState;
 import com.tencent.supersonic.headless.server.sync.superset.SupersetDatasetType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -52,6 +54,8 @@ public class SupersetSemanticDatasetRegistry {
                 record::setColumns);
         changed |= apply(record.getMetrics(), JsonUtil.toString(mapping.getMetrics()),
                 record::setMetrics);
+        changed |= apply(record.getSourceType(), SupersetDatasetSourceType.SEMANTIC_DATASET.name(),
+                record::setSourceType);
 
         User safeUser = user == null ? User.getDefaultUser() : user;
         Date now = new Date();
@@ -61,6 +65,12 @@ public class SupersetSemanticDatasetRegistry {
             record.setUpdatedAt(now);
             record.setUpdatedBy(safeUser.getName());
             record.setSyncedAt(null);
+            record.setSyncState(SupersetDatasetSyncState.PENDING.name());
+            record.setSyncAttemptAt(null);
+            record.setNextRetryAt(null);
+            record.setRetryCount(0);
+            record.setSyncErrorType(null);
+            record.setSyncErrorMsg(null);
             mapper.insert(record);
             return record;
         }
@@ -68,6 +78,12 @@ public class SupersetSemanticDatasetRegistry {
             record.setUpdatedAt(now);
             record.setUpdatedBy(safeUser.getName());
             record.setSyncedAt(null);
+            record.setSyncState(SupersetDatasetSyncState.PENDING.name());
+            record.setSyncAttemptAt(null);
+            record.setNextRetryAt(null);
+            record.setRetryCount(0);
+            record.setSyncErrorType(null);
+            record.setSyncErrorMsg(null);
             mapper.updateById(record);
         }
         return record;

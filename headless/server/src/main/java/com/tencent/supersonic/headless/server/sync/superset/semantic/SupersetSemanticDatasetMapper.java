@@ -328,6 +328,7 @@ public class SupersetSemanticDatasetMapper {
             QuerySqlReq req = new QuerySqlReq();
             req.setDataSetId(dataSetId);
             req.setSql(s2sql);
+            req.setNeedAuth(false);
             User safeUser = user == null ? User.getDefaultUser() : user;
             SemanticTranslateResp resp = semanticLayerService.translate(req, safeUser);
             return resp == null ? null : StringUtils.trimToNull(resp.getQuerySQL());

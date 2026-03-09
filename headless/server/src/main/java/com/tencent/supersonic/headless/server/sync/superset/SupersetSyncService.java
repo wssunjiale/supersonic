@@ -8,6 +8,7 @@ import com.tencent.supersonic.headless.api.pojo.response.DatabaseResp;
 import com.tencent.supersonic.headless.server.persistence.dataobject.SupersetDatasetDO;
 import com.tencent.supersonic.headless.server.service.DatabaseService;
 import com.tencent.supersonic.headless.server.service.SupersetDatasetRegistryService;
+import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -58,12 +59,13 @@ public class SupersetSyncService {
 
     public SupersetSyncResult triggerDatabaseSync(Set<Long> databaseIds,
             SupersetSyncTrigger trigger) {
-        return runWithRetry(SupersetSyncType.DATABASE, () -> syncDatabases(databaseIds, trigger));
+        return runWithRetry(SupersetSyncType.DATABASE, trigger,
+                () -> syncDatabases(databaseIds, trigger));
     }
 
     public SupersetSyncResult triggerDatasetSync(Set<Long> datasetRegistryIds,
             SupersetSyncTrigger trigger) {
-        return runWithRetry(SupersetSyncType.DATASET,
+        return runWithRetry(SupersetSyncType.DATASET, trigger,
                 () -> syncDatasets(datasetRegistryIds, trigger));
     }
 
@@ -115,13 +117,22 @@ public class SupersetSyncService {
     }
 
 
-    private SupersetSyncResult runWithRetry(SupersetSyncType type,
+    private SupersetSyncResult runWithRetry(SupersetSyncType type, SupersetSyncTrigger trigger,
             Supplier<SupersetSyncResult> action) {
         SupersetSyncResult result = action.get();
-        if (!result.isSuccess()) {
+        if (!result.isSuccess() && shouldScheduleRetry(trigger)) {
             scheduleRetry(type, action, 1);
         }
         return result;
+    }
+
+    private boolean shouldScheduleRetry(SupersetSyncTrigger trigger) {
+        // Manual runs should return a deterministic result to the caller. Retries will still be
+        // handled by the scheduled sync loop (retryable failures are persisted in registry).
+        if (trigger == null) {
+            return true;
+        }
+        return trigger != SupersetSyncTrigger.MANUAL;
     }
 
     private void scheduleRetry(SupersetSyncType type, Supplier<SupersetSyncResult> action,
@@ -142,6 +153,15 @@ public class SupersetSyncService {
         }, delay, TimeUnit.MILLISECONDS);
         log.warn("superset {} sync scheduled retry, attempt={}, delayMs={}",
                 type.name().toLowerCase(), attempt, delay);
+    }
+
+    @PreDestroy
+    public void shutdownRetryExecutor() {
+        try {
+            retryExecutor.shutdownNow();
+        } catch (Exception ex) {
+            log.debug("shutdown superset retry executor failed", ex);
+        }
     }
 
     private SupersetSyncResult syncDatabases(Set<Long> databaseIds, SupersetSyncTrigger trigger) {
@@ -268,6 +288,8 @@ public class SupersetSyncService {
         try {
             log.debug("superset dataset sync start, trigger={}, registryIds={}", trigger,
                     datasetRegistryIds);
+            boolean forceSync = trigger == SupersetSyncTrigger.MANUAL && datasetRegistryIds != null
+                    && !datasetRegistryIds.isEmpty();
             List<SupersetDatasetDO> datasets = registryService.listForSync(datasetRegistryIds);
             if (datasets.isEmpty()) {
                 return SupersetSyncResult.success("Superset 数据集同步完成",
@@ -286,13 +308,19 @@ public class SupersetSyncService {
                             .toMap(this::datasetKey, item -> item, (left, right) -> left));
             for (SupersetDatasetDO dataset : datasets) {
                 stats.incTotal();
-                if (!shouldSyncDataset(dataset)) {
+                Date attemptAt = new Date();
+                if (!forceSync && !shouldSyncDataset(dataset)) {
                     stats.incSkipped();
                     continue;
+                }
+                if (dataset.getId() != null) {
+                    registryService.updateSyncAttempt(dataset.getId(), attemptAt);
                 }
                 Long supersetDatabaseId = databaseMapping.get(dataset.getDatabaseId());
                 if (supersetDatabaseId == null) {
                     stats.incFailed();
+                    markDatasetSyncFailed(dataset, SupersetDatasetSyncErrorType.FATAL, attemptAt,
+                            "Superset 数据库映射缺失");
                     continue;
                 }
                 SupersetDatasetInfo expected = buildDatasetInfo(dataset, supersetDatabaseId);
@@ -300,59 +328,83 @@ public class SupersetSyncService {
                     stats.incSkipped();
                     continue;
                 }
-                String key = datasetKey(expected);
-                SupersetDatasetInfo existing = dataset.getSupersetDatasetId() == null ? null
-                        : datasetIdMap.get(dataset.getSupersetDatasetId());
-                if (existing == null) {
-                    existing = datasetMap.get(key);
-                }
-                if (existing == null) {
-                    try {
+                try {
+                    String key = datasetKey(expected);
+                    SupersetDatasetInfo existing = dataset.getSupersetDatasetId() == null ? null
+                            : datasetIdMap.get(dataset.getSupersetDatasetId());
+                    if (existing == null) {
+                        existing = datasetMap.get(key);
+                    }
+                    if (existing == null) {
                         Long createdId = syncClient.createDataset(expected);
-                        if (createdId != null) {
-                            expected.setId(createdId);
-                            if (shouldUpdateDataset(expected)) {
-                                SupersetDatasetInfo current = syncClient.fetchDataset(createdId);
-                                if (current == null) {
-                                    log.warn(
-                                            "superset dataset fetch failed after create, skip update, id={}",
-                                            createdId);
-                                } else {
-                                    SupersetDatasetInfo merged = mergeDatasetSchema(expected,
-                                            current, properties.getSync().isRebuild());
-                                    syncClient.updateDataset(createdId, merged);
-                                }
+                        if (createdId == null) {
+                            stats.incFailed();
+                            markDatasetSyncFailed(dataset, SupersetDatasetSyncErrorType.RETRYABLE,
+                                    attemptAt, "Superset dataset create failed (null id)");
+                            continue;
+                        }
+                        expected.setId(createdId);
+                        if (shouldUpdateDataset(expected)) {
+                            SupersetDatasetInfo current = syncClient.fetchDataset(createdId);
+                            if (current == null) {
+                                log.warn(
+                                        "superset dataset fetch failed after create, skip update, id={}",
+                                        createdId);
+                            } else {
+                                SupersetDatasetInfo merged =
+                                        mergeDatasetSchema(expected, current, true);
+                                syncClient.updateDataset(createdId, merged);
                             }
-                            stats.incCreated();
-                            registryService.updateSyncInfo(dataset.getId(), createdId, new Date());
+                        }
+                        stats.incCreated();
+                        registryService.updateSyncInfo(dataset.getId(), createdId, new Date());
+                        continue;
+                    }
+
+                    expected.setId(existing.getId());
+                    SupersetDatasetInfo current = syncClient.fetchDataset(existing.getId());
+                    SupersetDatasetInfo merged = mergeDatasetSchema(expected, current, false);
+                    if (current == null || !datasetMatches(current, merged, false)) {
+                        syncClient.updateDataset(existing.getId(), merged);
+                        stats.incUpdated();
+                    } else {
+                        stats.incSkipped();
+                    }
+                    registryService.updateSyncInfo(dataset.getId(), existing.getId(), new Date());
+                } catch (HttpStatusCodeException ex) {
+                    if (shouldIgnoreDuplicateCreate(ex)) {
+                        log.warn(
+                                "superset dataset create ignored for superset 6.0.0, name={}, status={}, body={}",
+                                expected.getTableName(), ex.getStatusCode(),
+                                abbreviateErrorBody(ex));
+                        SupersetDatasetInfo resolved = resolveDatasetByKey(expected);
+                        if (resolved != null && resolved.getId() != null) {
+                            registryService.updateSyncInfo(dataset.getId(), resolved.getId(),
+                                    new Date());
+                            stats.incUpdated();
                         } else {
                             stats.incFailed();
+                            markDatasetSyncFailed(dataset, SupersetDatasetSyncErrorType.RETRYABLE,
+                                    attemptAt,
+                                    String.format(
+                                            "Superset create ignored, need reconcile, status=%s, body=%s",
+                                            ex.getStatusCode(), abbreviateErrorBody(ex)));
                         }
-                    } catch (HttpStatusCodeException ex) {
-                        if (shouldIgnoreDuplicateCreate(ex)) {
-                            log.warn(
-                                    "superset dataset create ignored for superset 6.0.0, name={}, status={}, body={}",
-                                    expected.getTableName(), ex.getStatusCode(),
-                                    abbreviateErrorBody(ex));
-                            stats.incSkipped();
-                        } else {
-                            throw ex;
-                        }
+                    } else {
+                        stats.incFailed();
+                        SupersetDatasetSyncErrorType errorType =
+                                isRetryableStatus(ex) ? SupersetDatasetSyncErrorType.RETRYABLE
+                                        : SupersetDatasetSyncErrorType.FATAL;
+                        markDatasetSyncFailed(dataset, errorType, attemptAt, String.format(
+                                "status=%s, body=%s", ex.getStatusCode(), abbreviateErrorBody(ex)));
                     }
-                    continue;
+                } catch (Exception ex) {
+                    stats.incFailed();
+                    SupersetDatasetSyncErrorType errorType =
+                            isRetryableException(ex) ? SupersetDatasetSyncErrorType.RETRYABLE
+                                    : SupersetDatasetSyncErrorType.FATAL;
+                    markDatasetSyncFailed(dataset, errorType, attemptAt, ex.getMessage());
                 }
-                expected.setId(existing.getId());
-                SupersetDatasetInfo current = syncClient.fetchDataset(existing.getId());
-                SupersetDatasetInfo merged =
-                        mergeDatasetSchema(expected, current, properties.getSync().isRebuild());
-                if (current == null
-                        || !datasetMatches(current, merged, properties.getSync().isRebuild())) {
-                    syncClient.updateDataset(existing.getId(), merged);
-                    stats.incUpdated();
-                } else {
-                    stats.incSkipped();
-                }
-                registryService.updateSyncInfo(dataset.getId(), existing.getId(), new Date());
             }
             boolean success = stats.getFailed() == 0;
             String message = success ? "Superset 数据集同步完成" : "Superset 数据集同步失败";
@@ -450,6 +502,7 @@ public class SupersetSyncService {
         info.setId(dataset.getSupersetDatasetId());
         info.setDatabaseId(databaseId);
         info.setSchema(StringUtils.defaultIfBlank(dataset.getSchemaName(), null));
+        info.setDescription(StringUtils.trimToNull(dataset.getDatasetDesc()));
         String sqlText = StringUtils.trimToNull(dataset.getSqlText());
         if (StringUtils.isBlank(sqlText)) {
             sqlText = StringUtils.trimToNull(dataset.getNormalizedSql());
@@ -633,6 +686,15 @@ public class SupersetSyncService {
         if (dataset == null) {
             return false;
         }
+        if (SupersetDatasetSyncState.PENDING.name().equalsIgnoreCase(dataset.getSyncState())) {
+            return true;
+        }
+        if (SupersetDatasetSyncState.FAILED.name().equalsIgnoreCase(dataset.getSyncState())
+                && SupersetDatasetSyncErrorType.RETRYABLE.name()
+                        .equalsIgnoreCase(dataset.getSyncErrorType())) {
+            Date nextRetryAt = dataset.getNextRetryAt();
+            return nextRetryAt == null || !nextRetryAt.after(new Date());
+        }
         if (dataset.getSupersetDatasetId() == null) {
             return true;
         }
@@ -643,6 +705,67 @@ public class SupersetSyncService {
             return false;
         }
         return dataset.getUpdatedAt().after(dataset.getSyncedAt());
+    }
+
+    private void markDatasetSyncFailed(SupersetDatasetDO dataset, SupersetDatasetSyncErrorType type,
+            Date attemptAt, String message) {
+        if (dataset == null || dataset.getId() == null) {
+            return;
+        }
+        int retryCount = (dataset.getRetryCount() == null ? 0 : dataset.getRetryCount());
+        int nextRetryCount = retryCount + 1;
+        Date nextRetryAt = null;
+        if (SupersetDatasetSyncErrorType.RETRYABLE == type) {
+            nextRetryAt = computeNextRetryAt(nextRetryCount);
+        }
+        registryService.markSyncFailed(dataset.getId(), type.name(), message, attemptAt,
+                nextRetryAt, nextRetryCount);
+    }
+
+    private boolean isRetryableStatus(HttpStatusCodeException ex) {
+        if (ex == null || ex.getStatusCode() == null) {
+            return false;
+        }
+        int code = ex.getStatusCode().value();
+        return code == 429 || (code >= 500 && code < 600);
+    }
+
+    private boolean isRetryableException(Exception ex) {
+        if (ex == null) {
+            return false;
+        }
+        String name = ex.getClass().getName();
+        return name.contains("ResourceAccessException") || name.contains("ConnectException")
+                || name.contains("SocketTimeoutException") || name.contains("UnknownHostException");
+    }
+
+    private Date computeNextRetryAt(int retryCount) {
+        long base = properties.getSync().getRetryIntervalMs();
+        long maxDelayMs = Math.max(base, TimeUnit.MINUTES.toMillis(30));
+        int exp = Math.max(0, Math.min(10, retryCount - 1));
+        long delay = base * (1L << exp);
+        delay = Math.min(delay, maxDelayMs);
+        return new Date(System.currentTimeMillis() + delay);
+    }
+
+    private SupersetDatasetInfo resolveDatasetByKey(SupersetDatasetInfo expected) {
+        try {
+            if (expected == null) {
+                return null;
+            }
+            String key = datasetKey(expected);
+            for (SupersetDatasetInfo item : syncClient.listDatasets()) {
+                if (item == null) {
+                    continue;
+                }
+                if (key.equals(datasetKey(item))) {
+                    return item;
+                }
+            }
+        } catch (Exception ex) {
+            log.debug("resolve dataset by key failed", ex);
+        }
+        return null;
     }
 
     private Long resolveSupersetDatabaseId(Long databaseId) {
@@ -858,6 +981,11 @@ public class SupersetSyncService {
         String currentSchema = StringUtils.defaultString(current.getSchema());
         String expectedSchema = StringUtils.defaultString(expected.getSchema());
         if (!StringUtils.equalsIgnoreCase(currentSchema, expectedSchema)) {
+            return false;
+        }
+        String expectedDesc = StringUtils.trimToNull(expected.getDescription());
+        if (StringUtils.isNotBlank(expectedDesc) && !StringUtils.equalsIgnoreCase(
+                StringUtils.defaultString(current.getDescription()).trim(), expectedDesc)) {
             return false;
         }
         String currentSql = normalizeSql(current.getSql());

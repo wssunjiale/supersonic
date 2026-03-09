@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
+
 @Slf4j
 @Component
 public class SupersetSyncScheduler {
@@ -24,5 +26,15 @@ public class SupersetSyncScheduler {
         }
         log.debug("superset scheduled sync triggered");
         supersetSyncService.triggerFullSync(SupersetSyncTrigger.SCHEDULED);
+    }
+
+    @Scheduled(fixedDelayString = "${s2.superset.sync.dataset-interval-ms:60000}")
+    public void scheduleDatasetSync() {
+        if (!properties.isEnabled() || !properties.getSync().isEnabled()) {
+            return;
+        }
+        log.debug("superset scheduled dataset sync triggered");
+        supersetSyncService.triggerDatasetSync(Collections.emptySet(),
+                SupersetSyncTrigger.SCHEDULED);
     }
 }

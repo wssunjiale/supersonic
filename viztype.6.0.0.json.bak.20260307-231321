@@ -1,0 +1,4720 @@
+{
+  "version": "6.0.0",
+  "generatedAt": "2026-03-07T05:40:07.118277+00:00",
+  "supersetRoot": "D:/vsx/sources/superset-6.0.0",
+  "counts": {
+    "total": 60,
+    "frontendEnum": 47,
+    "backendLegacy": 28,
+    "examples": 41,
+    "supported": 60,
+    "droppedCandidates": 1
+  },
+  "droppedCandidates": [
+    "osm"
+  ],
+  "items": [
+    {
+      "vizType": "ag-grid-table",
+      "name": "Table V2",
+      "description": "Classic row-by-column spreadsheet like view of a dataset. Use tables to showcase a view into the underlying data or to show aggregated metrics.",
+      "vizKey": "TableAgGrid",
+      "pluginCategory": "Table",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": false,
+        "inExamples": false,
+        "deprecatedIn": null
+      },
+      "表现形态": "表格（Ag-Grid Table）",
+      "适用场景": [
+        "大数据量表格（前端交互更强）",
+        "需要列筛选/排序/选择等强交互"
+      ],
+      "核心参数": [
+        "groupby",
+        "metrics",
+        "row_limit",
+        "server_pagination"
+      ],
+      "summary": "表格（Ag-Grid Table）；核心参数来源: 启发式规则。",
+      "category": "table",
+      "tags": [
+        "table"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": true,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "heuristic",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/plugin-chart-ag-grid-table/src/index.ts"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "big_number",
+      "name": "Big Number with Trendline",
+      "description": "Showcases a single number accompanied by a simple line chart, to call attention to an important metric along with its change over time or other dimension.",
+      "vizKey": "BigNumber",
+      "pluginCategory": "KPI",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": false,
+        "inExamples": true,
+        "deprecatedIn": null
+      },
+      "表现形态": "指标卡/大数字（Big Number）",
+      "适用场景": [
+        "展示单个关键指标（KPI）",
+        "大屏/看板摘要",
+        "可选趋势/环比（取决于类型）"
+      ],
+      "核心参数": [
+        "compare_lag",
+        "compare_suffix",
+        "granularity_sqla",
+        "metric",
+        "since"
+      ],
+      "summary": "指标卡/大数字（Big Number）；核心参数来源: 示例抽样。",
+      "category": "kpi",
+      "tags": [
+        "kpi"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/world_bank.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/world_bank.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/world_bank.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": false,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "examples",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/BigNumberWithTrendline/index.ts"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "big_number_total",
+      "name": "Big Number",
+      "description": "Showcases a single metric front-and-center. Big number is best used to call attention to a KPI or the one thing you want your audience to focus on.",
+      "vizKey": "BigNumberTotal",
+      "pluginCategory": "KPI",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": false,
+        "inExamples": true,
+        "deprecatedIn": null
+      },
+      "表现形态": "指标卡/大数字（Big Number）",
+      "适用场景": [
+        "展示单个关键指标（KPI）",
+        "大屏/看板摘要",
+        "可选趋势/环比（取决于类型）"
+      ],
+      "核心参数": [
+        "adhoc_filters",
+        "granularity_sqla",
+        "metric",
+        "subheader"
+      ],
+      "summary": "指标卡/大数字（Big Number）；核心参数来源: 示例抽样。",
+      "category": "kpi",
+      "tags": [
+        "kpi"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": false,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "examples",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/BigNumberTotal/index.ts"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "box_plot",
+      "name": "Box Plot",
+      "description": "Also known as a box and whisker plot, this visualization compares the distributions of a related metric across multiple groups. The box in the middle emphasizes the mean, median, and inner 2 quartiles. The whiskers around each box visualize the min, max, range, and outer 2 quartiles.",
+      "vizKey": "BoxPlot",
+      "pluginCategory": "Distribution",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": false,
+        "inExamples": true,
+        "deprecatedIn": null
+      },
+      "表现形态": "箱线图（Box Plot）",
+      "适用场景": [
+        "分组分布对比（中位数/四分位/异常值）"
+      ],
+      "核心参数": [
+        "columns",
+        "groupby",
+        "metrics",
+        "since",
+        "until",
+        "whisker_options",
+        "x_ticks_layout"
+      ],
+      "summary": "箱线图（Box Plot）；核心参数来源: 示例抽样。",
+      "category": "distribution",
+      "tags": [
+        "distribution"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/world_bank.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/world_bank.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/world_bank.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": false,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "examples",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/plugin-chart-echarts/src/BoxPlot/index.ts"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "bubble",
+      "name": "Bubble Chart (legacy)",
+      "description": "Visualizes a metric across three dimensions of data in a single chart (X axis, Y axis, and bubble size). Bubbles from the same group can be showcased using bubble color.",
+      "vizKey": "LegacyBubble",
+      "pluginCategory": "Correlation",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": true,
+        "inExamples": true,
+        "deprecatedIn": "3.0"
+      },
+      "表现形态": "气泡图（Bubble/Scatter）",
+      "适用场景": [
+        "三变量对比（x/y/大小）",
+        "相关性/分布探索"
+      ],
+      "核心参数": [
+        "adhoc_filters",
+        "entity",
+        "limit",
+        "max_bubble_size",
+        "series",
+        "since",
+        "size",
+        "until",
+        "x",
+        "y"
+      ],
+      "summary": "气泡图（Bubble/Scatter）；核心参数来源: 示例抽样。",
+      "category": "scatter",
+      "tags": [
+        "scatter"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "backend_viz",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+            "detail": "superset/viz.py legacy BaseViz.viz_type"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/world_bank.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/world_bank.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/world_bank.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": false,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "examples",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/legacy-preset-chart-nvd3/src/Bubble/index.js"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "bubble_v2",
+      "name": "Bubble Chart",
+      "description": "Visualizes a metric across three dimensions of data in a single chart (X axis, Y axis, and bubble size). Bubbles from the same group can be showcased using bubble color.",
+      "vizKey": "Bubble",
+      "pluginCategory": "Correlation",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": false,
+        "inExamples": false,
+        "deprecatedIn": null
+      },
+      "表现形态": "气泡图（Bubble/Scatter）",
+      "适用场景": [
+        "三变量对比（x/y/大小）",
+        "相关性/分布探索"
+      ],
+      "核心参数": [
+        "row_limit",
+        "series",
+        "size",
+        "x",
+        "y"
+      ],
+      "summary": "气泡图（Bubble/Scatter）；核心参数来源: 启发式规则。",
+      "category": "scatter",
+      "tags": [
+        "scatter"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": true,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "heuristic",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/plugin-chart-echarts/src/Bubble/index.ts"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "bullet",
+      "name": "Bullet Chart",
+      "description": "Showcases the progress of a single metric against a given target. The higher the fill, the closer the metric is to the target.",
+      "vizKey": "Bullet",
+      "pluginCategory": "KPI",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": true,
+        "inExamples": false,
+        "deprecatedIn": "3.0"
+      },
+      "表现形态": "子弹图（Bullet）",
+      "适用场景": [
+        "目标达成度对比",
+        "实际值 vs 目标/区间"
+      ],
+      "核心参数": [
+        "metric",
+        "ranges",
+        "target"
+      ],
+      "summary": "子弹图（Bullet）；核心参数来源: 启发式规则。",
+      "category": "kpi",
+      "tags": [
+        "kpi"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "backend_viz",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+            "detail": "superset/viz.py legacy BaseViz.viz_type"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": true,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "heuristic",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/legacy-preset-chart-nvd3/src/Bullet/index.js"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "cal_heatmap",
+      "name": "Calendar Heatmap",
+      "description": "Visualizes how a metric has changed over a time using a color scale and a calendar view. Gray values are used to indicate missing values and the linear color scheme is used to encode the magnitude of each day's value.",
+      "vizKey": "Calendar",
+      "pluginCategory": "Correlation",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": true,
+        "inExamples": true,
+        "deprecatedIn": "3.0"
+      },
+      "表现形态": "日历热力图（Calendar Heatmap）",
+      "适用场景": [
+        "按天展示强度/活跃度",
+        "周期性与异常检测"
+      ],
+      "核心参数": [
+        "metrics",
+        "time_range"
+      ],
+      "summary": "日历热力图（Calendar Heatmap）；核心参数来源: 示例抽样。",
+      "category": "timeseries",
+      "tags": [
+        "timeseries",
+        "heatmap"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "backend_viz",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+            "detail": "superset/viz.py legacy BaseViz.viz_type"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/multiformat_time_series.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/multiformat_time_series.py",
+            "detail": "dict key 'viz_type': ..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/random_time_series.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/random_time_series.py",
+            "detail": "dict key 'viz_type': ..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": false,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "examples",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/legacy-plugin-chart-calendar/src/index.js"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "cartodiagram",
+      "name": "Cartodiagram",
+      "description": "Display charts on a map. For using this plugin, users first have to create any other chart that can then be placed on the map.",
+      "vizKey": "Cartodiagram",
+      "pluginCategory": "Map",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": false,
+        "inExamples": false,
+        "deprecatedIn": null
+      },
+      "表现形态": "未知/待补充",
+      "适用场景": [
+        "暂无（需补充插件元数据或运行时控件信息）"
+      ],
+      "核心参数": [
+        "row_limit"
+      ],
+      "summary": "未知/待补充；核心参数来源: 启发式规则。",
+      "category": "unknown",
+      "tags": [
+        "unknown"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": true,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "heuristic",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/plugin-chart-cartodiagram/src/index.ts"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "chord",
+      "name": "Chord Diagram",
+      "description": "Showcases the flow or link between categories using thickness of chords. The value and corresponding thickness can be different for each side.",
+      "vizKey": "Chord",
+      "pluginCategory": "Flow",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": true,
+        "inExamples": true,
+        "deprecatedIn": "3.0"
+      },
+      "表现形态": "弦图（Chord）",
+      "适用场景": [
+        "类别之间的双向关系/流量",
+        "关联强度可视化"
+      ],
+      "核心参数": [
+        "columns",
+        "groupby",
+        "metric"
+      ],
+      "summary": "弦图（Chord）；核心参数来源: 示例抽样。",
+      "category": "relationship",
+      "tags": [
+        "relationship"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "backend_viz",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+            "detail": "superset/viz.py legacy BaseViz.viz_type"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": false,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "examples",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/legacy-plugin-chart-chord/src/index.js"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "compare",
+      "name": "Time-series Percent Change",
+      "description": "Visualizes many different time-series objects in a single chart. This chart is being deprecated and we recommend using the Time-series Chart instead.",
+      "vizKey": "Compare",
+      "pluginCategory": "Evolution",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": true,
+        "inExamples": true,
+        "deprecatedIn": null
+      },
+      "表现形态": "对比/变化（Percent Change）",
+      "适用场景": [
+        "同比/环比等变化率展示",
+        "对比两个时间窗口的差异"
+      ],
+      "核心参数": [
+        "groupby",
+        "metrics"
+      ],
+      "summary": "对比/变化（Percent Change）；核心参数来源: 示例抽样。",
+      "category": "comparison",
+      "tags": [
+        "comparison"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "backend_viz",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+            "detail": "superset/viz.py legacy BaseViz.viz_type"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": false,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "examples",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/legacy-preset-chart-nvd3/src/Compare/index.js"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "country_map",
+      "name": "Country Map",
+      "description": "Visualizes how a single metric varies across a country's principal subdivisions (states, provinces, etc) on a choropleth map. Each subdivision's value is elevated when you hover over the corresponding geographic boundary.",
+      "vizKey": "CountryMap",
+      "pluginCategory": "Map",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": true,
+        "inExamples": true,
+        "deprecatedIn": "3.0"
+      },
+      "表现形态": "地图/空间可视化（Mapbox/地图）",
+      "适用场景": [
+        "地理维度聚合展示",
+        "国家/地区分布",
+        "空间数据叠加（点/线/面）"
+      ],
+      "核心参数": [
+        "mapbox_style",
+        "row_limit",
+        "spatial"
+      ],
+      "summary": "地图/空间可视化（Mapbox/地图）；核心参数来源: 启发式规则。",
+      "category": "geo",
+      "tags": [
+        "geo"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "backend_viz",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+            "detail": "superset/viz.py legacy BaseViz.viz_type"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/country_map.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/country_map.py",
+            "detail": "dict key 'viz_type': ..."
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": true,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "heuristic",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/legacy-plugin-chart-country-map/src/index.js"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "deck_arc",
+      "name": "deck.gl Arc",
+      "description": "Plot the distance (like flight paths) between origin and destination.",
+      "vizKey": null,
+      "pluginCategory": "Map",
+      "pluginTags": [
+        "deckGL",
+        "Geo",
+        "3D",
+        "Relational",
+        "Web"
+      ],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": true,
+        "inExamples": true,
+        "deprecatedIn": "3.0"
+      },
+      "表现形态": "地图/空间可视化（deck.gl）",
+      "适用场景": [
+        "空间点/面/轨迹数据展示",
+        "地理分布密度（网格/六边形/热力）",
+        "地图交互（缩放/旋转/视角）"
+      ],
+      "核心参数": [
+        "mapbox_style",
+        "row_limit",
+        "spatial",
+        "viewport"
+      ],
+      "summary": "地图/空间可视化（deck.gl）；核心参数来源: 启发式规则。",
+      "category": "geo",
+      "tags": [
+        "geo",
+        "deckgl",
+        "deckGL",
+        "Geo",
+        "3D",
+        "Relational",
+        "Web"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "backend_viz",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+            "detail": "superset/viz.py legacy BaseViz.viz_type"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/deck.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/deck.py",
+            "detail": "dict key 'viz_type': ..."
+          },
+          {
+            "kind": "frontend_plugin",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Arc/index.ts",
+            "detail": "deck.gl ChartMetadata (static extract)"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": true,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "heuristic",
+        "docs": null,
+        "frontendPlugin": {
+          "name": "deck.gl Arc",
+          "description": "Plot the distance (like flight paths) between origin and destination.",
+          "pluginCategory": "Map",
+          "pluginTags": [
+            "deckGL",
+            "Geo",
+            "3D",
+            "Relational",
+            "Web"
+          ],
+          "behaviors": [
+            "DrillBy",
+            "DrillToDetail",
+            "InteractiveChart"
+          ],
+          "sourcePath": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Arc/index.ts",
+          "controlPanelPath": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Arc/controlPanel.ts",
+          "presetPath": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/preset.ts"
+        }
+      }
+    },
+    {
+      "vizType": "deck_contour",
+      "name": "deck.gl Contour",
+      "description": "Uses Gaussian Kernel Density Estimation to visualize spatial distribution of data",
+      "vizKey": null,
+      "pluginCategory": "Map",
+      "pluginTags": [
+        "deckGL",
+        "Spatial",
+        "Comparison"
+      ],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": true,
+        "inExamples": false,
+        "deprecatedIn": null
+      },
+      "表现形态": "地图/空间可视化（deck.gl）",
+      "适用场景": [
+        "空间点/面/轨迹数据展示",
+        "地理分布密度（网格/六边形/热力）",
+        "地图交互（缩放/旋转/视角）"
+      ],
+      "核心参数": [
+        "mapbox_style",
+        "row_limit",
+        "spatial",
+        "viewport"
+      ],
+      "summary": "地图/空间可视化（deck.gl）；核心参数来源: 启发式规则。",
+      "category": "geo",
+      "tags": [
+        "geo",
+        "deckgl",
+        "deckGL",
+        "Spatial",
+        "Comparison"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "backend_viz",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+            "detail": "superset/viz.py legacy BaseViz.viz_type"
+          },
+          {
+            "kind": "frontend_plugin",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Contour/index.ts",
+            "detail": "deck.gl ChartMetadata (static extract)"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": true,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "heuristic",
+        "docs": null,
+        "frontendPlugin": {
+          "name": "deck.gl Contour",
+          "description": "Uses Gaussian Kernel Density Estimation to visualize spatial distribution of data",
+          "pluginCategory": "Map",
+          "pluginTags": [
+            "deckGL",
+            "Spatial",
+            "Comparison"
+          ],
+          "behaviors": [
+            "InteractiveChart"
+          ],
+          "sourcePath": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Contour/index.ts",
+          "controlPanelPath": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Contour/controlPanel.ts",
+          "presetPath": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/preset.ts"
+        }
+      }
+    },
+    {
+      "vizType": "deck_geojson",
+      "name": "deck.gl Geojson",
+      "description": "The GeoJsonLayer takes in GeoJSON formatted data and renders it as interactive polygons, lines and points (circles, icons and/or texts).",
+      "vizKey": null,
+      "pluginCategory": "Map",
+      "pluginTags": [
+        "deckGL",
+        "2D"
+      ],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": true,
+        "inExamples": false,
+        "deprecatedIn": "3.0"
+      },
+      "表现形态": "地图/空间可视化（deck.gl）",
+      "适用场景": [
+        "空间点/面/轨迹数据展示",
+        "地理分布密度（网格/六边形/热力）",
+        "地图交互（缩放/旋转/视角）"
+      ],
+      "核心参数": [
+        "mapbox_style",
+        "row_limit",
+        "spatial",
+        "viewport"
+      ],
+      "summary": "地图/空间可视化（deck.gl）；核心参数来源: 启发式规则。",
+      "category": "geo",
+      "tags": [
+        "geo",
+        "deckgl",
+        "deckGL",
+        "2D"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "backend_viz",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+            "detail": "superset/viz.py legacy BaseViz.viz_type"
+          },
+          {
+            "kind": "frontend_plugin",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Geojson/index.ts",
+            "detail": "deck.gl ChartMetadata (static extract)"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": true,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "heuristic",
+        "docs": null,
+        "frontendPlugin": {
+          "name": "deck.gl Geojson",
+          "description": "The GeoJsonLayer takes in GeoJSON formatted data and renders it as interactive polygons, lines and points (circles, icons and/or texts).",
+          "pluginCategory": "Map",
+          "pluginTags": [
+            "deckGL",
+            "2D"
+          ],
+          "behaviors": [
+            "InteractiveChart"
+          ],
+          "sourcePath": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Geojson/index.ts",
+          "controlPanelPath": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Geojson/controlPanel.ts",
+          "presetPath": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/preset.ts"
+        }
+      }
+    },
+    {
+      "vizType": "deck_grid",
+      "name": "deck.gl Grid",
+      "description": "Visualize geospatial data like 3D buildings, landscapes, or objects in grid view.",
+      "vizKey": null,
+      "pluginCategory": "Map",
+      "pluginTags": [
+        "deckGL",
+        "3D",
+        "Comparison"
+      ],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": true,
+        "inExamples": true,
+        "deprecatedIn": "3.0"
+      },
+      "表现形态": "地图/空间可视化（deck.gl）",
+      "适用场景": [
+        "空间点/面/轨迹数据展示",
+        "地理分布密度（网格/六边形/热力）",
+        "地图交互（缩放/旋转/视角）"
+      ],
+      "核心参数": [
+        "mapbox_style",
+        "row_limit",
+        "spatial",
+        "viewport"
+      ],
+      "summary": "地图/空间可视化（deck.gl）；核心参数来源: 启发式规则。",
+      "category": "geo",
+      "tags": [
+        "geo",
+        "deckgl",
+        "deckGL",
+        "3D",
+        "Comparison"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "backend_viz",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+            "detail": "superset/viz.py legacy BaseViz.viz_type"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/deck.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/deck.py",
+            "detail": "dict key 'viz_type': ..."
+          },
+          {
+            "kind": "frontend_plugin",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Grid/index.ts",
+            "detail": "deck.gl ChartMetadata (static extract)"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": true,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "heuristic",
+        "docs": null,
+        "frontendPlugin": {
+          "name": "deck.gl Grid",
+          "description": "Visualize geospatial data like 3D buildings, landscapes, or objects in grid view.",
+          "pluginCategory": "Map",
+          "pluginTags": [
+            "deckGL",
+            "3D",
+            "Comparison"
+          ],
+          "behaviors": [
+            "InteractiveChart"
+          ],
+          "sourcePath": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Grid/index.ts",
+          "controlPanelPath": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Grid/controlPanel.ts",
+          "presetPath": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/preset.ts"
+        }
+      }
+    },
+    {
+      "vizType": "deck_heatmap",
+      "name": "deck.gl Heatmap",
+      "description": "Uses Gaussian Kernel Density Estimation to visualize spatial distribution of data",
+      "vizKey": null,
+      "pluginCategory": "Map",
+      "pluginTags": [
+        "deckGL",
+        "Spatial",
+        "Comparison"
+      ],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": true,
+        "inExamples": false,
+        "deprecatedIn": null
+      },
+      "表现形态": "地图/空间可视化（deck.gl）",
+      "适用场景": [
+        "空间点/面/轨迹数据展示",
+        "地理分布密度（网格/六边形/热力）",
+        "地图交互（缩放/旋转/视角）"
+      ],
+      "核心参数": [
+        "mapbox_style",
+        "row_limit",
+        "spatial",
+        "viewport"
+      ],
+      "summary": "地图/空间可视化（deck.gl）；核心参数来源: 启发式规则。",
+      "category": "geo",
+      "tags": [
+        "geo",
+        "deckgl",
+        "deckGL",
+        "Spatial",
+        "Comparison"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "backend_viz",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+            "detail": "superset/viz.py legacy BaseViz.viz_type"
+          },
+          {
+            "kind": "frontend_plugin",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Heatmap/index.ts",
+            "detail": "deck.gl ChartMetadata (static extract)"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": true,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "heuristic",
+        "docs": null,
+        "frontendPlugin": {
+          "name": "deck.gl Heatmap",
+          "description": "Uses Gaussian Kernel Density Estimation to visualize spatial distribution of data",
+          "pluginCategory": "Map",
+          "pluginTags": [
+            "deckGL",
+            "Spatial",
+            "Comparison"
+          ],
+          "behaviors": [
+            "InteractiveChart"
+          ],
+          "sourcePath": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Heatmap/index.ts",
+          "controlPanelPath": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Heatmap/controlPanel.ts",
+          "presetPath": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/preset.ts"
+        }
+      }
+    },
+    {
+      "vizType": "deck_hex",
+      "name": "deck.gl 3D Hexagon",
+      "description": "Overlays a hexagonal grid on a map, and aggregates data within the boundary of each cell.",
+      "vizKey": null,
+      "pluginCategory": "Map",
+      "pluginTags": [
+        "deckGL",
+        "3D",
+        "Geo",
+        "Comparison"
+      ],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": true,
+        "inExamples": true,
+        "deprecatedIn": "3.0"
+      },
+      "表现形态": "地图/空间可视化（deck.gl）",
+      "适用场景": [
+        "空间点/面/轨迹数据展示",
+        "地理分布密度（网格/六边形/热力）",
+        "地图交互（缩放/旋转/视角）"
+      ],
+      "核心参数": [
+        "mapbox_style",
+        "row_limit",
+        "spatial",
+        "viewport"
+      ],
+      "summary": "地图/空间可视化（deck.gl）；核心参数来源: 启发式规则。",
+      "category": "geo",
+      "tags": [
+        "geo",
+        "deckgl",
+        "deckGL",
+        "3D",
+        "Geo",
+        "Comparison"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "backend_viz",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+            "detail": "superset/viz.py legacy BaseViz.viz_type"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/deck.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/deck.py",
+            "detail": "dict key 'viz_type': ..."
+          },
+          {
+            "kind": "frontend_plugin",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Hex/index.ts",
+            "detail": "deck.gl ChartMetadata (static extract)"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": true,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "heuristic",
+        "docs": null,
+        "frontendPlugin": {
+          "name": "deck.gl 3D Hexagon",
+          "description": "Overlays a hexagonal grid on a map, and aggregates data within the boundary of each cell.",
+          "pluginCategory": "Map",
+          "pluginTags": [
+            "deckGL",
+            "3D",
+            "Geo",
+            "Comparison"
+          ],
+          "behaviors": [
+            "InteractiveChart"
+          ],
+          "sourcePath": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Hex/index.ts",
+          "controlPanelPath": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Hex/controlPanel.ts",
+          "presetPath": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/preset.ts"
+        }
+      }
+    },
+    {
+      "vizType": "deck_multi",
+      "name": "deck.gl Multiple Layers",
+      "description": "Compose multiple layers together to form complex visuals.",
+      "vizKey": null,
+      "pluginCategory": "Map",
+      "pluginTags": [
+        "deckGL",
+        "Multi-Layers"
+      ],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": true,
+        "inExamples": false,
+        "deprecatedIn": "3.0"
+      },
+      "表现形态": "地图/空间可视化（deck.gl）",
+      "适用场景": [
+        "空间点/面/轨迹数据展示",
+        "地理分布密度（网格/六边形/热力）",
+        "地图交互（缩放/旋转/视角）"
+      ],
+      "核心参数": [
+        "mapbox_style",
+        "row_limit",
+        "spatial",
+        "viewport"
+      ],
+      "summary": "地图/空间可视化（deck.gl）；核心参数来源: 启发式规则。",
+      "category": "geo",
+      "tags": [
+        "geo",
+        "deckgl",
+        "deckGL",
+        "Multi-Layers"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "backend_viz",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+            "detail": "superset/viz.py legacy BaseViz.viz_type"
+          },
+          {
+            "kind": "frontend_plugin",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/Multi/index.ts",
+            "detail": "deck.gl ChartMetadata (static extract)"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": true,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "heuristic",
+        "docs": null,
+        "frontendPlugin": {
+          "name": "deck.gl Multiple Layers",
+          "description": "Compose multiple layers together to form complex visuals.",
+          "pluginCategory": "Map",
+          "pluginTags": [
+            "deckGL",
+            "Multi-Layers"
+          ],
+          "behaviors": [],
+          "sourcePath": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/Multi/index.ts",
+          "controlPanelPath": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/Multi/controlPanel.ts",
+          "presetPath": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/preset.ts"
+        }
+      }
+    },
+    {
+      "vizType": "deck_path",
+      "name": "deck.gl Path",
+      "description": "Visualizes connected points, which form a path, on a map.",
+      "vizKey": null,
+      "pluginCategory": "Map",
+      "pluginTags": [
+        "deckGL",
+        "Web"
+      ],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": true,
+        "inExamples": true,
+        "deprecatedIn": "3.0"
+      },
+      "表现形态": "地图/空间可视化（deck.gl）",
+      "适用场景": [
+        "空间点/面/轨迹数据展示",
+        "地理分布密度（网格/六边形/热力）",
+        "地图交互（缩放/旋转/视角）"
+      ],
+      "核心参数": [
+        "mapbox_style",
+        "row_limit",
+        "spatial",
+        "viewport"
+      ],
+      "summary": "地图/空间可视化（deck.gl）；核心参数来源: 启发式规则。",
+      "category": "geo",
+      "tags": [
+        "geo",
+        "deckgl",
+        "deckGL",
+        "Web"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "backend_viz",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+            "detail": "superset/viz.py legacy BaseViz.viz_type"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/deck.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/deck.py",
+            "detail": "dict key 'viz_type': ..."
+          },
+          {
+            "kind": "frontend_plugin",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Path/index.ts",
+            "detail": "deck.gl ChartMetadata (static extract)"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": true,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "heuristic",
+        "docs": null,
+        "frontendPlugin": {
+          "name": "deck.gl Path",
+          "description": "Visualizes connected points, which form a path, on a map.",
+          "pluginCategory": "Map",
+          "pluginTags": [
+            "deckGL",
+            "Web"
+          ],
+          "behaviors": [
+            "InteractiveChart"
+          ],
+          "sourcePath": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Path/index.ts",
+          "controlPanelPath": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Path/controlPanel.ts",
+          "presetPath": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/preset.ts"
+        }
+      }
+    },
+    {
+      "vizType": "deck_polygon",
+      "name": "deck.gl Polygon",
+      "description": "Visualizes geographic areas from your data as polygons on a Mapbox rendered map. Polygons can be colored using a metric.",
+      "vizKey": null,
+      "pluginCategory": "Map",
+      "pluginTags": [
+        "deckGL",
+        "3D",
+        "Multi-Dimensions",
+        "Geo"
+      ],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": true,
+        "inExamples": true,
+        "deprecatedIn": "3.0"
+      },
+      "表现形态": "地图/空间可视化（deck.gl）",
+      "适用场景": [
+        "空间点/面/轨迹数据展示",
+        "地理分布密度（网格/六边形/热力）",
+        "地图交互（缩放/旋转/视角）"
+      ],
+      "核心参数": [
+        "mapbox_style",
+        "row_limit",
+        "spatial",
+        "viewport"
+      ],
+      "summary": "地图/空间可视化（deck.gl）；核心参数来源: 启发式规则。",
+      "category": "geo",
+      "tags": [
+        "geo",
+        "deckgl",
+        "deckGL",
+        "3D",
+        "Multi-Dimensions",
+        "Geo"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "backend_viz",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+            "detail": "superset/viz.py legacy BaseViz.viz_type"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/deck.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/deck.py",
+            "detail": "dict key 'viz_type': ..."
+          },
+          {
+            "kind": "frontend_plugin",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Polygon/index.ts",
+            "detail": "deck.gl ChartMetadata (static extract)"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": true,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "heuristic",
+        "docs": null,
+        "frontendPlugin": {
+          "name": "deck.gl Polygon",
+          "description": "Visualizes geographic areas from your data as polygons on a Mapbox rendered map. Polygons can be colored using a metric.",
+          "pluginCategory": "Map",
+          "pluginTags": [
+            "deckGL",
+            "3D",
+            "Multi-Dimensions",
+            "Geo"
+          ],
+          "behaviors": [
+            "InteractiveChart"
+          ],
+          "sourcePath": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Polygon/index.ts",
+          "controlPanelPath": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Polygon/controlPanel.ts",
+          "presetPath": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/preset.ts"
+        }
+      }
+    },
+    {
+      "vizType": "deck_scatter",
+      "name": "deck.gl Scatterplot",
+      "description": "A map that takes rendering circles with a variable radius at latitude/longitude coordinates",
+      "vizKey": null,
+      "pluginCategory": "Map",
+      "pluginTags": [
+        "deckGL",
+        "Comparison",
+        "Scatter",
+        "2D",
+        "Geo",
+        "Intensity",
+        "Density"
+      ],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": true,
+        "inExamples": true,
+        "deprecatedIn": "3.0"
+      },
+      "表现形态": "地图/空间可视化（deck.gl）",
+      "适用场景": [
+        "空间点/面/轨迹数据展示",
+        "地理分布密度（网格/六边形/热力）",
+        "地图交互（缩放/旋转/视角）"
+      ],
+      "核心参数": [
+        "mapbox_style",
+        "row_limit",
+        "spatial",
+        "viewport"
+      ],
+      "summary": "地图/空间可视化（deck.gl）；核心参数来源: 启发式规则。",
+      "category": "geo",
+      "tags": [
+        "geo",
+        "deckgl",
+        "deckGL",
+        "Comparison",
+        "Scatter",
+        "2D",
+        "Geo",
+        "Intensity",
+        "Density"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "backend_viz",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+            "detail": "superset/viz.py legacy BaseViz.viz_type"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/deck.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/deck.py",
+            "detail": "dict key 'viz_type': ..."
+          },
+          {
+            "kind": "frontend_plugin",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Scatter/index.ts",
+            "detail": "deck.gl ChartMetadata (static extract)"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": true,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "heuristic",
+        "docs": null,
+        "frontendPlugin": {
+          "name": "deck.gl Scatterplot",
+          "description": "A map that takes rendering circles with a variable radius at latitude/longitude coordinates",
+          "pluginCategory": "Map",
+          "pluginTags": [
+            "deckGL",
+            "Comparison",
+            "Scatter",
+            "2D",
+            "Geo",
+            "Intensity",
+            "Density"
+          ],
+          "behaviors": [
+            "InteractiveChart"
+          ],
+          "sourcePath": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Scatter/index.ts",
+          "controlPanelPath": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Scatter/controlPanel.ts",
+          "presetPath": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/preset.ts"
+        }
+      }
+    },
+    {
+      "vizType": "deck_screengrid",
+      "name": "deck.gl Screen Grid",
+      "description": "Aggregates data within the boundary of grid cells and maps the aggregated values to a dynamic color scale",
+      "vizKey": null,
+      "pluginCategory": "Map",
+      "pluginTags": [
+        "deckGL",
+        "Comparison",
+        "Intensity",
+        "Density"
+      ],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": true,
+        "inExamples": true,
+        "deprecatedIn": "3.0"
+      },
+      "表现形态": "地图/空间可视化（deck.gl）",
+      "适用场景": [
+        "空间点/面/轨迹数据展示",
+        "地理分布密度（网格/六边形/热力）",
+        "地图交互（缩放/旋转/视角）"
+      ],
+      "核心参数": [
+        "mapbox_style",
+        "row_limit",
+        "spatial",
+        "viewport"
+      ],
+      "summary": "地图/空间可视化（deck.gl）；核心参数来源: 启发式规则。",
+      "category": "geo",
+      "tags": [
+        "geo",
+        "deckgl",
+        "deckGL",
+        "Comparison",
+        "Intensity",
+        "Density"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "backend_viz",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+            "detail": "superset/viz.py legacy BaseViz.viz_type"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/deck.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/deck.py",
+            "detail": "dict key 'viz_type': ..."
+          },
+          {
+            "kind": "frontend_plugin",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Screengrid/index.ts",
+            "detail": "deck.gl ChartMetadata (static extract)"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": true,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "heuristic",
+        "docs": null,
+        "frontendPlugin": {
+          "name": "deck.gl Screen Grid",
+          "description": "Aggregates data within the boundary of grid cells and maps the aggregated values to a dynamic color scale",
+          "pluginCategory": "Map",
+          "pluginTags": [
+            "deckGL",
+            "Comparison",
+            "Intensity",
+            "Density"
+          ],
+          "behaviors": [
+            "InteractiveChart"
+          ],
+          "sourcePath": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Screengrid/index.ts",
+          "controlPanelPath": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Screengrid/controlPanel.ts",
+          "presetPath": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/preset.ts"
+        }
+      }
+    },
+    {
+      "vizType": "echarts_area",
+      "name": "Area Chart",
+      "description": "Area charts are similar to line charts in that they represent variables with the same scale, but area charts stack the metrics on top of each other.",
+      "vizKey": "Area",
+      "pluginCategory": "Evolution",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": false,
+        "inExamples": true,
+        "deprecatedIn": null
+      },
+      "表现形态": "时间序列（折线/面积/柱状/散点等）",
+      "适用场景": [
+        "随时间的趋势变化",
+        "多序列对比（按维度拆分）",
+        "同比/环比（视配置而定）"
+      ],
+      "核心参数": [
+        "adhoc_filters",
+        "comparison_type",
+        "groupby",
+        "limit",
+        "metrics",
+        "since",
+        "stacked_style",
+        "time_grain_sqla",
+        "until",
+        "x_axis_forma"
+      ],
+      "summary": "时间序列（折线/面积/柱状/散点等）；核心参数来源: 示例抽样。",
+      "category": "timeseries",
+      "tags": [
+        "timeseries"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/world_bank.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/world_bank.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/world_bank.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": false,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "examples",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/plugin-chart-echarts/src/Timeseries/Area/index.ts"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "echarts_timeseries",
+      "name": "Generic Chart",
+      "description": "Swiss army knife for visualizing data. Choose between step, line, scatter, and bar charts. This viz type has many customization options as well.",
+      "vizKey": "Timeseries",
+      "pluginCategory": "Evolution",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": false,
+        "inExamples": true,
+        "deprecatedIn": null
+      },
+      "表现形态": "时间序列（折线/面积/柱状/散点等）",
+      "适用场景": [
+        "随时间的趋势变化",
+        "多序列对比（按维度拆分）",
+        "同比/环比（视配置而定）"
+      ],
+      "核心参数": [
+        "groupby",
+        "metrics"
+      ],
+      "summary": "时间序列（折线/面积/柱状/散点等）；核心参数来源: 示例抽样。",
+      "category": "timeseries",
+      "tags": [
+        "timeseries"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": false,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "examples",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/plugin-chart-echarts/src/Timeseries/index.ts"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "echarts_timeseries_bar",
+      "name": "Bar Chart",
+      "description": "Bar Charts are used to show metrics as a series of bars.",
+      "vizKey": "Bar",
+      "pluginCategory": "Evolution",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": false,
+        "inExamples": true,
+        "deprecatedIn": null
+      },
+      "表现形态": "时间序列（折线/面积/柱状/散点等）",
+      "适用场景": [
+        "随时间的趋势变化",
+        "多序列对比（按维度拆分）",
+        "同比/环比（视配置而定）"
+      ],
+      "核心参数": [
+        "adhoc_filters",
+        "groupby",
+        "metrics"
+      ],
+      "summary": "时间序列（折线/面积/柱状/散点等）；核心参数来源: 示例抽样。",
+      "category": "timeseries",
+      "tags": [
+        "timeseries"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "dict key 'viz_type': ..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": false,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "examples",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/plugin-chart-echarts/src/Timeseries/Regular/Bar/index.ts"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "echarts_timeseries_line",
+      "name": "Line Chart",
+      "description": "Line chart is used to visualize measurements taken over a given category. Line chart is a type of chart which displays information as a series of data points connected by straight line segments. It is a basic type of chart common in many fields.",
+      "vizKey": "Line",
+      "pluginCategory": "Evolution",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": false,
+        "inExamples": true,
+        "deprecatedIn": null
+      },
+      "表现形态": "时间序列（折线/面积/柱状/散点等）",
+      "适用场景": [
+        "随时间的趋势变化",
+        "多序列对比（按维度拆分）",
+        "同比/环比（视配置而定）"
+      ],
+      "核心参数": [
+        "granularity_sqla",
+        "groupby",
+        "limit",
+        "metrics",
+        "num_period_compare",
+        "rich_tooltip",
+        "show_legend",
+        "since",
+        "timeseries_limit_metric"
+      ],
+      "summary": "时间序列（折线/面积/柱状/散点等）；核心参数来源: 示例抽样。",
+      "category": "timeseries",
+      "tags": [
+        "timeseries"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/world_bank.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/world_bank.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/world_bank.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": false,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "examples",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/plugin-chart-echarts/src/Timeseries/Regular/Line/index.ts"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "echarts_timeseries_scatter",
+      "name": "Scatter Plot",
+      "description": "Scatter Plot has the horizontal axis in linear units, and the points are connected in order. It shows a statistical relationship between two variables.",
+      "vizKey": "Scatter",
+      "pluginCategory": "Evolution",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": false,
+        "inExamples": true,
+        "deprecatedIn": null
+      },
+      "表现形态": "时间序列（折线/面积/柱状/散点等）",
+      "适用场景": [
+        "随时间的趋势变化",
+        "多序列对比（按维度拆分）",
+        "同比/环比（视配置而定）"
+      ],
+      "核心参数": [
+        "groupby",
+        "metrics"
+      ],
+      "summary": "时间序列（折线/面积/柱状/散点等）；核心参数来源: 示例抽样。",
+      "category": "timeseries",
+      "tags": [
+        "timeseries"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": false,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "examples",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/plugin-chart-echarts/src/Timeseries/Regular/Scatter/index.ts"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "echarts_timeseries_smooth",
+      "name": "Smooth Line",
+      "description": "Smooth-line is a variation of the line chart. Without angles and hard edges, Smooth-line sometimes looks smarter and more professional.",
+      "vizKey": "SmoothLine",
+      "pluginCategory": "Evolution",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": false,
+        "inExamples": true,
+        "deprecatedIn": null
+      },
+      "表现形态": "时间序列（折线/面积/柱状/散点等）",
+      "适用场景": [
+        "随时间的趋势变化",
+        "多序列对比（按维度拆分）",
+        "同比/环比（视配置而定）"
+      ],
+      "核心参数": [
+        "groupby",
+        "metrics"
+      ],
+      "summary": "时间序列（折线/面积/柱状/散点等）；核心参数来源: 示例抽样。",
+      "category": "timeseries",
+      "tags": [
+        "timeseries"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": false,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "examples",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/plugin-chart-echarts/src/Timeseries/Regular/SmoothLine/index.ts"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "echarts_timeseries_step",
+      "name": "Stepped Line",
+      "description": "Stepped-line graph (also called step chart) is a variation of line chart but with the line forming a series of steps between data points. A step chart can be useful when you want to show the changes that occur at irregular intervals.",
+      "vizKey": "Step",
+      "pluginCategory": "Evolution",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": false,
+        "inExamples": true,
+        "deprecatedIn": null
+      },
+      "表现形态": "时间序列（折线/面积/柱状/散点等）",
+      "适用场景": [
+        "随时间的趋势变化",
+        "多序列对比（按维度拆分）",
+        "同比/环比（视配置而定）"
+      ],
+      "核心参数": [
+        "groupby",
+        "metrics"
+      ],
+      "summary": "时间序列（折线/面积/柱状/散点等）；核心参数来源: 示例抽样。",
+      "category": "timeseries",
+      "tags": [
+        "timeseries"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": false,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "examples",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/plugin-chart-echarts/src/Timeseries/Step/index.ts"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "event_flow",
+      "name": "Event flow",
+      "description": "A visualization to explore patterns in event sequences",
+      "vizKey": null,
+      "pluginCategory": null,
+      "pluginTags": [],
+      "availability": {
+        "frontend": false,
+        "backendVizPy": true,
+        "inExamples": false,
+        "deprecatedIn": "3.0"
+      },
+      "表现形态": "事件流（Event Flow）",
+      "适用场景": [
+        "用户/实体的事件序列模式探索",
+        "漏斗之外的路径分析（序列聚合）"
+      ],
+      "核心参数": [
+        "all_columns",
+        "all_columns_x",
+        "entity",
+        "order_by_entity",
+        "row_limit"
+      ],
+      "summary": "事件流（Event Flow）；核心参数来源: 启发式规则。",
+      "category": "sequence",
+      "tags": [
+        "sequence",
+        "legacy"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "backend_viz",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+            "detail": "superset/viz.py legacy BaseViz.viz_type"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": true,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "heuristic",
+        "docs": null,
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "funnel",
+      "name": "Funnel Chart",
+      "description": "Showcases how a metric changes as the funnel progresses. This classic chart is useful for visualizing drop-off between stages in a pipeline or lifecycle.",
+      "vizKey": "Funnel",
+      "pluginCategory": "KPI",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": false,
+        "inExamples": true,
+        "deprecatedIn": null
+      },
+      "表现形态": "漏斗图（Funnel）",
+      "适用场景": [
+        "分阶段转化对比",
+        "环节流失分析"
+      ],
+      "核心参数": [
+        "groupby",
+        "metric"
+      ],
+      "summary": "漏斗图（Funnel）；核心参数来源: 示例抽样。",
+      "category": "flow",
+      "tags": [
+        "flow"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": false,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "examples",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/plugin-chart-echarts/src/Funnel/index.ts"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "gantt_chart",
+      "name": "Gantt Chart",
+      "description": "Gantt chart visualizes important events over a time span. Every data point displayed as a separate event along a horizontal line.",
+      "vizKey": "Gantt",
+      "pluginCategory": null,
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": false,
+        "inExamples": false,
+        "deprecatedIn": null
+      },
+      "表现形态": "甘特图（Gantt）",
+      "适用场景": [
+        "项目排期/任务时间段展示",
+        "开始/结束时间与持续时间对比"
+      ],
+      "核心参数": [
+        "end_date",
+        "groupby",
+        "row_limit",
+        "start_date"
+      ],
+      "summary": "甘特图（Gantt）；核心参数来源: 启发式规则。",
+      "category": "timeline",
+      "tags": [
+        "timeline"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": true,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "heuristic",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/plugin-chart-echarts/src/Gantt/index.ts"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "gauge_chart",
+      "name": "Gauge Chart",
+      "description": "Uses a gauge to showcase progress of a metric towards a target. The position of the dial represents the progress and the terminal value in the gauge represents the target value.",
+      "vizKey": "Gauge",
+      "pluginCategory": "KPI",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": false,
+        "inExamples": true,
+        "deprecatedIn": null
+      },
+      "表现形态": "仪表盘（Gauge）",
+      "适用场景": [
+        "单指标与目标/区间对比",
+        "阈值告警"
+      ],
+      "核心参数": [
+        "groupby",
+        "metric"
+      ],
+      "summary": "仪表盘（Gauge）；核心参数来源: 示例抽样。",
+      "category": "kpi",
+      "tags": [
+        "kpi"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": false,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "examples",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/plugin-chart-echarts/src/Gauge/index.ts"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "graph_chart",
+      "name": "Graph Chart",
+      "description": "Displays connections between entities in a graph structure. Useful for mapping relationships and showing which nodes are important in a network. Graph charts can be configured to be force-directed or circulate. If your data has a geospatial component, try the deck.gl Arc chart.",
+      "vizKey": "Graph",
+      "pluginCategory": "Flow",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": false,
+        "inExamples": true,
+        "deprecatedIn": null
+      },
+      "表现形态": "关系图（Graph）",
+      "适用场景": [
+        "节点-边关系展示",
+        "关联网络/知识图谱的简化可视化"
+      ],
+      "核心参数": [
+        "metric",
+        "row_limit",
+        "source",
+        "target"
+      ],
+      "summary": "关系图（Graph）；核心参数来源: 启发式规则。",
+      "category": "network",
+      "tags": [
+        "network"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/energy.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/energy.py",
+            "detail": "dict key 'viz_type': ..."
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": true,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "heuristic",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/plugin-chart-echarts/src/Graph/index.ts"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "handlebars",
+      "name": "Handlebars",
+      "description": "Write a handlebars template to render the data",
+      "vizKey": "Handlebars",
+      "pluginCategory": null,
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": false,
+        "inExamples": false,
+        "deprecatedIn": null
+      },
+      "表现形态": "自定义模板渲染（Handlebars）",
+      "适用场景": [
+        "将查询结果按模板渲染成自定义卡片/HTML",
+        "需要高度自定义展示样式"
+      ],
+      "核心参数": [
+        "groupby",
+        "metrics",
+        "row_limit",
+        "template"
+      ],
+      "summary": "自定义模板渲染（Handlebars）；核心参数来源: 启发式规则。",
+      "category": "custom",
+      "tags": [
+        "custom"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": true,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "heuristic",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/plugin-chart-handlebars/src/plugin/index.ts"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "heatmap_v2",
+      "name": "Heatmap",
+      "description": "Visualize a related metric across pairs of groups. Heatmaps excel at showcasing the correlation or strength between two groups. Color is used to emphasize the strength of the link between each pair of groups.",
+      "vizKey": "Heatmap",
+      "pluginCategory": "Correlation",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": false,
+        "inExamples": true,
+        "deprecatedIn": null
+      },
+      "表现形态": "未知/待补充",
+      "适用场景": [
+        "暂无（需补充插件元数据或运行时控件信息）"
+      ],
+      "核心参数": [
+        "defaults",
+        "groupby",
+        "legend_type",
+        "metric",
+        "sort_x_axis",
+        "sort_y_axis",
+        "x_axis"
+      ],
+      "summary": "未知/待补充；核心参数来源: 示例抽样。",
+      "category": "unknown",
+      "tags": [
+        "unknown"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/energy.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/energy.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/energy.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": false,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "examples",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/plugin-chart-echarts/src/Heatmap/index.ts"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "histogram_v2",
+      "name": "Histogram",
+      "description": "The histogram chart displays the distribution of a dataset by representing the frequency or count of values within different ranges or bins. It helps visualize patterns, clusters, and outliers in the data and provides insights into its shape, central tendency, and spread.",
+      "vizKey": "Histogram",
+      "pluginCategory": "Distribution",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": false,
+        "inExamples": false,
+        "deprecatedIn": null
+      },
+      "表现形态": "未知/待补充",
+      "适用场景": [
+        "暂无（需补充插件元数据或运行时控件信息）"
+      ],
+      "核心参数": [
+        "row_limit"
+      ],
+      "summary": "未知/待补充；核心参数来源: 启发式规则。",
+      "category": "unknown",
+      "tags": [
+        "unknown"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": true,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "heuristic",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/plugin-chart-echarts/src/Histogram/index.ts"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "horizon",
+      "name": "Horizon Chart",
+      "description": "Compares how a metric changes over time between different groups. Each group is mapped to a row and change over time is visualized bar lengths and color.",
+      "vizKey": "Horizon",
+      "pluginCategory": "Distribution",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": true,
+        "inExamples": false,
+        "deprecatedIn": null
+      },
+      "表现形态": "地平线图（Horizon）",
+      "适用场景": [
+        "多序列时间趋势对比（节省垂直空间）",
+        "大屏多指标概览"
+      ],
+      "核心参数": [
+        "groupby",
+        "metrics",
+        "time_grain_sqla",
+        "time_range"
+      ],
+      "summary": "地平线图（Horizon）；核心参数来源: 启发式规则。",
+      "category": "timeseries",
+      "tags": [
+        "timeseries",
+        "legacy"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "backend_viz",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+            "detail": "superset/viz.py legacy BaseViz.viz_type"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": true,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "heuristic",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/legacy-plugin-chart-horizon/src/index.js"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "line",
+      "name": "Time Series - Line Chart",
+      "description": "A rich line chart component with tons of options",
+      "vizKey": null,
+      "pluginCategory": null,
+      "pluginTags": [],
+      "availability": {
+        "frontend": false,
+        "backendVizPy": true,
+        "inExamples": false,
+        "deprecatedIn": "3.0"
+      },
+      "表现形态": "时间序列（折线/面积/柱状/散点等）",
+      "适用场景": [
+        "随时间的趋势变化",
+        "多序列对比（按维度拆分）",
+        "同比/环比（视配置而定）"
+      ],
+      "核心参数": [
+        "groupby",
+        "metrics",
+        "time_grain_sqla",
+        "time_range"
+      ],
+      "summary": "时间序列（折线/面积/柱状/散点等）；核心参数来源: 启发式规则。",
+      "category": "timeseries",
+      "tags": [
+        "timeseries"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "backend_viz",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+            "detail": "superset/viz.py legacy BaseViz.viz_type"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": true,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "heuristic",
+        "docs": null,
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "mapbox",
+      "name": "MapBox",
+      "description": "Rich maps made with Mapbox",
+      "vizKey": "MapBox",
+      "pluginCategory": "Map",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": true,
+        "inExamples": true,
+        "deprecatedIn": "3.0"
+      },
+      "表现形态": "地图/空间可视化（Mapbox/地图）",
+      "适用场景": [
+        "地理维度聚合展示",
+        "国家/地区分布",
+        "空间数据叠加（点/线/面）"
+      ],
+      "核心参数": [
+        "mapbox_style",
+        "row_limit",
+        "spatial"
+      ],
+      "summary": "地图/空间可视化（Mapbox/地图）；核心参数来源: 启发式规则。",
+      "category": "geo",
+      "tags": [
+        "geo"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "backend_viz",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+            "detail": "superset/viz.py legacy BaseViz.viz_type"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/long_lat.py",
+            "detail": "dict key 'viz_type': ..."
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": true,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "heuristic",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/legacy-plugin-chart-map-box/src/index.js"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "mixed_timeseries",
+      "name": "Mixed Chart",
+      "description": "Visualize two different series using the same x-axis. Note that both series can be visualized with a different chart type (e.g. 1 using bars and 1 using a line).",
+      "vizKey": "MixedTimeseries",
+      "pluginCategory": "Evolution",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": false,
+        "inExamples": true,
+        "deprecatedIn": null
+      },
+      "表现形态": "未知/待补充",
+      "适用场景": [
+        "暂无（需补充插件元数据或运行时控件信息）"
+      ],
+      "核心参数": [
+        "granularity_sqla",
+        "groupby",
+        "groupby_b",
+        "metrics",
+        "metrics_b",
+        "yAxisIndex",
+        "yAxisIndexB"
+      ],
+      "summary": "未知/待补充；核心参数来源: 示例抽样。",
+      "category": "unknown",
+      "tags": [
+        "unknown"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": false,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "examples",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/plugin-chart-echarts/src/MixedTimeseries/index.ts"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "paired_ttest",
+      "name": "Paired t-test Table",
+      "description": "Table that visualizes paired t-tests, which are used to understand statistical differences between groups.",
+      "vizKey": "PairedTTest",
+      "pluginCategory": "Correlation",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": true,
+        "inExamples": false,
+        "deprecatedIn": "3.0"
+      },
+      "表现形态": "配对 t 检验（Paired t-test）",
+      "适用场景": [
+        "两组时间序列/样本的差异显著性检验",
+        "统计检验报告表"
+      ],
+      "核心参数": [
+        "groupby",
+        "metrics",
+        "time_range"
+      ],
+      "summary": "配对 t 检验（Paired t-test）；核心参数来源: 启发式规则。",
+      "category": "statistics",
+      "tags": [
+        "statistics",
+        "legacy"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "backend_viz",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+            "detail": "superset/viz.py legacy BaseViz.viz_type"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": true,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "heuristic",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/legacy-plugin-chart-paired-t-test/src/index.js"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "para",
+      "name": "Parallel Coordinates",
+      "description": "Plots the individual metrics for each row in the data vertically and links them together as a line. This chart is useful for comparing multiple metrics across all of the samples or rows in the data.",
+      "vizKey": "ParallelCoordinates",
+      "pluginCategory": "Ranking",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": true,
+        "inExamples": true,
+        "deprecatedIn": "3.0"
+      },
+      "表现形态": "未知/待补充",
+      "适用场景": [
+        "暂无（需补充插件元数据或运行时控件信息）"
+      ],
+      "核心参数": [
+        "limit",
+        "metrics",
+        "secondary_metric",
+        "series",
+        "since",
+        "until"
+      ],
+      "summary": "未知/待补充；核心参数来源: 示例抽样。",
+      "category": "unknown",
+      "tags": [
+        "unknown"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "backend_viz",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+            "detail": "superset/viz.py legacy BaseViz.viz_type"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/world_bank.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/world_bank.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/world_bank.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": false,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "examples",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/legacy-plugin-chart-parallel-coordinates/src/index.js"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "partition",
+      "name": "Partition Chart",
+      "description": "Compare the same summarized metric across multiple groups.",
+      "vizKey": "Partition",
+      "pluginCategory": "Part of a Whole",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": true,
+        "inExamples": true,
+        "deprecatedIn": "3.0"
+      },
+      "表现形态": "分区图（Partition）",
+      "适用场景": [
+        "层级结构占比（传统分区/旭日/树图等变体的 legacy 入口）"
+      ],
+      "核心参数": [
+        "groupby",
+        "metrics"
+      ],
+      "summary": "分区图（Partition）；核心参数来源: 示例抽样。",
+      "category": "hierarchy",
+      "tags": [
+        "hierarchy",
+        "legacy"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "backend_viz",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+            "detail": "superset/viz.py legacy BaseViz.viz_type"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": false,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "examples",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/legacy-plugin-chart-partition/src/index.js"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "pie",
+      "name": "Pie Chart",
+      "description": "The classic. Great for showing how much of a company each investor gets, what demographics follow your blog, or what portion of the budget goes to the military industrial complex. Pie charts can be difficult to interpret precisely. If clarity of relative proportion is important, consider using a bar or other chart type instead.",
+      "vizKey": "Pie",
+      "pluginCategory": "Part of a Whole",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": false,
+        "inExamples": true,
+        "deprecatedIn": null
+      },
+      "表现形态": "饼图/玫瑰图（占比）",
+      "适用场景": [
+        "类别占比对比",
+        "Top-N 类别占比展示",
+        "适合类别数量较少的场景"
+      ],
+      "核心参数": [
+        "adhoc_filters",
+        "groupby",
+        "metric"
+      ],
+      "summary": "饼图/玫瑰图（占比）；核心参数来源: 示例抽样。",
+      "category": "categorical",
+      "tags": [
+        "proportion"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": false,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "examples",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/plugin-chart-echarts/src/Pie/index.ts"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "pivot_table_v2",
+      "name": "Pivot Table",
+      "description": "Used to summarize a set of data by grouping together multiple statistics along two axes. Examples: Sales numbers by region and month, tasks by status and assignee, active users by age and location. Not the most visually stunning visualization, but highly informative and versatile.",
+      "vizKey": "PivotTable",
+      "pluginCategory": "Table",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": false,
+        "inExamples": true,
+        "deprecatedIn": null
+      },
+      "表现形态": "透视表（Pivot Table）",
+      "适用场景": [
+        "多维度交叉分析",
+        "指标按行/列维度展开",
+        "支持小计/排序/格式化（取决于实现）"
+      ],
+      "核心参数": [
+        "groupbyColumns",
+        "groupbyRows",
+        "metrics"
+      ],
+      "summary": "透视表（Pivot Table）；核心参数来源: 示例抽样。",
+      "category": "table",
+      "tags": [
+        "table",
+        "pivot"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": false,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "examples",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/plugin-chart-pivot-table/src/plugin/index.ts"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "pop_kpi",
+      "name": "Big Number with Time Period Comparison",
+      "description": "Showcases a metric along with a comparison of value, change, and percent change for a selected time period.",
+      "vizKey": "BigNumberPeriodOverPeriod",
+      "pluginCategory": "KPI",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": false,
+        "inExamples": false,
+        "deprecatedIn": null
+      },
+      "表现形态": "指标卡/大数字（Big Number）",
+      "适用场景": [
+        "展示单个关键指标（KPI）",
+        "大屏/看板摘要",
+        "可选趋势/环比（取决于类型）"
+      ],
+      "核心参数": [
+        "compare_lag",
+        "metric",
+        "time_range"
+      ],
+      "summary": "指标卡/大数字（Big Number）；核心参数来源: 启发式规则。",
+      "category": "kpi",
+      "tags": [
+        "kpi"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": true,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "heuristic",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/BigNumberPeriodOverPeriod/index.ts"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "radar",
+      "name": "Radar Chart",
+      "description": "Visualize a parallel set of metrics across multiple groups. Each group is visualized using its own line of points and each metric is represented as an edge in the chart.",
+      "vizKey": "Radar",
+      "pluginCategory": "Ranking",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": false,
+        "inExamples": true,
+        "deprecatedIn": null
+      },
+      "表现形态": "未知/待补充",
+      "适用场景": [
+        "暂无（需补充插件元数据或运行时控件信息）"
+      ],
+      "核心参数": [
+        "groupby",
+        "metrics"
+      ],
+      "summary": "未知/待补充；核心参数来源: 示例抽样。",
+      "category": "unknown",
+      "tags": [
+        "unknown"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": false,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "examples",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/plugin-chart-echarts/src/Radar/index.ts"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "rose",
+      "name": "Nightingale Rose Chart",
+      "description": "A polar coordinate chart where the circle is broken into wedges of equal angle, and the value represented by any wedge is illustrated by its area, rather than its radius or sweep angle.",
+      "vizKey": "Rose",
+      "pluginCategory": "Ranking",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": true,
+        "inExamples": true,
+        "deprecatedIn": "3.0"
+      },
+      "表现形态": "饼图/玫瑰图（占比）",
+      "适用场景": [
+        "类别占比对比",
+        "Top-N 类别占比展示",
+        "适合类别数量较少的场景"
+      ],
+      "核心参数": [
+        "groupby",
+        "metrics"
+      ],
+      "summary": "饼图/玫瑰图（占比）；核心参数来源: 示例抽样。",
+      "category": "categorical",
+      "tags": [
+        "proportion"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "backend_viz",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+            "detail": "superset/viz.py legacy BaseViz.viz_type"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": false,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "examples",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/legacy-plugin-chart-rose/src/index.js"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "sankey_v2",
+      "name": "Sankey Chart",
+      "description": "The Sankey chart visually tracks the movement and transformation of values across system stages. Nodes represent stages, connected by links depicting value flow. Node height corresponds to the visualized metric, providing a clear representation of value distribution and transformation.",
+      "vizKey": "Sankey",
+      "pluginCategory": "Flow",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": false,
+        "inExamples": true,
+        "deprecatedIn": null
+      },
+      "表现形态": "桑基图（Sankey）",
+      "适用场景": [
+        "流向/转化漏斗的路径贡献",
+        "源→目标的权重流量展示"
+      ],
+      "核心参数": [
+        "metric",
+        "source",
+        "target"
+      ],
+      "summary": "桑基图（Sankey）；核心参数来源: 示例抽样。",
+      "category": "flow",
+      "tags": [
+        "flow"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/energy.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/energy.py",
+            "detail": "dict key 'viz_type': ..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": false,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "examples",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/plugin-chart-echarts/src/Sankey/index.ts"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "sunburst_v2",
+      "name": "Sunburst Chart",
+      "description": "Uses circles to visualize the flow of data through different stages of a system. Hover over individual paths in the visualization to understand the stages a value took. Useful for multi-stage, multi-group visualizing funnels and pipelines.",
+      "vizKey": "Sunburst",
+      "pluginCategory": "Part of a Whole",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": false,
+        "inExamples": true,
+        "deprecatedIn": null
+      },
+      "表现形态": "旭日图（Sunburst）",
+      "适用场景": [
+        "层级结构占比（环形层级）",
+        "展示父子层级占比关系"
+      ],
+      "核心参数": [
+        "columns",
+        "metric",
+        "secondary_metric",
+        "since",
+        "until"
+      ],
+      "summary": "旭日图（Sunburst）；核心参数来源: 示例抽样。",
+      "category": "hierarchy",
+      "tags": [
+        "hierarchy"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/world_bank.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/world_bank.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/world_bank.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": false,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "examples",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/plugin-chart-echarts/src/Sunburst/index.ts"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "table",
+      "name": "Table",
+      "description": "Classic row-by-column spreadsheet like view of a dataset. Use tables to showcase a view into the underlying data or to show aggregated metrics.",
+      "vizKey": "Table",
+      "pluginCategory": "Table",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": false,
+        "inExamples": true,
+        "deprecatedIn": null
+      },
+      "表现形态": "表格（Table）",
+      "适用场景": [
+        "明细/汇总数据展示",
+        "需要可复制/可排序的结果表",
+        "作为图表兜底表现形态"
+      ],
+      "核心参数": [
+        "groupby",
+        "metrics",
+        "time_range"
+      ],
+      "summary": "表格（Table）；核心参数来源: 示例抽样。",
+      "category": "table",
+      "tags": [
+        "table"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "dict key 'viz_type': ..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/world_bank.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/world_bank.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/world_bank.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": false,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "examples",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/plugin-chart-table/src/index.ts"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "time_pivot",
+      "name": "Time-series Period Pivot",
+      "description": "Compares metrics between different time periods. Displays time series data across multiple periods (like weeks or months) to show period-over-period trends and patterns.",
+      "vizKey": "TimePivot",
+      "pluginCategory": "Evolution",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": true,
+        "inExamples": false,
+        "deprecatedIn": "3.0"
+      },
+      "表现形态": "时间透视表（Time Pivot）",
+      "适用场景": [
+        "按时间粒度展开的透视分析",
+        "对比不同维度在不同时间桶的变化"
+      ],
+      "核心参数": [
+        "groupby",
+        "metrics",
+        "time_grain_sqla",
+        "time_range"
+      ],
+      "summary": "时间透视表（Time Pivot）；核心参数来源: 启发式规则。",
+      "category": "table",
+      "tags": [
+        "table",
+        "timeseries",
+        "pivot"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "backend_viz",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+            "detail": "superset/viz.py legacy BaseViz.viz_type"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": true,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "heuristic",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/legacy-preset-chart-nvd3/src/TimePivot/index.js"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "time_table",
+      "name": "Time-series Table",
+      "description": "Compare multiple time series charts (as sparklines) and related metrics quickly.",
+      "vizKey": "TimeTable",
+      "pluginCategory": "Table",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": true,
+        "inExamples": false,
+        "deprecatedIn": "3.0"
+      },
+      "表现形态": "时间序列表（Time Table）",
+      "适用场景": [
+        "以表格方式展示时间序列聚合结果",
+        "作为图表之外的精确数据对照"
+      ],
+      "核心参数": [
+        "groupby",
+        "metrics",
+        "time_grain_sqla",
+        "time_range"
+      ],
+      "summary": "时间序列表（Time Table）；核心参数来源: 启发式规则。",
+      "category": "table",
+      "tags": [
+        "table",
+        "timeseries"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "backend_viz",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+            "detail": "superset/viz.py legacy BaseViz.viz_type"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": true,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "heuristic",
+        "docs": {
+          "sourcePath": "superset-frontend/src/visualizations/TimeTable/index.ts"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "tree_chart",
+      "name": "Tree Chart",
+      "description": "Visualize multiple levels of hierarchy using a familiar tree-like structure.",
+      "vizKey": "Tree",
+      "pluginCategory": "Part of a Whole",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": false,
+        "inExamples": false,
+        "deprecatedIn": null
+      },
+      "表现形态": "未知/待补充",
+      "适用场景": [
+        "暂无（需补充插件元数据或运行时控件信息）"
+      ],
+      "核心参数": [
+        "row_limit"
+      ],
+      "summary": "未知/待补充；核心参数来源: 启发式规则。",
+      "category": "unknown",
+      "tags": [
+        "unknown"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": true,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "heuristic",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/plugin-chart-echarts/src/Tree/index.ts"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "treemap_v2",
+      "name": "Treemap",
+      "description": "Show hierarchical relationships of data, with the value represented by area, showing proportion and contribution to the whole.",
+      "vizKey": "Treemap",
+      "pluginCategory": "Part of a Whole",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": false,
+        "inExamples": true,
+        "deprecatedIn": null
+      },
+      "表现形态": "矩形树图（Treemap）",
+      "适用场景": [
+        "层级结构占比",
+        "从大到小的构成展示"
+      ],
+      "核心参数": [
+        "groupby",
+        "metric",
+        "since",
+        "until"
+      ],
+      "summary": "矩形树图（Treemap）；核心参数来源: 示例抽样。",
+      "category": "hierarchy",
+      "tags": [
+        "hierarchy"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/world_bank.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/world_bank.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/world_bank.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": false,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "examples",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/plugin-chart-echarts/src/Treemap/index.ts"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "waterfall",
+      "name": "Waterfall Chart",
+      "description": "A waterfall chart is a form of data visualization that helps in understanding the cumulative effect of sequentially introduced positive or negative values. These intermediate values can either be time based or category based.",
+      "vizKey": "Waterfall",
+      "pluginCategory": "Evolution",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": false,
+        "inExamples": false,
+        "deprecatedIn": null
+      },
+      "表现形态": "未知/待补充",
+      "适用场景": [
+        "暂无（需补充插件元数据或运行时控件信息）"
+      ],
+      "核心参数": [
+        "row_limit"
+      ],
+      "summary": "未知/待补充；核心参数来源: 启发式规则。",
+      "category": "unknown",
+      "tags": [
+        "unknown"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": true,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "heuristic",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/plugin-chart-echarts/src/Waterfall/index.ts"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "word_cloud",
+      "name": "Word Cloud",
+      "description": "Visualizes the words in a column that appear the most often. Bigger font corresponds to higher frequency.",
+      "vizKey": "WordCloud",
+      "pluginCategory": "Ranking",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": false,
+        "inExamples": true,
+        "deprecatedIn": null
+      },
+      "表现形态": "词云（Word Cloud）",
+      "适用场景": [
+        "关键词频次/权重展示",
+        "文本主题的粗略概览"
+      ],
+      "核心参数": [
+        "adhoc_filters",
+        "limit",
+        "metric",
+        "rotation",
+        "series",
+        "size_from",
+        "size_to"
+      ],
+      "summary": "词云（Word Cloud）；核心参数来源: 示例抽样。",
+      "category": "text",
+      "tags": [
+        "text"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/birth_names.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": false,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "examples",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/plugin-chart-word-cloud/src/plugin/index.ts"
+        },
+        "frontendPlugin": null
+      }
+    },
+    {
+      "vizType": "world_map",
+      "name": "World Map",
+      "description": "A map of the world, that can indicate values in different countries.",
+      "vizKey": "WorldMap",
+      "pluginCategory": "Map",
+      "pluginTags": [],
+      "availability": {
+        "frontend": true,
+        "backendVizPy": true,
+        "inExamples": true,
+        "deprecatedIn": "3.0"
+      },
+      "表现形态": "地图/空间可视化（Mapbox/地图）",
+      "适用场景": [
+        "地理维度聚合展示",
+        "国家/地区分布",
+        "空间数据叠加（点/线/面）"
+      ],
+      "核心参数": [
+        "metric",
+        "num_period_compare",
+        "secondary_metric"
+      ],
+      "summary": "地图/空间可视化（Mapbox/地图）；核心参数来源: 示例抽样。",
+      "category": "geo",
+      "tags": [
+        "geo"
+      ],
+      "_meta": {
+        "version": "6.0.0",
+        "sources": [
+          {
+            "kind": "frontend_enum",
+            "file": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+            "detail": "packages/superset-ui-core VizType enum"
+          },
+          {
+            "kind": "backend_viz",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+            "detail": "superset/viz.py legacy BaseViz.viz_type"
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/world_bank.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/world_bank.py",
+            "detail": "keyword viz_type=..."
+          },
+          {
+            "kind": "example",
+            "file": "D:/vsx/sources/superset-6.0.0/superset/examples/world_bank.py",
+            "detail": "get_slice_json keyword params"
+          },
+          {
+            "kind": "docs",
+            "file": "docs/viztype.json",
+            "detail": "merged name/description/sourcePath/controlPanel from docs asset"
+          }
+        ],
+        "inferred": {
+          "表现形态": true,
+          "适用场景": true,
+          "核心参数": false,
+          "name": false,
+          "description": false
+        },
+        "coreParamsSource": "examples",
+        "docs": {
+          "sourcePath": "superset-frontend/plugins/legacy-plugin-chart-world-map/src/index.js"
+        },
+        "frontendPlugin": null
+      }
+    }
+  ]
+}
