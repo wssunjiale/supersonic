@@ -21,11 +21,11 @@ export const getTipNode = ({ parseInfo, dimensionFilters, entityInfo }) => {
   const entityId = dimensionFilters?.length > 0 ? dimensionFilters[0].value : undefined;
   const entityAlias = entity?.alias?.[0]?.split('.')?.[0];
   const entityName = elementMatches?.find(item => item.element?.type === 'ID')?.element.name;
+  const isDetailQuery = queryType === ChatContextTypeQueryTypeEnum.DETAIL;
 
   const { type: agentType, name: agentName } = properties || {};
 
-  const fields =
-    queryMode === 'TAG_DETAIL' ? dimensionItems?.concat(metrics || []) : dimensionItems;
+  const fields = isDetailQuery ? dimensionItems?.concat(metrics || []) : dimensionItems;
   return (
     <div className={`${prefixCls}-tip-content`}>
       {!!agentType && queryMode !== 'LLM_S2SQL' ? (
@@ -50,18 +50,19 @@ export const getTipNode = ({ parseInfo, dimensionFilters, entityInfo }) => {
             </div>
           )}
           {(queryType === ChatContextTypeQueryTypeEnum.AGGREGATE ||
-            queryType === 'METRIC_TAG' ||
-            queryType === 'DETAIL') && (
+            queryType === ChatContextTypeQueryTypeEnum.METRIC_TAG ||
+            queryType === ChatContextTypeQueryTypeEnum.DETAIL) && (
             <div className={`${prefixCls}-tip-item`}>
               <div className={`${prefixCls}-tip-item-name`}>查询模式：</div>
               <div className={itemValueClass}>
-                {queryType === ChatContextTypeQueryTypeEnum.AGGREGATE || queryType === 'METRIC_TAG'
+                {queryType === ChatContextTypeQueryTypeEnum.AGGREGATE ||
+                queryType === ChatContextTypeQueryTypeEnum.METRIC_TAG
                   ? '聚合模式'
                   : '明细模式'}
               </div>
             </div>
           )}
-          {queryType !== 'DETAIL' &&
+          {queryType !== ChatContextTypeQueryTypeEnum.DETAIL &&
             metrics &&
             metrics.length > 0 &&
             !dimensions?.some(item => item.bizName?.includes('_id')) && (
@@ -72,18 +73,15 @@ export const getTipNode = ({ parseInfo, dimensionFilters, entityInfo }) => {
                 </div>
               </div>
             )}
-          {[
-            'METRIC_GROUPBY',
-            'METRIC_ORDERBY',
-            'TAG_DETAIL',
-            'LLM_S2SQL',
-            'METRIC_FILTER',
-          ].includes(queryMode!) &&
+          {(isDetailQuery ||
+            ['METRIC_GROUPBY', 'METRIC_ORDERBY', 'TAG_DETAIL', 'LLM_S2SQL', 'METRIC_FILTER'].includes(
+              queryMode!
+            )) &&
             fields &&
             fields.length > 0 && (
               <div className={`${prefixCls}-tip-item`}>
                 <div className={`${prefixCls}-tip-item-name`}>
-                  {queryType === 'DETAIL' ? '查询字段' : '下钻维度'}：
+                  {isDetailQuery ? '查询字段' : '下钻维度'}：
                 </div>
                 <div className={itemValueClass}>
                   {fields

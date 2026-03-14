@@ -277,6 +277,7 @@ export type HistoryMsgItemType = {
   parseTimeCost: ParseTimeCostType;
   queryResult: MsgDataType;
   chatId: number;
+  agentId?: number;
   createTime: string;
   feedback: string;
   score: number;

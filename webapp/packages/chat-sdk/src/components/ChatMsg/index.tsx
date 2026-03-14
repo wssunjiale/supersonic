@@ -7,7 +7,11 @@ import { ColumnType, DrillDownDimensionType, FieldType, MsgDataType } from '../.
 import { useEffect, useState } from 'react';
 import { queryData } from '../../service';
 import classNames from 'classnames';
-import { PREFIX_CLS, MsgContentTypeEnum } from '../../common/constants';
+import {
+  PREFIX_CLS,
+  MsgContentTypeEnum,
+  ChatContextTypeQueryTypeEnum,
+} from '../../common/constants';
 import Text from './Text';
 import DrillDownDimensions from '../DrillDownDimensions';
 import MetricOptions from '../MetricOptions';
@@ -37,6 +41,7 @@ const ChatMsg: React.FC<Props> = ({
 }) => {
   const { queryColumns, queryResults, chatContext, queryMode } = data || {};
   const { dimensionFilters, elementMatches } = chatContext || {};
+  const isDetailQuery = chatContext?.queryType === ChatContextTypeQueryTypeEnum.DETAIL;
 
   const [columns, setColumns] = useState<ColumnType[]>([]);
   const [referenceColumn, setReferenceColumn] = useState<ColumnType>();
@@ -102,6 +107,7 @@ const ChatMsg: React.FC<Props> = ({
       !isText &&
       !isMetricCard &&
       (categoryField.length > 1 ||
+        isDetailQuery ||
         queryMode === 'TAG_DETAIL' ||
         queryMode === 'ENTITY_DIMENSION' ||
         dataSource?.length === 1 ||

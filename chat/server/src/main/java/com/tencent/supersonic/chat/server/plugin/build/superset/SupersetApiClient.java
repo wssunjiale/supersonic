@@ -1340,9 +1340,22 @@ public class SupersetApiClient {
             log.debug("superset dashboard color payload, dashboardId={}, payload={}", dashboardId,
                     JsonUtil.toString(payload));
             put(DASHBOARD_API + dashboardId + "/colors?mark_updated=false", payload);
+        } catch (HttpStatusCodeException ex) {
+            if (shouldSkipDashboardColorInitialization(ex)) {
+                log.debug(
+                        "superset dashboard color init skipped, dashboardId={}, status={}, message={}",
+                        dashboardId, ex.getStatusCode(), ex.getMessage());
+                return;
+            }
+            log.warn("superset dashboard color init failed, dashboardId={}", dashboardId, ex);
         } catch (Exception ex) {
             log.warn("superset dashboard color init failed, dashboardId={}", dashboardId, ex);
         }
+    }
+
+    private boolean shouldSkipDashboardColorInitialization(HttpStatusCodeException ex) {
+        int status = ex.getStatusCode().value();
+        return status == 401 || status == 403 || status == 404;
     }
 
     private Map<String, Object> fetchDashboardJsonMetadata(Long dashboardId) {

@@ -1,8 +1,13 @@
 package com.tencent.supersonic.chat.server.plugin.build.superset;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.tencent.supersonic.common.util.JsonUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -354,6 +359,48 @@ public class SupersetApiClientTest {
         RecordingRequest colorRequest = factory.getLastRequest(HttpMethod.PUT,
                 "http://localhost:8088/api/v1/dashboard/88/colors?mark_updated=false");
         Assertions.assertNull(colorRequest);
+    }
+
+    @Test
+    public void testCreateEmbeddedGuestTokenSkipsWarnWhenDashboardMetadataNotFound()
+            throws Exception {
+        SupersetPluginConfig config = new SupersetPluginConfig();
+        config.setBaseUrl("http://localhost:8088/");
+        SupersetApiClient client = new SupersetApiClient(config);
+        RoutingFactory factory = new RoutingFactory();
+        factory.add(HttpMethod.GET, "http://localhost:8088/api/v1/embedded_dashboard/embed-99",
+                HttpStatus.OK, "{\"result\":{\"dashboard_id\":\"99\"}}");
+        factory.add(HttpMethod.GET, "http://localhost:8088/api/v1/dashboard/99",
+                HttpStatus.NOT_FOUND, "{\"message\":\"Not found\"}");
+        factory.add(HttpMethod.POST, "http://localhost:8088/api/v1/security/guest_token/",
+                HttpStatus.OK, "{\"token\":\"guest-token-99\"}");
+        replaceRestTemplate(client, new RestTemplate(factory));
+
+        Logger logger = (Logger) LoggerFactory.getLogger(SupersetApiClient.class);
+        Level previousLevel = logger.getLevel();
+        ListAppender<ILoggingEvent> appender = new ListAppender<>();
+        logger.setLevel(Level.DEBUG);
+        logger.addAppender(appender);
+        appender.start();
+        try {
+            String token = client.createEmbeddedGuestToken("embed-99");
+
+            Assertions.assertEquals("guest-token-99", token);
+            RecordingRequest colorRequest = factory.getLastRequest(HttpMethod.PUT,
+                    "http://localhost:8088/api/v1/dashboard/99/colors?mark_updated=false");
+            Assertions.assertNull(colorRequest);
+            Assertions.assertTrue(appender.list.stream().anyMatch(event ->
+                    event.getLevel() == Level.DEBUG
+                            && event.getFormattedMessage()
+                                    .contains("superset dashboard color init skipped")));
+            Assertions.assertFalse(appender.list.stream().anyMatch(event ->
+                    event.getLevel() == Level.WARN
+                            && event.getFormattedMessage()
+                                    .contains("superset dashboard color init failed")));
+        } finally {
+            logger.detachAppender(appender);
+            logger.setLevel(previousLevel);
+        }
     }
 
     @Test

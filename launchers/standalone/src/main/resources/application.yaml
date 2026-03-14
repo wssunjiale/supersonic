@@ -12,6 +12,8 @@ spring:
     name: chat
   config:
     import:
+      - optional:file:.env[.properties]
+      - optional:file:../../.env[.properties]
       - classpath:s2-config.yaml
   main:
     allow-circular-references: true

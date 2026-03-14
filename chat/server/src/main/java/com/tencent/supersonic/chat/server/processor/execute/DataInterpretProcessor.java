@@ -101,7 +101,8 @@ public class DataInterpretProcessor implements ExecuteResultProcessor {
                 && executeContext.getParseInfo().getProperties().containsKey("CONTEXT")) {
             Map<String, Object> context = (Map<String, Object>) executeContext.getParseInfo()
                     .getProperties().get("CONTEXT");
-            if (context.get("queryText") != null && "".equals(context.get("queryText"))) {
+            if (context.get("queryText") != null
+                    && StringUtils.isNotBlank(context.get("queryText").toString())) {
                 question = context.get("queryText").toString();
             }
         }

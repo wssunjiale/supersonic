@@ -26,8 +26,17 @@ cd %baseDir%
 if "%service%"=="webapp" (
    call :buildWebapp
    set "targetPath=%projectDir%\launchers\%standalone_service%\target\classes"
+   if not exist "!targetPath!" mkdir "!targetPath!"
    tar xvf "%projectDir%\webapp\supersonic-webapp.tar.gz" -C "!targetPath!"
+   if errorlevel 1 (
+      echo Failed to extract frontend package to "!targetPath!".
+      exit /b 1
+   )
    if exist "!targetPath!\webapp" rmdir /s /q "!targetPath!\webapp"
+   if not exist "!targetPath!\supersonic-webapp" (
+      echo Failed to find extracted frontend directory in "!targetPath!".
+      exit /b 1
+   )
    move /y "!targetPath!\supersonic-webapp" "!targetPath!\webapp"
    goto :EOF
 ) else (
