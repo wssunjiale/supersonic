@@ -83,13 +83,21 @@ export function chatExecute(
   parseInfo: ChatContextType,
   agentId?: number
 ) {
-  return axios.post<MsgDataType>(`${prefix}/chat/query/execute`, {
-    queryText,
-    agentId,
-    chatId: chatId || DEFAULT_CHAT_ID,
-    queryId: parseInfo.queryId,
-    parseId: parseInfo.id,
-  });
+  // AgentService executes external agent calls that may take a long time.
+  // Override axiosInstance default timeout (120s) to avoid frontend aborting the request.
+  const requestConfig =
+    parseInfo?.queryMode === 'AGENT_SERVICE' ? { timeout: 0 } : undefined;
+  return axios.post<MsgDataType>(
+    `${prefix}/chat/query/execute`,
+    {
+      queryText,
+      agentId,
+      chatId: chatId || DEFAULT_CHAT_ID,
+      queryId: parseInfo.queryId,
+      parseId: parseInfo.id
+    },
+    requestConfig as any
+  );
 }
 
 export function fetchSupersetDashboards(pluginId?: number) {

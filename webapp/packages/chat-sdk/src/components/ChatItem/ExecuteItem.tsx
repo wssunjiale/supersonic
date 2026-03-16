@@ -10,6 +10,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { solarizedlight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import React, { ReactNode, useState } from 'react';
 import { SupersetChartResponseType } from '../../common/type';
+import MarkDown from '../ChatMsg/MarkDown';
 
 type Props = {
   queryId?: number;
@@ -169,11 +170,11 @@ const ExecuteItem: React.FC<Props> = ({
 
           {renderCustomExecuteNode && executeItemNode ? (
             executeItemNode
-          ) : data?.queryMode === 'PLAIN_TEXT' ||
-            data?.queryMode === 'WEB_SERVICE' ||
-            data?.queryMode === 'AGENT_SERVICE' ? (
+          ) : data?.queryMode === 'AGENT_SERVICE' ? (
+            <MarkDown markdown={data?.textResult} />
+          ) : data?.queryMode === 'PLAIN_TEXT' || data?.queryMode === 'WEB_SERVICE' ? (
             data?.textResult
-          ) : canRenderSuperset ? (
+          ): canRenderSuperset ? (
             <SupersetChart
               id={queryId ?? data?.queryId ?? data?.id ?? ''}
               data={data}
