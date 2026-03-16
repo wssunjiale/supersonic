@@ -15,10 +15,13 @@ import com.tencent.supersonic.chat.server.service.MemoryService;
 import com.tencent.supersonic.common.config.ChatModel;
 import com.tencent.supersonic.common.pojo.ChatApp;
 import com.tencent.supersonic.common.pojo.User;
+import com.tencent.supersonic.common.pojo.enums.AppModule;
 import com.tencent.supersonic.common.pojo.enums.AuthType;
 import com.tencent.supersonic.common.service.ChatModelService;
+import com.tencent.supersonic.common.util.ChatAppManager;
 import com.tencent.supersonic.common.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -26,7 +29,10 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -159,8 +165,8 @@ public class AgentServiceImpl extends ServiceImpl<AgentDOMapper, AgentDO> implem
         BeanUtils.copyProperties(agentDO, agent);
         agent.setToolConfig(agentDO.getToolConfig());
         agent.setExamples(JsonUtil.toList(agentDO.getExamples(), String.class));
-        agent.setChatAppConfig(
-                JsonUtil.toMap(agentDO.getChatModelConfig(), String.class, ChatApp.class));
+        agent.setChatAppConfig(mergeChatAppConfigs(
+                JsonUtil.toMap(agentDO.getChatModelConfig(), String.class, ChatApp.class)));
         agent.setVisualConfig(JsonUtil.toObject(agentDO.getVisualConfig(), VisualConfig.class));
         agent.getChatAppConfig().values().forEach(c -> {
             if (c.isEnable()) {// 优化，减少访问数据库的次数
@@ -183,7 +189,7 @@ public class AgentServiceImpl extends ServiceImpl<AgentDOMapper, AgentDO> implem
         BeanUtils.copyProperties(agent, agentDO);
         agentDO.setToolConfig(agent.getToolConfig());
         agentDO.setExamples(JsonUtil.toString(agent.getExamples()));
-        agentDO.setChatModelConfig(JsonUtil.toString(agent.getChatAppConfig()));
+        agentDO.setChatModelConfig(JsonUtil.toString(normalizeChatAppConfigs(agent.getChatAppConfig())));
         agentDO.setVisualConfig(JsonUtil.toString(agent.getVisualConfig()));
         agentDO.setAdmin(JsonUtil.toString(agent.getAdmins()));
         agentDO.setViewer(JsonUtil.toString(agent.getViewers()));
@@ -194,6 +200,82 @@ public class AgentServiceImpl extends ServiceImpl<AgentDOMapper, AgentDO> implem
             agentDO.setStatus(1);
         }
         return agentDO;
+    }
+
+    Map<String, ChatApp> mergeChatAppConfigs(Map<String, ChatApp> configuredApps) {
+        if (CollectionUtils.isEmpty(configuredApps)) {
+            return Collections.emptyMap();
+        }
+        Map<String, ChatApp> merged = new LinkedHashMap<>();
+        configuredApps.forEach((key, configuredApp) -> {
+            ChatApp defaultApp =
+                    ChatAppManager.getAllApps(AppModule.CHAT).get(key);
+            merged.put(key, mergeChatApp(defaultApp, configuredApp));
+        });
+        return merged;
+    }
+
+    Map<String, ChatApp> normalizeChatAppConfigs(Map<String, ChatApp> configuredApps) {
+        if (CollectionUtils.isEmpty(configuredApps)) {
+            return Collections.emptyMap();
+        }
+        Map<String, ChatApp> normalized = new LinkedHashMap<>();
+        configuredApps.forEach((key, configuredApp) -> {
+            if (configuredApp == null) {
+                return;
+            }
+            ChatApp app = copyChatApp(configuredApp);
+            if (StringUtils.isBlank(app.getPrompt())) {
+                app.setPrompt(null);
+            }
+            normalized.put(key, app);
+        });
+        return normalized;
+    }
+
+    private ChatApp mergeChatApp(ChatApp defaultApp, ChatApp configuredApp) {
+        if (defaultApp == null) {
+            return copyChatApp(configuredApp);
+        }
+        ChatApp merged = copyChatApp(defaultApp);
+        if (configuredApp == null) {
+            return merged;
+        }
+        if (StringUtils.isNotBlank(configuredApp.getName())) {
+            merged.setName(configuredApp.getName());
+        }
+        if (StringUtils.isNotBlank(configuredApp.getDescription())) {
+            merged.setDescription(configuredApp.getDescription());
+        }
+        if (StringUtils.isNotBlank(configuredApp.getPrompt())) {
+            merged.setPrompt(configuredApp.getPrompt());
+        }
+        merged.setEnable(configuredApp.isEnable());
+        if (configuredApp.getChatModelId() != null) {
+            merged.setChatModelId(configuredApp.getChatModelId());
+        }
+        if (configuredApp.getChatModelConfig() != null) {
+            merged.setChatModelConfig(configuredApp.getChatModelConfig());
+        }
+        if (configuredApp.getAppModule() != null) {
+            merged.setAppModule(configuredApp.getAppModule());
+        }
+        return merged;
+    }
+
+    private ChatApp copyChatApp(ChatApp source) {
+        if (source == null) {
+            return null;
+        }
+        ChatApp target = new ChatApp();
+        target.setName(source.getName());
+        target.setDescription(source.getDescription());
+        target.setPrompt(source.getPrompt());
+        target.setEnable(source.isEnable());
+        target.setChatModelId(source.getChatModelId());
+        target.setChatModelConfig(source.getChatModelConfig());
+        target.setAppModule(source.getAppModule());
+        return target;
     }
 
     private boolean checkAdminPermission(Set<String> orgIds, User user, Agent agent) {

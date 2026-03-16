@@ -13,6 +13,7 @@ import com.tencent.supersonic.headless.api.pojo.response.DimensionResp;
 import com.tencent.supersonic.headless.api.pojo.response.MetricResp;
 import com.tencent.supersonic.headless.api.pojo.response.ModelResp;
 import com.tencent.supersonic.headless.api.pojo.response.SemanticTranslateResp;
+import com.tencent.supersonic.headless.api.pojo.enums.MetricDefineType;
 import com.tencent.supersonic.headless.server.facade.service.SemanticLayerService;
 import com.tencent.supersonic.headless.server.service.DataSetService;
 import com.tencent.supersonic.headless.server.service.DatabaseService;
@@ -134,8 +135,8 @@ public class SupersetSemanticDatasetMapper {
             if (StringUtils.isBlank(expandedExpr)) {
                 continue;
             }
-            Set<String> fields =
-                    extractDependencyFields(expandedExpr, seenMetricNamesLower, metricsByBizName);
+            Set<String> fields = extractDependencyFields(expandedExpr, metricKey,
+                    metric.getMetricDefineType(), metricsByBizName);
             if (!CollectionUtils.isEmpty(fields)) {
                 dependencyFields.addAll(fields);
             }
@@ -204,6 +205,11 @@ public class SupersetSemanticDatasetMapper {
             supersetColumns.add(col);
         }
 
+        Set<String> availableColumns = supersetColumns.stream()
+                .map(SupersetDatasetColumn::getColumnName).filter(StringUtils::isNotBlank)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+        supersetMetrics = filterExecutableMetrics(supersetMetrics, availableColumns, dataSetId);
+
         LinkedHashSet<String> selectItems = new LinkedHashSet<>();
         supersetColumns.stream().map(SupersetDatasetColumn::getColumnName)
                 .filter(StringUtils::isNotBlank).forEach(selectItems::add);
@@ -242,8 +248,16 @@ public class SupersetSemanticDatasetMapper {
                 .mainDttmCol(mainDttmCol).columns(supersetColumns).metrics(supersetMetrics).build();
     }
 
-    private Set<String> extractDependencyFields(String expr, Set<String> metricNamesLower,
+    private Set<String> extractDependencyFields(String expr, String currentMetricKey,
+            MetricDefineType defineType,
             Map<String, MetricResp> metricsByBizName) {
+        return extractExpressionFields(expr).stream()
+                .filter(token -> !shouldIgnoreMetricReference(token, currentMetricKey, defineType,
+                        metricsByBizName))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    private Set<String> extractExpressionFields(String expr) {
         if (StringUtils.isBlank(expr)) {
             return Collections.emptySet();
         }
@@ -255,13 +269,11 @@ public class SupersetSemanticDatasetMapper {
             }
             return columns.stream().filter(StringUtils::isNotBlank).map(String::trim)
                     .filter(this::isValidDependencyToken)
-                    .filter(token -> !metricNamesLower.contains(token.toLowerCase(Locale.ROOT)))
-                    .filter(token -> !metricsByBizName.containsKey(token.toLowerCase(Locale.ROOT)))
                     .collect(Collectors.toCollection(LinkedHashSet::new));
         } catch (Exception ex) {
             // JSqlParser doesn't support some dialect fragments (e.g. postgres :: cast). Fallback
             // to a conservative identifier scan.
-            return regexExtractDependencies(sanitized, metricNamesLower, metricsByBizName);
+            return regexExtractDependencies(sanitized);
         }
     }
 
@@ -274,8 +286,7 @@ public class SupersetSemanticDatasetMapper {
         return sanitized;
     }
 
-    private Set<String> regexExtractDependencies(String sanitizedExpr, Set<String> metricNamesLower,
-            Map<String, MetricResp> metricsByBizName) {
+    private Set<String> regexExtractDependencies(String sanitizedExpr) {
         if (StringUtils.isBlank(sanitizedExpr)) {
             return Collections.emptySet();
         }
@@ -291,13 +302,52 @@ public class SupersetSemanticDatasetMapper {
             if (!isValidDependencyToken(token)) {
                 continue;
             }
-            String key = token.toLowerCase(Locale.ROOT);
-            if (metricNamesLower.contains(key) || metricsByBizName.containsKey(key)) {
-                continue;
-            }
             tokens.add(token);
         }
         return tokens;
+    }
+
+    private boolean shouldIgnoreMetricReference(String token, String currentMetricKey,
+            MetricDefineType defineType, Map<String, MetricResp> metricsByBizName) {
+        if (StringUtils.isBlank(token) || CollectionUtils.isEmpty(metricsByBizName)) {
+            return false;
+        }
+        String key = token.toLowerCase(Locale.ROOT);
+        if (!metricsByBizName.containsKey(key)) {
+            return false;
+        }
+        if (!MetricDefineType.METRIC.equals(defineType) && StringUtils.equals(key,
+                currentMetricKey)) {
+            return false;
+        }
+        return true;
+    }
+
+    private List<SupersetDatasetMetric> filterExecutableMetrics(List<SupersetDatasetMetric> metrics,
+            Set<String> availableColumns, Long dataSetId) {
+        if (CollectionUtils.isEmpty(metrics) || CollectionUtils.isEmpty(availableColumns)) {
+            return CollectionUtils.isEmpty(metrics) ? new ArrayList<>() : metrics;
+        }
+        Set<String> availableColumnKeys = availableColumns.stream().filter(StringUtils::isNotBlank)
+                .map(item -> item.toLowerCase(Locale.ROOT))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+        List<SupersetDatasetMetric> executable = new ArrayList<>();
+        for (SupersetDatasetMetric metric : metrics) {
+            if (metric == null || StringUtils.isBlank(metric.getExpression())) {
+                continue;
+            }
+            Set<String> fields = extractExpressionFields(metric.getExpression());
+            boolean valid = fields.stream().map(item -> item.toLowerCase(Locale.ROOT))
+                    .allMatch(availableColumnKeys::contains);
+            if (valid) {
+                executable.add(metric);
+                continue;
+            }
+            log.warn(
+                    "superset semantic dataset drop invalid metric, dataSetId={}, metric={}, expr={}, availableColumns={}",
+                    dataSetId, metric.getMetricName(), metric.getExpression(), availableColumns);
+        }
+        return executable;
     }
 
     private boolean isValidDependencyToken(String token) {

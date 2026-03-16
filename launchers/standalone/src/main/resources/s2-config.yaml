@@ -6,9 +6,9 @@ s2:
   parser:
     strategy: ONE_PASS_SELF_CONSISTENCY
     exemplar-recall:
-      number: 0
+      number: 10
     few-shot:
-      number: 0
+      number: 5
     self-consistency:
       number: 1
     multi-turn:
@@ -47,10 +47,8 @@ s2:
 
   superset:
     enabled: ${S2_SUPERSET_ENABLED:true}
-    base-url: ${S2_SUPERSET_BASE_URL:http://10.0.12.244:8088}
+    base-url: ${S2_SUPERSET_BASE_URL:}
     auth-enabled: ${S2_SUPERSET_AUTH_ENABLED:true}
-    auth-strategy: ${S2_SUPERSET_AUTH_STRATEGY:JWT_FIRST}
-    api-key: ${S2_SUPERSET_API_KEY:}
     jwt-username: ${S2_SUPERSET_JWT_USERNAME:}
     jwt-password: ${S2_SUPERSET_JWT_PASSWORD:}
     jwt-provider: ${S2_SUPERSET_JWT_PROVIDER:db}

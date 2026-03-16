@@ -5,12 +5,7 @@ chmod +x $sbinDir/supersonic-common.sh
 source $sbinDir/supersonic-common.sh
 cd $projectDir
 
-MVN_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | grep -v '^\[' | sed -n '/^[0-9]/p')
-if [ -z "$MVN_VERSION" ]; then
-  echo "Failed to retrieve Maven project version."
-  exit 1
-fi
-echo "Maven project version: $MVN_VERSION"
+MVN_VERSION=""
 
 cd $baseDir
 service=$1
@@ -30,11 +25,23 @@ function buildJavaService {
   echo "finished building supersonic-${model_name} service"
 }
 
+function resolveMavenProjectVersion {
+  if [ -n "$MVN_VERSION" ]; then
+    return
+  fi
+  MVN_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | grep -v '^\[' | sed -n '/^[0-9]/p')
+  if [ -z "$MVN_VERSION" ]; then
+    echo "Failed to retrieve Maven project version."
+    exit 1
+  fi
+  echo "Maven project version: $MVN_VERSION"
+}
+
 function buildWebapp {
   echo "starting building supersonic webapp"
   chmod +x $projectDir/webapp/start-fe-prod.sh
   cd $projectDir/webapp
-  sh ./start-fe-prod.sh
+  ./start-fe-prod.sh
   # check build result
   if [ $? -ne 0 ]; then
       echo "Failed to build frontend webapp."
@@ -129,6 +136,7 @@ if [ "$service" == "webapp" ]; then
   buildWebapp
   syncWebappToStandaloneClasses
 else
+  resolveMavenProjectVersion
   buildJavaService $service
   buildWebapp
   packageRelease $service

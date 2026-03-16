@@ -1,6 +1,7 @@
 package com.tencent.supersonic.headless.server.sync.superset;
 
 import com.tencent.supersonic.common.pojo.User;
+import com.tencent.supersonic.common.pojo.QueryColumn;
 import com.tencent.supersonic.common.pojo.enums.EngineType;
 import com.tencent.supersonic.common.util.JsonUtil;
 import com.tencent.supersonic.headless.api.pojo.SemanticParseInfo;
@@ -80,7 +81,7 @@ public class SupersetSyncService {
     }
 
     public SupersetDatasetInfo registerAndSyncDataset(SemanticParseInfo parseInfo, String sql,
-            User user) {
+            List<QueryColumn> queryColumns, User user) {
         if (parseInfo == null || StringUtils.isBlank(sql)) {
             return null;
         }
@@ -88,7 +89,8 @@ public class SupersetSyncService {
                 || StringUtils.isBlank(properties.getBaseUrl())) {
             return null;
         }
-        SupersetDatasetDO record = registryService.registerDataset(parseInfo, sql, user);
+        SupersetDatasetDO record = registryService.registerDataset(parseInfo, sql, queryColumns,
+                user);
         if (record == null) {
             return null;
         }
@@ -110,6 +112,30 @@ public class SupersetSyncService {
         } catch (Exception ex) {
             log.warn("superset dataset fetch failed after sync, id={}, message={}", info.getId(),
                     ex.getMessage());
+            log.debug("superset dataset fetch error", ex);
+        }
+        mergeDatasetInfoForChart(info, remote);
+        return info;
+    }
+
+    public SupersetDatasetInfo resolveDatasetInfo(SupersetDatasetDO dataset) {
+        if (dataset == null || dataset.getSupersetDatasetId() == null) {
+            return null;
+        }
+        if (!properties.isEnabled() || StringUtils.isBlank(properties.getBaseUrl())) {
+            return null;
+        }
+        Long supersetDatabaseId = resolveSupersetDatabaseId(dataset.getDatabaseId());
+        SupersetDatasetInfo info = buildDatasetInfo(dataset, supersetDatabaseId);
+        if (info == null || info.getId() == null) {
+            return null;
+        }
+        SupersetDatasetInfo remote = null;
+        try {
+            remote = syncClient.fetchDataset(info.getId());
+        } catch (Exception ex) {
+            log.warn("superset dataset fetch failed for registry record, id={}, message={}",
+                    info.getId(), ex.getMessage());
             log.debug("superset dataset fetch error", ex);
         }
         mergeDatasetInfoForChart(info, remote);

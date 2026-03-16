@@ -60,6 +60,8 @@ knife4j:
       description: ChatBI API Documents
 
 s2:
+  mapper:
+    strategy: ${S2_MAPPER_STRATEGY:LLM}
   agent:
     service:
       response-timeout-minutes: ${S2_AGENT_SERVICE_RESPONSE_TIMEOUT_MINUTES:5}

@@ -40,6 +40,14 @@
   - 方案: `plan/202603101731_superset-viztype-online-metadata/`
 
 ### 修复
+- **[build-webapp]**: 前端打包链改为直接执行 `start-fe-prod.sh`，统一走 workspace 递归安装与构建，移除 `pnpm link --global`；新增 pnpm/corepack/store/cache/registry 隔离与超时回退，修正锁文件中的失真 checksum；生产构建改为消费 `chat-sdk/dist`，并收紧 `supersonic-fe` 的运行时环境注入与 `mfsu` 范围，降低 `webapp` 构建脆弱性
+  - 文件: `assembly/bin/supersonic-build.sh`, `webapp/start-fe-prod.sh`, `webapp/packages/supersonic-fe/config/config.ts`, `webapp/package.json`, `webapp/pnpm-lock.yaml`
+
+### 修复
+- **[assembly]**: 恢复 `assembly/bin/supersonic-build.sh` 非 `webapp` 分支的官方构建顺序（先 Java、后 Web），修复发布构建流程被打乱的问题
+- **[chat-server]**: Superset 图表共享链路过滤失效 dataset metric，并限制非时间图默认注入时间粒度，修复多类图表引用不存在列的问题 — by qtmssa
+  - 方案: `archive/2026-03/202603160951_fix-superset-metric-dataset-consistency/`
+- **[headless-superset-sync]**: 修复 semantic dataset 同步时原子指标依赖列被误过滤、saved metric 使用裸列表达式的问题，并在同步前增加 metric 可执行性校验，避免 dataset SQL、metric 定义与图表聚合行为失配
 - **[chat-server]**: 打包后可从 classpath 读取 docs/viztype.json，避免选图退化为 table
   - 方案: `archive/2026-02/202602040217_superset-viztype-candidates/`
 - **[chat-server]**: 查询列缺失时回退语义/数据集列生成选图特征，避免固定为 table

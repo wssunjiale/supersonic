@@ -83,7 +83,7 @@ public class OnePassSCSqlGenStrategy extends SqlGenStrategy {
         List<List<Text2SQLExemplar>> exemplarsList = promptHelper.getFewShotExemplars(llmReq);
 
         // 2.generate sql generation prompt for each self-consistency inference
-        ChatApp chatApp = llmReq.getChatAppConfig().get(APP_KEY);
+        ChatApp chatApp = resolveChatApp(llmReq);
         ChatModelConfig chatModelConfig = chatApp.getChatModelConfig();
         if (!StringUtils.isBlank(parserConfig.getParameterValue(PARSER_FORMAT_JSON_TYPE))) {
             chatModelConfig.setJsonFormat(true);
@@ -140,9 +140,65 @@ public class OnePassSCSqlGenStrategy extends SqlGenStrategy {
         variable.put("schema", dataSemantics);
         variable.put("information", sideInformation);
 
-        // use custom prompt template if provided.
-        String promptTemplate = chatApp.getPrompt();
+        String promptTemplate = resolvePromptTemplate(chatApp);
         return PromptTemplate.from(promptTemplate).apply(variable);
+    }
+
+    ChatApp resolveChatApp(LLMReq llmReq) {
+        ChatApp configured = null;
+        if (llmReq != null && llmReq.getChatAppConfig() != null) {
+            configured = llmReq.getChatAppConfig().get(APP_KEY);
+        }
+        ChatApp resolved = ChatAppManager.getApp(APP_KEY).map(this::copyChatApp)
+                .orElseGet(() -> ChatApp.builder().prompt(INSTRUCTION).name("语义SQL解析")
+                        .appModule(AppModule.CHAT).description("通过大模型做语义解析生成S2SQL")
+                        .enable(true).build());
+        if (configured == null) {
+            return resolved;
+        }
+        if (!StringUtils.isBlank(configured.getName())) {
+            resolved.setName(configured.getName());
+        }
+        if (!StringUtils.isBlank(configured.getDescription())) {
+            resolved.setDescription(configured.getDescription());
+        }
+        if (!StringUtils.isBlank(configured.getPrompt())) {
+            resolved.setPrompt(configured.getPrompt());
+        }
+        resolved.setEnable(configured.isEnable());
+        if (configured.getChatModelId() != null) {
+            resolved.setChatModelId(configured.getChatModelId());
+        }
+        if (configured.getChatModelConfig() != null) {
+            resolved.setChatModelConfig(configured.getChatModelConfig());
+        }
+        if (configured.getAppModule() != null) {
+            resolved.setAppModule(configured.getAppModule());
+        }
+        return resolved;
+    }
+
+    String resolvePromptTemplate(ChatApp chatApp) {
+        if (chatApp != null && !StringUtils.isBlank(chatApp.getPrompt())) {
+            return chatApp.getPrompt();
+        }
+        return ChatAppManager.getApp(APP_KEY).map(ChatApp::getPrompt).filter(StringUtils::isNotBlank)
+                .orElse(INSTRUCTION);
+    }
+
+    private ChatApp copyChatApp(ChatApp source) {
+        if (source == null) {
+            return null;
+        }
+        ChatApp target = new ChatApp();
+        target.setName(source.getName());
+        target.setDescription(source.getDescription());
+        target.setPrompt(source.getPrompt());
+        target.setEnable(source.isEnable());
+        target.setChatModelId(source.getChatModelId());
+        target.setChatModelConfig(source.getChatModelConfig());
+        target.setAppModule(source.getAppModule());
+        return target;
     }
 
     @Override

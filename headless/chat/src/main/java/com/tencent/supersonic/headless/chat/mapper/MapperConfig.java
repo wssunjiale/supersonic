@@ -5,6 +5,8 @@ import com.tencent.supersonic.common.config.ParameterConfig;
 import com.tencent.supersonic.common.pojo.Parameter;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service("HeadlessMapperConfig")
 public class MapperConfig extends ParameterConfig {
 
@@ -70,4 +72,9 @@ public class MapperConfig extends ParameterConfig {
     public static final Parameter EMBEDDING_MAPPER_ALLOWED_SEGMENT_NATURE =
             new Parameter("s2.mapper.embedding.allowed-segment-nature", "['v', 'd', 'a']",
                     "使用LLM召回二次处理时对问题分词词性的控制", "分词后允许的词性才会进行向量召回", "list", "Mapper相关配置");
+
+    @Override
+    public List<Parameter> getSysParameters() {
+        return Lists.newArrayList(MAPPER_STRATEGY);
+    }
 }

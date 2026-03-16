@@ -7,6 +7,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.tencent.supersonic.common.jsqlparser.SqlNormalizeHelper;
 import com.tencent.supersonic.common.jsqlparser.SqlSelectHelper;
+import com.tencent.supersonic.common.pojo.QueryColumn;
 import com.tencent.supersonic.common.pojo.User;
 import com.tencent.supersonic.common.pojo.enums.EngineType;
 import com.tencent.supersonic.common.pojo.exception.InvalidPermissionException;
@@ -35,14 +36,24 @@ import com.tencent.supersonic.headless.server.sync.superset.SupersetDatasetSyncE
 import com.tencent.supersonic.headless.server.sync.superset.SupersetDatasetSyncState;
 import com.tencent.supersonic.headless.server.sync.superset.SupersetDatasetType;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.schema.Table;
+import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.select.SelectItem;
+import net.sf.jsqlparser.statement.select.SetOperationList;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -67,7 +78,8 @@ public class SupersetDatasetRegistryServiceImpl
     }
 
     @Override
-    public SupersetDatasetDO registerDataset(SemanticParseInfo parseInfo, String sql, User user) {
+    public SupersetDatasetDO registerDataset(SemanticParseInfo parseInfo, String sql,
+            List<QueryColumn> queryColumns, User user) {
         if (parseInfo == null || StringUtils.isBlank(sql)) {
             return null;
         }
@@ -102,8 +114,18 @@ public class SupersetDatasetRegistryServiceImpl
         }
         String datasetDesc = buildDatasetDesc(parseInfo, sqlHash);
         String tags = buildDatasetTags(parseInfo, datasetType, sqlHash);
-        List<SupersetDatasetColumn> columns = buildDatasetColumns(parseInfo);
-        List<SupersetDatasetMetric> metrics = buildDatasetMetrics(parseInfo);
+        DatasetSchemaSpec schemaSpec = buildDatasetSchema(parseInfo, normalizedSql, queryColumns);
+        List<SupersetDatasetColumn> columns = schemaSpec.getColumns();
+        List<SupersetDatasetMetric> metrics = schemaSpec.getMetrics();
+        log.debug("superset dataset register schema, sqlHash={}, queryColumns={}, columns={}, metrics={}",
+                sqlHash,
+                queryColumns == null ? Collections.emptyList()
+                        : queryColumns.stream().map(QueryColumn::getBizName)
+                                .collect(Collectors.toList()),
+                columns.stream().map(SupersetDatasetColumn::getColumnName)
+                        .collect(Collectors.toList()),
+                metrics.stream().map(SupersetDatasetMetric::getMetricName)
+                        .collect(Collectors.toList()));
         String mainDttmCol = resolveMainDttmCol(columns);
 
         SupersetDatasetDO record = existing == null ? new SupersetDatasetDO() : existing;
@@ -157,6 +179,36 @@ public class SupersetDatasetRegistryServiceImpl
     @Override
     public SupersetDatasetDO getById(Long id) {
         return super.getById(id);
+    }
+
+    @Override
+    public List<SupersetDatasetDO> listAvailablePersistentDatasets(Long dataSetId) {
+        if (dataSetId == null) {
+            return Collections.emptyList();
+        }
+        LambdaQueryWrapper<SupersetDatasetDO> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(SupersetDatasetDO::getDataSetId, dataSetId)
+                .eq(SupersetDatasetDO::getSyncState, SupersetDatasetSyncState.SUCCESS.name())
+                .isNotNull(SupersetDatasetDO::getSupersetDatasetId)
+                .and(w -> w.eq(SupersetDatasetDO::getSourceType,
+                        SupersetDatasetSourceType.SEMANTIC_DATASET.name()).or()
+                        .eq(SupersetDatasetDO::getDatasetType, SupersetDatasetType.PHYSICAL.name()));
+        List<SupersetDatasetDO> records = list(wrapper);
+        if (CollectionUtils.isEmpty(records)) {
+            return Collections.emptyList();
+        }
+        return records.stream().filter(Objects::nonNull)
+                .filter(record -> Objects.equals(dataSetId, record.getDataSetId()))
+                .filter(record -> record.getSupersetDatasetId() != null)
+                .filter(record -> SupersetDatasetSyncState.SUCCESS.name()
+                        .equalsIgnoreCase(record.getSyncState()))
+                .filter(this::isPersistentDatasetCandidate)
+                .sorted(Comparator.comparingInt(this::resolvePersistentDatasetPriority)
+                        .thenComparing(SupersetDatasetDO::getUpdatedAt,
+                                Comparator.nullsLast(Comparator.reverseOrder()))
+                        .thenComparing(SupersetDatasetDO::getCreatedAt,
+                                Comparator.nullsLast(Comparator.reverseOrder())))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -360,6 +412,31 @@ public class SupersetDatasetRegistryServiceImpl
         SupersetDatasetResp resp = new SupersetDatasetResp();
         BeanMapper.mapper(record, resp);
         return resp;
+    }
+
+    private boolean isPersistentDatasetCandidate(SupersetDatasetDO record) {
+        if (record == null) {
+            return false;
+        }
+        if (SupersetDatasetSourceType.SEMANTIC_DATASET.name()
+                .equalsIgnoreCase(record.getSourceType())) {
+            return true;
+        }
+        return SupersetDatasetType.PHYSICAL.name().equalsIgnoreCase(record.getDatasetType());
+    }
+
+    private int resolvePersistentDatasetPriority(SupersetDatasetDO record) {
+        if (record == null) {
+            return Integer.MAX_VALUE;
+        }
+        if (SupersetDatasetSourceType.SEMANTIC_DATASET.name()
+                .equalsIgnoreCase(record.getSourceType())) {
+            return 0;
+        }
+        if (SupersetDatasetType.PHYSICAL.name().equalsIgnoreCase(record.getDatasetType())) {
+            return 1;
+        }
+        return 2;
     }
 
     private void assertAdmin(User user) {
@@ -576,6 +653,106 @@ public class SupersetDatasetRegistryServiceImpl
         return JsonUtil.toString(tags);
     }
 
+    private DatasetSchemaSpec buildDatasetSchema(SemanticParseInfo parseInfo, String sql,
+            List<QueryColumn> queryColumns) {
+        List<DatasetOutputField> outputFields = buildOutputFields(parseInfo, sql, queryColumns);
+        if (!outputFields.isEmpty()) {
+            return new DatasetSchemaSpec(buildDatasetColumns(outputFields),
+                    buildDatasetMetrics(outputFields));
+        }
+        if (!CollectionUtils.isEmpty(queryColumns)) {
+            List<DatasetOutputField> queryFields = buildQueryColumnOutputFields(queryColumns);
+            if (!queryFields.isEmpty()) {
+                return new DatasetSchemaSpec(buildDatasetColumns(queryFields),
+                        buildDatasetMetrics(queryFields));
+            }
+        }
+        return new DatasetSchemaSpec(buildDatasetColumns(parseInfo), buildDatasetMetrics(parseInfo));
+    }
+
+    private List<DatasetOutputField> buildOutputFields(SemanticParseInfo parseInfo, String sql,
+            List<QueryColumn> queryColumns) {
+        List<SelectItem<?>> selectItems = resolveTopLevelSelectItems(sql);
+        if (CollectionUtils.isEmpty(selectItems)) {
+            return Collections.emptyList();
+        }
+        Map<String, SchemaElement> metricLookup =
+                buildSchemaElementLookup(parseInfo == null ? null : parseInfo.getMetrics());
+        Map<String, SchemaElement> dimensionLookup =
+                buildSchemaElementLookup(parseInfo == null ? null : parseInfo.getDimensions());
+        Map<String, QueryColumn> queryColumnLookup = buildQueryColumnLookup(queryColumns);
+        List<DatasetOutputField> outputFields = new ArrayList<>();
+        for (int i = 0; i < selectItems.size(); i++) {
+            SelectItem<?> selectItem = selectItems.get(i);
+            if (selectItem == null || selectItem.getExpression() == null) {
+                continue;
+            }
+            QueryColumn positionalColumn = resolveQueryColumnByIndex(queryColumns, i);
+            String outputName = resolveOutputName(selectItem, positionalColumn);
+            if (StringUtils.isBlank(outputName)) {
+                continue;
+            }
+            QueryColumn queryColumn = positionalColumn == null
+                    ? queryColumnLookup.get(normalizeName(outputName))
+                    : positionalColumn;
+            Set<String> sourceFields = resolveSourceFields(selectItem.getExpression());
+            SchemaElement metricElement =
+                    resolveMatchedElement(metricLookup, outputName, sourceFields);
+            SchemaElement dimensionElement =
+                    resolveMatchedElement(dimensionLookup, outputName, sourceFields);
+            boolean isTime = isTimeField(dimensionElement, queryColumn);
+            boolean numeric = metricElement != null || isNumericQueryColumn(queryColumn)
+                    || isLikelyNumericExpression(selectItem.getExpression());
+            boolean groupBy =
+                    metricElement == null && (isTime || dimensionElement != null || !numeric);
+
+            DatasetOutputField outputField = new DatasetOutputField();
+            outputField.setOutputName(outputName);
+            outputField.setVerboseName(resolveVerboseName(queryColumn, metricElement,
+                    dimensionElement, outputField.getOutputName()));
+            outputField.setDescription(resolveDescription(queryColumn, metricElement,
+                    dimensionElement));
+            outputField.setDttm(isTime);
+            outputField.setGroupby(groupBy);
+            outputField.setFilterable(groupBy);
+            outputField.setMetricCandidate(!groupBy && numeric);
+            outputField.setMatchedMetric(metricElement != null);
+            outputField.setAggregate(metricElement == null ? null : metricElement.getDefaultAgg());
+            outputField.setType(isTime ? "DATE" : (numeric ? "NUMBER" : "STRING"));
+            outputFields.add(outputField);
+        }
+        return outputFields;
+    }
+
+    private List<DatasetOutputField> buildQueryColumnOutputFields(List<QueryColumn> queryColumns) {
+        if (CollectionUtils.isEmpty(queryColumns)) {
+            return Collections.emptyList();
+        }
+        List<DatasetOutputField> outputFields = new ArrayList<>();
+        for (QueryColumn queryColumn : queryColumns) {
+            if (queryColumn == null || StringUtils.isBlank(queryColumn.getBizName())) {
+                continue;
+            }
+            boolean isTime = isTimeQueryColumn(queryColumn);
+            boolean numeric = isNumericQueryColumn(queryColumn);
+            boolean groupBy = !numeric || isTime;
+            DatasetOutputField outputField = new DatasetOutputField();
+            outputField.setOutputName(queryColumn.getBizName());
+            outputField.setVerboseName(StringUtils.defaultIfBlank(queryColumn.getName(),
+                    queryColumn.getBizName()));
+            outputField.setDescription(queryColumn.getComment());
+            outputField.setDttm(isTime);
+            outputField.setGroupby(groupBy);
+            outputField.setFilterable(groupBy);
+            outputField.setMetricCandidate(!groupBy && numeric);
+            outputField.setMatchedMetric(numeric);
+            outputField.setAggregate("SUM");
+            outputField.setType(isTime ? "DATE" : (numeric ? "NUMBER" : "STRING"));
+            outputFields.add(outputField);
+        }
+        return outputFields;
+    }
+
     private List<SupersetDatasetColumn> buildDatasetColumns(SemanticParseInfo parseInfo) {
         if (parseInfo == null) {
             return new ArrayList<>();
@@ -625,6 +802,29 @@ public class SupersetDatasetRegistryServiceImpl
                 .values().stream().collect(Collectors.toList());
     }
 
+    private List<SupersetDatasetColumn> buildDatasetColumns(List<DatasetOutputField> outputFields) {
+        if (CollectionUtils.isEmpty(outputFields)) {
+            return Collections.emptyList();
+        }
+        Map<String, SupersetDatasetColumn> columns = new LinkedHashMap<>();
+        for (DatasetOutputField outputField : outputFields) {
+            if (outputField == null || StringUtils.isBlank(outputField.getOutputName())) {
+                continue;
+            }
+            SupersetDatasetColumn column = new SupersetDatasetColumn();
+            column.setColumnName(outputField.getOutputName());
+            column.setVerboseName(StringUtils.defaultIfBlank(outputField.getVerboseName(),
+                    outputField.getOutputName()));
+            column.setDescription(outputField.getDescription());
+            column.setGroupby(outputField.isGroupby());
+            column.setFilterable(outputField.isFilterable());
+            column.setIsDttm(outputField.isDttm());
+            column.setType(outputField.getType());
+            columns.putIfAbsent(normalizeName(outputField.getOutputName()), column);
+        }
+        return new ArrayList<>(columns.values());
+    }
+
     private List<SupersetDatasetMetric> buildDatasetMetrics(SemanticParseInfo parseInfo) {
         if (parseInfo == null || CollectionUtils.isEmpty(parseInfo.getMetrics())) {
             return new ArrayList<>();
@@ -647,6 +847,36 @@ public class SupersetDatasetRegistryServiceImpl
         return metrics;
     }
 
+    private List<SupersetDatasetMetric> buildDatasetMetrics(List<DatasetOutputField> outputFields) {
+        if (CollectionUtils.isEmpty(outputFields)) {
+            return Collections.emptyList();
+        }
+        List<DatasetOutputField> selectedMetrics = outputFields.stream()
+                .filter(field -> field != null && field.isMatchedMetric() && field.isMetricCandidate())
+                .collect(Collectors.toList());
+        if (selectedMetrics.isEmpty()) {
+            selectedMetrics = outputFields.stream()
+                    .filter(field -> field != null && field.isMetricCandidate())
+                    .collect(Collectors.toList());
+        }
+        Map<String, SupersetDatasetMetric> metrics = new LinkedHashMap<>();
+        for (DatasetOutputField outputField : selectedMetrics) {
+            if (StringUtils.isBlank(outputField.getOutputName())) {
+                continue;
+            }
+            SupersetDatasetMetric metric = new SupersetDatasetMetric();
+            metric.setMetricName(outputField.getOutputName());
+            metric.setExpression(buildMetricExpression(outputField.getOutputName(),
+                    outputField.getAggregate()));
+            metric.setMetricType("SQL");
+            metric.setVerboseName(StringUtils.defaultIfBlank(outputField.getVerboseName(),
+                    outputField.getOutputName()));
+            metric.setDescription(outputField.getDescription());
+            metrics.putIfAbsent(normalizeName(outputField.getOutputName()), metric);
+        }
+        return new ArrayList<>(metrics.values());
+    }
+
     private String resolveSchemaElementColumnName(SchemaElement element) {
         if (element == null) {
             return null;
@@ -655,6 +885,206 @@ public class SupersetDatasetRegistryServiceImpl
             return element.getBizName();
         }
         return element.getName();
+    }
+
+    private List<SelectItem<?>> resolveTopLevelSelectItems(String sql) {
+        if (StringUtils.isBlank(sql)) {
+            return Collections.emptyList();
+        }
+        try {
+            Select select = SqlSelectHelper.getSelect(sql);
+            if (select instanceof PlainSelect) {
+                return ((PlainSelect) select).getSelectItems();
+            }
+            if (select instanceof SetOperationList) {
+                List<Select> selects = ((SetOperationList) select).getSelects();
+                if (!CollectionUtils.isEmpty(selects) && selects.get(0) instanceof PlainSelect) {
+                    return ((PlainSelect) selects.get(0)).getSelectItems();
+                }
+            }
+        } catch (Exception ex) {
+            log.debug("resolve top level select items failed", ex);
+        }
+        return Collections.emptyList();
+    }
+
+    private Map<String, SchemaElement> buildSchemaElementLookup(Set<SchemaElement> elements) {
+        Map<String, SchemaElement> lookup = new LinkedHashMap<>();
+        if (CollectionUtils.isEmpty(elements)) {
+            return lookup;
+        }
+        for (SchemaElement element : elements) {
+            if (element == null) {
+                continue;
+            }
+            addLookupEntry(lookup, element.getBizName(), element);
+            addLookupEntry(lookup, element.getName(), element);
+        }
+        return lookup;
+    }
+
+    private Map<String, QueryColumn> buildQueryColumnLookup(List<QueryColumn> queryColumns) {
+        Map<String, QueryColumn> lookup = new LinkedHashMap<>();
+        if (CollectionUtils.isEmpty(queryColumns)) {
+            return lookup;
+        }
+        for (QueryColumn queryColumn : queryColumns) {
+            if (queryColumn == null) {
+                continue;
+            }
+            addLookupEntry(lookup, queryColumn.getBizName(), queryColumn);
+            addLookupEntry(lookup, queryColumn.getName(), queryColumn);
+        }
+        return lookup;
+    }
+
+    private <T> void addLookupEntry(Map<String, T> lookup, String key, T value) {
+        if (lookup == null || value == null || StringUtils.isBlank(key)) {
+            return;
+        }
+        lookup.putIfAbsent(normalizeName(key), value);
+    }
+
+    private QueryColumn resolveQueryColumnByIndex(List<QueryColumn> queryColumns, int index) {
+        if (CollectionUtils.isEmpty(queryColumns) || index < 0 || index >= queryColumns.size()) {
+            return null;
+        }
+        return queryColumns.get(index);
+    }
+
+    private String resolveOutputName(SelectItem<?> selectItem, QueryColumn positionalColumn) {
+        if (selectItem == null) {
+            return null;
+        }
+        if (selectItem.getAlias() != null && StringUtils.isNotBlank(selectItem.getAlias().getName())) {
+            return StringUtil.replaceBackticks(selectItem.getAlias().getName());
+        }
+        if (positionalColumn != null && StringUtils.isNotBlank(positionalColumn.getBizName())) {
+            return positionalColumn.getBizName();
+        }
+        if (selectItem.getExpression() != null) {
+            String expression = StringUtil.replaceBackticks(selectItem.getExpression().toString());
+            if (StringUtils.isNotBlank(expression)) {
+                return expression;
+            }
+        }
+        return null;
+    }
+
+    private Set<String> resolveSourceFields(Expression expression) {
+        Set<String> sourceFields = new LinkedHashSet<>();
+        if (expression == null) {
+            return sourceFields;
+        }
+        try {
+            SqlSelectHelper.getFieldsFromExpr(expression, sourceFields);
+        } catch (Exception ex) {
+            log.debug("resolve source fields failed, expression={}", expression, ex);
+        }
+        return sourceFields;
+    }
+
+    private SchemaElement resolveMatchedElement(Map<String, SchemaElement> lookup, String outputName,
+            Set<String> sourceFields) {
+        if (lookup == null || lookup.isEmpty()) {
+            return null;
+        }
+        SchemaElement matched = lookup.get(normalizeName(outputName));
+        if (matched != null || CollectionUtils.isEmpty(sourceFields)) {
+            return matched;
+        }
+        for (String sourceField : sourceFields) {
+            matched = lookup.get(normalizeName(sourceField));
+            if (matched != null) {
+                return matched;
+            }
+        }
+        return null;
+    }
+
+    private boolean isTimeField(SchemaElement dimensionElement, QueryColumn queryColumn) {
+        return (dimensionElement != null && dimensionElement.isPartitionTime())
+                || isTimeQueryColumn(queryColumn);
+    }
+
+    private boolean isTimeQueryColumn(QueryColumn queryColumn) {
+        if (queryColumn == null) {
+            return false;
+        }
+        String showType = StringUtils.defaultString(queryColumn.getShowType());
+        return "DATE".equalsIgnoreCase(showType) || "TIME".equalsIgnoreCase(showType)
+                || isTimeType(queryColumn.getType());
+    }
+
+    private boolean isNumericQueryColumn(QueryColumn queryColumn) {
+        if (queryColumn == null) {
+            return false;
+        }
+        String showType = StringUtils.defaultString(queryColumn.getShowType());
+        return "NUMBER".equalsIgnoreCase(showType) || isNumericType(queryColumn.getType());
+    }
+
+    private boolean isLikelyNumericExpression(Expression expression) {
+        if (expression == null) {
+            return false;
+        }
+        String text = StringUtils.lowerCase(StringUtil.replaceBackticks(expression.toString()));
+        return text.contains("sum(") || text.contains("avg(") || text.contains("count(")
+                || text.contains("max(") || text.contains("min(") || text.contains("rank(")
+                || text.contains("row_number(") || text.contains("dense_rank(")
+                || text.contains("percent_rank(");
+    }
+
+    private String resolveVerboseName(QueryColumn queryColumn, SchemaElement metricElement,
+            SchemaElement dimensionElement, String outputName) {
+        if (queryColumn != null && StringUtils.isNotBlank(queryColumn.getName())) {
+            return queryColumn.getName();
+        }
+        if (metricElement != null && StringUtils.isNotBlank(metricElement.getName())) {
+            return metricElement.getName();
+        }
+        if (dimensionElement != null && StringUtils.isNotBlank(dimensionElement.getName())) {
+            return dimensionElement.getName();
+        }
+        return outputName;
+    }
+
+    private String resolveDescription(QueryColumn queryColumn, SchemaElement metricElement,
+            SchemaElement dimensionElement) {
+        if (queryColumn != null && StringUtils.isNotBlank(queryColumn.getComment())) {
+            return queryColumn.getComment();
+        }
+        if (metricElement != null && StringUtils.isNotBlank(metricElement.getDescription())) {
+            return metricElement.getDescription();
+        }
+        if (dimensionElement != null && StringUtils.isNotBlank(dimensionElement.getDescription())) {
+            return dimensionElement.getDescription();
+        }
+        return null;
+    }
+
+    private String buildMetricExpression(String metricName, String aggregate) {
+        String agg = StringUtils.defaultIfBlank(aggregate, "SUM").toUpperCase();
+        return agg + "(" + metricName + ")";
+    }
+
+    private String normalizeName(String name) {
+        return StringUtils.lowerCase(StringUtils.trimToEmpty(name));
+    }
+
+    private boolean isNumericType(String type) {
+        String normalized = StringUtils.defaultString(type).toUpperCase();
+        return normalized.contains("INT") || normalized.contains("LONG")
+                || normalized.contains("DOUBLE") || normalized.contains("FLOAT")
+                || normalized.contains("DECIMAL") || normalized.contains("NUMBER")
+                || normalized.contains("NUMERIC") || normalized.contains("BIGINT")
+                || normalized.contains("SHORT");
+    }
+
+    private boolean isTimeType(String type) {
+        String normalized = StringUtils.defaultString(type).toUpperCase();
+        return normalized.contains("DATE") || normalized.contains("TIME")
+                || normalized.contains("TIMESTAMP");
     }
 
     private String resolveMainDttmCol(List<SupersetDatasetColumn> columns) {
@@ -703,5 +1133,117 @@ public class SupersetDatasetRegistryServiceImpl
             return name;
         }
         return name.substring(0, NAME_LIMIT);
+    }
+
+    private static class DatasetSchemaSpec {
+        private final List<SupersetDatasetColumn> columns;
+        private final List<SupersetDatasetMetric> metrics;
+
+        private DatasetSchemaSpec(List<SupersetDatasetColumn> columns,
+                List<SupersetDatasetMetric> metrics) {
+            this.columns = columns == null ? Collections.emptyList() : columns;
+            this.metrics = metrics == null ? Collections.emptyList() : metrics;
+        }
+
+        private List<SupersetDatasetColumn> getColumns() {
+            return columns;
+        }
+
+        private List<SupersetDatasetMetric> getMetrics() {
+            return metrics;
+        }
+    }
+
+    private static class DatasetOutputField {
+        private String outputName;
+        private String verboseName;
+        private String description;
+        private String type;
+        private boolean dttm;
+        private boolean groupby;
+        private boolean filterable;
+        private boolean metricCandidate;
+        private boolean matchedMetric;
+        private String aggregate;
+
+        private String getOutputName() {
+            return outputName;
+        }
+
+        private void setOutputName(String outputName) {
+            this.outputName = outputName;
+        }
+
+        private String getVerboseName() {
+            return verboseName;
+        }
+
+        private void setVerboseName(String verboseName) {
+            this.verboseName = verboseName;
+        }
+
+        private String getDescription() {
+            return description;
+        }
+
+        private void setDescription(String description) {
+            this.description = description;
+        }
+
+        private String getType() {
+            return type;
+        }
+
+        private void setType(String type) {
+            this.type = type;
+        }
+
+        private boolean isDttm() {
+            return dttm;
+        }
+
+        private void setDttm(boolean dttm) {
+            this.dttm = dttm;
+        }
+
+        private boolean isGroupby() {
+            return groupby;
+        }
+
+        private void setGroupby(boolean groupby) {
+            this.groupby = groupby;
+        }
+
+        private boolean isFilterable() {
+            return filterable;
+        }
+
+        private void setFilterable(boolean filterable) {
+            this.filterable = filterable;
+        }
+
+        private boolean isMetricCandidate() {
+            return metricCandidate;
+        }
+
+        private void setMetricCandidate(boolean metricCandidate) {
+            this.metricCandidate = metricCandidate;
+        }
+
+        private boolean isMatchedMetric() {
+            return matchedMetric;
+        }
+
+        private void setMatchedMetric(boolean matchedMetric) {
+            this.matchedMetric = matchedMetric;
+        }
+
+        private String getAggregate() {
+            return aggregate;
+        }
+
+        private void setAggregate(String aggregate) {
+            this.aggregate = aggregate;
+        }
     }
 }

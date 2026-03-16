@@ -111,3 +111,9 @@ supersonic/
 - [README.md](README.md) - English documentation
 - [README_CN.md](README_CN.md) - Chinese documentation
 - [Evaluation Guide](evaluation/README.md) - Text2SQL evaluation process
+
+# 项目的部署信息
+- 在文档 "部署信息.md" 中
+
+# 项目的需求信息
+- 在文件夹 "pr" 中

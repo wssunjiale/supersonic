@@ -116,15 +116,25 @@ public class SqlExecutor implements ChatQueryExecutor {
             queryResult.setQuerySql(finalSql);
             queryResult.setQueryResults(queryResp.getResultList());
             queryResult.setQueryColumns(queryResp.getColumns());
-            queryResult.setQueryState(QueryState.SUCCESS);
             queryResult.setErrorMsg(queryResp.getErrorMsg());
-            chatCtx.setParseInfo(parseInfo);
-            chatContextService.updateContext(chatCtx);
+            QueryState queryState = resolveQueryState(queryResp);
+            queryResult.setQueryState(queryState);
+            if (QueryState.SUCCESS.equals(queryState)) {
+                chatCtx.setParseInfo(parseInfo);
+                chatContextService.updateContext(chatCtx);
+            }
         } else {
             queryResult.setQueryState(QueryState.INVALID);
         }
 
         return queryResult;
+    }
+
+    static QueryState resolveQueryState(SemanticQueryResp queryResp) {
+        if (queryResp == null || StringUtils.isNotBlank(queryResp.getErrorMsg())) {
+            return QueryState.INVALID;
+        }
+        return QueryState.SUCCESS;
     }
 
     /**

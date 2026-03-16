@@ -210,8 +210,6 @@ public class SupersetController {
         config.setEnabled(supersetProperties.isEnabled());
         config.setBaseUrl(supersetProperties.getBaseUrl());
         config.setAuthEnabled(supersetProperties.isAuthEnabled());
-        config.setAuthStrategy(supersetProperties.getAuthStrategy());
-        config.setApiKey(supersetProperties.getApiKey());
         config.setJwtUsername(supersetProperties.getJwtUsername());
         config.setJwtPassword(supersetProperties.getJwtPassword());
         config.setJwtProvider(supersetProperties.getJwtProvider());

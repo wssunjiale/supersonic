@@ -12,15 +12,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 public class SupersetApiClient {
@@ -47,23 +52,34 @@ public class SupersetApiClient {
             + ".dashboard-component-chart-holder { margin: 0 !important; }";
     private static final String EMBEDDED_UI_CONFIG = "3";
     private static final String TAG_API = "/api/v1/tag/";
+    private static final String LOGIN_PAGE = "/login/";
+    private static final String LOGIN_PAGE_NEXT =
+            "/login/?next=%2Fsuperset%2Fwelcome%2F";
+    private static final String WELCOME_PAGE = "/superset/welcome/";
     private static final String LOGIN_API = "/api/v1/security/login";
     private static final String REFRESH_API = "/api/v1/security/refresh";
     private static final String CSRF_API = "/api/v1/security/csrf_token/";
     private static final int TAG_OBJECT_DASHBOARD = 3;
+    private static final Pattern HTML_CSRF_PATTERN = Pattern.compile(
+            "name=[\"']csrf_token[\"'][^>]*value=[\"']([^\"']+)[\"']",
+            Pattern.CASE_INSENSITIVE);
 
-    private static final String AUTH_STRATEGY_JWT_FIRST = "JWT_FIRST";
-    private static final String AUTH_STRATEGY_API_KEY_FIRST = "API_KEY_FIRST";
     private static volatile SupersetVizTypeSelector.VizTypeCatalog VIZTYPE_CATALOG;
 
     private final SupersetPluginConfig config;
     private final RestTemplate restTemplate;
     private final String baseUrl;
     private JwtSession jwtSession;
+    private BrowserSession browserSession;
 
     private static class JwtSession {
         private String accessToken;
         private String refreshToken;
+        private String csrfToken;
+        private String cookie;
+    }
+
+    private static class BrowserSession {
         private String csrfToken;
         private String cookie;
     }
@@ -746,18 +762,24 @@ public class SupersetApiClient {
         if (orderby != null) {
             query.put("orderby", orderby);
         }
-        query.putIfAbsent("filters", Collections.emptyList());
+        List<Map<String, Object>> filters = resolveFilters(formData);
+        if (!filters.isEmpty()) {
+            query.put("filters", filters);
+        } else {
+            query.putIfAbsent("filters", Collections.emptyList());
+        }
         Map<String, Object> extras = resolveMap(query, "extras");
         if (extras == null || extras.isEmpty()) {
             extras = new HashMap<>();
             extras.put("having", "");
             extras.put("where", "");
         }
+        applyTimeRange(query, extras, formData);
         query.put("extras", extras);
         query.putIfAbsent("applied_time_extras", Collections.emptyMap());
         query.putIfAbsent("annotation_layers", Collections.emptyList());
         query.putIfAbsent("row_limit", formData.getOrDefault("row_limit", 10000));
-        query.putIfAbsent("series_limit", 0);
+        query.putIfAbsent("series_limit", formData.getOrDefault("series_limit", 0));
         query.putIfAbsent("group_others_when_limit_reached", false);
         query.putIfAbsent("order_desc", formData.getOrDefault("order_desc", true));
         query.putIfAbsent("url_params",
@@ -766,6 +788,126 @@ public class SupersetApiClient {
         query.putIfAbsent("custom_form_data", Collections.emptyMap());
         query.putIfAbsent("post_processing", Collections.emptyList());
         query.putIfAbsent("time_offsets", Collections.emptyList());
+    }
+
+    private void applyTimeRange(Map<String, Object> query, Map<String, Object> extras,
+            Map<String, Object> formData) {
+        if (query == null || formData == null) {
+            return;
+        }
+        String timeRange = resolveTimeRange(formData);
+        if (StringUtils.isBlank(timeRange)) {
+            return;
+        }
+        query.put("time_range", timeRange);
+        if (extras != null) {
+            extras.put("time_range", timeRange);
+        }
+    }
+
+    private String resolveTimeRange(Map<String, Object> formData) {
+        if (formData == null) {
+            return null;
+        }
+        Object direct = formData.get("time_range");
+        if (direct instanceof String && StringUtils.isNotBlank((String) direct)) {
+            return (String) direct;
+        }
+        Object adhocFilters = formData.get("adhoc_filters");
+        if (!(adhocFilters instanceof List)) {
+            return null;
+        }
+        for (Object item : (List<?>) adhocFilters) {
+            if (!(item instanceof Map)) {
+                continue;
+            }
+            Map<?, ?> filter = (Map<?, ?>) item;
+            if (!StringUtils.equalsIgnoreCase(String.valueOf(filter.get("operator")),
+                    "TEMPORAL_RANGE")) {
+                continue;
+            }
+            Object comparator = filter.get("comparator");
+            if (comparator instanceof String && StringUtils.isNotBlank((String) comparator)) {
+                return (String) comparator;
+            }
+        }
+        return null;
+    }
+
+    private List<Map<String, Object>> resolveFilters(Map<String, Object> formData) {
+        if (formData == null) {
+            return Collections.emptyList();
+        }
+        List<Map<String, Object>> filters = new ArrayList<>();
+        Object adhocFilters = formData.get("adhoc_filters");
+        if (adhocFilters instanceof List) {
+            for (Object item : (List<?>) adhocFilters) {
+                if (!(item instanceof Map)) {
+                    continue;
+                }
+                Map<String, Object> filter = toSimpleFilter((Map<?, ?>) item);
+                if (filter != null) {
+                    filters.add(filter);
+                }
+            }
+        }
+        Object extraFilters = formData.get("extra_filters");
+        if (extraFilters instanceof List) {
+            for (Object item : (List<?>) extraFilters) {
+                if (!(item instanceof Map)) {
+                    continue;
+                }
+                Map<String, Object> filter = toExistingFilter((Map<?, ?>) item);
+                if (filter != null) {
+                    filters.add(filter);
+                }
+            }
+        }
+        return filters;
+    }
+
+    private Map<String, Object> toSimpleFilter(Map<?, ?> filter) {
+        if (filter == null) {
+            return null;
+        }
+        String operator = String.valueOf(filter.get("operator"));
+        if (StringUtils.equalsIgnoreCase(operator, "TEMPORAL_RANGE")) {
+            return null;
+        }
+        String subject = String.valueOf(filter.get("subject"));
+        if (StringUtils.isBlank(subject)) {
+            return null;
+        }
+        Object comparator = filter.get("comparator");
+        if (comparator == null) {
+            return null;
+        }
+        Map<String, Object> simple = new HashMap<>();
+        simple.put("col", subject);
+        simple.put("op", operator);
+        simple.put("val", comparator);
+        return simple;
+    }
+
+    private Map<String, Object> toExistingFilter(Map<?, ?> filter) {
+        if (filter == null) {
+            return null;
+        }
+        Object col = firstNonNull(filter.get("col"), filter.get("column"));
+        Object op = filter.get("op");
+        Object val = filter.get("val");
+        if (col == null || op == null || val == null) {
+            return null;
+        }
+        Map<String, Object> simple = new HashMap<>();
+        simple.put("col", col);
+        simple.put("op", op);
+        simple.put("val", val);
+        return simple;
+    }
+
+    private Object firstNonNull(Object left, Object right) {
+        return left != null ? left : right;
     }
 
     private void normalizeAccessFields(Map<String, Object> formData) {
@@ -1554,29 +1696,27 @@ public class SupersetApiClient {
         return execute(HttpMethod.GET, path, null, headers);
     }
 
-    HttpHeaders buildHeaders() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        if (config.isAuthEnabled() && StringUtils.isNotBlank(config.getApiKey())) {
-            headers.set("Authorization", "Bearer " + config.getApiKey());
-        }
-        return headers;
-    }
-
     /**
-     * 执行带认证策略的 Superset 请求。
+     * 执行带认证的 Superset 请求。
      *
      * Args: method: HTTP 方法。 path: API 路径。 body: 请求体（可为空）。
      *
      * Returns: 解析后的响应 Map。
      */
     private Map<String, Object> request(HttpMethod method, String path, Object body) {
-        AuthHeaders authHeaders = resolveAuthHeaders(method);
+        AuthHeaders authHeaders = resolveAuthHeaders(method, path);
         log.debug("superset request, method={}, path={}, authMode={}", method, path,
                 authHeaders.mode);
         try {
             return execute(method, path, body, authHeaders.headers);
         } catch (HttpStatusCodeException ex) {
+            if (authHeaders.mode == AuthMode.WEB_SESSION && canRetryWebSession(ex)) {
+                clearBrowserSession();
+                AuthHeaders refreshed = tryBuildWebSessionHeaders(method, path);
+                if (refreshed != null) {
+                    return execute(method, path, body, refreshed.headers);
+                }
+            }
             if (authHeaders.mode == AuthMode.JWT && canFallback(ex)) {
                 if (refreshJwt()) {
                     AuthHeaders refreshed = tryBuildJwtHeaders(method);
@@ -1584,10 +1724,15 @@ public class SupersetApiClient {
                         return execute(method, path, body, refreshed.headers);
                     }
                 }
-                if (StringUtils.isNotBlank(config.getApiKey())) {
-                    log.warn("superset jwt request failed, fallback to api key: {}",
-                            ex.getStatusCode());
-                    return execute(method, path, body, buildHeaders());
+            }
+            if (authHeaders.mode == AuthMode.JWT && canFallbackToWebSession(path, ex)) {
+                clearBrowserSession();
+                AuthHeaders webSessionHeaders = tryBuildWebSessionHeaders(method, path);
+                if (webSessionHeaders != null) {
+                    log.warn(
+                            "superset jwt request failed, fallback to browser session, path={}, status={}",
+                            path, ex.getStatusCode());
+                    return execute(method, path, body, webSessionHeaders.headers);
                 }
             }
             throw ex;
@@ -1613,54 +1758,27 @@ public class SupersetApiClient {
     }
 
     /**
-     * 根据认证策略生成请求头。
+     * 根据当前认证方式生成请求头。
      *
      * Args: method: HTTP 方法。
      *
      * Returns: 包含请求头与认证模式的结构。
      */
-    private AuthHeaders resolveAuthHeaders(HttpMethod method) {
+    private AuthHeaders resolveAuthHeaders(HttpMethod method, String path) {
+        AuthHeaders webSessionHeaders = tryBuildWebSessionHeaders(method, path);
+        if (webSessionHeaders != null) {
+            return webSessionHeaders;
+        }
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         if (!config.isAuthEnabled()) {
             return new AuthHeaders(headers, AuthMode.NONE);
         }
-        boolean jwtFirst = !AUTH_STRATEGY_API_KEY_FIRST.equalsIgnoreCase(config.getAuthStrategy());
-        if (jwtFirst) {
-            AuthHeaders jwtHeaders = tryBuildJwtHeaders(method);
-            if (jwtHeaders != null) {
-                return jwtHeaders;
-            }
-            AuthHeaders apiHeaders = tryBuildApiKeyHeaders(headers);
-            if (apiHeaders != null) {
-                return apiHeaders;
-            }
-        } else {
-            AuthHeaders apiHeaders = tryBuildApiKeyHeaders(headers);
-            if (apiHeaders != null) {
-                return apiHeaders;
-            }
-            AuthHeaders jwtHeaders = tryBuildJwtHeaders(method);
-            if (jwtHeaders != null) {
-                return jwtHeaders;
-            }
+        AuthHeaders jwtHeaders = tryBuildJwtHeaders(method);
+        if (jwtHeaders != null) {
+            return jwtHeaders;
         }
         return new AuthHeaders(headers, AuthMode.NONE);
-    }
-
-    /**
-     * 构建 API key 请求头。
-     *
-     * Args: headers: 需要补充的请求头。
-     *
-     * Returns: 构建成功返回 AuthHeaders，否则返回 null。
-     */
-    private AuthHeaders tryBuildApiKeyHeaders(HttpHeaders headers) {
-        if (StringUtils.isBlank(config.getApiKey())) {
-            return null;
-        }
-        headers.set("Authorization", "Bearer " + config.getApiKey());
-        return new AuthHeaders(headers, AuthMode.API_KEY);
     }
 
     /**
@@ -1689,7 +1807,30 @@ public class SupersetApiClient {
             }
             return new AuthHeaders(headers, AuthMode.JWT);
         } catch (Exception ex) {
-            log.warn("superset jwt auth failed, fallback to api key", ex);
+            log.warn("superset jwt auth failed", ex);
+            return null;
+        }
+    }
+
+    private AuthHeaders tryBuildWebSessionHeaders(HttpMethod method, String path) {
+        if (!requiresDashboardSession(path) || !config.isAuthEnabled()
+                || StringUtils.isBlank(config.getJwtUsername())
+                || StringUtils.isBlank(config.getJwtPassword())) {
+            return null;
+        }
+        try {
+            ensureBrowserSession();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set(HttpHeaders.REFERER, baseUrl + WELCOME_PAGE);
+            headers.set(HttpHeaders.COOKIE, browserSession.cookie);
+            if (requiresCsrf(method)) {
+                headers.set("X-CSRFToken", browserSession.csrfToken);
+            }
+            return new AuthHeaders(headers, AuthMode.WEB_SESSION);
+        } catch (Exception ex) {
+            log.warn("superset browser session auth failed, fallback to standard auth", ex);
+            clearBrowserSession();
             return null;
         }
     }
@@ -1733,6 +1874,56 @@ public class SupersetApiClient {
         jwtSession.cookie = extractCookie(response.getHeaders());
         if (StringUtils.isBlank(jwtSession.csrfToken) || StringUtils.isBlank(jwtSession.cookie)) {
             throw new IllegalStateException("superset csrf token missing");
+        }
+    }
+
+    private void ensureBrowserSession() {
+        if (browserSession == null) {
+            browserSession = new BrowserSession();
+        }
+        if (StringUtils.isNotBlank(browserSession.csrfToken)
+                && StringUtils.isNotBlank(browserSession.cookie)) {
+            return;
+        }
+        String loginPageUrl = baseUrl + LOGIN_PAGE_NEXT;
+        ResponseEntity<String> loginPageResponse =
+                restTemplate.exchange(loginPageUrl, HttpMethod.GET,
+                        new HttpEntity<>(new HttpHeaders()), String.class);
+        String loginPageCookie = extractCookie(loginPageResponse.getHeaders());
+        String loginCsrfToken = extractHtmlCsrfToken(loginPageResponse.getBody());
+
+        MultiValueMap<String, String> loginForm = new LinkedMultiValueMap<>();
+        loginForm.add("username", config.getJwtUsername());
+        loginForm.add("password", config.getJwtPassword());
+        loginForm.add("csrf_token", loginCsrfToken);
+
+        HttpHeaders loginHeaders = new HttpHeaders();
+        loginHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        loginHeaders.set(HttpHeaders.REFERER, loginPageUrl);
+        if (StringUtils.isNotBlank(loginPageCookie)) {
+            loginHeaders.set(HttpHeaders.COOKIE, loginPageCookie);
+        }
+        ResponseEntity<String> loginResponse =
+                restTemplate.exchange(loginPageUrl, HttpMethod.POST,
+                        new HttpEntity<>(loginForm, loginHeaders), String.class);
+        String browserCookie =
+                mergeCookies(loginPageCookie, extractCookie(loginResponse.getHeaders()));
+
+        HttpHeaders homeHeaders = new HttpHeaders();
+        homeHeaders.set(HttpHeaders.REFERER, loginPageUrl);
+        if (StringUtils.isNotBlank(browserCookie)) {
+            homeHeaders.set(HttpHeaders.COOKIE, browserCookie);
+        }
+        ResponseEntity<String> homeResponse =
+                restTemplate.exchange(baseUrl + WELCOME_PAGE, HttpMethod.GET,
+                        new HttpEntity<>(homeHeaders), String.class);
+        browserSession.cookie =
+                mergeCookies(browserCookie, extractCookie(homeResponse.getHeaders()));
+        browserSession.csrfToken = extractHtmlCsrfToken(homeResponse.getBody());
+        if (StringUtils.isBlank(browserSession.cookie)
+                || StringUtils.isBlank(browserSession.csrfToken)) {
+            clearBrowserSession();
+            throw new IllegalStateException("superset browser session missing");
         }
     }
 
@@ -1803,8 +1994,12 @@ public class SupersetApiClient {
         return method != HttpMethod.GET;
     }
 
+    private boolean requiresDashboardSession(String path) {
+        return StringUtils.isNotBlank(path) && path.startsWith(DASHBOARD_API);
+    }
+
     /**
-     * 判断是否允许回退到 API key。
+     * 判断是否允许刷新 JWT 后重试。
      *
      * Args: ex: HTTP 状态异常。
      *
@@ -1812,6 +2007,27 @@ public class SupersetApiClient {
      */
     private boolean canFallback(HttpStatusCodeException ex) {
         return ex.getStatusCode().value() == 401 || ex.getStatusCode().value() == 403;
+    }
+
+    private boolean canFallbackToWebSession(String path, HttpStatusCodeException ex) {
+        if (!requiresDashboardSession(path)) {
+            return false;
+        }
+        int status = ex.getStatusCode().value();
+        return status == 401 || status == 403 || status >= 500;
+    }
+
+    private boolean canRetryWebSession(HttpStatusCodeException ex) {
+        int status = ex.getStatusCode().value();
+        return status == 401 || status == 403;
+    }
+
+    private void clearBrowserSession() {
+        if (browserSession == null) {
+            return;
+        }
+        browserSession.cookie = null;
+        browserSession.csrfToken = null;
     }
 
     /**
@@ -1839,8 +2055,39 @@ public class SupersetApiClient {
         return cookies.isEmpty() ? null : String.join("; ", cookies);
     }
 
+    private String mergeCookies(String... cookieValues) {
+        Map<String, String> merged = new LinkedHashMap<>();
+        if (cookieValues == null) {
+            return null;
+        }
+        for (String cookieValue : cookieValues) {
+            if (StringUtils.isBlank(cookieValue)) {
+                continue;
+            }
+            for (String cookie : cookieValue.split("; ")) {
+                if (StringUtils.isBlank(cookie)) {
+                    continue;
+                }
+                String[] parts = cookie.split("=", 2);
+                if (parts.length != 2 || StringUtils.isBlank(parts[0])) {
+                    continue;
+                }
+                merged.put(parts[0], parts[0] + "=" + parts[1]);
+            }
+        }
+        return merged.isEmpty() ? null : String.join("; ", merged.values());
+    }
+
+    private String extractHtmlCsrfToken(String html) {
+        Matcher matcher = HTML_CSRF_PATTERN.matcher(StringUtils.defaultString(html));
+        if (!matcher.find()) {
+            throw new IllegalStateException("superset html csrf token missing");
+        }
+        return matcher.group(1);
+    }
+
     private enum AuthMode {
-        NONE, JWT, API_KEY
+        NONE, JWT, WEB_SESSION
     }
 
     private static class AuthHeaders {

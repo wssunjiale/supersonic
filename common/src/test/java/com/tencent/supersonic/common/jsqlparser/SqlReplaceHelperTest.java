@@ -391,6 +391,35 @@ class SqlReplaceHelperTest {
                 replaceSql);
     }
 
+    @Test
+    void testReplaceExpressionWithAnalyticOrderBy() {
+        String expr = "ROW_NUMBER() OVER (PARTITION BY 部门 ORDER BY SUM(访问次数) DESC)";
+        Map<String, String> replace = new HashMap<>();
+        replace.put("部门", "department");
+        replace.put("访问次数", "count(1)");
+
+        String replaced = SqlReplaceHelper.replaceExpression(expr, replace);
+
+        Assert.assertEquals(
+                "ROW_NUMBER() OVER (PARTITION BY department ORDER BY count(1) DESC)", replaced);
+    }
+
+    @Test
+    void testReplaceSqlByExpressionWithAnalyticOrderBy() {
+        String sql = "WITH department_visits AS (SELECT department, SUM(pv) AS _总访问次数, "
+                + "ROW_NUMBER() OVER (ORDER BY SUM(pv) DESC) AS _排名 FROM t_1 GROUP BY department) "
+                + "SELECT department, _总访问次数, _排名 FROM department_visits WHERE _排名 <= 3 ORDER BY _排名";
+        Map<String, String> replace = new HashMap<>();
+        replace.put("pv", "count(1)");
+
+        String replaced = SqlReplaceHelper.replaceSqlByExpression("t_1", sql, replace);
+
+        Assert.assertEquals("WITH department_visits AS (SELECT department, count(1) AS _总访问次数, "
+                + "ROW_NUMBER() OVER (ORDER BY count(1) DESC) AS _排名 FROM t_1 GROUP BY department) "
+                + "SELECT department, _总访问次数, _排名 FROM department_visits WHERE _排名 <= 3 ORDER BY _排名",
+                replaced);
+    }
+
     protected Map<String, String> initParams() {
         Map<String, String> fieldToBizName = new HashMap<>();
         fieldToBizName.put("部门", "department");

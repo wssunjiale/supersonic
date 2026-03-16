@@ -24,6 +24,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.net.URI;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -266,6 +268,199 @@ public class SupersetApiClientTest {
                 factory.getLastUri().toString());
         Assertions.assertEquals("Bearer token-123",
                 factory.getLastRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION));
+    }
+
+    @Test
+    public void testCreateEmptyDashboardUsesWebSessionForDashboardRequests() throws Exception {
+        SupersetPluginConfig config = new SupersetPluginConfig();
+        config.setBaseUrl("http://localhost:8088/");
+        config.setJwtUsername("supersonic");
+        config.setJwtPassword("secret");
+        SupersetApiClient client = new SupersetApiClient(config);
+        RoutingFactory factory = new RoutingFactory();
+        String encodedLoginUrl = "http://localhost:8088/login/?next=%2Fsuperset%2Fwelcome%2F";
+        String decodedLoginUrl = "http://localhost:8088/login/?next=/superset/welcome/";
+
+        HttpHeaders loginPageHeaders = new HttpHeaders();
+        loginPageHeaders.setContentType(MediaType.TEXT_HTML);
+        loginPageHeaders.add(HttpHeaders.SET_COOKIE, "session=login-session; Path=/");
+        factory.add(HttpMethod.GET, encodedLoginUrl, HttpStatus.OK,
+                "<input name=\"csrf_token\" value=\"login-csrf\" />", loginPageHeaders);
+        factory.add(HttpMethod.GET, decodedLoginUrl, HttpStatus.OK,
+                "<input name=\"csrf_token\" value=\"login-csrf\" />", loginPageHeaders);
+
+        HttpHeaders loginHeaders = new HttpHeaders();
+        loginHeaders.add(HttpHeaders.SET_COOKIE, "session=browser-session; Path=/");
+        factory.add(HttpMethod.POST, encodedLoginUrl, HttpStatus.FOUND, "", loginHeaders);
+        factory.add(HttpMethod.POST, decodedLoginUrl, HttpStatus.FOUND, "", loginHeaders);
+
+        HttpHeaders homeHeaders = new HttpHeaders();
+        homeHeaders.setContentType(MediaType.TEXT_HTML);
+        factory.add(HttpMethod.GET, "http://localhost:8088/superset/welcome/", HttpStatus.OK,
+                "<input name=\"csrf_token\" value=\"page-csrf\" />", homeHeaders);
+
+        factory.add(HttpMethod.POST, "http://localhost:8088/api/v1/dashboard/", HttpStatus.OK,
+                "{\"result\":{\"id\":77}}");
+        factory.add(HttpMethod.GET, "http://localhost:8088/api/v1/dashboard/77", HttpStatus.OK,
+                "{\"result\":{\"json_metadata\":\"{}\"}}");
+        factory.add(HttpMethod.PUT,
+                "http://localhost:8088/api/v1/dashboard/77/colors?mark_updated=false",
+                HttpStatus.OK, "{\"result\":[]}");
+        factory.add(HttpMethod.GET, "http://localhost:8088/api/v1/dashboard/77/embedded",
+                HttpStatus.NOT_FOUND, "{\"message\":\"not found\"}");
+        factory.add(HttpMethod.POST, "http://localhost:8088/api/v1/dashboard/77/embedded",
+                HttpStatus.OK, "{\"result\":{\"uuid\":\"embed-77\"}}");
+        replaceRestTemplate(client, new RestTemplate(factory));
+
+        SupersetDashboardInfo dashboardInfo =
+                client.createEmptyDashboard("supersonic_dashboard", Collections.emptyList());
+
+        Assertions.assertEquals(77L, dashboardInfo.getId());
+
+        RecordingRequest loginRequest =
+                firstNonNull(factory.getLastRequest(HttpMethod.POST, encodedLoginUrl),
+                        factory.getLastRequest(HttpMethod.POST, decodedLoginUrl),
+                        factory.findLastRequestContaining(HttpMethod.POST, "/login/?next="));
+        Assertions.assertNotNull(loginRequest);
+        Assertions.assertEquals("session=login-session",
+                loginRequest.getHeaders().getFirst(HttpHeaders.COOKIE));
+        Assertions.assertTrue(loginRequest.getHeaders().getFirst(HttpHeaders.REFERER)
+                .startsWith("http://localhost:8088/login/?next="));
+        String loginBody = loginRequest.getWrittenBody();
+        Assertions.assertTrue(loginBody.contains("username=supersonic"));
+        Assertions.assertTrue(loginBody.contains("password=secret"));
+        Assertions.assertTrue(loginBody.contains("csrf_token=login-csrf"));
+
+        RecordingRequest dashboardCreate = factory.getLastRequest(HttpMethod.POST,
+                "http://localhost:8088/api/v1/dashboard/");
+        Assertions.assertNotNull(dashboardCreate);
+        Assertions.assertNull(dashboardCreate.getHeaders().getFirst(HttpHeaders.AUTHORIZATION));
+        Assertions.assertEquals("session=browser-session",
+                dashboardCreate.getHeaders().getFirst(HttpHeaders.COOKIE));
+        Assertions.assertEquals("page-csrf",
+                dashboardCreate.getHeaders().getFirst("X-CSRFToken"));
+        Assertions.assertEquals("http://localhost:8088/superset/welcome/",
+                dashboardCreate.getHeaders().getFirst(HttpHeaders.REFERER));
+
+        RecordingRequest colorRequest = factory.getLastRequest(HttpMethod.PUT,
+                "http://localhost:8088/api/v1/dashboard/77/colors?mark_updated=false");
+        Assertions.assertNotNull(colorRequest);
+        Assertions.assertNull(colorRequest.getHeaders().getFirst(HttpHeaders.AUTHORIZATION));
+        Assertions.assertEquals("session=browser-session",
+                colorRequest.getHeaders().getFirst(HttpHeaders.COOKIE));
+        Assertions.assertEquals("page-csrf", colorRequest.getHeaders().getFirst("X-CSRFToken"));
+    }
+
+    @Test
+    public void testCreateEmptyDashboardFallsBackToWebSessionAfterJwtDashboardFailure()
+            throws Exception {
+        SupersetPluginConfig config = new SupersetPluginConfig();
+        config.setBaseUrl("http://localhost:8088/");
+        config.setJwtUsername("supersonic");
+        config.setJwtPassword("secret");
+        SupersetApiClient client = new SupersetApiClient(config);
+        RoutingFactory factory = new RoutingFactory();
+        String encodedLoginUrl = "http://localhost:8088/login/?next=%2Fsuperset%2Fwelcome%2F";
+        String decodedLoginUrl = "http://localhost:8088/login/?next=/superset/welcome/";
+
+        factory.addSequence(HttpMethod.GET, encodedLoginUrl,
+                new ResponseSpec(HttpStatus.INTERNAL_SERVER_ERROR,
+                        "{\"message\":\"Fatal error\"}".getBytes(), jsonHeaders()),
+                new ResponseSpec(HttpStatus.OK,
+                        "<input name=\"csrf_token\" value=\"login-csrf\" />".getBytes(),
+                        htmlHeaders("session=login-session; Path=/")));
+        factory.addSequence(HttpMethod.GET, decodedLoginUrl,
+                new ResponseSpec(HttpStatus.INTERNAL_SERVER_ERROR,
+                        "{\"message\":\"Fatal error\"}".getBytes(), jsonHeaders()),
+                new ResponseSpec(HttpStatus.OK,
+                        "<input name=\"csrf_token\" value=\"login-csrf\" />".getBytes(),
+                        htmlHeaders("session=login-session; Path=/")));
+        factory.addSequence(HttpMethod.POST, encodedLoginUrl,
+                new ResponseSpec(HttpStatus.FOUND, "".getBytes(),
+                        htmlHeaders("session=browser-session; Path=/")));
+        factory.addSequence(HttpMethod.POST, decodedLoginUrl,
+                new ResponseSpec(HttpStatus.FOUND, "".getBytes(),
+                        htmlHeaders("session=browser-session; Path=/")));
+        factory.add(HttpMethod.GET, "http://localhost:8088/superset/welcome/", HttpStatus.OK,
+                "<input name=\"csrf_token\" value=\"page-csrf\" />", htmlHeaders(null));
+
+        factory.add(HttpMethod.POST, "http://localhost:8088/api/v1/security/login",
+                HttpStatus.OK, "{\"access_token\":\"access-token\",\"refresh_token\":\"refresh-token\"}");
+        HttpHeaders csrfHeaders = new HttpHeaders();
+        csrfHeaders.setContentType(MediaType.APPLICATION_JSON);
+        csrfHeaders.add(HttpHeaders.SET_COOKIE, "session=jwt-cookie; Path=/");
+        factory.add(HttpMethod.GET, "http://localhost:8088/api/v1/security/csrf_token/",
+                HttpStatus.OK, "{\"result\":\"jwt-csrf\"}", csrfHeaders);
+
+        factory.addSequence(HttpMethod.POST, "http://localhost:8088/api/v1/dashboard/",
+                new ResponseSpec(HttpStatus.INTERNAL_SERVER_ERROR,
+                        "{\"message\":\"Fatal error\"}".getBytes(), jsonHeaders()),
+                new ResponseSpec(HttpStatus.OK, "{\"result\":{\"id\":77}}".getBytes(),
+                        jsonHeaders()));
+        factory.add(HttpMethod.GET, "http://localhost:8088/api/v1/dashboard/77", HttpStatus.OK,
+                "{\"result\":{\"json_metadata\":\"{}\"}}");
+        factory.add(HttpMethod.PUT,
+                "http://localhost:8088/api/v1/dashboard/77/colors?mark_updated=false",
+                HttpStatus.OK, "{\"result\":[]}");
+        factory.add(HttpMethod.GET, "http://localhost:8088/api/v1/dashboard/77/embedded",
+                HttpStatus.NOT_FOUND, "{\"message\":\"not found\"}");
+        factory.add(HttpMethod.POST, "http://localhost:8088/api/v1/dashboard/77/embedded",
+                HttpStatus.OK, "{\"result\":{\"uuid\":\"embed-77\"}}");
+        replaceRestTemplate(client, new RestTemplate(factory));
+
+        SupersetDashboardInfo dashboardInfo =
+                client.createEmptyDashboard("supersonic_dashboard", Collections.emptyList());
+
+        Assertions.assertEquals(77L, dashboardInfo.getId());
+        Assertions.assertNotNull(factory.getLastRequest(HttpMethod.POST,
+                "http://localhost:8088/api/v1/security/login"));
+        Assertions.assertNotNull(factory.getLastRequest(HttpMethod.GET,
+                "http://localhost:8088/api/v1/security/csrf_token/"));
+        RecordingRequest dashboardCreate = factory.getLastRequest(HttpMethod.POST,
+                "http://localhost:8088/api/v1/dashboard/");
+        Assertions.assertNotNull(dashboardCreate);
+        Assertions.assertNull(dashboardCreate.getHeaders().getFirst(HttpHeaders.AUTHORIZATION));
+        Assertions.assertEquals("session=browser-session",
+                dashboardCreate.getHeaders().getFirst(HttpHeaders.COOKIE));
+        Assertions.assertEquals("page-csrf",
+                dashboardCreate.getHeaders().getFirst("X-CSRFToken"));
+        Assertions.assertEquals("http://localhost:8088/superset/welcome/",
+                dashboardCreate.getHeaders().getFirst(HttpHeaders.REFERER));
+    }
+
+    @Test
+    public void testAddChartToDashboardUsesJwtAuthForChartRequests() throws Exception {
+        SupersetPluginConfig config = new SupersetPluginConfig();
+        config.setBaseUrl("http://localhost:8088/");
+        config.setJwtUsername("supersonic");
+        config.setJwtPassword("secret");
+        SupersetApiClient client = new SupersetApiClient(config);
+        RoutingFactory factory = new RoutingFactory();
+        factory.add(HttpMethod.POST, "http://localhost:8088/api/v1/security/login",
+                HttpStatus.OK, "{\"access_token\":\"access-token\",\"refresh_token\":\"refresh-token\"}");
+
+        HttpHeaders csrfHeaders = new HttpHeaders();
+        csrfHeaders.setContentType(MediaType.APPLICATION_JSON);
+        csrfHeaders.add(HttpHeaders.SET_COOKIE, "session=jwt-cookie; Path=/");
+        factory.add(HttpMethod.GET, "http://localhost:8088/api/v1/security/csrf_token/",
+                HttpStatus.OK, "{\"result\":\"jwt-csrf\"}", csrfHeaders);
+
+        factory.add(HttpMethod.GET, "http://localhost:8088/api/v1/chart/12", HttpStatus.OK,
+                "{\"result\":{\"dashboards\":[{\"id\":34},{\"id\":56}]}}");
+        factory.add(HttpMethod.PUT, "http://localhost:8088/api/v1/chart/12", HttpStatus.OK,
+                "{\"result\":{}}");
+        replaceRestTemplate(client, new RestTemplate(factory));
+
+        client.addChartToDashboard(78L, 12L);
+
+        RecordingRequest putRequest =
+                factory.getLastRequest(HttpMethod.PUT, "http://localhost:8088/api/v1/chart/12");
+        Assertions.assertNotNull(putRequest);
+        Assertions.assertEquals("Bearer access-token",
+                putRequest.getHeaders().getFirst(HttpHeaders.AUTHORIZATION));
+        Assertions.assertEquals("jwt-csrf", putRequest.getHeaders().getFirst("X-CSRFToken"));
+        Assertions.assertEquals("session=jwt-cookie",
+                putRequest.getHeaders().getFirst(HttpHeaders.COOKIE));
     }
 
     @Test
@@ -575,6 +770,48 @@ public class SupersetApiClientTest {
     }
 
     @Test
+    public void testBuildQueryContextCarriesTimeRangeFiltersAndLimits() {
+        SupersetPluginConfig config = new SupersetPluginConfig();
+        SupersetApiClient client = new SupersetApiClient(config);
+        Map<String, Object> formData = new HashMap<>();
+        formData.put("metric", "pv");
+        formData.put("groupby", Arrays.asList("department"));
+        formData.put("row_limit", 3L);
+        formData.put("series_limit", 3L);
+        formData.put("order_desc", true);
+        formData.put("orderby", Collections.singletonList(Arrays.asList("pv", false)));
+        formData.put("time_range", "2026-02-14 : 2026-03-15");
+        Map<String, Object> temporalFilter = new HashMap<>();
+        temporalFilter.put("clause", "WHERE");
+        temporalFilter.put("expressionType", "SIMPLE");
+        temporalFilter.put("subject", "imp_date");
+        temporalFilter.put("operator", "TEMPORAL_RANGE");
+        temporalFilter.put("comparator", "2026-02-14 : 2026-03-15");
+        Map<String, Object> normalFilter = new HashMap<>();
+        normalFilter.put("clause", "WHERE");
+        normalFilter.put("expressionType", "SIMPLE");
+        normalFilter.put("subject", "department");
+        normalFilter.put("operator", "IN");
+        normalFilter.put("comparator", Collections.singletonList("研发部"));
+        formData.put("adhoc_filters", Arrays.asList(temporalFilter, normalFilter));
+
+        Map<String, Object> context = client.buildQueryContext(formData, 12L, "table");
+        List<?> queries = (List<?>) context.get("queries");
+        Map<?, ?> query = (Map<?, ?>) queries.get(0);
+        Assertions.assertEquals(3, ((Number) query.get("row_limit")).intValue());
+        Assertions.assertEquals(3, ((Number) query.get("series_limit")).intValue());
+        Assertions.assertEquals(Boolean.TRUE, query.get("order_desc"));
+        Assertions.assertEquals("2026-02-14 : 2026-03-15", query.get("time_range"));
+        Map<?, ?> extras = (Map<?, ?>) query.get("extras");
+        Assertions.assertEquals("2026-02-14 : 2026-03-15", extras.get("time_range"));
+        List<?> filters = (List<?>) query.get("filters");
+        Assertions.assertEquals(1, filters.size());
+        Map<?, ?> filter = (Map<?, ?>) filters.get(0);
+        Assertions.assertEquals("department", filter.get("col"));
+        Assertions.assertEquals("IN", filter.get("op"));
+    }
+
+    @Test
     public void testBuildQueryContextSanitizesMetricOptionName() {
         SupersetPluginConfig config = new SupersetPluginConfig();
         SupersetApiClient client = new SupersetApiClient(config);
@@ -605,6 +842,19 @@ public class SupersetApiClientTest {
         field.set(client, restTemplate);
     }
 
+    @SafeVarargs
+    private static <T> T firstNonNull(T... values) {
+        if (values == null) {
+            return null;
+        }
+        for (T value : values) {
+            if (value != null) {
+                return value;
+            }
+        }
+        return null;
+    }
+
     private static class RecordingFactory implements ClientHttpRequestFactory {
         private final byte[] body;
         private URI lastUri;
@@ -619,7 +869,10 @@ public class SupersetApiClientTest {
         public ClientHttpRequest createRequest(URI uri, HttpMethod httpMethod) {
             this.lastUri = uri;
             this.lastMethod = httpMethod;
-            this.lastRequest = new RecordingRequest(uri, httpMethod, HttpStatus.OK, body);
+            HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.setContentType(MediaType.APPLICATION_JSON);
+            this.lastRequest =
+                    new RecordingRequest(uri, httpMethod, HttpStatus.OK, body, responseHeaders);
             return lastRequest;
         }
 
@@ -637,24 +890,67 @@ public class SupersetApiClientTest {
     }
 
     private static class RoutingFactory implements ClientHttpRequestFactory {
-        private final Map<String, ResponseSpec> routes = new LinkedHashMap<>();
+        private final Map<String, List<ResponseSpec>> routes = new LinkedHashMap<>();
         private final Map<String, RecordingRequest> requests = new LinkedHashMap<>();
 
         void add(HttpMethod method, String url, HttpStatus status, String responseJson) {
-            routes.put(buildKey(method, url), new ResponseSpec(status, responseJson.getBytes()));
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            add(method, url, status, responseJson, headers);
+        }
+
+        void add(HttpMethod method, String url, HttpStatus status, String responseBody,
+                HttpHeaders headers) {
+            addSequence(method, url, new ResponseSpec(status, responseBody.getBytes(), headers));
+        }
+
+        void addSequence(HttpMethod method, String url, ResponseSpec... specs) {
+            String key = buildKey(method, url);
+            List<ResponseSpec> values = routes.computeIfAbsent(key, ignored -> new ArrayList<>());
+            values.addAll(Arrays.asList(specs));
         }
 
         RecordingRequest getLastRequest(HttpMethod method, String url) {
-            return requests.get(buildKey(method, url));
+            String key = buildKey(method, url);
+            RecordingRequest request = requests.get(key);
+            if (request != null) {
+                return request;
+            }
+            String decodedUrl = decodeUrl(url);
+            return requests.get(buildKey(method, decodedUrl));
+        }
+
+        RecordingRequest findLastRequestContaining(HttpMethod method, String fragment) {
+            for (Map.Entry<String, RecordingRequest> entry : requests.entrySet()) {
+                if (!entry.getKey().startsWith(method + " ")) {
+                    continue;
+                }
+                if (entry.getKey().contains(fragment)) {
+                    return entry.getValue();
+                }
+            }
+            return null;
         }
 
         @Override
         public ClientHttpRequest createRequest(URI uri, HttpMethod httpMethod) {
-            String key = buildKey(httpMethod, uri.toString());
-            ResponseSpec spec =
-                    routes.getOrDefault(key, new ResponseSpec(HttpStatus.OK, "{}".getBytes()));
+            String requestUrl = uri.toString();
+            String key = buildKey(httpMethod, requestUrl);
+            List<ResponseSpec> specs = routes.get(key);
+            ResponseSpec spec = pollSpec(specs);
+            if (spec == null) {
+                specs = routes.get(buildKey(httpMethod, decodeUrl(requestUrl)));
+                spec = pollSpec(specs);
+            }
+            if (spec == null) {
+                specs = routes.get(buildKey(httpMethod, decodeUrl(decodeUrl(requestUrl))));
+                spec = pollSpec(specs);
+            }
+            if (spec == null) {
+                spec = new ResponseSpec(HttpStatus.OK, "{}".getBytes(), new HttpHeaders());
+            }
             RecordingRequest request =
-                    new RecordingRequest(uri, httpMethod, spec.status, spec.body);
+                    new RecordingRequest(uri, httpMethod, spec.status, spec.body, spec.headers);
             requests.put(key, request);
             return request;
         }
@@ -662,16 +958,47 @@ public class SupersetApiClientTest {
         private String buildKey(HttpMethod method, String url) {
             return method + " " + url;
         }
+
+        private String decodeUrl(String url) {
+            return URLDecoder.decode(url, StandardCharsets.UTF_8);
+        }
+
+        private ResponseSpec pollSpec(List<ResponseSpec> specs) {
+            if (specs == null || specs.isEmpty()) {
+                return null;
+            }
+            if (specs.size() == 1) {
+                return specs.get(0);
+            }
+            return specs.remove(0);
+        }
     }
 
     private static class ResponseSpec {
         private final HttpStatus status;
         private final byte[] body;
+        private final HttpHeaders headers;
 
-        private ResponseSpec(HttpStatus status, byte[] body) {
+        private ResponseSpec(HttpStatus status, byte[] body, HttpHeaders headers) {
             this.status = status;
             this.body = body;
+            this.headers = headers;
         }
+    }
+
+    private static HttpHeaders jsonHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return headers;
+    }
+
+    private static HttpHeaders htmlHeaders(String cookie) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.TEXT_HTML);
+        if (cookie != null) {
+            headers.add(HttpHeaders.SET_COOKIE, cookie);
+        }
+        return headers;
     }
 
     private static class RecordingRequest implements ClientHttpRequest {
@@ -679,14 +1006,17 @@ public class SupersetApiClientTest {
         private final HttpMethod method;
         private final HttpStatus status;
         private final byte[] responseBody;
+        private final HttpHeaders responseHeaders;
         private final HttpHeaders headers = new HttpHeaders();
         private final ByteArrayOutputStream requestBody = new ByteArrayOutputStream();
 
-        RecordingRequest(URI uri, HttpMethod method, HttpStatus status, byte[] responseBody) {
+        RecordingRequest(URI uri, HttpMethod method, HttpStatus status, byte[] responseBody,
+                HttpHeaders responseHeaders) {
             this.uri = uri;
             this.method = method;
             this.status = status;
             this.responseBody = responseBody;
+            this.responseHeaders = responseHeaders;
         }
 
         @Override
@@ -717,8 +1047,6 @@ public class SupersetApiClientTest {
 
                 @Override
                 public HttpHeaders getHeaders() {
-                    HttpHeaders responseHeaders = new HttpHeaders();
-                    responseHeaders.setContentType(MediaType.APPLICATION_JSON);
                     return responseHeaders;
                 }
             };

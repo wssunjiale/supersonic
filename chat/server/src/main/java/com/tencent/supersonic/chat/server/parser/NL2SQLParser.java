@@ -22,6 +22,7 @@ import com.tencent.supersonic.headless.api.pojo.request.QueryNLReq;
 import com.tencent.supersonic.headless.api.pojo.response.MapResp;
 import com.tencent.supersonic.headless.api.pojo.response.ParseResp;
 import com.tencent.supersonic.headless.api.pojo.response.QueryState;
+import com.tencent.supersonic.headless.chat.query.llm.s2sql.LLMSqlQuery;
 import com.tencent.supersonic.headless.chat.parser.ParserConfig;
 import com.tencent.supersonic.headless.server.facade.service.ChatLayerService;
 import com.tencent.supersonic.headless.server.utils.ModelConfigHelper;
@@ -44,6 +45,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.regex.Pattern;
 
 import static com.tencent.supersonic.headless.chat.parser.ParserConfig.PARSER_EXEMPLAR_RECALL_NUMBER;
 import static com.tencent.supersonic.headless.chat.parser.ParserConfig.PARSER_SHOW_COUNT;
@@ -52,6 +54,10 @@ import static com.tencent.supersonic.headless.chat.parser.ParserConfig.PARSER_SH
 public class NL2SQLParser implements ChatQueryParser {
 
     private static final Logger keyPipelineLog = LoggerFactory.getLogger("keyPipeline");
+    private static final Pattern UNSAFE_WINDOW_AGG_PATTERN =
+            Pattern.compile("(?is)\\b(row_number|rank|dense_rank|percent_rank)\\s*\\(\\s*\\)"
+                    + "\\s*over\\s*\\([^)]*\\border\\s+by\\s+[^)]*\\b(sum|avg|max|min|count)"
+                    + "\\s*\\(");
 
     public static final String APP_KEY_MULTI_TURN = "REWRITE_MULTI_TURN";
     private static final String REWRITE_MULTI_TURN_INSTRUCTION = ""
@@ -134,6 +140,8 @@ public class NL2SQLParser implements ChatQueryParser {
                     && parseContext.getResponse().getSelectedParses().isEmpty()) {
                 return;
             }
+            List<SemanticParseInfo> ruleSelectedParses =
+                    new ArrayList<>(parseContext.getResponse().getSelectedParses());
 
             QueryNLReq queryNLReq = QueryReqConverter.buildQueryNLReq(parseContext);
             queryNLReq.setText2SQLType(Text2SQLType.LLM_OR_RULE);
@@ -152,7 +160,43 @@ public class NL2SQLParser implements ChatQueryParser {
                 queryNLReq.setMapModeEnum(MapModeEnum.ALL);
                 doParse(queryNLReq, parseContext.getResponse());
             }
+
+            fallbackToRuleParses(parseContext, ruleSelectedParses);
         }
+    }
+
+    private void fallbackToRuleParses(ParseContext parseContext,
+            List<SemanticParseInfo> ruleSelectedParses) {
+        if (parseContext == null || ruleSelectedParses == null || ruleSelectedParses.isEmpty()) {
+            return;
+        }
+        ChatParseResp llmResp = parseContext.getResponse();
+        boolean llmFailed = llmResp == null
+                || llmResp.getState() == ParseResp.ParseState.FAILED
+                || llmResp.getSelectedParses() == null
+                || llmResp.getSelectedParses().isEmpty();
+        boolean unsafeSql = !llmFailed && llmResp.getSelectedParses().stream()
+                .anyMatch(NL2SQLParser::containsTranslatorUnsafeWindowAgg);
+        if (!llmFailed && !unsafeSql) {
+            return;
+        }
+        log.warn("fallback to rule parse, queryId={}, llmFailed={}, unsafeSql={}",
+                parseContext.getRequest() == null ? null : parseContext.getRequest().getQueryId(),
+                llmFailed, unsafeSql);
+        llmResp.setSelectedParses(new ArrayList<>(ruleSelectedParses));
+        llmResp.setState(ParseResp.ParseState.COMPLETED);
+        llmResp.setErrorMsg(null);
+    }
+
+    static boolean containsTranslatorUnsafeWindowAgg(SemanticParseInfo parseInfo) {
+        if (parseInfo == null || parseInfo.getSqlInfo() == null
+                || !LLMSqlQuery.QUERY_MODE.equalsIgnoreCase(parseInfo.getQueryMode())) {
+            return false;
+        }
+        String querySql = StringUtils.defaultIfBlank(parseInfo.getSqlInfo().getQuerySQL(),
+                parseInfo.getSqlInfo().getCorrectedS2SQL());
+        return StringUtils.isNotBlank(querySql)
+                && UNSAFE_WINDOW_AGG_PATTERN.matcher(querySql).find();
     }
 
     private void doParse(QueryNLReq req, ChatParseResp resp) {

@@ -149,6 +149,7 @@ const ChatItem: React.FC<Props> = ({
       }
     } else if (
       (queryColumns && queryColumns.length > 0 && queryResults) ||
+      queryMode === 'SUPERSET' ||
       queryMode === 'WEB_PAGE' ||
       queryMode === 'WEB_SERVICE' ||
       queryMode === 'AGENT_SERVICE' ||

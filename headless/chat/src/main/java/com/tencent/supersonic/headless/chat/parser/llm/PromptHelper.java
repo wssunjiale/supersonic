@@ -38,6 +38,17 @@ public class PromptHelper {
         int selfConsistencyNumber =
                 Integer.parseInt(parserConfig.getParameterValue(PARSER_SELF_CONSISTENCY_NUMBER));
 
+        List<List<Text2SQLExemplar>> results = new ArrayList<>();
+        if (selfConsistencyNumber <= 0) {
+            return results;
+        }
+        if (fewShotNumber <= 0) {
+            for (int i = 0; i < selfConsistencyNumber; i++) {
+                results.add(new ArrayList<>());
+            }
+            return results;
+        }
+
         List<Text2SQLExemplar> exemplars = Lists.newArrayList();
         exemplars.addAll(llmReq.getDynamicExemplars());
 
@@ -46,7 +57,6 @@ public class PromptHelper {
             exemplars.addAll(exemplarService.recallExemplars(llmReq.getQueryText(), recallSize));
         }
 
-        List<List<Text2SQLExemplar>> results = new ArrayList<>();
         // use random collection of exemplars for each self-consistency inference
         for (int i = 0; i < selfConsistencyNumber; i++) {
             List<Text2SQLExemplar> shuffledList = new ArrayList<>(exemplars);
@@ -54,11 +64,16 @@ public class PromptHelper {
                     .filter(e -> e.getSimilarity() > 0.989).collect(Collectors.toList());
             List<Text2SQLExemplar> noSame = shuffledList.stream()
                     .filter(e -> e.getSimilarity() <= 0.989).collect(Collectors.toList());
+            if (same.isEmpty() && noSame.isEmpty()) {
+                results.add(new ArrayList<>());
+                continue;
+            }
             if ((noSame.size() - same.size()) > fewShotNumber) {// 去除部分最低分
                 noSame.sort(Comparator.comparingDouble(Text2SQLExemplar::getSimilarity));
                 noSame = noSame.subList((noSame.size() - fewShotNumber) / 2, noSame.size());
             }
-            Text2SQLExemplar mostSimilar = noSame.get(noSame.size() - 1);
+            Text2SQLExemplar mostSimilar =
+                    noSame.isEmpty() ? null : noSame.get(noSame.size() - 1);
             Collections.shuffle(noSame);
             List<Text2SQLExemplar> ts;
             if (same.size() > 0) {// 一样的话，必须作为提示语
@@ -70,7 +85,7 @@ public class PromptHelper {
                 ts.addAll(same);
             } else { // 至少要一个最像的
                 ts = noSame.subList(0, Math.min(noSame.size(), fewShotNumber));
-                if (!ts.contains(mostSimilar)) {
+                if (!ts.isEmpty() && Objects.nonNull(mostSimilar) && !ts.contains(mostSimilar)) {
                     ts.remove(ts.size() - 1);
                     ts.add(mostSimilar);
                 }

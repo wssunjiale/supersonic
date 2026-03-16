@@ -1,5 +1,5 @@
 import { EntityInfoType, ChatContextType } from '../../../common/type';
-import { PREFIX_CLS, ChatContextTypeQueryTypeEnum } from '../../../common/constants';
+import { PREFIX_CLS } from '../../../common/constants';
 
 type Props = {
   position: 'left' | 'right';
@@ -30,7 +30,6 @@ const Message: React.FC<Props> = ({
 
   const { modelName, dateInfo, dimensionFilters } = chatContext || {};
   const { startDate, endDate } = dateInfo || {};
-  const isDetailQuery = chatContext?.queryType === ChatContextTypeQueryTypeEnum.DETAIL;
 
   const entityInfoList =
     entityInfo?.dimensions?.filter(dimension => !dimension.bizName.includes('photo')) || [];
@@ -46,7 +45,7 @@ const Message: React.FC<Props> = ({
               e.stopPropagation();
             }}
           >
-            {(queryMode === 'METRIC_ID' || queryMode === 'TAG_DETAIL' || isDetailQuery) &&
+            {(queryMode === 'METRIC_ID' || queryMode === 'TAG_DETAIL') &&
               entityInfoList.length > 0 && (
                 <div className={`${prefixCls}-info-bar`}>
                   <div className={`${prefixCls}-main-entity-info`}>

@@ -18,10 +18,6 @@ public class SupersetPluginProperties {
 
     private boolean authEnabled = false;
 
-    private String authStrategy = "JWT_FIRST";
-
-    private String apiKey;
-
     private String jwtUsername;
 
     private String jwtPassword;

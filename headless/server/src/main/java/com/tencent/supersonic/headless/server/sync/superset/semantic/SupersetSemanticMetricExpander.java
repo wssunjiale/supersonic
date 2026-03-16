@@ -15,6 +15,9 @@ import java.util.regex.Pattern;
 @Slf4j
 public class SupersetSemanticMetricExpander {
 
+    private static final Pattern AGGREGATE_FUNCTION_PATTERN = Pattern.compile(
+            "^\\s*(?i)(sum|count|avg|min|max|count_distinct|approx_count_distinct)\\s*\\(");
+
     public String expandMetricExpression(MetricResp metric,
             Map<String, MetricResp> metricsByBizNameLowerCase) {
         return expandMetricExpression(metric, metricsByBizNameLowerCase, new java.util.HashSet<>());
@@ -40,7 +43,7 @@ public class SupersetSemanticMetricExpander {
                 return null;
             }
             if (!MetricDefineType.METRIC.equals(defineType)) {
-                return expr;
+                return applyDefaultAgg(expr, metric);
             }
             if (metric.getMetricDefineByMetricParams() == null
                     || metric.getMetricDefineByMetricParams().getMetrics() == null) {
@@ -69,6 +72,37 @@ public class SupersetSemanticMetricExpander {
                 visiting.remove(bizName.toLowerCase(Locale.ROOT));
             }
         }
+    }
+
+    private String applyDefaultAgg(String expr, MetricResp metric) {
+        if (StringUtils.isBlank(expr) || metric == null) {
+            return StringUtils.trimToNull(expr);
+        }
+        if (AGGREGATE_FUNCTION_PATTERN.matcher(expr).find()) {
+            return expr;
+        }
+        String agg = resolveDefaultAgg(metric);
+        if (StringUtils.isBlank(agg)) {
+            return expr;
+        }
+        return agg.toUpperCase(Locale.ROOT) + "(" + expr + ")";
+    }
+
+    private String resolveDefaultAgg(MetricResp metric) {
+        if (metric == null) {
+            return null;
+        }
+        String agg = StringUtils.trimToNull(metric.getDefaultAgg());
+        if (StringUtils.isNotBlank(agg)) {
+            return agg;
+        }
+        if (metric.getMetricDefineByMeasureParams() == null
+                || metric.getMetricDefineByMeasureParams().getMeasures() == null) {
+            return null;
+        }
+        return metric.getMetricDefineByMeasureParams().getMeasures().stream()
+                .map(item -> item == null ? null : StringUtils.trimToNull(item.getAgg()))
+                .filter(StringUtils::isNotBlank).findFirst().orElse(null);
     }
 
     /**
