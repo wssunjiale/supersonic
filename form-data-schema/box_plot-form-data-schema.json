@@ -1,0 +1,443 @@
+{
+  "viz_type": "box_plot",
+  "display_name": "Box Plot",
+  "purpose": "用于调用 API 创建或保存 Box Plot 时填写的 form_data 模板",
+  "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/box_plot-schema.json",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BoxPlot/controlPanel.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BoxPlot/index.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BoxPlot/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BoxPlot/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BoxPlot/types.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/test/BoxPlot/buildQuery.test.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/test/BoxPlot/transformProps.test.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/sections/chartTitle.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/operators/boxplotOperator.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/PostProcessing.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/models/ChartProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/store.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getControlState.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/reducers/exploreReducer.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/components/ExploreViewContainer/index.jsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/components/Chart/chartAction.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/standardizedFormData.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryObject.ts"
+  ],
+  "notes": [
+    "API form_data 的键名必须保留源码中的原始 control name。box_plot 这一组字段同时包含 snake_case 字段和一个例外的 camelCase 字段 `whiskerOptions`。",
+    "Explore 导出 form_data 时走 getFormDataFromControls()，它按 controlName 原样取值，不会把 `x_ticks_layout`、`number_format`、`whiskerOptions` 统一改成别的命名风格。",
+    "transformProps 中看到的 `colorScheme`、`numberFormat`、`xAxisTitle` 等 camelCase 名称来自 ChartProps.convertKeysToCamelCase(formData)，是运行时别名，不是 API form_data 的主键名。",
+    "box_plot 的正式分布字段是 `columns`。`buildQuery.ts` 只有在 `columns` 为空且 legacy 的 `granularity_sqla` 存在时，才会把 `granularity_sqla` 当作回退分布列。",
+    "当 `columns` 里选中物理时间列且 `time_grain_sqla` 不为空时，`buildQuery.ts` 会借助隐藏 helper `temporal_columns_lookup` 把该列转换成带 `timeGrain` 的 AdhocColumn。这个 helper 通常由 UI 自动推导，不是手工配置的主字段。",
+    "Chart Title 的真实 control 默认值来自 `sections/chartTitle.tsx`，不是 `plugin-chart-echarts/src/constants.ts` 的 `DEFAULT_TITLE_FORM_DATA`。如果你要构造与 Explore 新建页一致的模板，应采用 15 / 30 / Left 这一组 control 默认值。",
+    "当前正式的须线配置字段是 `whiskerOptions`。Cypress 老用例中的 `whisker_options` 不应作为新模板字段。"
+  ],
+  "naming_and_pipeline": {
+    "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写成 form_data[name]",
+    "api_form_data_to_query_context": "BoxPlot/buildQuery.ts 把 form_data.columns 与 form_data.groupby 组合进 query.columns，并附加 boxplotOperator(formData, baseQueryObject) 生成 post_processing",
+    "api_form_data_to_runtime_form_data": "ChartProps.ts 会把 form_data 转成 camelCase 的 runtime formData，同时保留 rawFormData"
+  },
+  "global_required_fields": {
+    "datasource": {
+      "data_type": "string",
+      "required": true,
+      "sample_data": "<dataset_id>__table",
+      "source": "datasourceAndVizType section"
+    },
+    "viz_type": {
+      "data_type": "string",
+      "required": true,
+      "fixed_value": "box_plot",
+      "source": "datasourceAndVizType section"
+    },
+    "columns": {
+      "data_type": "array[string | object]",
+      "required": true,
+      "sample_data": [
+        "<distribution_column>"
+      ],
+      "source": "BoxPlot Query section"
+    },
+    "metrics": {
+      "data_type": "array[string | object]",
+      "required": true,
+      "sample_data": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "AVG",
+          "label": "AVG(<metric_column>)"
+        }
+      ],
+      "source": "BoxPlot Query section"
+    }
+  },
+  "global_optional_fields": {
+    "time_grain_sqla": {
+      "data_type": "string | null",
+      "required": false,
+      "sample_data": "P1D",
+      "source": "BoxPlot Query section",
+      "notes": "仅当 columns 里包含 adhoc column 或物理时间列时，当前 controlPanel 才显示该控件。"
+    },
+    "temporal_columns_lookup": {
+      "data_type": "object<string, boolean>",
+      "required": false,
+      "sample_data": {
+        "<temporal_column>": true
+      },
+      "source": "BoxPlot Query hidden helper",
+      "notes": "通常由 UI 根据 datasource 自动推导。若你直接走前端 buildQuery 且要让时间分布列应用 time_grain_sqla，需要保证该映射与数据源一致。"
+    },
+    "groupby": {
+      "data_type": "array[string | object]",
+      "required": false,
+      "sample_data": [
+        "region"
+      ],
+      "source": "BoxPlot Query section"
+    },
+    "adhoc_filters": {
+      "data_type": "array[object]",
+      "required": false,
+      "sample_data": [],
+      "source": "BoxPlot Query section"
+    },
+    "series_limit": {
+      "data_type": "integer | null",
+      "required": false,
+      "sample_data": 25,
+      "source": "BoxPlot Query section"
+    },
+    "series_limit_metric": {
+      "data_type": "string | object | null",
+      "required": false,
+      "sample_data": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "AVG",
+        "label": "AVG(<metric_column>)"
+      },
+      "source": "BoxPlot Query section"
+    },
+    "row_limit": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 10000,
+      "source": "BoxPlot Query section"
+    },
+    "whiskerOptions": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "Tukey",
+      "source": "BoxPlot Query section"
+    },
+    "color_scheme": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "SUPERSET_DEFAULT",
+      "source": "BoxPlot Chart Options section"
+    },
+    "x_ticks_layout": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "auto",
+      "source": "BoxPlot Chart Options section"
+    },
+    "number_format": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "SMART_NUMBER",
+      "source": "BoxPlot Chart Options section"
+    },
+    "date_format": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "smart_date",
+      "source": "BoxPlot Chart Options section"
+    },
+    "x_axis_title": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "Order Date",
+      "source": "Chart Title section"
+    },
+    "x_axis_title_margin": {
+      "data_type": "integer | string",
+      "required": false,
+      "sample_data": 15,
+      "source": "Chart Title section"
+    },
+    "y_axis_title": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "Sales",
+      "source": "Chart Title section"
+    },
+    "y_axis_title_margin": {
+      "data_type": "integer | string",
+      "required": false,
+      "sample_data": 30,
+      "source": "Chart Title section"
+    },
+    "y_axis_title_position": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "Left",
+      "source": "Chart Title section"
+    },
+    "slice_id": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 0,
+      "source": "datasourceAndVizType hidden control",
+      "notes": "新建图表时通常省略；编辑已存在图表时由服务端或上层调用方提供。"
+    },
+    "cache_timeout": {
+      "data_type": "integer | null",
+      "required": false,
+      "sample_data": null,
+      "source": "datasourceAndVizType hidden control"
+    },
+    "url_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "datasourceAndVizType hidden control"
+    },
+    "custom_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "datasourceAndVizType hidden control"
+    },
+    "time_range": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "No filter",
+      "source": "generic QueryFormData / dashboard context",
+      "notes": "当前 box_plot controlPanel 没有独立 time_range 控件；通常优先在 adhoc_filters 或 extra_form_data 中表达时间过滤。"
+    },
+    "granularity_sqla": {
+      "data_type": "string | object | null",
+      "required": false,
+      "sample_data": "<temporal_column>",
+      "source": "legacy compatibility in buildQuery.ts",
+      "notes": "仅作向后兼容回退。当前 controlPanel 正式字段是 columns，不建议新模板主用 granularity_sqla。"
+    }
+  },
+  "minimal_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "box_plot",
+    "columns": [
+      "<distribution_column>"
+    ],
+    "metrics": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "AVG",
+        "label": "AVG(<metric_column>)"
+      }
+    ],
+    "adhoc_filters": []
+  },
+  "recommended_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "box_plot",
+    "columns": [
+      "<distribution_column>"
+    ],
+    "groupby": [],
+    "metrics": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "AVG",
+        "label": "AVG(<metric_column>)"
+      }
+    ],
+    "adhoc_filters": [],
+    "series_limit": null,
+    "series_limit_metric": null,
+    "row_limit": 10000,
+    "whiskerOptions": "Tukey",
+    "color_scheme": "SUPERSET_DEFAULT",
+    "x_ticks_layout": "auto",
+    "number_format": "SMART_NUMBER",
+    "date_format": "smart_date",
+    "x_axis_title": "",
+    "x_axis_title_margin": 15,
+    "y_axis_title": "",
+    "y_axis_title_margin": 30,
+    "y_axis_title_position": "Left"
+  },
+  "conditional_blocks": {
+    "temporal_distribution_column": {
+      "condition": "当分布轴 columns 选择的是时间列，且希望按粒度汇总分布时",
+      "fields": {
+        "columns": [
+          "<temporal_column>"
+        ],
+        "time_grain_sqla": "P1D",
+        "temporal_columns_lookup": {
+          "<temporal_column>": true
+        }
+      }
+    },
+    "filters": {
+      "condition": "需要做普通或时间过滤时",
+      "fields": {
+        "adhoc_filters": [
+          {
+            "clause": "WHERE",
+            "subject": "<filter_column>",
+            "operator": "==",
+            "comparator": "<value>",
+            "expressionType": "SIMPLE"
+          }
+        ]
+      }
+    },
+    "groupby_dimension": {
+      "condition": "需要按类别拆分每个 box plot 时",
+      "fields": {
+        "groupby": [
+          "region"
+        ]
+      }
+    },
+    "limit_series": {
+      "condition": "groupby 的基数较高，需要限制系列数量时",
+      "fields": {
+        "series_limit": 25,
+        "series_limit_metric": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "AVG",
+          "label": "AVG(<metric_column>)"
+        }
+      }
+    },
+    "whisker_min_max": {
+      "condition": "需要按最小值/最大值显示 whiskers，且不显示 outliers 时",
+      "fields": {
+        "whiskerOptions": "Min/max (no outliers)"
+      }
+    },
+    "whisker_percentiles": {
+      "condition": "需要按百分位控制 whiskers 时",
+      "fields": {
+        "whiskerOptions": "5/95 percentiles"
+      }
+    },
+    "titles": {
+      "condition": "需要显式设置坐标轴标题时",
+      "fields": {
+        "x_axis_title": "Order Date",
+        "x_axis_title_margin": 15,
+        "y_axis_title": "Sales",
+        "y_axis_title_margin": 30,
+        "y_axis_title_position": "Left"
+      }
+    },
+    "formatting": {
+      "condition": "需要控制数值、日期和 x 轴刻度布局时",
+      "fields": {
+        "color_scheme": "SUPERSET_DEFAULT",
+        "x_ticks_layout": "45°",
+        "number_format": "SMART_NUMBER",
+        "date_format": "smart_date"
+      }
+    }
+  },
+  "runtime_only_or_non_template_fields": {
+    "legacy_accepted_by_build_query": [
+      {
+        "field_name": "granularity_sqla",
+        "reason": "BoxPlot/buildQuery.ts 在 columns 为空时，会把 legacy 的 granularity_sqla 当作回退分布列；当前 controlPanel 已不再把它作为正式主字段。"
+      }
+    ],
+    "hidden_helper_fields": [
+      {
+        "field_name": "temporal_columns_lookup",
+        "reason": "用于判断选中的物理列是否为时间列，从而决定是否把该列包装成带 timeGrain 的 AdhocColumn。通常由 UI 自动推导。"
+      }
+    ],
+    "legacy_or_confusing_keys": [
+      {
+        "field_name": "whisker_options",
+        "reason": "老的 Cypress 用例仍使用 whisker_options，但当前 BoxPlot controlPanel、types 和 boxplotOperator 的正式字段名是 whiskerOptions。"
+      }
+    ],
+    "runtime_derived_fields": [
+      {
+        "field_name": "labelMap",
+        "reason": "transformProps.ts 从查询结果构建交互映射，供 cross-filter / drill 行为使用，不是 form_data 字段。"
+      },
+      {
+        "field_name": "selectedValues",
+        "reason": "transformProps.ts 依据 filterState.selectedValues 计算图上高亮状态，不是 form_data 字段。"
+      },
+      {
+        "field_name": "coltypeMapping",
+        "reason": "运行时由查询结果列类型推导，用于格式化 groupby label，不是 form_data 字段。"
+      },
+      {
+        "field_name": "echartOptions",
+        "reason": "运行时由 transformProps.ts 生成，包括 boxplot series、outlier scatter series、tooltip 和 axis 配置。"
+      }
+    ],
+    "viz_switch_only": [
+      {
+        "field_name": "formDataOverrides(columns/groupby remap)",
+        "reason": "只在 standardizedFormData.transform() 切换 viz_type 时触发，用于把 standardized controls.columns 拆成最终的 columns 与 groupby，不是常规导出 Box Plot form_data 的必经步骤。"
+      }
+    ]
+  },
+  "api_usage_guidance": {
+    "high_confidence_required_fields": [
+      "datasource",
+      "viz_type",
+      "columns",
+      "metrics"
+    ],
+    "recommended_always_set": [
+      "adhoc_filters",
+      "row_limit",
+      "whiskerOptions",
+      "color_scheme",
+      "x_ticks_layout",
+      "number_format",
+      "date_format"
+    ],
+    "api_field_examples": [
+      "columns",
+      "groupby",
+      "metrics",
+      "whiskerOptions",
+      "series_limit",
+      "series_limit_metric",
+      "x_axis_title"
+    ],
+    "avoid_confusion": [
+      "不要把 box_plot 的正式分布字段写成 granularity_sqla；当前主字段是 columns。",
+      "不要把当前正式字段 whiskerOptions 错写成旧的 whisker_options。",
+      "不要把 plugin-chart-echarts/src/constants.ts 里的 DEFAULT_TITLE_FORM_DATA 当成 controlPanel 默认值；Chart Title 的真实 control 默认值来自 sections/chartTitle.tsx。",
+      "如果 columns 使用的是时间列并且你还设置了 time_grain_sqla，记得理解 temporal_columns_lookup 的辅助作用。"
+    ]
+  }
+}

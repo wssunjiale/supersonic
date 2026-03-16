@@ -5,6 +5,10 @@ import lombok.Data;
 @Data
 public class SupersetChartInfo {
 
+    private Long dashboardId;
+
+    private String dashboardTitle;
+
     private Long chartId;
 
     private String chartUuid;

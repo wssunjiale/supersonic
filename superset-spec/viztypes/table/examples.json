@@ -1,0 +1,442 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "table",
+  "display_name": "Table",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "region",
+          "operator": "IN",
+          "comparator": [
+            "East",
+            "West"
+          ]
+        }
+      ]
+    ],
+    "align_pn": [
+      false
+    ],
+    "all_columns": [
+      [
+        "order_id",
+        "customer_name"
+      ]
+    ],
+    "allow_rearrange_columns": [
+      false
+    ],
+    "allow_render_html": [
+      true
+    ],
+    "color_pn": [
+      true
+    ],
+    "column_config": [
+      {
+        "sum__num": {
+          "d3NumberFormat": ".3s",
+          "columnWidth": 180,
+          "customColumnName": "Sales"
+        }
+      },
+      {
+        "sum__num": {
+          "d3NumberFormat": ".3s",
+          "columnWidth": 180,
+          "horizontalAlign": "right",
+          "customColumnName": "Sales"
+        }
+      }
+    ],
+    "comparison_color_enabled": [
+      false
+    ],
+    "comparison_color_scheme": [
+      "Green"
+    ],
+    "comparison_range_label": [],
+    "comparison_type": [
+      "values"
+    ],
+    "conditional_formatting": [
+      [
+        {
+          "column": "sum__num",
+          "operator": ">",
+          "targetValue": 2467,
+          "colorScheme": "#ACE1C4"
+        }
+      ]
+    ],
+    "groupby": [
+      [
+        "region"
+      ]
+    ],
+    "include_search": [
+      false
+    ],
+    "metrics": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        }
+      ]
+    ],
+    "order_by_cols": [
+      [
+        "[\"order_id\",true]"
+      ],
+      [
+        "[\"order_id\",true]",
+        "[\"customer_name\",false]"
+      ]
+    ],
+    "order_desc": [
+      true
+    ],
+    "page_length": [
+      20
+    ],
+    "percent_metric_calculation": [
+      "row_limit"
+    ],
+    "percent_metrics": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        }
+      ]
+    ],
+    "query_mode": [
+      "aggregate"
+    ],
+    "row_limit": [
+      1000
+    ],
+    "server_page_length": [
+      20
+    ],
+    "server_pagination": [
+      false,
+      true
+    ],
+    "show_cell_bars": [
+      true
+    ],
+    "show_totals": [
+      false
+    ],
+    "start_date_offset": [
+      "1 year ago"
+    ],
+    "table_timestamp_format": [
+      "smart_date"
+    ],
+    "temporal_columns_lookup": [
+      {
+        "order_date": true
+      },
+      {
+        "order_date": true,
+        "ship_date": true
+      }
+    ],
+    "time_compare": [
+      "1 year ago"
+    ],
+    "time_grain_sqla": [
+      "P1D"
+    ],
+    "timeseries_limit_metric": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "sales"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(sales)"
+      }
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "table",
+      "adhoc_filters": [],
+      "time_range": "No filter"
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "table",
+      "adhoc_filters": [],
+      "time_range": "No filter"
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "table",
+      "query_mode": "<copied_from_saved_chart>",
+      "groupby": "<copied_from_saved_chart>",
+      "metrics": "<copied_from_saved_chart>",
+      "all_columns": "<copied_from_saved_chart>",
+      "percent_metrics": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "time_grain_sqla": "<copied_from_saved_chart>",
+      "temporal_columns_lookup": "<copied_from_saved_chart>",
+      "timeseries_limit_metric": "<copied_from_saved_chart>",
+      "order_by_cols": "<copied_from_saved_chart>",
+      "order_desc": "<copied_from_saved_chart>",
+      "server_pagination": "<copied_from_saved_chart>",
+      "server_page_length": "<copied_from_saved_chart>",
+      "row_limit": "<copied_from_saved_chart>",
+      "percent_metric_calculation": "<copied_from_saved_chart>",
+      "show_totals": "<copied_from_saved_chart>",
+      "table_timestamp_format": "<copied_from_saved_chart>",
+      "page_length": "<copied_from_saved_chart>",
+      "include_search": "<copied_from_saved_chart>",
+      "allow_rearrange_columns": "<copied_from_saved_chart>",
+      "allow_render_html": "<copied_from_saved_chart>",
+      "column_config": "<copied_from_saved_chart>",
+      "show_cell_bars": "<copied_from_saved_chart>",
+      "align_pn": "<copied_from_saved_chart>",
+      "color_pn": "<copied_from_saved_chart>",
+      "comparison_color_enabled": "<copied_from_saved_chart>",
+      "comparison_color_scheme": "<copied_from_saved_chart>",
+      "conditional_formatting": "<copied_from_saved_chart>",
+      "time_compare": "<copied_from_saved_chart>",
+      "start_date_offset": "<copied_from_saved_chart>",
+      "comparison_type": "<copied_from_saved_chart>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_table": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "effect": "追加简单过滤条件；这是最稳妥的 guest 动态入口之一。",
+        "source": "query constants + backend merge_extra_form_data"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[object]",
+        "behavior": "append",
+        "safe_for_table": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会把它们标记为 extra 并并入查询。",
+        "source": "query constants + backend merge_extra_form_data"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_table": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；当前 Table buildQuery / transformProps 默认不直接消费它。",
+        "source": "query constants"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "data_type": "array[string | object]",
+        "behavior": "append",
+        "safe_for_table": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "Table/buildQuery 会把它直接 append 到 query.columns。",
+        "source": "query constants + Table/buildQuery.ts",
+        "status": "guest 下不建议动态修改"
+      },
+      {
+        "field_name": "time_compare",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_table": false,
+        "recommended": false,
+        "sample_data": "1 year ago",
+        "effect": "通用 override 白名单允许该 key，但 Table/buildQuery 会据此生成 comparison post_processing 与 time_offsets。",
+        "source": "query constants + Table/buildQuery.ts",
+        "status": "guest 下不建议动态修改"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_table": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "会改写 aggregate 模式的 temporal column 编译结果，并影响 queries[*].columns。",
+        "source": "query constants + Table/buildQuery.ts",
+        "status": "guest 下不建议动态修改"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_table": false,
+        "recommended": false,
+        "sample_data": "Last 30 days",
+        "effect": "这是通用 override 白名单，但 Table 当前 controlPanel 没有显式时间范围控件闭环；guest 下不建议依赖。",
+        "source": "query constants",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_table": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "通用时间列 override；当前 Table 插件并未以它作为 primary control key。",
+        "source": "query constants",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_column",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_table": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "底层 QueryObject 时间列 override；当前 Table 插件没有对应 controlPanel 闭环。",
+        "source": "query constants",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_grain",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_table": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "底层 QueryObject 时间粒度 override；当前 Table 插件没有对应 controlPanel 闭环。",
+        "source": "query constants",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "relative_start",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_table": false,
+        "recommended": false,
+        "sample_data": "now",
+        "effect": "进入 query extras 的相对开始时间；当前 Table 插件没有显式时间过滤控件闭环。",
+        "source": "query constants",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "relative_end",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_table": false,
+        "recommended": false,
+        "sample_data": "today",
+        "effect": "进入 query extras 的相对结束时间；当前 Table 插件没有显式时间过滤控件闭环。",
+        "source": "query constants",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_table": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用交互字段；当前 Table buildQuery/transformProps 默认不直接消费。",
+        "source": "query constants"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_table": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用交互字段；当前 Table buildQuery/transformProps 默认不直接消费。",
+        "source": "query constants"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "table",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/table-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/table-form-data-schema.json",
+      "control-schema": "form-data-schema/table-schema.json"
+    }
+  }
+}

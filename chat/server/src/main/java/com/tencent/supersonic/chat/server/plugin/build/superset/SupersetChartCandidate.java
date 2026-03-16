@@ -9,9 +9,15 @@ public class SupersetChartCandidate {
 
     private String vizName;
 
+    private Long dashboardId;
+
+    private String dashboardTitle;
+
     private Long chartId;
 
     private String chartUuid;
+
+    private Integer dashboardHeight;
 
     private String guestToken;
 

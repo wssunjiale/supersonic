@@ -1,0 +1,131 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "waterfall",
+  "display_name": "Waterfall Chart",
+  "normalized_summary": {
+    "category": "comparison",
+    "tags": [
+      "waterfall",
+      "cumulative",
+      "increment",
+      "comparison"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "groupby",
+        "required": true,
+        "description": "分类维度字段，定义瀑布图的类别轴（如月份、成本项）。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于计算每个类别的增量数值。"
+      },
+      {
+        "key": "show_total",
+        "required": false,
+        "description": "是否显示总计行（true/false），展示最终的累积数值。"
+      },
+      {
+        "key": "total_label",
+        "required": false,
+        "description": "总计行标签，自定义总计行的显示名称（如“总计”、“净利润”）。"
+      }
+    ],
+    "description_zh": "Waterfall Chart displays cumulative metric changes over categories, with positive/negative values represented by upward/downward bars and a total bar for final value.",
+    "visual_shape_zh": "瀑布图（增量累积型）",
+    "use_cases_zh": [
+      "指标的增量分析（如月度收入增减、成本构成）",
+      "正负值的累积变化展示（如利润构成）",
+      "类别间的增量贡献度分析"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "waterfall",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/waterfall-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/waterfall-form-data-schema.json",
+      "control-schema": "form-data-schema/waterfall-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Waterfall Chart",
+    "viztype": "waterfall",
+    "详细描述": "Waterfall Chart displays cumulative metric changes over categories, with positive/negative values represented by upward/downward bars and a total bar for final value.",
+    "表现形态": "瀑布图（增量累积型）",
+    "适用场景": [
+      "指标的增量分析（如月度收入增减、成本构成）",
+      "正负值的累积变化展示（如利润构成）",
+      "类别间的增量贡献度分析"
+    ],
+    "vizKey": "Waterfall",
+    "pluginCategory": "Comparison",
+    "pluginTags": [],
+    "category": "comparison",
+    "tags": [
+      "waterfall",
+      "cumulative",
+      "increment",
+      "comparison"
+    ],
+    "关键字段": [
+      {
+        "key": "groupby",
+        "required": true,
+        "description": "分类维度字段，定义瀑布图的类别轴（如月份、成本项）。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于计算每个类别的增量数值。"
+      },
+      {
+        "key": "show_total",
+        "required": false,
+        "description": "是否显示总计行（true/false），展示最终的累积数值。"
+      },
+      {
+        "key": "total_label",
+        "required": false,
+        "description": "总计行标签，自定义总计行的显示名称（如“总计”、“净利润”）。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

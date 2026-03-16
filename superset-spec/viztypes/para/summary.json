@@ -1,0 +1,121 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "para",
+  "display_name": "Parallel Coordinates",
+  "normalized_summary": {
+    "category": "relationship",
+    "tags": [
+      "parallel",
+      "multi_dimensional",
+      "relationship",
+      "coordinates"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "dimensions",
+        "required": true,
+        "description": "维度字段列表，用于定义平行坐标的垂直轴。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "数值指标列表，用于绘制跨维度的数值连线。"
+      },
+      {
+        "key": "normalize",
+        "required": false,
+        "description": "是否归一化数值（true/false），用于跨维度数值的可比化。"
+      }
+    ],
+    "description_zh": "Parallel Coordinates Chart displays multi-dimensional numerical data, with each dimension as a vertical axis and data points as lines connecting values across axes.",
+    "visual_shape_zh": "平行坐标图（多维关联型）",
+    "use_cases_zh": [
+      "多维数值数据关联分析（如多指标特征对比）",
+      "高维数据模式识别",
+      "多维度异常值检测"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "para",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/para-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/para-form-data-schema.json",
+      "control-schema": "form-data-schema/para-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Parallel Coordinates",
+    "viztype": "para",
+    "详细描述": "Parallel Coordinates Chart displays multi-dimensional numerical data, with each dimension as a vertical axis and data points as lines connecting values across axes.",
+    "表现形态": "平行坐标图（多维关联型）",
+    "适用场景": [
+      "多维数值数据关联分析（如多指标特征对比）",
+      "高维数据模式识别",
+      "多维度异常值检测"
+    ],
+    "vizKey": "ParallelCoordinates",
+    "pluginCategory": "Relationship",
+    "pluginTags": [],
+    "category": "relationship",
+    "tags": [
+      "parallel",
+      "multi_dimensional",
+      "relationship",
+      "coordinates"
+    ],
+    "关键字段": [
+      {
+        "key": "dimensions",
+        "required": true,
+        "description": "维度字段列表，用于定义平行坐标的垂直轴。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "数值指标列表，用于绘制跨维度的数值连线。"
+      },
+      {
+        "key": "normalize",
+        "required": false,
+        "description": "是否归一化数值（true/false），用于跨维度数值的可比化。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

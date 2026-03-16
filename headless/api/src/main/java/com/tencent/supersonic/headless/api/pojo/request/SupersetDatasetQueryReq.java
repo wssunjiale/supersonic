@@ -21,4 +21,20 @@ public class SupersetDatasetQueryReq extends PageBaseReq {
     private String createdBy;
 
     private Boolean synced;
+
+    /**
+     * Registry source type filter (e.g. SEMANTIC_DATASET / CHAT_SQL).
+     */
+    private String sourceType;
+
+    /**
+     * Whether only return datasets that need sync (PENDING/FAILED). If null, backend may apply a
+     * default strategy depending on UI.
+     */
+    private Boolean needSync;
+
+    /**
+     * Sync state filter (PENDING/SUCCESS/FAILED).
+     */
+    private String syncState;
 }

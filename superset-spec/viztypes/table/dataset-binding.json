@@ -1,0 +1,659 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "table",
+  "display_name": "Table",
+  "generation_mode": "heuristic_seed",
+  "slot_candidates": [
+    {
+      "field_name": "adhoc_filters",
+      "required": false,
+      "slot_kind": "filter_list",
+      "accepted_dataset_roles": [
+        "filter_context"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [],
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [
+        "extra_form_data.append"
+      ],
+      "descriptions": [
+        "过滤条件集合。",
+        "Filters"
+      ]
+    },
+    {
+      "field_name": "all_columns",
+      "required": false,
+      "slot_kind": "dimension_list",
+      "accepted_dataset_roles": [
+        "dimension",
+        "category_dimension"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [
+        "<dimension_column>"
+      ],
+      "source_categories": [
+        "图表专属",
+        "Query"
+      ],
+      "embedding_modes": [
+        "否（guest 下不应动态修改）"
+      ],
+      "descriptions": [
+        "raw 模式下展示的明细列集合。",
+        "Columns to display"
+      ]
+    },
+    {
+      "field_name": "groupby",
+      "required": false,
+      "slot_kind": "dimension_list",
+      "accepted_dataset_roles": [
+        "dimension",
+        "category_dimension"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [
+        "<dimension_column>"
+      ],
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [
+        "否（guest 下不应动态修改）"
+      ],
+      "descriptions": [
+        "聚合模式下的分组维度。",
+        "Dimensions contain qualitative values such as names, dates, or geographical data. Use dimensions to categorize, segment, and reveal the details in your data. Dimensions affect the level of detail in the view."
+      ]
+    },
+    {
+      "field_name": "metrics",
+      "required": false,
+      "slot_kind": "metric_list",
+      "accepted_dataset_roles": [
+        "metric",
+        "saved_metric",
+        "adhoc_metric"
+      ],
+      "cardinality": "1..n",
+      "placeholder": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        }
+      ],
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [
+        "否（guest 下不应动态修改）"
+      ],
+      "descriptions": [
+        "聚合模式下的主指标集合。",
+        "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+      ]
+    },
+    {
+      "field_name": "percent_metric_calculation",
+      "required": false,
+      "slot_kind": "metric",
+      "accepted_dataset_roles": [
+        "metric",
+        "saved_metric",
+        "adhoc_metric"
+      ],
+      "cardinality": "0..n",
+      "placeholder": "<metric_or_metric_list>",
+      "source_categories": [
+        "图表专属",
+        "Query"
+      ],
+      "embedding_modes": [
+        "否（guest 下不应动态修改）"
+      ],
+      "descriptions": [
+        "百分比指标基于 row_limit 还是 all_records 计算。",
+        "Row Limit: percentages are calculated based on the subset of data retrieved, respecting the row limit. All Records: Percentages are calculated based on the total dataset, ignoring the row limit."
+      ]
+    },
+    {
+      "field_name": "percent_metrics",
+      "required": false,
+      "slot_kind": "metric",
+      "accepted_dataset_roles": [
+        "metric",
+        "saved_metric",
+        "adhoc_metric"
+      ],
+      "cardinality": "0..n",
+      "placeholder": "<metric_or_metric_list>",
+      "source_categories": [
+        "图表专属",
+        "Query"
+      ],
+      "embedding_modes": [
+        "否（guest 下不应动态修改）"
+      ],
+      "descriptions": [
+        "aggregate 模式下追加百分比指标列。",
+        "Select one or many metrics to display, that will be displayed in the percentages of total. Percentage metrics will be calculated only from data within the row limit. You can use an aggregation function on a column or write custom SQL to create a percentage metric."
+      ]
+    },
+    {
+      "field_name": "time_grain_sqla",
+      "required": false,
+      "slot_kind": "time_grain",
+      "accepted_dataset_roles": [
+        "time_grain"
+      ],
+      "cardinality": "0..1",
+      "placeholder": "P1D",
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [
+        "extra_form_data.override（guest 下不建议）",
+        "extra_form_data.override（技术上可传，但 guest 下不建议）"
+      ],
+      "descriptions": [
+        "时间粒度。仅当 `groupby` 中包含 temporal 列时才生效。",
+        "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart."
+      ]
+    }
+  ],
+  "non_binding_form_controls": [
+    {
+      "field_name": "align_pn",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options",
+        "Visual formatting"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "正负值数据条是否以 0 为对齐中轴。",
+        "Whether to align background charts with both positive and negative values at 0"
+      ]
+    },
+    {
+      "field_name": "allow_rearrange_columns",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options",
+        "Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "是否允许终端用户拖拽重排列顺序。",
+        "Allow end user to drag-and-drop column headers to rearrange them. Note their changes won't persist for the next time they open the chart."
+      ]
+    },
+    {
+      "field_name": "allow_render_html",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options",
+        "Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "是否按 HTML 渲染单元格内容。",
+        "Renders table cells as HTML when applicable. For example, HTML <a> tags will be rendered as hyperlinks."
+      ]
+    },
+    {
+      "field_name": "color_pn",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options",
+        "Visual formatting"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "是否按正负值给数据条着色。",
+        "Whether to colorize numeric values by whether they are positive or negative"
+      ]
+    },
+    {
+      "field_name": "column_config",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "图表专属",
+        "Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "逐列定制格式、列宽、别名、显示隐藏和 comparison 子列格式。",
+        "Further customize how to display each column"
+      ]
+    },
+    {
+      "field_name": "comparison_color_enabled",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options",
+        "Visual formatting"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "时间对比模式下，是否启用基础涨跌箭头与底色格式。",
+        "This will be applied to the whole table. Arrows (↑ and ↓) will be added to main columns for increase and decrease. Basic conditional formatting can be overwritten by conditional formatting below."
+      ]
+    },
+    {
+      "field_name": "comparison_color_scheme",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options",
+        "Visual formatting"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "时间对比模式下，涨跌配色策略。",
+        "Adds color to the chart symbols based on the positive or negative change from the comparison value."
+      ]
+    },
+    {
+      "field_name": "comparison_range_label",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Time Comparison"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Time Comparison section 的显示型辅助控件，用于回显 comparison range label。"
+      ]
+    },
+    {
+      "field_name": "comparison_type",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Advanced analytics",
+        "Time Comparison"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "时间对比展示方式：值、差值、百分比变化或比率。",
+        "How to display time shifts: as individual lines; as the difference between the main time series and each time shift; as the percentage change; or as the ratio between series and time shifts."
+      ]
+    },
+    {
+      "field_name": "conditional_formatting",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options",
+        "Visual formatting"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "自定义条件着色规则集合。",
+        "Apply conditional color formatting to numeric columns"
+      ]
+    },
+    {
+      "field_name": "include_search",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options",
+        "Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "是否展示客户端搜索框。",
+        "Whether to include a client-side search box"
+      ]
+    },
+    {
+      "field_name": "order_by_cols",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "图表专属",
+        "Query"
+      ],
+      "embedding_modes": [
+        "否（guest 下不应动态修改）"
+      ],
+      "descriptions": [
+        "raw 模式专用排序配置。",
+        "Order results by selected columns"
+      ]
+    },
+    {
+      "field_name": "order_desc",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [
+        "否（guest 下不应动态修改）"
+      ],
+      "descriptions": [
+        "aggregate 模式下，是否按 `timeseries_limit_metric` 降序排序。",
+        "If enabled, this control sorts the results/values descending, otherwise it sorts the results ascending."
+      ]
+    },
+    {
+      "field_name": "page_length",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options",
+        "Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "前端分页时每页显示行数；`null` 代表自动分页。",
+        "Rows per page, 0 means no pagination"
+      ]
+    },
+    {
+      "field_name": "query_mode",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "图表专属",
+        "Query"
+      ],
+      "embedding_modes": [
+        "否（guest 下不应动态修改）"
+      ],
+      "descriptions": [
+        "Table 独有的 raw / aggregate 双模式开关。",
+        "Query mode"
+      ]
+    },
+    {
+      "field_name": "row_limit",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [
+        "否（guest 下不应动态修改）"
+      ],
+      "descriptions": [
+        "查询返回的最大行数上限。",
+        "Limits the number of the rows that are computed in the query that is the source of the data used for this chart."
+      ]
+    },
+    {
+      "field_name": "server_page_length",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "图表专属",
+        "Query"
+      ],
+      "embedding_modes": [
+        "否（guest 下不应动态修改）"
+      ],
+      "descriptions": [
+        "服务端分页时的每页条数。",
+        "Rows per page, 0 means no pagination"
+      ]
+    },
+    {
+      "field_name": "server_pagination",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "图表专属",
+        "Query"
+      ],
+      "embedding_modes": [
+        "否（guest 下不应动态修改）"
+      ],
+      "descriptions": [
+        "是否启用服务端分页。",
+        "Enable server side pagination of results (experimental feature)"
+      ]
+    },
+    {
+      "field_name": "show_cell_bars",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options",
+        "Visual formatting"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "是否在数值单元格背景显示数据条。",
+        "Whether to display a bar chart background in table columns"
+      ]
+    },
+    {
+      "field_name": "show_totals",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "图表专属",
+        "Query"
+      ],
+      "embedding_modes": [
+        "否（guest 下不应动态修改）"
+      ],
+      "descriptions": [
+        "是否额外生成 summary totals。",
+        "Show total aggregations of selected metrics. Note that row limit does not apply to the result."
+      ]
+    },
+    {
+      "field_name": "start_date_offset",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Advanced analytics",
+        "Time Comparison"
+      ],
+      "embedding_modes": [
+        "extra_form_data.override（guest 下不建议）",
+        "extra_form_data.override（技术上可传，但 guest 下不建议）"
+      ],
+      "descriptions": [
+        "当 `time_compare='custom'` 时的自定义偏移量。",
+        "Shift start date"
+      ]
+    },
+    {
+      "field_name": "table_timestamp_format",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "图表专属",
+        "Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Table 全局时间列格式。",
+        "D3 time format for datetime columns"
+      ]
+    },
+    {
+      "field_name": "temporal_columns_lookup",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "隐藏映射，用来标记哪些分组列是 temporal physical columns。",
+        "隐藏控件。把 datasource 中所有 temporal physical columns 整理成 `{ column_name: true }` 映射，供 `time_grain_sqla` 可见性判断与 buildQuery 时间列改写使用。"
+      ]
+    },
+    {
+      "field_name": "time_compare",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Advanced analytics",
+        "Time Comparison"
+      ],
+      "embedding_modes": [
+        "extra_form_data.override（guest 下不建议）",
+        "extra_form_data.override（技术上可传，但 guest 下不建议）"
+      ],
+      "descriptions": [
+        "时间位移对比字段。开启后会生成 comparison columns。",
+        "Overlay results from a relative time period. Expects relative time deltas in natural language (example: 24 hours, 7 days, 52 weeks, 365 days). Free text is supported. Use \"Inherit range from time filters\" to shift the comparison time range by the same length as your time range and use \"Custom\" to set a custom comparison range."
+      ]
+    },
+    {
+      "field_name": "timeseries_limit_metric",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [
+        "否（guest 下不应动态修改）"
+      ],
+      "descriptions": [
+        "aggregate 模式下用于决定 top rows 排序与截断依据的指标。",
+        "Orders the query result that generates the source data for this chart. If a series or row limit is reached, this determines what data are truncated. If undefined, defaults to the first metric (where appropriate)."
+      ]
+    }
+  ],
+  "dataset_role_inventory": {
+    "adhoc_metric": [
+      "metrics",
+      "percent_metric_calculation",
+      "percent_metrics"
+    ],
+    "category_dimension": [
+      "all_columns",
+      "groupby"
+    ],
+    "dimension": [
+      "all_columns",
+      "groupby"
+    ],
+    "filter_context": [
+      "adhoc_filters"
+    ],
+    "metric": [
+      "metrics",
+      "percent_metric_calculation",
+      "percent_metrics"
+    ],
+    "saved_metric": [
+      "metrics",
+      "percent_metric_calculation",
+      "percent_metrics"
+    ],
+    "time_grain": [
+      "time_grain_sqla"
+    ]
+  },
+  "binding_seed_example": {},
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "table",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/table-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/table-form-data-schema.json",
+      "control-schema": "form-data-schema/table-schema.json"
+    }
+  }
+}

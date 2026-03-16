@@ -1,0 +1,131 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "echarts_timeseries_line",
+  "display_name": "Line Chart",
+  "normalized_summary": {
+    "category": "timeseries",
+    "tags": [
+      "timeseries",
+      "line",
+      "trend",
+      "continuous"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "groupby",
+        "required": true,
+        "description": "维度字段列表（通常为时间维度），用于分组/系列/分类轴。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标列表（可多个），用于绘制多系列折线对比。"
+      },
+      {
+        "key": "time_grain_sqla",
+        "required": false,
+        "description": "时间粒度（如 day/week/month），用于时间聚合桶。"
+      },
+      {
+        "key": "smooth",
+        "required": false,
+        "description": "是否平滑折线（true/false），控制折线的展示样式。"
+      }
+    ],
+    "description_zh": "Time-series Line Chart displays metric trends over time, with data points connected by lines to show continuous change over a time dimension.",
+    "visual_shape_zh": "时间序列（折线）",
+    "use_cases_zh": [
+      "随时间的趋势变化（如小时/日/月指标波动）",
+      "多指标趋势对比",
+      "长期趋势与周期性分析"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "echarts_timeseries_line",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/echarts_timeseries_line-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/echarts_timeseries_line-form-data-schema.json",
+      "control-schema": "form-data-schema/echarts_timeseries_line-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Line Chart",
+    "viztype": "echarts_timeseries_line",
+    "详细描述": "Time-series Line Chart displays metric trends over time, with data points connected by lines to show continuous change over a time dimension.",
+    "表现形态": "时间序列（折线）",
+    "适用场景": [
+      "随时间的趋势变化（如小时/日/月指标波动）",
+      "多指标趋势对比",
+      "长期趋势与周期性分析"
+    ],
+    "vizKey": "Line",
+    "pluginCategory": "Evolution",
+    "pluginTags": [],
+    "category": "timeseries",
+    "tags": [
+      "timeseries",
+      "line",
+      "trend",
+      "continuous"
+    ],
+    "关键字段": [
+      {
+        "key": "groupby",
+        "required": true,
+        "description": "维度字段列表（通常为时间维度），用于分组/系列/分类轴。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标列表（可多个），用于绘制多系列折线对比。"
+      },
+      {
+        "key": "time_grain_sqla",
+        "required": false,
+        "description": "时间粒度（如 day/week/month），用于时间聚合桶。"
+      },
+      {
+        "key": "smooth",
+        "required": false,
+        "description": "是否平滑折线（true/false），控制折线的展示样式。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

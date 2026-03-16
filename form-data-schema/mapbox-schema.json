@@ -1,0 +1,306 @@
+{
+  "viz_type": "mapbox",
+  "display_name": "MapBox",
+  "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-map-box/src/controlPanel.ts",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-map-box/src/controlPanel.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-map-box/src/index.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-map-box/src/transformProps.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-map-box/src/MapBox.jsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-map-box/src/ScatterPlotGlowOverlay.jsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+    "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+    "D:/vsx/sources/superset-6.0.0/superset/views/core.py",
+    "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+    "D:/vsx/sources/superset-6.0.0/superset/examples/long_lat.py"
+  ],
+  "notes": [
+    "MapBox 位于 `legacy-plugin-chart-map-box` 插件中，metadata 显式声明 `useLegacyApi=true`，因此前端真实请求路径是 `/superset/explore_json/`，不是 `/api/v1/chart/data`。",
+    "MapBox 的 controlPanel 分为 `Query`、`Points`、`Labelling`、`Visual Tweaks`、`Viewport` 五个 section，没有 ECharts 时序图那类 Query Context 构造逻辑。",
+    "`all_columns_x` 与 `all_columns_y` 来自共享 `entity` 控件，底层定义是单选且带 `validateNonEmpty`；当前图通过 override 仅改了 label/description。",
+    "`groupby` 仍是共享多选维度控件，且通过 controlOverrides 改写了说明：若使用 groupby，longitude 和 latitude 列必须包含在其中。",
+    "`formDataOverrides` 只会在 standardized controls 切换图表类型时，把 standardized columns 写回 `groupby`；它不会改变最终 API root 键名。",
+    "`MapboxViz.query_obj()` 分成两条路径：无 groupby 时直接把 longitude、latitude、可选 label、可选 point_radius 列写到 `query_obj.columns`；有 groupby 时要求 longitude/latitude 与可选 label/point_radius 列都已包含在 `groupby` 中。",
+    "`mapbox_label` 控件本身是 `multi=true`，但当前后端只消费数组第一个元素 `label_col[0]`。",
+    "`viewport_longitude`、`viewport_latitude`、`viewport_zoom` 是持久化控件值，且 transformProps 会在拖拽缩放时回写它们；但当前 `MapBox.jsx` 初始化视口时实际依据的是 `bounds.fitBounds(...)`，没有读取这三个已保存值。"
+  ],
+  "control_overrides": {
+    "groupby": {
+      "description": "One or many controls to group by. If grouping, latitude and longitude columns must be present."
+    }
+  },
+  "form_data_overrides": {
+    "groupby": "getStandardizedControls().popAllColumns()"
+  },
+  "legacy_api_behavior": {
+    "useLegacyApi": true,
+    "frontend_request_endpoint": "/superset/explore_json/",
+    "frontend_request_payload": {
+      "form_data": "<raw form_data>"
+    },
+    "query_builder": "MapBox 没有专属前端 buildQuery。ChartClient.ts 在 `useLegacyApi=true` 且未注册 buildQuery 时，会把原始 form_data 直接包装进 legacy payload。"
+  },
+  "query_compilation": {
+    "backend_class": "superset/viz.py::MapboxViz",
+    "base_query": "继承 BaseViz.query_obj()，因此会先处理 legacy filters / extra_form_data，并构造基础 query_obj。",
+    "no_groupby_branch": "如果 `groupby` 为空，必须提供 `all_columns_x` 与 `all_columns_y`；后端会把经度列、纬度列放进 `query_obj.columns`，并按需追加 `mapbox_label[0]` 与 `point_radius` 列。",
+    "groupby_branch": "如果 `groupby` 非空，`all_columns_x` 与 `all_columns_y` 必须包含在 groupby 中；若 `mapbox_label[0] != 'count'` 或 `point_radius != 'Auto'`，它们也必须已经在 groupby 中。",
+    "returned_data": "get_data(df) 返回 `{ geoJSON, hasCustomMetric, mapboxApiKey, mapStyle, aggregatorName, clusteringRadius, pointRadiusUnit, globalOpacity, bounds, renderWhileDragging, tooltip, color }`。"
+  },
+  "field_categories": {
+    "Query": [
+      {
+        "field_name": "all_columns_x",
+        "description": "Column containing longitude data",
+        "data_type": "string | object",
+        "enum_source": "datasource columns；共享 entity 控件会优先使用可 groupby 列元数据",
+        "sample_data": "longitude",
+        "required": true,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "共享控件源自 dndEntityControl，底层是单选且带 `validateNonEmpty`。`MapboxViz.query_obj()` 在无 groupby 时要求该字段必填，在有 groupby 时要求它已包含于 `groupby`。"
+      },
+      {
+        "field_name": "all_columns_y",
+        "description": "Column containing latitude data",
+        "data_type": "string | object",
+        "enum_source": "datasource columns；共享 entity 控件会优先使用可 groupby 列元数据",
+        "sample_data": "latitude",
+        "required": true,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "共享控件源自 dndEntityControl，底层是单选且带 `validateNonEmpty`。`MapboxViz.query_obj()` 在无 groupby 时要求该字段必填，在有 groupby 时要求它已包含于 `groupby`。"
+      },
+      {
+        "field_name": "clustering_radius",
+        "description": "The radius (in pixels) the algorithm uses to define a cluster. Choose 0 to turn off clustering, but beware that a large number of points (>1000) will cause lag.",
+        "data_type": "string | number",
+        "enum_values": [
+          "0",
+          "20",
+          "40",
+          "60",
+          "80",
+          "100",
+          "200",
+          "500",
+          "1000"
+        ],
+        "sample_data": "60",
+        "required": false,
+        "embedding": "否",
+        "default_value": "60",
+        "notes": "控件是 `SelectControl + freeForm=true`，因此既可选预置值，也可手输其它像素半径。"
+      },
+      {
+        "field_name": "row_limit",
+        "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+        "data_type": "integer",
+        "enum_values": [
+          10,
+          50,
+          100,
+          250,
+          500,
+          1000,
+          5000,
+          10000,
+          50000
+        ],
+        "sample_data": 10000,
+        "required": false,
+        "embedding": "否",
+        "default_value": 10000
+      },
+      {
+        "field_name": "adhoc_filters",
+        "description": "字段标签为 Filters。legacy explore_json 路径会先把 legacy filters 转成 adhoc_filters，再继续处理 extra filters / extra_form_data。",
+        "data_type": "array[object]",
+        "enum_source": "datasource columns + saved metrics + 当前 metrics",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "West"
+            ]
+          }
+        ],
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "default_value": []
+      },
+      {
+        "field_name": "groupby",
+        "description": "One or many controls to group by. If grouping, latitude and longitude columns must be present.",
+        "data_type": "array[string | object]",
+        "enum_source": "datasource columns；若 dataset metadata 含 `groupby=true`，共享控件会优先只暴露可 groupby 的列",
+        "sample_data": [
+          "region",
+          "longitude",
+          "latitude"
+        ],
+        "required": false,
+        "embedding": "否",
+        "default_value": [],
+        "notes": "当前图没有把 groupby 改成单选。若 groupby 非空，`all_columns_x` 与 `all_columns_y` 必须已经包含在其中；`point_radius != 'Auto'` 或 `mapbox_label[0] != 'count'` 时也会触发额外包含约束。"
+      }
+    ],
+    "Points": [
+      {
+        "field_name": "point_radius",
+        "description": "The radius of individual points (ones that are not in a cluster). Either a numerical column or `Auto`, which scales the point based on the largest cluster",
+        "data_type": "string",
+        "enum_source": "`Auto` + datasource columns",
+        "sample_data": "Auto",
+        "required": false,
+        "embedding": "否",
+        "default_value": "Auto",
+        "notes": "`MapboxViz.query_obj()` 在无 groupby 时会把非 Auto 的 point_radius 追加到 `query_obj.columns`；在有 groupby 时要求它已经存在于 `groupby`。"
+      },
+      {
+        "field_name": "point_radius_unit",
+        "description": "The unit of measure for the specified point radius",
+        "data_type": "string",
+        "enum_values": [
+          "Pixels",
+          "Miles",
+          "Kilometers"
+        ],
+        "sample_data": "Pixels",
+        "required": false,
+        "embedding": "否",
+        "default_value": "Pixels"
+      }
+    ],
+    "Labelling": [
+      {
+        "field_name": "mapbox_label",
+        "description": "`count` is COUNT(*) if a group by is used. Numerical columns will be aggregated with the aggregator. Non-numerical columns will be used to label points. Leave empty to get a count of points in each cluster.",
+        "data_type": "array[string]",
+        "enum_source": "columnChoices(datasource)；后端还特殊识别首元素为 `count` 的 legacy sentinel",
+        "sample_data": [
+          "count"
+        ],
+        "required": false,
+        "embedding": "否",
+        "default_value": [],
+        "notes": "控件本身 `multi=true`，但 `MapboxViz` 只读取 `label_col[0]`。无 groupby 时若首元素是 `count` 会直接报错；有 groupby 时允许 `count`。"
+      },
+      {
+        "field_name": "pandas_aggfunc",
+        "description": "Aggregate function applied to the list of points in each cluster to produce the cluster label.",
+        "data_type": "string",
+        "enum_values": [
+          "sum",
+          "mean",
+          "min",
+          "max",
+          "std",
+          "var"
+        ],
+        "sample_data": "sum",
+        "required": false,
+        "embedding": "否",
+        "default_value": "sum"
+      }
+    ],
+    "Visual Tweaks": [
+      {
+        "field_name": "render_while_dragging",
+        "description": "Points and clusters will update as the viewport is being changed",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true
+      },
+      {
+        "field_name": "mapbox_style",
+        "description": "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/",
+        "data_type": "string",
+        "enum_values": [
+          "mapbox://styles/mapbox/streets-v9",
+          "mapbox://styles/mapbox/dark-v9",
+          "mapbox://styles/mapbox/light-v9",
+          "mapbox://styles/mapbox/satellite-streets-v9",
+          "mapbox://styles/mapbox/satellite-v9",
+          "mapbox://styles/mapbox/outdoors-v9"
+        ],
+        "sample_data": "mapbox://styles/mapbox/light-v9",
+        "required": false,
+        "embedding": "否",
+        "default_value": "mapbox://styles/mapbox/light-v9",
+        "notes": "控件允许 freeForm，并挂了 `validateMapboxStylesUrl` 校验，因此也接受其它合法 style URL。"
+      },
+      {
+        "field_name": "global_opacity",
+        "description": "Opacity of all clusters, points, and labels. Between 0 and 1.",
+        "data_type": "number",
+        "sample_data": 1,
+        "required": false,
+        "embedding": "否",
+        "default_value": 1
+      },
+      {
+        "field_name": "mapbox_color",
+        "description": "The color for points and clusters in RGB",
+        "data_type": "string",
+        "enum_values": [
+          "rgb(0, 139, 139)",
+          "rgb(128, 0, 128)",
+          "rgb(255, 215, 0)",
+          "rgb(69, 69, 69)",
+          "rgb(220, 20, 60)",
+          "rgb(34, 139, 34)"
+        ],
+        "sample_data": "rgb(0, 139, 139)",
+        "required": false,
+        "embedding": "否",
+        "default_value": "rgb(0, 139, 139)",
+        "notes": "transformProps.js 会用正则 `/^rgb\\((\\d{1,3}),\\s*(\\d{1,3}),\\s*(\\d{1,3})\\)$/` 校验它；格式不合法会触发 `onError`。"
+      }
+    ],
+    "Viewport": [
+      {
+        "field_name": "viewport_longitude",
+        "description": "Longitude of default viewport",
+        "data_type": "number",
+        "sample_data": -122.405293,
+        "required": false,
+        "embedding": "否",
+        "default_value": -122.405293,
+        "notes": "控件标记了 `dontRefreshOnChange=true`。transformProps 在拖拽缩放时会通过 `setControlValue` 回写它，但当前 `MapBox.jsx` 初始化并未读取该值。"
+      },
+      {
+        "field_name": "viewport_latitude",
+        "description": "Latitude of default viewport",
+        "data_type": "number",
+        "sample_data": 37.772123,
+        "required": false,
+        "embedding": "否",
+        "default_value": 37.772123,
+        "notes": "控件标记了 `dontRefreshOnChange=true`。transformProps 在拖拽缩放时会通过 `setControlValue` 回写它，但当前 `MapBox.jsx` 初始化并未读取该值。"
+      },
+      {
+        "field_name": "viewport_zoom",
+        "description": "Zoom level of the map",
+        "data_type": "number",
+        "sample_data": 11,
+        "required": false,
+        "embedding": "否",
+        "default_value": 11,
+        "notes": "控件标记了 `dontRefreshOnChange=true`。transformProps 在拖拽缩放时会通过 `setControlValue` 回写它，但当前 `MapBox.jsx` 初始化并未读取该值。"
+      }
+    ]
+  }
+}

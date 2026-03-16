@@ -1,0 +1,239 @@
+{
+  "viz_type": "word_cloud",
+  "display_name": "Word Cloud",
+  "purpose": "用于调用 API 创建或保存 Word Cloud 时填写的 form_data 模板",
+  "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/word_cloud-schema.json",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-word-cloud/src/plugin/index.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-word-cloud/src/plugin/controlPanel.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-word-cloud/src/plugin/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-word-cloud/src/plugin/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-word-cloud/src/types.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-word-cloud/src/chart/WordCloud.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-word-cloud/test/buildQuery.test.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/sections/sections.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/utils/getStandardizedControls.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/components/controls/CheckboxControl.jsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getControlState.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/models/ChartProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractQueryFields.ts"
+  ],
+  "notes": [
+    "API form_data 的键名必须保留源码中的原始 control name。Word Cloud 的 root 字段既有 Query 字段，也有展示字段。",
+    "Explore 导出 form_data 时走 getFormDataFromControls()，它只会按 controlName 原样取 value，不会自动改成 camelCase。",
+    "transformProps 里看到的 `sizeFrom`、`sizeTo`、`colorScheme`、`sliceId` 是 runtime camelCase 形态，不是 API 入参键名。",
+    "datasource 和 viz_type 来自 datasourceAndVizType section，不是 Word Cloud 专属控件，但创建图表时必须提供。",
+    "Word Cloud 的真正查询维度字段叫 `series`，不是 `groupby`。`series` 会在 core alias 阶段被归并到 query.columns。",
+    "Word Cloud 的 `metric` 是可选的；只有在存在 metric 时，词云字体大小才会按度量值缩放。",
+    "controlPanel 对 `row_limit` 的默认值做了 override，把 shared 默认值改成了 `100`。"
+  ],
+  "naming_and_pipeline": {
+    "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写成 form_data[name]。",
+    "api_form_data_to_query_context": "Word Cloud/buildQuery.ts 使用原始 snake_case form_data 构建 query context。",
+    "api_form_data_to_runtime_form_data": "ChartProps 会把 form_data 转成 camelCase 的 runtime formData，同时保留 rawFormData。",
+    "core_aliasing": "core `extractQueryFields()` 会把 `series` 归并到 query.columns，把 `metric` 归并到 query.metrics。"
+  },
+  "global_required_fields": {
+    "datasource": {
+      "data_type": "string",
+      "required": true,
+      "sample_data": "<dataset_id>__table",
+      "source": "datasourceAndVizType section"
+    },
+    "viz_type": {
+      "data_type": "string",
+      "required": true,
+      "fixed_value": "word_cloud",
+      "source": "datasourceAndVizType section"
+    },
+    "series": {
+      "data_type": "string | object",
+      "required": true,
+      "sample_data": "term",
+      "source": "Word Cloud Query section + controlOverride validator",
+      "notes": "这是新建模板里最核心的字段；查询时它会进入 query.columns。"
+    }
+  },
+  "global_optional_fields": {
+    "metric": {
+      "data_type": "string | object | null",
+      "required": false,
+      "sample_data": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "cnt"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(cnt)"
+      },
+      "source": "Word Cloud Query section",
+      "notes": "为空时，词云会使用统一默认字号。"
+    },
+    "adhoc_filters": {
+      "data_type": "array[object]",
+      "required": false,
+      "sample_data": [],
+      "source": "Word Cloud Query section"
+    },
+    "row_limit": {
+      "data_type": "integer | string",
+      "required": false,
+      "sample_data": 100,
+      "source": "Word Cloud Query section"
+    },
+    "sort_by_metric": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": false,
+      "source": "Word Cloud Query section",
+      "notes": "shared control 没有显式 `default`，因此 untouched root form_data 的缺省态通常是未设置；但 CheckboxControl 会以未勾选状态渲染。只有在 `metric` 存在时它才有实际意义。"
+    },
+    "size_from": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 10,
+      "source": "Options section"
+    },
+    "size_to": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 70,
+      "source": "Options section"
+    },
+    "rotation": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "square",
+      "source": "Options section"
+    },
+    "color_scheme": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "bnbColors",
+      "source": "Options section"
+    },
+    "slice_id": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 0,
+      "source": "datasourceAndVizType hidden control"
+    },
+    "cache_timeout": {
+      "data_type": "integer | null",
+      "required": false,
+      "sample_data": null,
+      "source": "datasourceAndVizType hidden control"
+    },
+    "url_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "datasourceAndVizType hidden control"
+    },
+    "custom_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "datasourceAndVizType hidden control"
+    },
+    "extra_form_data": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "QueryFormData.extra_form_data"
+    }
+  },
+  "minimal_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "word_cloud",
+    "series": "term",
+    "adhoc_filters": [],
+    "row_limit": 100
+  },
+  "recommended_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "word_cloud",
+    "series": "term",
+    "metric": {
+      "expressionType": "SIMPLE",
+      "column": {
+        "column_name": "cnt"
+      },
+      "aggregate": "SUM",
+      "label": "SUM(cnt)"
+    },
+    "adhoc_filters": [],
+    "row_limit": 100,
+    "sort_by_metric": false,
+    "size_from": 10,
+    "size_to": 70,
+    "rotation": "square",
+    "color_scheme": "bnbColors"
+  },
+  "conditional_blocks": {
+    "metric_driven_font_size": {
+      "condition": "需要让词的字号按某个指标大小缩放时",
+      "fields": {
+        "metric": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "cnt"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(cnt)"
+        },
+        "size_from": 10,
+        "size_to": 70
+      }
+    },
+    "metric_sorting": {
+      "condition": "需要按指标从大到小排序查询结果时",
+      "fields": {
+        "sort_by_metric": true
+      },
+      "notes": "buildQuery 会在此时额外写入 `orderby=[[metric,false]]`。"
+    },
+    "uniform_font_size_mode": {
+      "condition": "只想按词项展示，不需要按指标映射字号时",
+      "fields": {
+        "metric": null
+      },
+      "notes": "此时 WordCloud.tsx 会用组件默认字号。"
+    }
+  },
+  "runtime_only_or_non_template_fields": {
+    "runtime_aliases_only": [
+      {
+        "field_name": "sizeFrom/sizeTo/colorScheme/sliceId",
+        "reason": "这些是 runtime camelCase 形态；API 调用时应使用原始 snake_case 键。"
+      }
+    ],
+    "query_context_generated_only": [
+      {
+        "field_name": "columns",
+        "reason": "Word Cloud 通过 core alias 把 root `series` 自动编译进 query.columns。"
+      },
+      {
+        "field_name": "orderby",
+        "reason": "只有 `sort_by_metric=true` 时，Word Cloud/buildQuery.ts 才会显式生成 query.orderby。"
+      }
+    ],
+    "source_inconsistencies": [
+      {
+        "field_name": "rotation",
+        "reason": "controlPanel 默认 `square`，但组件 defaultProps.rotation 是 `flat`。构造 API form_data 时应优先信任 controlPanel 导出的显式值。"
+      },
+      {
+        "field_name": "size_from",
+        "reason": "controlPanel 默认 `10`，但 transformProps 对缺失值的 runtime fallback 是 `0`。"
+      },
+      {
+        "field_name": "sort_by_metric",
+        "reason": "shared control 没有显式 `default`。UI 通过 CheckboxControl 以未勾选状态显示，但 untouched root form_data 通常仍是未设置，而不是显式 `false`。"
+      }
+    ]
+  }
+}

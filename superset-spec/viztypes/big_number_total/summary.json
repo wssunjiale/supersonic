@@ -1,0 +1,121 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "big_number_total",
+  "display_name": "Big Number",
+  "normalized_summary": {
+    "category": "kpi",
+    "tags": [
+      "kpi",
+      "single_value",
+      "total",
+      "cumulative"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标（仅单个），用于展示累计核心KPI数值。"
+      },
+      {
+        "key": "number_format",
+        "required": false,
+        "description": "数字格式化（如 SMART_NUMBER、PERCENT），控制数值展示格式。"
+      },
+      {
+        "key": "compare_lag",
+        "required": false,
+        "description": "对比时间偏移（如 7 天、1 个月），用于展示累计值的周期对比。"
+      }
+    ],
+    "description_zh": "Big Number Total chart displays a cumulative total metric value in a prominent format, with optional comparison to previous periods.",
+    "visual_shape_zh": "累计单值指标（大数字）",
+    "use_cases_zh": [
+      "累计类KPI展示（如累计销售额、总用户数）",
+      "全量数据指标汇总",
+      "带累计对比的关键指标"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "big_number_total",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/big_number_total-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/big_number_total-form-data-schema.json",
+      "control-schema": "form-data-schema/big_number_total-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Big Number",
+    "viztype": "big_number_total",
+    "详细描述": "Big Number Total chart displays a cumulative total metric value in a prominent format, with optional comparison to previous periods.",
+    "表现形态": "累计单值指标（大数字）",
+    "适用场景": [
+      "累计类KPI展示（如累计销售额、总用户数）",
+      "全量数据指标汇总",
+      "带累计对比的关键指标"
+    ],
+    "vizKey": "BigNumberTotal",
+    "pluginCategory": "KPI",
+    "pluginTags": [],
+    "category": "kpi",
+    "tags": [
+      "kpi",
+      "single_value",
+      "total",
+      "cumulative"
+    ],
+    "关键字段": [
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标（仅单个），用于展示累计核心KPI数值。"
+      },
+      {
+        "key": "number_format",
+        "required": false,
+        "description": "数字格式化（如 SMART_NUMBER、PERCENT），控制数值展示格式。"
+      },
+      {
+        "key": "compare_lag",
+        "required": false,
+        "description": "对比时间偏移（如 7 天、1 个月），用于展示累计值的周期对比。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

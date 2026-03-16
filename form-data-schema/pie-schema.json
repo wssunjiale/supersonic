@@ -1,0 +1,438 @@
+{
+  "viz_type": "pie",
+  "display_name": "Pie Chart",
+  "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Pie/controlPanel.tsx",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Pie/controlPanel.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Pie/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Pie/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Pie/types.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Pie/index.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/controls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/constants.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryContext.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryObject.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractQueryFields.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/constants.ts"
+  ],
+  "notes": [
+    "Pie Chart 是 ECharts 图，走 buildQueryContext/query context，而不是 legacy `/superset/explore_json/`。",
+    "`metric` 是单值根字段，但 `extractQueryFields()` 会把 `metric` 别名映射成 query `metrics`；`groupby` 会映射成 query `columns`。",
+    "`buildQuery.ts` 在基础查询后固定追加 `contribution` post_processing，并把指标贡献列重命名成 `Contribution(<metricLabel>)`；`transformProps.ts` 的 `threshold_for_other` 逻辑依赖这列。",
+    "`controlOverrides.row_limit.default=100` 且 `formDataOverrides` 会把任何 `row_limit >= 100` 的值截成 `100`，因此当前图的高置信行数上限就是 100。",
+    "`controlOverrides.series` 虽然设置了 `validateNonEmpty`，但当前 controlPanel 并没有暴露 `series` 控件；API form_data 不应额外补一个 `series`。",
+    "`transformProps.ts` 消费的是 runtime camelCase 别名，但真正 API form_data 仍应使用 control name 原样键名，例如 `date_format`、`number_format`、`show_labels`、`threshold_for_other`。"
+  ],
+  "metadata_summary": {
+    "description": "Classic proportional chart for part-to-whole comparison. Supports ordinary pie, donut, and Nightingale rose modes.",
+    "category": "Part of a Whole",
+    "tags": [
+      "Categorical",
+      "Circular",
+      "Comparison",
+      "Percentages",
+      "Proportional",
+      "ECharts",
+      "Nightingale"
+    ]
+  },
+  "query_compilation": {
+    "frontend_builder": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Pie/buildQuery.ts",
+    "query_context_builder": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryContext.ts",
+    "query_field_aliases": {
+      "metric": "metrics",
+      "groupby": "columns"
+    },
+    "base_query_effect": "`buildQueryObject()` 会从 raw form_data 提取 `metric`、`groupby`、`adhoc_filters`、`row_limit` 等字段，生成 query `metrics` / `columns` / filters。",
+    "pie_build_query_effect": "`sort_by_metric=true` 时会显式写入 `orderby=[[metric, false]]`；同时固定追加 `contribution` 后处理。",
+    "frontend_post_processing": "`transformProps.ts` 会根据 `threshold_for_other` 把低占比切片聚合进 `Other`，并把 legend、label、donut、rose、show_total 等字段映射成 ECharts option。"
+  },
+  "control_overrides": {
+    "series": {
+      "validators": [
+        "validateNonEmpty"
+      ],
+      "clearable": false,
+      "notes": "当前 Pie controlPanel 未实际暴露该控件。"
+    },
+    "row_limit": {
+      "default_value": 100
+    }
+  },
+  "form_data_overrides": {
+    "metric": "getStandardizedControls().shiftMetric()",
+    "groupby": "getStandardizedControls().popAllColumns()",
+    "row_limit": "ensureIsInt(formData.row_limit, 100) >= 100 ? 100 : formData.row_limit"
+  },
+  "field_categories": {
+    "Query": [
+      {
+        "field_name": "groupby",
+        "description": "Dimensions contain qualitative values such as names, dates, or geographical data. Use dimensions to categorize, segment, and reveal the details in your data. Dimensions affect the level of detail in the view.",
+        "data_type": "array[string | object]",
+        "enum_source": "datasource columns",
+        "sample_data": [
+          "region"
+        ],
+        "required": false,
+        "embedding": "否",
+        "default_value": []
+      },
+      {
+        "field_name": "metric",
+        "description": "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+        "data_type": "string | object",
+        "enum_source": "saved metrics + adhoc metrics",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        },
+        "required": true,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "`extractQueryFields()` 会把 root `metric` 折叠到 query `metrics`。"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "description": "源码未提供额外描述；字段标签为 Filters。",
+        "data_type": "array[object]",
+        "enum_source": "dataset filterable columns + saved metrics + 当前 metric",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "default_value": []
+      },
+      {
+        "field_name": "row_limit",
+        "runtime_alias": "rowLimit",
+        "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+        "data_type": "integer",
+        "enum_values": [
+          10,
+          50,
+          100,
+          250,
+          500,
+          1000,
+          5000,
+          10000,
+          50000
+        ],
+        "sample_data": 100,
+        "required": false,
+        "embedding": "否",
+        "default_value": 100,
+        "notes": "controlPanel override 把默认值改成 100；formDataOverrides 还会把任何 >=100 的输入回写成 100。"
+      },
+      {
+        "field_name": "sort_by_metric",
+        "description": "Whether to sort results by the selected metric in descending order.",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true,
+        "notes": "`buildQuery.ts` 只在它为 true 时写入 `orderby=[[metric, false]]`。"
+      }
+    ],
+    "Chart Options / General": [
+      {
+        "field_name": "color_scheme",
+        "runtime_alias": "colorScheme",
+        "description": "The color scheme for rendering chart",
+        "data_type": "string",
+        "enum_source": "categoricalSchemeRegistry.keys()",
+        "sample_data": "supersetColors",
+        "required": false,
+        "embedding": "否",
+        "default_value": "categoricalSchemeRegistry.getDefaultKey()"
+      },
+      {
+        "field_name": "threshold_for_other",
+        "runtime_alias": "thresholdForOther",
+        "description": "Values less than this percentage will be grouped into the Other category.",
+        "data_type": "number",
+        "enum_range": {
+          "min": 0,
+          "max": 100,
+          "step": 0.5
+        },
+        "sample_data": 2.5,
+        "required": false,
+        "embedding": "否",
+        "default_value": 0,
+        "notes": "`transformProps.ts` 会把 contribution 百分比低于阈值的切片聚合进 `Other`。"
+      },
+      {
+        "field_name": "roseType",
+        "description": "Whether to show as Nightingale chart.",
+        "data_type": "string | null",
+        "enum_values": [
+          "area",
+          "radius",
+          null
+        ],
+        "sample_data": "area",
+        "required": false,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "show_total",
+        "runtime_alias": "showTotal",
+        "description": "Whether to display the aggregate count",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false,
+        "notes": "开启后 `transformProps.ts` 会在图中心或顶部绘制 `Total: ...` 文本。"
+      }
+    ],
+    "Chart Options / Legend": [
+      {
+        "field_name": "show_legend",
+        "runtime_alias": "showLegend",
+        "description": "Whether to display a legend for the chart",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true
+      },
+      {
+        "field_name": "legendType",
+        "description": "Legend type",
+        "data_type": "string",
+        "enum_values": [
+          "scroll",
+          "plain"
+        ],
+        "sample_data": "scroll",
+        "required": false,
+        "embedding": "否",
+        "default_value": "scroll"
+      },
+      {
+        "field_name": "legendOrientation",
+        "description": "Legend Orientation",
+        "data_type": "string",
+        "enum_values": [
+          "top",
+          "bottom",
+          "left",
+          "right"
+        ],
+        "sample_data": "top",
+        "required": false,
+        "embedding": "否",
+        "default_value": "top"
+      },
+      {
+        "field_name": "legendMargin",
+        "description": "Additional padding for legend.",
+        "data_type": "integer | null",
+        "sample_data": null,
+        "required": false,
+        "embedding": "否",
+        "default_value": null
+      }
+    ],
+    "Chart Options / Labels": [
+      {
+        "field_name": "show_labels_threshold",
+        "runtime_alias": "showLabelsThreshold",
+        "description": "Minimum threshold in percentage points for showing labels.",
+        "data_type": "number",
+        "sample_data": 5,
+        "required": false,
+        "embedding": "否",
+        "default_value": 5,
+        "notes": "`transformProps.ts` 会把它转换成 `minShowLabelAngle = value * 3.6`。"
+      },
+      {
+        "field_name": "label_type",
+        "runtime_alias": "labelType",
+        "description": "What should be shown on the label?",
+        "data_type": "string",
+        "enum_values": [
+          "key",
+          "value",
+          "percent",
+          "key_value",
+          "key_percent",
+          "key_value_percent",
+          "value_percent",
+          "template"
+        ],
+        "sample_data": "key_value_percent",
+        "required": false,
+        "embedding": "否",
+        "default_value": "key"
+      },
+      {
+        "field_name": "label_template",
+        "runtime_alias": "labelTemplate",
+        "description": "Format data labels. Use variables: {name}, {value}, {percent}. \\n represents a new line. ECharts compatibility: {a} (series), {b} (name), {c} (value), {d} (percentage)",
+        "data_type": "string | null",
+        "sample_data": "{name}: {value} ({percent})",
+        "required": false,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "只有 `label_type='template'` 时可见。"
+      },
+      {
+        "field_name": "number_format",
+        "runtime_alias": "numberFormat",
+        "description": "D3 format syntax for numbers",
+        "data_type": "string",
+        "enum_source": "D3_FORMAT_OPTIONS + freeForm",
+        "sample_data": "SMART_NUMBER",
+        "required": false,
+        "embedding": "否",
+        "default_value": "SMART_NUMBER"
+      },
+      {
+        "field_name": "currency_format",
+        "runtime_alias": "currencyFormat",
+        "description": "Currency format",
+        "data_type": "string | object | null",
+        "sample_data": {
+          "symbol": "$",
+          "symbolPosition": "prefix"
+        },
+        "required": false,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "date_format",
+        "runtime_alias": "dateFormat",
+        "description": "D3 format syntax for dates and times",
+        "data_type": "string",
+        "enum_source": "D3_TIME_FORMAT_OPTIONS + freeForm",
+        "sample_data": "smart_date",
+        "required": false,
+        "embedding": "否",
+        "default_value": "smart_date"
+      },
+      {
+        "field_name": "show_labels",
+        "runtime_alias": "showLabels",
+        "description": "Whether to display the labels.",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true
+      },
+      {
+        "field_name": "labels_outside",
+        "runtime_alias": "labelsOutside",
+        "description": "Put the labels outside of the pie?",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true,
+        "notes": "只有 `show_labels=true` 时可见。"
+      },
+      {
+        "field_name": "label_line",
+        "runtime_alias": "labelLine",
+        "description": "Draw line from Pie to label when labels outside?",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false,
+        "notes": "只有 `show_labels=true` 时可见。"
+      }
+    ],
+    "Chart Options / Pie Shape": [
+      {
+        "field_name": "outerRadius",
+        "description": "Outer edge of Pie chart",
+        "data_type": "number",
+        "enum_range": {
+          "min": 10,
+          "max": 100,
+          "step": 1
+        },
+        "sample_data": 70,
+        "required": false,
+        "embedding": "否",
+        "default_value": 70
+      },
+      {
+        "field_name": "donut",
+        "description": "Do you want a donut or a pie?",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      },
+      {
+        "field_name": "innerRadius",
+        "description": "Inner radius of donut hole",
+        "data_type": "number",
+        "enum_range": {
+          "min": 0,
+          "max": 100,
+          "step": 1
+        },
+        "sample_data": 30,
+        "required": false,
+        "embedding": "否",
+        "default_value": 30,
+        "notes": "只有 `donut=true` 时可见。"
+      }
+    ]
+  }
+}

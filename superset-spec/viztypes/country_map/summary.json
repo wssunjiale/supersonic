@@ -1,0 +1,143 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "country_map",
+  "display_name": "Country Map",
+  "normalized_summary": {
+    "category": "geospatial",
+    "tags": [
+      "country_map",
+      "geospatial",
+      "national",
+      "administrative",
+      "spatial"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "geographic_field",
+        "required": true,
+        "description": "地理维度字段（如省份/州编码、名称），用于关联国家内部行政边界与数据。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于计算每个行政区域的数值（地图配色/尺寸依据）。"
+      },
+      {
+        "key": "country_code",
+        "required": true,
+        "description": "国家编码（如CN、US），用于指定渲染的目标国家地图。"
+      },
+      {
+        "key": "administrative_level",
+        "required": false,
+        "description": "行政层级（如省/州、市/县），控制地图展示的行政划分粒度。"
+      },
+      {
+        "key": "legend_position",
+        "required": false,
+        "description": "图例位置（如top、right、bottom），控制图例在地图中的展示位置。"
+      }
+    ],
+    "description_zh": "Country Map visualizes data on a country-level geographic map, enabling detailed spatial analysis of metrics within a specific country's administrative divisions (e.g., provinces, states).",
+    "visual_shape_zh": "国家地图（地理空间型）",
+    "use_cases_zh": [
+      "单一国家内各行政区域的指标对比（如各省人口、各州市销售额）",
+      "国家级业务数据的精细化空间分布展示",
+      "区域级趋势分析与地理关联洞察"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "country_map",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/country_map-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/country_map-form-data-schema.json",
+      "control-schema": "form-data-schema/country_map-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Country Map",
+    "viztype": "country_map",
+    "详细描述": "Country Map visualizes data on a country-level geographic map, enabling detailed spatial analysis of metrics within a specific country's administrative divisions (e.g., provinces, states).",
+    "表现形态": "国家地图（地理空间型）",
+    "适用场景": [
+      "单一国家内各行政区域的指标对比（如各省人口、各州市销售额）",
+      "国家级业务数据的精细化空间分布展示",
+      "区域级趋势分析与地理关联洞察"
+    ],
+    "vizKey": "CountryMap",
+    "pluginCategory": "Geospatial",
+    "pluginTags": [],
+    "category": "geospatial",
+    "tags": [
+      "country_map",
+      "geospatial",
+      "national",
+      "administrative",
+      "spatial"
+    ],
+    "关键字段": [
+      {
+        "key": "geographic_field",
+        "required": true,
+        "description": "地理维度字段（如省份/州编码、名称），用于关联国家内部行政边界与数据。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于计算每个行政区域的数值（地图配色/尺寸依据）。"
+      },
+      {
+        "key": "country_code",
+        "required": true,
+        "description": "国家编码（如CN、US），用于指定渲染的目标国家地图。"
+      },
+      {
+        "key": "administrative_level",
+        "required": false,
+        "description": "行政层级（如省/州、市/县），控制地图展示的行政划分粒度。"
+      },
+      {
+        "key": "legend_position",
+        "required": false,
+        "description": "图例位置（如top、right、bottom），控制图例在地图中的展示位置。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

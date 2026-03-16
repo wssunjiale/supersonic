@@ -1,11 +1,13 @@
 package com.tencent.supersonic.headless.server.utils;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.tencent.supersonic.common.pojo.DimensionConstants;
 import com.tencent.supersonic.headless.api.pojo.*;
 import com.tencent.supersonic.headless.api.pojo.response.DataSetSchemaResp;
 import com.tencent.supersonic.headless.api.pojo.response.DimSchemaResp;
 import com.tencent.supersonic.headless.api.pojo.response.MetricSchemaResp;
+import com.tencent.supersonic.headless.api.pojo.response.ModelResp;
 import com.tencent.supersonic.headless.api.pojo.response.TermResp;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -19,9 +21,10 @@ public class DataSetSchemaBuilder {
     public static DataSetSchema build(DataSetSchemaResp resp) {
         DataSetSchema dataSetSchema = new DataSetSchema();
         dataSetSchema.setQueryConfig(resp.getQueryConfig());
-        SchemaElement dataSet = SchemaElement.builder().dataSetId(resp.getId())
-                .dataSetName(resp.getName()).id(resp.getId()).name(resp.getName())
-                .bizName(resp.getBizName()).type(SchemaElementType.DATASET).build();
+        SchemaElement dataSet =
+                SchemaElement.builder().dataSetId(resp.getId()).dataSetName(resp.getName())
+                        .id(resp.getId()).name(resp.getName()).description(resp.getDescription())
+                        .bizName(resp.getBizName()).type(SchemaElementType.DATASET).build();
         dataSetSchema.setDataSet(dataSet);
         dataSetSchema.setDatabaseType(resp.getDatabaseType());
         dataSetSchema.setDatabaseVersion(resp.getDatabaseVersion());
@@ -91,6 +94,13 @@ public class DataSetSchemaBuilder {
 
     private static Set<SchemaElement> getDimensions(DataSetSchemaResp resp) {
         Set<SchemaElement> dimensions = new HashSet<>();
+        Map<Long, Map<String, String>> dataTypeMap = Maps.newHashMap();
+        for (ModelResp modelResp : resp.getModelResps()) {
+            dataTypeMap.put(modelResp.getId(),
+                    modelResp.getModelDetail().getFields().stream().collect(Collectors
+                            .toMap(Field::getFieldName, Field::getDataType, (k1, k2) -> k2)));
+        }
+
         for (DimSchemaResp dim : resp.getDimensions()) {
             List<String> alias = SchemaItem.getAliasList(dim.getAlias());
             List<DimValueMap> dimValueMaps = dim.getDimValueMaps();
@@ -108,11 +118,18 @@ public class DataSetSchemaBuilder {
                     .alias(alias).schemaValueMaps(schemaValueMaps).isTag(dim.getIsTag())
                     .description(dim.getDescription()).type(SchemaElementType.DIMENSION).build();
             dimToAdd.getExtInfo().put(DimensionConstants.DIMENSION_TYPE, dim.getType());
-
+            // data type
+            if (dim.getDataType() != null) {
+                dimToAdd.getExtInfo().put(DimensionConstants.DIMENSION_DATA_TYPE,
+                        dim.getDataType());
+            } else {
+                dimToAdd.getExtInfo().put(DimensionConstants.DIMENSION_DATA_TYPE,
+                        dataTypeMap.get(dim.getModelId()).get(dim.getBizName()));
+            }
             if (dim.isTimeDimension()) {
                 String timeFormat =
                         String.valueOf(dim.getExt().get(DimensionConstants.DIMENSION_TIME_FORMAT));
-                setDefaultTimeFormat(dimToAdd, dim.getTypeParams(), timeFormat);
+                setDefaultTimeFormat(dimToAdd, timeFormat);
             }
             dimensions.add(dimToAdd);
         }
@@ -124,7 +141,13 @@ public class DataSetSchemaBuilder {
         for (DimSchemaResp dim : resp.getDimensions()) {
             Set<String> dimValueAlias = new HashSet<>();
             List<DimValueMap> dimValueMaps = dim.getDimValueMaps();
+            List<SchemaValueMap> schemaValueMaps = new ArrayList<>();
             if (!CollectionUtils.isEmpty(dimValueMaps)) {
+                for (DimValueMap dimValueMap : dimValueMaps) {
+                    SchemaValueMap schemaValueMap = new SchemaValueMap();
+                    BeanUtils.copyProperties(dimValueMap, schemaValueMap);
+                    schemaValueMaps.add(schemaValueMap);
+                }
                 for (DimValueMap dimValueMap : dimValueMaps) {
                     if (StringUtils.isNotEmpty(dimValueMap.getBizName())) {
                         dimValueAlias.add(dimValueMap.getBizName());
@@ -137,7 +160,7 @@ public class DataSetSchemaBuilder {
             SchemaElement dimValueToAdd = SchemaElement.builder().dataSetId(resp.getId())
                     .dataSetName(resp.getName()).model(dim.getModelId()).id(dim.getId())
                     .name(dim.getName()).bizName(dim.getBizName()).type(SchemaElementType.VALUE)
-                    .useCnt(dim.getUseCnt())
+                    .schemaValueMaps(schemaValueMaps).useCnt(dim.getUseCnt())
                     .alias(new ArrayList<>(Arrays.asList(dimValueAlias.toArray(new String[0]))))
                     .isTag(dim.getIsTag()).description(dim.getDescription()).build();
             dimensionValues.add(dimValueToAdd);
@@ -191,8 +214,7 @@ public class DataSetSchemaBuilder {
         }).collect(Collectors.toList());
     }
 
-    private static void setDefaultTimeFormat(SchemaElement dimToAdd,
-            DimensionTimeTypeParams dimensionTimeTypeParams, String timeFormat) {
+    private static void setDefaultTimeFormat(SchemaElement dimToAdd, String timeFormat) {
         dimToAdd.getExtInfo().put(DimensionConstants.DIMENSION_TIME_FORMAT, timeFormat);
     }
 }

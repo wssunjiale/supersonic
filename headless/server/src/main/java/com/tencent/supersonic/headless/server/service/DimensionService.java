@@ -27,9 +27,14 @@ public interface DimensionService {
 
     DimensionResp createDimension(DimensionReq dimensionReq, User user) throws Exception;
 
+    void alterDimensionBatch(List<DimensionReq> dimensionReqs, Long modelId, User user)
+            throws Exception;
+
     void createDimensionBatch(List<DimensionReq> dimensionReqs, User user) throws Exception;
 
     void updateDimension(DimensionReq dimensionReq, User user) throws Exception;
+
+    void updateDimensionBatch(List<DimensionReq> dimensionReqs, User user) throws Exception;
 
     PageInfo<DimensionResp> queryDimension(PageDimensionReq pageDimensionReq);
 
@@ -39,13 +44,15 @@ public interface DimensionService {
 
     void deleteDimension(Long id, User user);
 
+    void deleteDimensionBatch(List<Long> idList, User user);
+
     List<DimensionResp> getDimensionInModelCluster(Long modelId);
 
     List<String> mockAlias(DimensionReq dimensionReq, String mockType, User user);
 
     List<DimValueMap> mockDimensionValueAlias(DimensionReq dimensionReq, User user);
 
-    void sendDimensionEventBatch(List<Long> modelIds, EventType eventType);
+    void sendDimensionEventBatch(List<Long> modelIds, EventType eventType, User user);
 
     DataEvent getAllDataEvents();
 

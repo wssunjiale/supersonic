@@ -35,6 +35,11 @@ import java.util.Objects;
 @Slf4j
 public class SqlExecutor implements ChatQueryExecutor {
 
+    @Override
+    public boolean accept(ExecuteContext executeContext) {
+        return true;
+    }
+
     @SneakyThrows
     @Override
     public QueryResult execute(ExecuteContext executeContext) {
@@ -80,8 +85,21 @@ public class SqlExecutor implements ChatQueryExecutor {
             return null;
         }
 
-        QuerySqlReq sqlReq =
-                QuerySqlReq.builder().sql(parseInfo.getSqlInfo().getCorrectedS2SQL()).build();
+        if (shouldSkipSqlExecution(executeContext, parseInfo)) {
+            QueryResult queryResult = buildSupersetPlaceholderResult(executeContext, parseInfo,
+                    semanticLayer, chatCtx, chatContextService);
+            if (queryResult != null) {
+                return queryResult;
+            }
+        }
+
+        // 使用querySQL，它已经包含了所有修正（包括物理SQL修正）
+        String finalSql = StringUtils.isNotBlank(parseInfo.getSqlInfo().getQuerySQL())
+                ? parseInfo.getSqlInfo().getQuerySQL()
+                : parseInfo.getSqlInfo().getCorrectedS2SQL();
+
+        QuerySqlReq sqlReq = QuerySqlReq.builder().sql(finalSql).build();
+
         sqlReq.setSqlInfo(parseInfo.getSqlInfo());
         sqlReq.setDataSetId(parseInfo.getDataSetId());
 
@@ -90,23 +108,33 @@ public class SqlExecutor implements ChatQueryExecutor {
         queryResult.setQueryId(executeContext.getRequest().getQueryId());
         queryResult.setChatContext(parseInfo);
         queryResult.setQueryMode(parseInfo.getQueryMode());
-        queryResult.setQueryTimeCost(System.currentTimeMillis() - startTime);
         SemanticQueryResp queryResp =
                 semanticLayer.queryByReq(sqlReq, executeContext.getRequest().getUser());
+        queryResult.setQueryTimeCost(System.currentTimeMillis() - startTime);
         if (queryResp != null) {
             queryResult.setQueryAuthorization(queryResp.getQueryAuthorization());
-            queryResult.setQuerySql(queryResp.getSql());
+            queryResult.setQuerySql(finalSql);
             queryResult.setQueryResults(queryResp.getResultList());
             queryResult.setQueryColumns(queryResp.getColumns());
-            queryResult.setQueryState(QueryState.SUCCESS);
             queryResult.setErrorMsg(queryResp.getErrorMsg());
-            chatCtx.setParseInfo(parseInfo);
-            chatContextService.updateContext(chatCtx);
+            QueryState queryState = resolveQueryState(queryResp);
+            queryResult.setQueryState(queryState);
+            if (QueryState.SUCCESS.equals(queryState)) {
+                chatCtx.setParseInfo(parseInfo);
+                chatContextService.updateContext(chatCtx);
+            }
         } else {
             queryResult.setQueryState(QueryState.INVALID);
         }
 
         return queryResult;
+    }
+
+    static QueryState resolveQueryState(SemanticQueryResp queryResp) {
+        if (queryResp == null || StringUtils.isNotBlank(queryResp.getErrorMsg())) {
+            return QueryState.INVALID;
+        }
+        return QueryState.SUCCESS;
     }
 
     /**

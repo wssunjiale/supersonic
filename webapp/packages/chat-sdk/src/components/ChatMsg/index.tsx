@@ -12,6 +12,7 @@ import Text from './Text';
 import DrillDownDimensions from '../DrillDownDimensions';
 import MetricOptions from '../MetricOptions';
 import { isMobile } from '../../utils/utils';
+import Pie from './Pie';
 
 type Props = {
   queryId?: number;
@@ -51,14 +52,14 @@ const ChatMsg: React.FC<Props> = ({
 
   const prefixCls = `${PREFIX_CLS}-chat-msg`;
 
-  const updateColummns = (queryColumnsValue: ColumnType[]) => {
+  const updateColumns = (queryColumnsValue: ColumnType[]) => {
     const referenceColumn = queryColumnsValue.find(item => item.showType === 'more');
     setReferenceColumn(referenceColumn);
     setColumns(queryColumnsValue.filter(item => item.showType !== 'more'));
   };
 
   useEffect(() => {
-    updateColummns(queryColumns);
+    updateColumns(queryColumns);
     setDataSource(queryResults);
     setDefaultMetricField(chatContext?.metrics?.[0]);
     setActiveMetricField(chatContext?.metrics?.[0]);
@@ -114,16 +115,45 @@ const ChatMsg: React.FC<Props> = ({
       metricFields.length > 0 &&
       categoryField.length <= 1 &&
       !(metricFields.length > 1 && categoryField.length > 0) &&
-      !dataSource.every(item => item[dateField.bizName] === dataSource[0][dateField.bizName]);
+      dataSource.some(item => item[dateField.bizName] !== dataSource[0][dateField.bizName]);
 
     if (isMetricTrend) {
       return MsgContentTypeEnum.METRIC_TREND;
     }
 
+    /**
+     * For Pie Chart:
+     * 1. There should be at least one category field.
+     * 2. There should be exactly one metric field.
+     * 3. All metric values should be non-negative.
+     * 4. limit the number of data points based on device type:
+     *   - For mobile devices, limit to 5 data points.
+     *   - For desktop devices, limit to 10 data points.
+     */
+    const isMetricPie =
+      categoryField.length > 0 &&
+      metricFields?.length === 1 &&
+      (isMobile ? dataSource?.length <= 5 : dataSource?.length <= 10) &&
+      dataSource.every(item => item[metricFields[0].bizName] >= 0);
+
+    if (isMetricPie) {
+      return MsgContentTypeEnum.METRIC_PIE;
+    }
+
+    /**
+     * For Bar Chart:
+     * 1. There should be at least one category field.
+     * 2. There should be exactly one metric field.
+     * 3. The number of data points should be limited based on device type:
+     *  - For mobile devices, limit to 5 data points.
+     *  - For desktop devices, limit to 50 data points.
+     * 4. All metric values should be finite numbers.
+     */
     const isMetricBar =
       categoryField?.length > 0 &&
       metricFields?.length === 1 &&
-      (isMobile ? dataSource?.length <= 5 : dataSource?.length <= 50);
+      (isMobile ? dataSource?.length <= 5 : dataSource?.length <= 50) &&
+      dataSource.every(item => isFinite(Number(item[metricFields[0].bizName])));
 
     if (isMetricBar) {
       return MsgContentTypeEnum.METRIC_BAR;
@@ -148,7 +178,7 @@ const ChatMsg: React.FC<Props> = ({
         [queryColumns.length > 5 ? 'width' : 'minWidth']: queryColumns.length * 150,
       };
     }
-    if (type === MsgContentTypeEnum.METRIC_TREND) {
+    if (type === MsgContentTypeEnum.METRIC_TREND || type === MsgContentTypeEnum.METRIC_PIE) {
       return { width: 'calc(100vw - 410px)' };
     }
   };
@@ -213,6 +243,18 @@ const ChatMsg: React.FC<Props> = ({
             metricField={metricFields[0]}
           />
         );
+      case MsgContentTypeEnum.METRIC_PIE:
+        const categoryField = columns.find(item => item.showType === 'CATEGORY');
+        return (
+          <Pie
+            data={{ ...data, queryColumns: columns, queryResults: dataSource }}
+            question={question}
+            triggerResize={triggerResize}
+            loading={loading}
+            metricField={metricFields[0]}
+            categoryField={categoryField!}
+          />
+        );
       case MsgContentTypeEnum.MARKDOWN:
         return (
           <div style={{ maxHeight: 800 }}>
@@ -240,7 +282,7 @@ const ChatMsg: React.FC<Props> = ({
     });
     setLoading(false);
     if (res.code === 200) {
-      updateColummns(res.data?.queryColumns || []);
+      updateColumns(res.data?.queryColumns || []);
       setDataSource(res.data?.queryResults || []);
     }
   };
@@ -267,7 +309,7 @@ const ChatMsg: React.FC<Props> = ({
       dateInfo: {
         ...chatContext.dateInfo,
         dateMode: dateModeValue,
-        unit: currentDateOption || chatContext.dateInfo.unit,
+        unit: currentDateOption || chatContext.dateInfo?.unit,
       },
       dimensions: [
         ...(chatContext.dimensions || []),
@@ -284,7 +326,7 @@ const ChatMsg: React.FC<Props> = ({
       dateInfo: {
         ...chatContext.dateInfo,
         dateMode: dateModeValue,
-        unit: currentDateOption || chatContext.dateInfo.unit,
+        unit: currentDateOption || chatContext.dateInfo?.unit,
       },
       dimensions: drillDownDimension
         ? [...(chatContext.dimensions || []), drillDownDimension]
@@ -325,7 +367,7 @@ const ChatMsg: React.FC<Props> = ({
     entityName !== undefined;
 
   const existDrillDownDimension =
-    queryMode.includes('METRIC') &&
+  (queryMode.includes('METRIC') || queryMode === 'LLM_S2SQL')&&
     getMsgContentType() !== MsgContentTypeEnum.TEXT &&
     !isEntityMode;
 

@@ -1,0 +1,408 @@
+{
+  "viz_type": "radar",
+  "display_name": "Radar Chart",
+  "purpose": "第三方 embedding / guest token 场景下安全传输的 Radar Chart form_data 模板",
+  "base_form_data_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/radar-form-data-schema.json",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset/security/manager.py",
+    "D:/vsx/sources/superset-6.0.0/superset/charts/data/api.py",
+    "D:/vsx/sources/superset-6.0.0/superset/commands/chart/data/get_data_command.py",
+    "D:/vsx/sources/superset-6.0.0/superset/charts/schemas.py",
+    "D:/vsx/sources/superset-6.0.0/superset/constants.py",
+    "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Radar/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Radar/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Radar/EchartsRadar.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/utils/eventHandlers.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryContext.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryObject.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/QueryFormData.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/processExtraFormData.ts"
+  ],
+  "notes": [
+    "embedded guest 的核心限制在后端 `security/manager.py::query_context_modified()`。报错原文是 `Guest user cannot modify chart payload`。",
+    "Radar 走 chart data API 的 query context。`buildQueryContext()` 会把 raw form_data 原样保存在 `query_context.form_data`，同时 `extractQueryFields()` 会把 `groupby` 折叠成 query `columns`。",
+    "当前图的交互点击事件会在 `groupby.length > 0` 时调用 `setDataMask({ extraFormData: { filters: ... } })`，所以 embedding 场景下高置信动态入口仍然是 `extra_form_data.filters`。",
+    "Radar 的排序字段链路存在源码不一致：controlPanel 保存的是 `timeseries_limit_metric`，而 `Radar/buildQuery.ts` 读取的是 `series_limit_metric`。guest 场景不应尝试动态修补这条链路，根层字段应保持保存态不变。"
+  ],
+  "security_enforcement": {
+    "backend_check_function": "superset/security/manager.py::query_context_modified",
+    "checked_when": "ChartDataCommand.validate() -> QueryContext.raise_for_access()",
+    "error_message": "Guest user cannot modify chart payload",
+    "directly_compared_root_fields": [
+      "slice_id",
+      "metrics",
+      "columns",
+      "groupby",
+      "orderby"
+    ],
+    "radar_specific_query_sensitive_fields": [
+      "groupby",
+      "metrics",
+      "adhoc_filters",
+      "row_limit"
+    ],
+    "radar_specific_query_sensitive_fields_low_confidence": [
+      {
+        "field_name": "timeseries_limit_metric",
+        "reason": "这是保存态 control 字段，但当前 buildQuery 似乎不会真正消费它。"
+      },
+      {
+        "field_name": "series_limit_metric",
+        "reason": "`Radar/buildQuery.ts` 读取它，但它不是 controlPanel 暴露字段。"
+      }
+    ],
+    "recommended_strategy": "复制保存态 Radar Chart 的完整 form_data 作为 base，只通过 extra_form_data 追加动态过滤条件；不要在 guest 请求里重构查询字段或图表样式字段。"
+  },
+  "safe_base_rule": {
+    "description": "第三方 embedding 请求中的根层 form_data，应当从已保存 Radar Chart 的 form_data 直接复制，不要重构。",
+    "must_be_copied_from_saved_chart": [
+      "slice_id",
+      "dashboardId",
+      "datasource",
+      "viz_type",
+      "groupby",
+      "metrics",
+      "timeseries_limit_metric",
+      "adhoc_filters",
+      "row_limit",
+      "color_scheme",
+      "show_legend",
+      "legendType",
+      "legendOrientation",
+      "legendMargin",
+      "show_labels",
+      "label_type",
+      "label_position",
+      "number_format",
+      "date_format",
+      "column_config",
+      "is_circle",
+      "all other saved chart-definition fields"
+    ],
+    "why": [
+      "`buildQueryContext()` 会把 raw formData 直接放进 `query_context.form_data`。",
+      "`extractQueryFields()` 会把 `groupby` 转成 query `columns`，`metrics` 保持为 query `metrics`；这些字段都属于 guest payload 校验的重点。",
+      "`Radar/buildQuery.ts` 默认会根据 `metrics[0]` 生成 `orderby`。即使 `timeseries_limit_metric` 存在当前实现不生效，也不应在 guest 场景里试图重构它。",
+      "Radar 的颜色、标签、legend、circle shape、column bounds 虽然多数不改 SQL，但都属于图表定义的一部分。复制保存态最稳妥。"
+    ]
+  },
+  "safe_embedding_form_data_template": {
+    "description": "这是 Radar Chart guest embedding 下的安全写法。根层以保存态图表为 base，仅改 extra_form_data。",
+    "template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "radar",
+      "groupby": "<copied_from_saved_chart>",
+      "metrics": "<copied_from_saved_chart>",
+      "timeseries_limit_metric": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "row_limit": "<copied_from_saved_chart>",
+      "color_scheme": "<copied_from_saved_chart>",
+      "show_legend": "<copied_from_saved_chart>",
+      "legendType": "<copied_from_saved_chart>",
+      "legendOrientation": "<copied_from_saved_chart>",
+      "legendMargin": "<copied_from_saved_chart>",
+      "show_labels": "<copied_from_saved_chart>",
+      "label_type": "<copied_from_saved_chart>",
+      "label_position": "<copied_from_saved_chart>",
+      "number_format": "<copied_from_saved_chart>",
+      "date_format": "<copied_from_saved_chart>",
+      "column_config": "<copied_from_saved_chart>",
+      "is_circle": "<copied_from_saved_chart>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    }
+  },
+  "preferred_dynamic_container": {
+    "field_name": "extra_form_data",
+    "description": "第三方 embedding 推荐把动态上下文放在这里；后端会在 merge_extra_form_data() 中合并它。",
+    "append_keys": [
+      "adhoc_filters",
+      "filters",
+      "interactive_groupby",
+      "interactive_highlight",
+      "interactive_drilldown",
+      "custom_form_data"
+    ],
+    "override_keys_backend_high_confidence": [
+      "granularity_sqla",
+      "time_column",
+      "time_grain",
+      "time_range",
+      "time_grain_sqla",
+      "relative_start",
+      "relative_end"
+    ],
+    "notes": "Radar controlPanel 没有时间过滤控件链路。对当前图而言，只有 `filters` / `adhoc_filters` 属于高置信动态入口。"
+  },
+  "extra_form_data_field_schema": [
+    {
+      "field_name": "filters",
+      "data_type": "array[QueryObjectFilterClause]",
+      "behavior": "append",
+      "safe_for_radar": true,
+      "recommended": true,
+      "sample_data": [
+        {
+          "col": "region",
+          "op": "IN",
+          "val": [
+            "East",
+            "West"
+          ]
+        }
+      ],
+      "effect": "追加普通过滤条件；Radar 点击系列做 cross-filter 时也正是产出这类结构。",
+      "source": "plugins/plugin-chart-echarts/src/utils/eventHandlers.ts + superset/constants.py"
+    },
+    {
+      "field_name": "adhoc_filters",
+      "data_type": "array[object]",
+      "behavior": "append",
+      "safe_for_radar": true,
+      "recommended": true,
+      "sample_data": [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "region",
+          "operator": "IN",
+          "comparator": [
+            "East",
+            "West"
+          ]
+        }
+      ],
+      "effect": "追加 adhoc filters；后端会把它们标记为 extra 并并入查询。",
+      "source": "superset/constants.py + superset/utils/core.py"
+    },
+    {
+      "field_name": "custom_form_data",
+      "data_type": "object",
+      "behavior": "append",
+      "safe_for_radar": true,
+      "recommended": false,
+      "sample_data": {},
+      "effect": "传递非标准附加数据；Radar 默认 buildQuery/transformProps 不直接消费它。",
+      "source": "QueryFormData.ts + superset/constants.py"
+    },
+    {
+      "field_name": "time_range",
+      "data_type": "string",
+      "behavior": "override",
+      "safe_for_radar": false,
+      "recommended": false,
+      "sample_data": "Last 30 days",
+      "effect": "通用 extra_form_data override 白名单允许该 key，但 Radar 当前没有显式时间过滤控件链路。",
+      "source": "superset/constants.py + QueryFormData.ts",
+      "status": "低置信，不建议在 guest embedding 中依赖"
+    },
+    {
+      "field_name": "time_grain_sqla",
+      "data_type": "string | null",
+      "behavior": "override",
+      "safe_for_radar": false,
+      "recommended": false,
+      "sample_data": "P1D",
+      "effect": "通用时间粒度 override。Radar 当前没有对应控件，也没有专门的 buildQuery 时间处理逻辑。",
+      "source": "superset/constants.py + QueryFormData.ts",
+      "status": "低置信，不建议在 guest embedding 中依赖"
+    },
+    {
+      "field_name": "granularity_sqla",
+      "data_type": "string | null",
+      "behavior": "override",
+      "safe_for_radar": false,
+      "recommended": false,
+      "sample_data": "order_date",
+      "effect": "通用时间列 override。Radar 当前没有对应控件。",
+      "source": "superset/constants.py + QueryFormData.ts",
+      "status": "低置信，不建议在 guest embedding 中依赖"
+    },
+    {
+      "field_name": "time_column",
+      "data_type": "string | null",
+      "behavior": "override",
+      "safe_for_radar": false,
+      "recommended": false,
+      "sample_data": "order_date",
+      "effect": "底层 QueryObject 时间列 override；当前图没有官方时间控件闭环。",
+      "source": "superset/constants.py + QueryFormData.ts",
+      "status": "低置信，不建议在 guest embedding 中依赖"
+    },
+    {
+      "field_name": "time_grain",
+      "data_type": "string | null",
+      "behavior": "override",
+      "safe_for_radar": false,
+      "recommended": false,
+      "sample_data": "P1D",
+      "effect": "底层 QueryObject 时间粒度 override；当前图没有官方时间控件闭环。",
+      "source": "superset/constants.py + QueryFormData.ts",
+      "status": "低置信，不建议在 guest embedding 中依赖"
+    },
+    {
+      "field_name": "relative_start",
+      "data_type": "string",
+      "behavior": "override",
+      "safe_for_radar": false,
+      "recommended": false,
+      "sample_data": "now",
+      "effect": "进入 query extras 的相对开始时间；Radar 当前没有显式时间过滤控件。",
+      "source": "superset/constants.py + superset/utils/core.py",
+      "status": "低置信，不建议在 guest embedding 中依赖"
+    },
+    {
+      "field_name": "relative_end",
+      "data_type": "string",
+      "behavior": "override",
+      "safe_for_radar": false,
+      "recommended": false,
+      "sample_data": "today",
+      "effect": "进入 query extras 的相对结束时间；Radar 当前没有显式时间过滤控件。",
+      "source": "superset/constants.py + superset/utils/core.py",
+      "status": "低置信，不建议在 guest embedding 中依赖"
+    },
+    {
+      "field_name": "interactive_groupby",
+      "data_type": "array[string]",
+      "behavior": "append",
+      "safe_for_radar": false,
+      "recommended": false,
+      "sample_data": [
+        "region"
+      ],
+      "effect": "通用交互字段；Radar 默认 buildQuery/transformProps 不直接消费它。",
+      "source": "QueryFormData.ts + query constants"
+    },
+    {
+      "field_name": "interactive_highlight",
+      "data_type": "array[string]",
+      "behavior": "append",
+      "safe_for_radar": false,
+      "recommended": false,
+      "sample_data": [
+        "region"
+      ],
+      "effect": "通用交互字段；Radar 默认不直接消费。",
+      "source": "QueryFormData.ts + query constants"
+    },
+    {
+      "field_name": "interactive_drilldown",
+      "data_type": "array[string]",
+      "behavior": "append",
+      "safe_for_radar": false,
+      "recommended": false,
+      "sample_data": [
+        "region"
+      ],
+      "effect": "通用交互字段；Radar 默认不直接消费。",
+      "source": "QueryFormData.ts + query constants"
+    }
+  ],
+  "minimal_extra_form_data_template": {
+    "filters": [
+      {
+        "col": "region",
+        "op": "IN",
+        "val": [
+          "East"
+        ]
+      }
+    ]
+  },
+  "recommended_extra_form_data_template": {
+    "filters": [
+      {
+        "col": "region",
+        "op": "IN",
+        "val": [
+          "East",
+          "West"
+        ]
+      }
+    ],
+    "adhoc_filters": [
+      {
+        "expressionType": "SIMPLE",
+        "clause": "WHERE",
+        "subject": "region",
+        "operator": "IN",
+        "comparator": [
+          "East",
+          "West"
+        ]
+      }
+    ],
+    "custom_form_data": {}
+  },
+  "unsafe_root_form_data_changes": [
+    {
+      "field_name": "slice_id",
+      "reason": "与保存态图表 id 不一致会被后端立即判定为请求了另一张图。"
+    },
+    {
+      "field_name": "datasource / viz_type",
+      "reason": "guest embedding 不应修改图表绑定的数据集或图表类型。"
+    },
+    {
+      "field_name": "groupby",
+      "reason": "`extractQueryFields()` 会把它折叠成 query `columns`；这是 guest payload 校验关注的关键字段。"
+    },
+    {
+      "field_name": "metrics",
+      "reason": "它会直接进入 query `metrics`。"
+    },
+    {
+      "field_name": "adhoc_filters / row_limit",
+      "reason": "会改变实际查询条件和返回结果规模。"
+    },
+    {
+      "field_name": "timeseries_limit_metric",
+      "reason": "虽然当前实现对 query `orderby` 的作用不稳定，但它仍是保存态图表定义字段，guest 请求应保持不变。"
+    },
+    {
+      "field_name": "color_scheme / show_legend / legendType / legendOrientation / legendMargin / show_labels / label_type / label_position / number_format / date_format / column_config / is_circle",
+      "reason": "这些字段虽然多数不改 SQL，但都会改变图表定义、显示语义或雷达轴边界。"
+    }
+  ],
+  "practical_guidance": {
+    "best_practice": [
+      "先从保存态 Radar Chart 读取完整 form_data。",
+      "根层字段保持不变，尤其保留 `groupby`、`metrics`、`timeseries_limit_metric`、`adhoc_filters`、`row_limit` 和所有 legend / label / radar 样式字段。",
+      "只在 `extra_form_data` 中放动态 `filters` / `adhoc_filters`。",
+      "如果只是做第三方筛选联动，优先使用 `filters`，因为 Radar 的交互点击就是通过这个结构发出 data mask。"
+    ],
+    "avoid": [
+      "不要在 guest embedding 请求里重构 Radar 的 `groupby` / `metrics` 结构。",
+      "不要试图在 guest 请求里修复 `timeseries_limit_metric` / `series_limit_metric` 的实现不一致；根层 form_data 应保持保存态。",
+      "不要把 runtime 别名 `colorScheme`、`showLegend`、`showLabels`、`labelType`、`labelPosition`、`numberFormat`、`dateFormat`、`columnConfig`、`isCircle` 当成 root 键。",
+      "不要把 `column_config` 的 key 改成原始列名；它的 key 必须与保存态 metric label 一致。"
+    ]
+  }
+}

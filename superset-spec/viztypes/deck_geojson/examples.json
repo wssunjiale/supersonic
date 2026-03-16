@@ -1,0 +1,288 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "deck_geojson",
+  "display_name": "deck.gl Geojson",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "country",
+          "operator": "IN",
+          "comparator": [
+            "US"
+          ]
+        }
+      ]
+    ],
+    "autozoom": [
+      true
+    ],
+    "extruded": [
+      true
+    ],
+    "fill_color_picker": [
+      {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      }
+    ],
+    "filled": [
+      true
+    ],
+    "filter_nulls": [
+      true
+    ],
+    "geojson": [
+      "geom"
+    ],
+    "js_columns": [
+      [
+        "name"
+      ]
+    ],
+    "js_data_mutator": [
+      "data => data"
+    ],
+    "js_onclick_href": [
+      "o => `https://example.com/?id=${o.object.extraProps?.id}`"
+    ],
+    "js_tooltip": [
+      "o => `<div>${o.object.extraProps?.name}</div>`"
+    ],
+    "line_width": [
+      1
+    ],
+    "line_width_unit": [
+      "pixels"
+    ],
+    "mapbox_style": [
+      "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+    ],
+    "point_radius_scale": [
+      100
+    ],
+    "row_limit": [
+      5000
+    ],
+    "stroke_color_picker": [
+      {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      }
+    ],
+    "stroked": [
+      false
+    ],
+    "viewport": [
+      {
+        "longitude": 6.85236157047845,
+        "latitude": 31.222656842808707,
+        "zoom": 1,
+        "bearing": 0,
+        "pitch": 0
+      }
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "deck_geojson",
+      "geojson": "geom",
+      "adhoc_filters": [],
+      "fill_color_picker": {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      },
+      "stroke_color_picker": {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      },
+      "mapbox_style": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+      "viewport": {
+        "longitude": 6.85236157047845,
+        "latitude": 31.222656842808707,
+        "zoom": 1,
+        "bearing": 0,
+        "pitch": 0
+      },
+      "filled": true,
+      "stroked": false,
+      "extruded": true
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "deck_geojson",
+      "geojson": "geom",
+      "row_limit": 5000,
+      "filter_nulls": true,
+      "adhoc_filters": [],
+      "mapbox_style": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+      "viewport": {
+        "longitude": 6.85236157047845,
+        "latitude": 31.222656842808707,
+        "zoom": 1,
+        "bearing": 0,
+        "pitch": 0
+      },
+      "autozoom": true,
+      "fill_color_picker": {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      },
+      "stroke_color_picker": {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      },
+      "filled": true,
+      "stroked": false,
+      "extruded": true,
+      "line_width": 1,
+      "line_width_unit": "pixels",
+      "point_radius_scale": null,
+      "js_columns": [],
+      "js_data_mutator": "",
+      "js_tooltip": "",
+      "js_onclick_href": ""
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "deck_geojson",
+      "geojson": "<copied_from_saved_chart>",
+      "row_limit": "<copied_from_saved_chart_if_present>",
+      "filter_nulls": "<copied_from_saved_chart_if_present>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "mapbox_style": "<copied_from_saved_chart_if_present>",
+      "viewport": "<copied_from_saved_chart_if_present>",
+      "autozoom": "<copied_from_saved_chart_if_present>",
+      "fill_color_picker": "<copied_from_saved_chart>",
+      "stroke_color_picker": "<copied_from_saved_chart>",
+      "filled": "<copied_from_saved_chart_if_present>",
+      "stroked": "<copied_from_saved_chart_if_present>",
+      "extruded": "<copied_from_saved_chart_if_present>",
+      "line_width": "<copied_from_saved_chart_if_present>",
+      "line_width_unit": "<copied_from_saved_chart_if_present>",
+      "point_radius_scale": "<copied_from_saved_chart_if_present>",
+      "js_columns": "<copied_from_saved_chart_if_present>",
+      "js_data_mutator": "<copied_from_saved_chart_if_present>",
+      "js_tooltip": "<copied_from_saved_chart_if_present>",
+      "js_onclick_href": "<copied_from_saved_chart_if_present>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": {
+              "expressionType": "SQL",
+              "sqlExpression": "REPLACE(geom, ' ', '')",
+              "label": "geom"
+            },
+            "op": "LIKE",
+            "val": "%[[[-122.4,37.8],[-122.3,37.8],[-122.3,37.7],[-122.4,37.7],[-122.4,37.8]]]%"
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "country",
+            "operator": "IN",
+            "comparator": [
+              "US"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_deck_geojson_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": {
+              "expressionType": "SQL",
+              "sqlExpression": "REPLACE(geom, ' ', '')",
+              "label": "geom"
+            },
+            "op": "LIKE",
+            "val": "%[[[-122.4,37.8],[-122.3,37.8],[-122.3,37.7],[-122.4,37.7],[-122.4,37.8]]]%"
+          }
+        ],
+        "effect": "追加 simple filters；对 deck_geojson 来说，点击要素时由 `crossFiltersDataMask.ts` 生成的是 SQL 表达式过滤，而不是普通列过滤。",
+        "source": "superset/constants.py + superset/utils/core.py + crossFiltersDataMask.ts"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_deck_geojson_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "country",
+            "operator": "IN",
+            "comparator": [
+              "US"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会标记为 `isExtra` 并并入查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_deck_geojson_legacy": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；deck_geojson 默认不直接消费它。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_deck_geojson_legacy": false,
+        "recommended": false,
+        "sample_data": "Last 30 days",
+        "effect": "这是通用 extra_form_data override 字段，但当前图不是时序图，deck_geojson 控制面板与后端查询路径都没有高置信业务依赖。",
+        "source": "QueryFormData.ts + superset/constants.py + superset/utils/core.py + superset/viz.py",
+        "status": "低相关，不建议在 guest embedding 中依赖"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "deck_geojson",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/deck_geojson-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/deck_geojson-form-data-schema.json",
+      "control-schema": "form-data-schema/deck_geojson-schema.json"
+    }
+  }
+}

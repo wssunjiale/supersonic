@@ -1,0 +1,131 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "funnel",
+  "display_name": "Funnel Chart",
+  "normalized_summary": {
+    "category": "process",
+    "tags": [
+      "funnel",
+      "conversion",
+      "process",
+      "sales"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "groupby",
+        "required": true,
+        "description": "漏斗阶段字段（如转化阶段、流程步骤），用于定义漏斗的层级。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "各阶段数值指标，用于展示漏斗各层级的数值。"
+      },
+      {
+        "key": "sort_order",
+        "required": false,
+        "description": "漏斗排序方式（asc/desc），控制阶段的展示顺序。"
+      },
+      {
+        "key": "show_percent",
+        "required": false,
+        "description": "是否展示百分比（true/false），控制各阶段占比的显示。"
+      }
+    ],
+    "description_zh": "Funnel Chart displays a process with decreasing values at each stage (e.g., sales funnel: leads → prospects → customers), ideal for conversion analysis.",
+    "visual_shape_zh": "漏斗图（流程转化型）",
+    "use_cases_zh": [
+      "转化漏斗分析（如销售漏斗、用户转化漏斗）",
+      "流程各阶段数值递减展示",
+      "转化率/流失率监控"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "funnel",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/funnel-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/funnel-form-data-schema.json",
+      "control-schema": "form-data-schema/funnel-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Funnel Chart",
+    "viztype": "funnel",
+    "详细描述": "Funnel Chart displays a process with decreasing values at each stage (e.g., sales funnel: leads → prospects → customers), ideal for conversion analysis.",
+    "表现形态": "漏斗图（流程转化型）",
+    "适用场景": [
+      "转化漏斗分析（如销售漏斗、用户转化漏斗）",
+      "流程各阶段数值递减展示",
+      "转化率/流失率监控"
+    ],
+    "vizKey": "Funnel",
+    "pluginCategory": "Process",
+    "pluginTags": [],
+    "category": "process",
+    "tags": [
+      "funnel",
+      "conversion",
+      "process",
+      "sales"
+    ],
+    "关键字段": [
+      {
+        "key": "groupby",
+        "required": true,
+        "description": "漏斗阶段字段（如转化阶段、流程步骤），用于定义漏斗的层级。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "各阶段数值指标，用于展示漏斗各层级的数值。"
+      },
+      {
+        "key": "sort_order",
+        "required": false,
+        "description": "漏斗排序方式（asc/desc），控制阶段的展示顺序。"
+      },
+      {
+        "key": "show_percent",
+        "required": false,
+        "description": "是否展示百分比（true/false），控制各阶段占比的显示。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

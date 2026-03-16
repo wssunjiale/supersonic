@@ -1,0 +1,131 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "echarts_timeseries",
+  "display_name": "Generic Chart",
+  "normalized_summary": {
+    "category": "time_series",
+    "tags": [
+      "timeseries",
+      "general",
+      "flexible",
+      "mixed"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "granularity_sqla",
+        "required": true,
+        "description": "时间粒度字段，定义时序图的时间轴维度（如小时、天、月）。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于计算每个时间点的数值。"
+      },
+      {
+        "key": "chart_type",
+        "required": false,
+        "description": "子图表类型（area/bar/line/scatter），控制时序图的展示形态。"
+      },
+      {
+        "key": "show_legend",
+        "required": false,
+        "description": "是否展示图例（true/false），控制系列图例的显示。"
+      }
+    ],
+    "description_zh": "General Time Series Chart is a flexible container supporting multiple time-series chart types (Area/Bar/Line/Scatter) with unified time-axis configuration.",
+    "visual_shape_zh": "通用时序图（多类型兼容型）",
+    "use_cases_zh": [
+      "多类型时序图的灵活切换（如折线/柱状图快速切换）",
+      "多指标的混合展示（如一条折线+一个柱状图）",
+      "统一时间轴的多维度分析"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "echarts_timeseries",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/echarts_timeseries-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/echarts_timeseries-form-data-schema.json",
+      "control-schema": "form-data-schema/echarts_timeseries-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Generic Chart",
+    "viztype": "echarts_timeseries",
+    "详细描述": "General Time Series Chart is a flexible container supporting multiple time-series chart types (Area/Bar/Line/Scatter) with unified time-axis configuration.",
+    "表现形态": "通用时序图（多类型兼容型）",
+    "适用场景": [
+      "多类型时序图的灵活切换（如折线/柱状图快速切换）",
+      "多指标的混合展示（如一条折线+一个柱状图）",
+      "统一时间轴的多维度分析"
+    ],
+    "vizKey": "Timeseries",
+    "pluginCategory": "Time Series",
+    "pluginTags": [],
+    "category": "time_series",
+    "tags": [
+      "timeseries",
+      "general",
+      "flexible",
+      "mixed"
+    ],
+    "关键字段": [
+      {
+        "key": "granularity_sqla",
+        "required": true,
+        "description": "时间粒度字段，定义时序图的时间轴维度（如小时、天、月）。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于计算每个时间点的数值。"
+      },
+      {
+        "key": "chart_type",
+        "required": false,
+        "description": "子图表类型（area/bar/line/scatter），控制时序图的展示形态。"
+      },
+      {
+        "key": "show_legend",
+        "required": false,
+        "description": "是否展示图例（true/false），控制系列图例的显示。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

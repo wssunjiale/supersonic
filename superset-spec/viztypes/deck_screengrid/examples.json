@@ -1,0 +1,263 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "deck_screengrid",
+  "display_name": "deck.gl Screen Grid",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      []
+    ],
+    "autozoom": [
+      true
+    ],
+    "color_picker": [
+      {
+        "r": 14,
+        "g": 255,
+        "b": 0,
+        "a": 1
+      }
+    ],
+    "color_scheme": [
+      "SUPERSET_DEFAULT"
+    ],
+    "color_scheme_type": [
+      "default"
+    ],
+    "filter_nulls": [
+      true
+    ],
+    "grid_size": [
+      20
+    ],
+    "js_columns": [
+      [
+        "city"
+      ]
+    ],
+    "js_data_mutator": [
+      "data => data"
+    ],
+    "js_onclick_href": [
+      "o => `https://example.com/?lon=${o.coordinate[0]}&lat=${o.coordinate[1]}`"
+    ],
+    "js_tooltip": [
+      "o => `<div>${o.object?.value}</div>`"
+    ],
+    "mapbox_style": [
+      "mapbox://styles/mapbox/dark-v9"
+    ],
+    "row_limit": [
+      5000
+    ],
+    "size": [
+      "count"
+    ],
+    "spatial": [
+      {
+        "type": "latlong",
+        "lonCol": "LON",
+        "latCol": "LAT"
+      }
+    ],
+    "viewport": [
+      {
+        "longitude": -122.41827069521386,
+        "latitude": 37.76024135844065,
+        "zoom": 14.161641703941438,
+        "bearing": -4.952916738791771,
+        "pitch": 4.750411100577438
+      }
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "deck_screengrid",
+      "spatial": {
+        "type": "latlong",
+        "lonCol": "LON",
+        "latCol": "LAT"
+      },
+      "size": "count",
+      "adhoc_filters": []
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "deck_screengrid",
+      "spatial": {
+        "type": "latlong",
+        "lonCol": "LON",
+        "latCol": "LAT"
+      },
+      "size": "count",
+      "row_limit": 5000,
+      "filter_nulls": true,
+      "adhoc_filters": [],
+      "mapbox_style": "mapbox://styles/mapbox/dark-v9",
+      "autozoom": true,
+      "viewport": {
+        "longitude": 6.85236157047845,
+        "latitude": 31.222656842808707,
+        "zoom": 1,
+        "bearing": 0,
+        "pitch": 0
+      },
+      "grid_size": 20,
+      "color_scheme_type": "default",
+      "color_picker": {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      },
+      "color_scheme": "SUPERSET_DEFAULT",
+      "js_columns": [],
+      "js_data_mutator": "",
+      "js_tooltip": "",
+      "js_onclick_href": ""
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "deck_screengrid",
+      "spatial": "<copied_from_saved_chart>",
+      "size": "<copied_from_saved_chart>",
+      "row_limit": "<copied_from_saved_chart_if_present>",
+      "filter_nulls": "<copied_from_saved_chart_if_present>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "mapbox_style": "<copied_from_saved_chart_if_present>",
+      "viewport": "<copied_from_saved_chart_if_present>",
+      "autozoom": "<copied_from_saved_chart_if_present>",
+      "grid_size": "<copied_from_saved_chart_if_present>",
+      "color_scheme_type": "<copied_from_saved_chart_if_present>",
+      "color_picker": "<copied_from_saved_chart_if_present>",
+      "color_scheme": "<copied_from_saved_chart_if_present>",
+      "js_columns": "<copied_from_saved_chart_if_present>",
+      "js_data_mutator": "<copied_from_saved_chart_if_present>",
+      "js_tooltip": "<copied_from_saved_chart_if_present>",
+      "js_onclick_href": "<copied_from_saved_chart_if_present>",
+      "granularity_sqla": "<copied_from_saved_chart_if_present>",
+      "time_grain_sqla": "<copied_from_saved_chart_if_present>",
+      "time_range": "<copied_from_saved_chart_if_present>",
+      "deafult_breakpoint_color": "<copied_from_saved_chart_if_present>",
+      "color_breakpoints": "<copied_from_saved_chart_if_present>",
+      "legend_position": "<copied_from_saved_chart_if_present>",
+      "legend_format": "<copied_from_saved_chart_if_present>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "LON",
+            "op": "IN",
+            "val": [
+              -122.4221936,
+              -122.4101989
+            ]
+          },
+          {
+            "col": "LAT",
+            "op": "IN",
+            "val": [
+              37.7786083,
+              37.7878771
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "city",
+            "operator": "IN",
+            "comparator": [
+              "San Francisco"
+            ]
+          }
+        ]
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_deck_screengrid_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "LON",
+            "op": "IN",
+            "val": [
+              -122.4221936,
+              -122.4101989
+            ]
+          },
+          {
+            "col": "LAT",
+            "op": "IN",
+            "val": [
+              37.7786083,
+              37.7878771
+            ]
+          }
+        ],
+        "effect": "追加 simple filters；后端会把它们并入额外过滤条件。对 screengrid 来说，这也是 `crossFiltersDataMask.ts` 交互筛选明确产出的容器。latlong 场景下，点击包含多个点的 screen cell 会生成经纬度 `IN` 过滤；无 points 时会退回经纬度范围过滤。",
+        "source": "superset/constants.py + superset/utils/core.py + crossFiltersDataMask.ts"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_deck_screengrid_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "city",
+            "operator": "IN",
+            "comparator": [
+              "San Francisco"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会标记为 `isExtra` 并并入查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_deck_screengrid_legacy": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；deck_screengrid 默认不直接消费它。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_deck_screengrid_legacy": false,
+        "recommended": false,
+        "sample_data": "Last 30 days",
+        "effect": "screengrid 后端确实存在隐藏的时间查询路径，但当前 controlPanel 没有正式暴露时间字段。guest embedding 不建议依赖 override 去动态改它。",
+        "source": "QueryFormData.ts + superset/constants.py + superset/utils/core.py + superset/viz.py",
+        "status": "有后端消费证据，但不建议在 guest embedding 中依赖"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "deck_screengrid",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/deck_screengrid-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/deck_screengrid-form-data-schema.json",
+      "control-schema": "form-data-schema/deck_screengrid-schema.json"
+    }
+  }
+}

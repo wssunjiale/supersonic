@@ -1,0 +1,369 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "time_table",
+  "display_name": "Time-series Table",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "region",
+          "operator": "IN",
+          "comparator": [
+            "APAC"
+          ]
+        }
+      ]
+    ],
+    "column_collection": [
+      [
+        {
+          "key": "LHHNPhamU",
+          "label": "Current",
+          "colType": "time",
+          "timeLag": 0
+        },
+        {
+          "key": "9g4K-B-YL",
+          "label": "Last Year",
+          "colType": "time",
+          "timeLag": 1,
+          "comparisonType": "value"
+        },
+        {
+          "key": "JVZXtNu7_",
+          "label": "YoY",
+          "colType": "time",
+          "timeLag": 1,
+          "comparisonType": "perc",
+          "d3format": "%"
+        },
+        {
+          "key": "tN5Gba36u",
+          "label": "Trend",
+          "colType": "spark"
+        }
+      ]
+    ],
+    "column_collection[].bounds": [
+      [
+        null,
+        null
+      ]
+    ],
+    "column_collection[].colType": [
+      "time"
+    ],
+    "column_collection[].comparisonType": [
+      "perc"
+    ],
+    "column_collection[].d3format": [
+      "%"
+    ],
+    "column_collection[].dateFormat": [
+      "%Y-%m-%d"
+    ],
+    "column_collection[].height": [
+      "50"
+    ],
+    "column_collection[].key": [
+      "9g4K-B-YL"
+    ],
+    "column_collection[].label": [
+      "Last Year"
+    ],
+    "column_collection[].showYAxis": [
+      false
+    ],
+    "column_collection[].timeLag": [
+      1
+    ],
+    "column_collection[].timeRatio": [
+      1
+    ],
+    "column_collection[].tooltip": [
+      "Compare against one period ago"
+    ],
+    "column_collection[].width": [
+      "300"
+    ],
+    "column_collection[].yAxisBounds": [
+      [
+        null,
+        null
+      ]
+    ],
+    "granularity": [
+      "P1D"
+    ],
+    "granularity_sqla": [
+      "order_date"
+    ],
+    "groupby": [
+      [
+        "gender"
+      ]
+    ],
+    "limit": [
+      50
+    ],
+    "metrics": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        }
+      ]
+    ],
+    "row_limit": [
+      10000
+    ],
+    "time_grain_sqla": [
+      "P1D"
+    ],
+    "time_range": [
+      "No filter"
+    ],
+    "url": [
+      "/detail/{{metric.metric_name}}"
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "time_table",
+      "granularity_sqla": "<temporal_column>",
+      "time_grain_sqla": "P1D",
+      "time_range": "No filter",
+      "metrics": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        }
+      ],
+      "adhoc_filters": [],
+      "column_collection": [
+        {
+          "key": "LHHNPhamU",
+          "label": "Current",
+          "colType": "time",
+          "timeLag": 0
+        }
+      ]
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "time_table",
+      "granularity_sqla": "<temporal_column>",
+      "time_grain_sqla": "P1D",
+      "time_range": "No filter",
+      "metrics": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        },
+        "count"
+      ],
+      "adhoc_filters": [],
+      "groupby": [],
+      "limit": null,
+      "row_limit": 10000,
+      "column_collection": [
+        {
+          "key": "LHHNPhamU",
+          "label": "Current",
+          "colType": "time",
+          "timeLag": 0
+        },
+        {
+          "key": "9g4K-B-YL",
+          "label": "Last Year",
+          "colType": "time",
+          "timeLag": 1,
+          "comparisonType": "value"
+        },
+        {
+          "key": "JVZXtNu7_",
+          "label": "YoY",
+          "colType": "time",
+          "timeLag": 1,
+          "comparisonType": "perc",
+          "d3format": "%"
+        },
+        {
+          "key": "tN5Gba36u",
+          "label": "Trend",
+          "colType": "spark"
+        }
+      ],
+      "url": ""
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "time_table",
+      "granularity_sqla": "<copied_from_saved_chart>",
+      "time_grain_sqla": "<copied_from_saved_chart>",
+      "time_range": "<copied_from_saved_chart>",
+      "metrics": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "groupby": "<copied_from_saved_chart>",
+      "limit": "<copied_from_saved_chart>",
+      "row_limit": "<copied_from_saved_chart>",
+      "column_collection": "<copied_from_saved_chart>",
+      "url": "<copied_from_saved_chart>",
+      "extra_form_data": {
+        "time_range": "Last 90 days",
+        "time_grain_sqla": "P1D",
+        "filters": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "APAC"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "APAC"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_time_table_legacy": true,
+        "recommended": true,
+        "sample_data": "Last 90 days",
+        "effect": "覆盖保存态图表的时间范围。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_time_table_legacy": true,
+        "recommended": true,
+        "sample_data": "P1D",
+        "effect": "覆盖保存态图表的时间粒度。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_time_table_legacy": true,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "覆盖 Time Column；它会改变底层时间列语义，仅在确认保存态图表与目标时间列语义完全一致时使用。",
+        "source": "superset/constants.py + frontend QueryFormData.ts"
+      },
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_time_table_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "APAC"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters；后端会把它们并入额外过滤条件。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_time_table_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "APAC"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会标记为 extra 并并入查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_time_table_legacy": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；time_table 默认不直接消费它。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "relative_start",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_time_table_legacy": true,
+        "recommended": false,
+        "sample_data": "now",
+        "effect": "进入 query extras 的相对开始时间。",
+        "source": "superset/charts/schemas.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "relative_end",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_time_table_legacy": true,
+        "recommended": false,
+        "sample_data": "today",
+        "effect": "进入 query extras 的相对结束时间。",
+        "source": "superset/charts/schemas.py + superset/utils/core.py"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "time_table",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/time_table-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/time_table-form-data-schema.json",
+      "control-schema": "form-data-schema/time_table-schema.json"
+    }
+  }
+}

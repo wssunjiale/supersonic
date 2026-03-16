@@ -1,0 +1,5449 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "table",
+  "display_name": "Table",
+  "source_kind": "schema_file",
+  "normalized_control_schema": {
+    "field_category_order": [
+      "Query",
+      "Options",
+      "Visual formatting",
+      "Time Comparison"
+    ],
+    "field_occurrences": [
+      {
+        "source_name": "online-catalog",
+        "category": "Query",
+        "field_name": "groupby",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "description": "聚合模式下的分组维度。",
+        "data_type": "array[string | object]",
+        "sample_data": [
+          "region"
+        ],
+        "original_field": {
+          "field_name": "groupby",
+          "description": "聚合模式下的分组维度。",
+          "data_type": "array[string | object]",
+          "enum_source": "datasource columns",
+          "sample_data": [
+            "region"
+          ],
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": []
+        }
+      },
+      {
+        "source_name": "online-catalog",
+        "category": "Query",
+        "field_name": "time_grain_sqla",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "extra_form_data.override（guest 下不建议）",
+        "description": "时间粒度。仅当 `groupby` 中包含 temporal 列时才生效。",
+        "data_type": "string | null",
+        "sample_data": "P1D",
+        "original_field": {
+          "field_name": "time_grain_sqla",
+          "description": "时间粒度。仅当 `groupby` 中包含 temporal 列时才生效。",
+          "data_type": "string | null",
+          "enum_source": "datasource.time_grain_sqla",
+          "sample_data": "P1D",
+          "required": false,
+          "embedding": "extra_form_data.override（guest 下不建议）",
+          "default_value": "新建未保存图且 metadata 为空时初始为 P1D，否则沿用已有值"
+        }
+      },
+      {
+        "source_name": "online-catalog",
+        "category": "Query",
+        "field_name": "temporal_columns_lookup",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "隐藏映射，用来标记哪些分组列是 temporal physical columns。",
+        "data_type": "object[string, boolean]",
+        "sample_data": {
+          "order_date": true
+        },
+        "original_field": {
+          "field_name": "temporal_columns_lookup",
+          "description": "隐藏映射，用来标记哪些分组列是 temporal physical columns。",
+          "data_type": "object[string, boolean]",
+          "sample_data": {
+            "order_date": true
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": "由 datasource 自动生成"
+        }
+      },
+      {
+        "source_name": "online-catalog",
+        "category": "Query",
+        "field_name": "metrics",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "description": "聚合模式下的主指标集合。",
+        "data_type": "array[string | object]",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          }
+        ],
+        "original_field": {
+          "field_name": "metrics",
+          "description": "聚合模式下的主指标集合。",
+          "data_type": "array[string | object]",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "sales"
+              },
+              "aggregate": "SUM",
+              "label": "SUM(sales)"
+            }
+          ],
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": "未显式 default（UI 空态）"
+        }
+      },
+      {
+        "source_name": "online-catalog",
+        "category": "Query",
+        "field_name": "adhoc_filters",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "description": "过滤条件集合。",
+        "data_type": "array[object]",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "original_field": {
+          "field_name": "adhoc_filters",
+          "description": "过滤条件集合。",
+          "data_type": "array[object]",
+          "enum_source": "dataset filterable columns + saved metrics + current metrics",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "region",
+              "operator": "IN",
+              "comparator": [
+                "East",
+                "West"
+              ]
+            }
+          ],
+          "required": false,
+          "embedding": "extra_form_data.append",
+          "default_value": []
+        }
+      },
+      {
+        "source_name": "online-catalog",
+        "category": "Query",
+        "field_name": "timeseries_limit_metric",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "description": "aggregate 模式下用于决定 top rows 排序与截断依据的指标。",
+        "data_type": "string | object | null",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        },
+        "original_field": {
+          "field_name": "timeseries_limit_metric",
+          "description": "aggregate 模式下用于决定 top rows 排序与截断依据的指标。",
+          "data_type": "string | object | null",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          },
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": null
+        }
+      },
+      {
+        "source_name": "online-catalog",
+        "category": "Query",
+        "field_name": "order_desc",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "description": "aggregate 模式下，是否按 `timeseries_limit_metric` 降序排序。",
+        "data_type": "boolean",
+        "sample_data": true,
+        "original_field": {
+          "field_name": "order_desc",
+          "description": "aggregate 模式下，是否按 `timeseries_limit_metric` 降序排序。",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": true
+        }
+      },
+      {
+        "source_name": "online-catalog",
+        "category": "Query",
+        "field_name": "row_limit",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "description": "查询返回的最大行数上限。",
+        "data_type": "integer",
+        "sample_data": 1000,
+        "original_field": {
+          "field_name": "row_limit",
+          "description": "查询返回的最大行数上限。",
+          "data_type": "integer",
+          "sample_data": 1000,
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": 1000
+        }
+      },
+      {
+        "source_name": "online-catalog",
+        "category": "Advanced analytics",
+        "field_name": "time_compare",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "extra_form_data.override（guest 下不建议）",
+        "description": "时间位移对比字段。开启后会生成 comparison columns。",
+        "data_type": "string | null",
+        "sample_data": "1 year ago",
+        "original_field": {
+          "field_name": "time_compare",
+          "description": "时间位移对比字段。开启后会生成 comparison columns。",
+          "data_type": "string | null",
+          "enum_values": [
+            "1 day ago",
+            "1 week ago",
+            "1 month ago",
+            "1 year ago",
+            "custom",
+            "inherit"
+          ],
+          "sample_data": "1 year ago",
+          "required": false,
+          "embedding": "extra_form_data.override（guest 下不建议）",
+          "default_value": "未显式 default"
+        }
+      },
+      {
+        "source_name": "online-catalog",
+        "category": "Advanced analytics",
+        "field_name": "start_date_offset",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "extra_form_data.override（guest 下不建议）",
+        "description": "当 `time_compare='custom'` 时的自定义偏移量。",
+        "data_type": "string | null",
+        "sample_data": "1 year ago",
+        "original_field": {
+          "field_name": "start_date_offset",
+          "description": "当 `time_compare='custom'` 时的自定义偏移量。",
+          "data_type": "string | null",
+          "sample_data": "1 year ago",
+          "required": false,
+          "embedding": "extra_form_data.override（guest 下不建议）",
+          "default_value": null
+        }
+      },
+      {
+        "source_name": "online-catalog",
+        "category": "Advanced analytics",
+        "field_name": "comparison_type",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "时间对比展示方式：值、差值、百分比变化或比率。",
+        "data_type": "string",
+        "sample_data": "values",
+        "original_field": {
+          "field_name": "comparison_type",
+          "description": "时间对比展示方式：值、差值、百分比变化或比率。",
+          "data_type": "string",
+          "enum_values": [
+            "values",
+            "difference",
+            "percentage",
+            "ratio"
+          ],
+          "sample_data": "values",
+          "required": false,
+          "embedding": "否",
+          "default_value": "values"
+        }
+      },
+      {
+        "source_name": "online-catalog",
+        "category": "Chart Options",
+        "field_name": "page_length",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "前端分页时每页显示行数；`null` 代表自动分页。",
+        "data_type": "integer | string | null",
+        "sample_data": 20,
+        "original_field": {
+          "field_name": "page_length",
+          "description": "前端分页时每页显示行数；`null` 代表自动分页。",
+          "data_type": "integer | string | null",
+          "enum_values": [
+            0,
+            10,
+            20,
+            50,
+            100,
+            200
+          ],
+          "sample_data": 20,
+          "required": false,
+          "embedding": "否",
+          "default_value": null
+        }
+      },
+      {
+        "source_name": "online-catalog",
+        "category": "Chart Options",
+        "field_name": "include_search",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "是否展示客户端搜索框。",
+        "data_type": "boolean",
+        "sample_data": false,
+        "original_field": {
+          "field_name": "include_search",
+          "description": "是否展示客户端搜索框。",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false
+        }
+      },
+      {
+        "source_name": "online-catalog",
+        "category": "Chart Options",
+        "field_name": "allow_rearrange_columns",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "是否允许终端用户拖拽重排列顺序。",
+        "data_type": "boolean",
+        "sample_data": false,
+        "original_field": {
+          "field_name": "allow_rearrange_columns",
+          "description": "是否允许终端用户拖拽重排列顺序。",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false
+        }
+      },
+      {
+        "source_name": "online-catalog",
+        "category": "Chart Options",
+        "field_name": "allow_render_html",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "是否按 HTML 渲染单元格内容。",
+        "data_type": "boolean",
+        "sample_data": true,
+        "original_field": {
+          "field_name": "allow_render_html",
+          "description": "是否按 HTML 渲染单元格内容。",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true
+        }
+      },
+      {
+        "source_name": "online-catalog",
+        "category": "Chart Options",
+        "field_name": "show_cell_bars",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "是否在数值单元格背景显示数据条。",
+        "data_type": "boolean",
+        "sample_data": true,
+        "original_field": {
+          "field_name": "show_cell_bars",
+          "description": "是否在数值单元格背景显示数据条。",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true
+        }
+      },
+      {
+        "source_name": "online-catalog",
+        "category": "Chart Options",
+        "field_name": "align_pn",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "正负值数据条是否以 0 为对齐中轴。",
+        "data_type": "boolean",
+        "sample_data": false,
+        "original_field": {
+          "field_name": "align_pn",
+          "description": "正负值数据条是否以 0 为对齐中轴。",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false
+        }
+      },
+      {
+        "source_name": "online-catalog",
+        "category": "Chart Options",
+        "field_name": "color_pn",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "是否按正负值给数据条着色。",
+        "data_type": "boolean",
+        "sample_data": true,
+        "original_field": {
+          "field_name": "color_pn",
+          "description": "是否按正负值给数据条着色。",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true
+        }
+      },
+      {
+        "source_name": "online-catalog",
+        "category": "Chart Options",
+        "field_name": "comparison_color_enabled",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "时间对比模式下，是否启用基础涨跌箭头与底色格式。",
+        "data_type": "boolean",
+        "sample_data": false,
+        "original_field": {
+          "field_name": "comparison_color_enabled",
+          "description": "时间对比模式下，是否启用基础涨跌箭头与底色格式。",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false
+        }
+      },
+      {
+        "source_name": "online-catalog",
+        "category": "Chart Options",
+        "field_name": "comparison_color_scheme",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "时间对比模式下，涨跌配色策略。",
+        "data_type": "string",
+        "sample_data": "Green",
+        "original_field": {
+          "field_name": "comparison_color_scheme",
+          "description": "时间对比模式下，涨跌配色策略。",
+          "data_type": "string",
+          "enum_values": [
+            "Green",
+            "Red"
+          ],
+          "sample_data": "Green",
+          "required": false,
+          "embedding": "否",
+          "default_value": "Green"
+        }
+      },
+      {
+        "source_name": "online-catalog",
+        "category": "Chart Options",
+        "field_name": "conditional_formatting",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "自定义条件着色规则集合。",
+        "data_type": "array[object]",
+        "sample_data": [
+          {
+            "column": "sum__num",
+            "operator": ">",
+            "targetValue": 2467,
+            "colorScheme": "#ACE1C4"
+          }
+        ],
+        "original_field": {
+          "field_name": "conditional_formatting",
+          "description": "自定义条件着色规则集合。",
+          "data_type": "array[object]",
+          "sample_data": [
+            {
+              "column": "sum__num",
+              "operator": ">",
+              "targetValue": 2467,
+              "colorScheme": "#ACE1C4"
+            }
+          ],
+          "required": false,
+          "embedding": "否",
+          "default_value": "未显式 default；runtime 按空数组容错"
+        }
+      },
+      {
+        "source_name": "online-catalog",
+        "category": "图表专属",
+        "field_name": "query_mode",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "description": "Table 独有的 raw / aggregate 双模式开关。",
+        "data_type": "string | null",
+        "sample_data": "aggregate",
+        "original_field": {
+          "field_name": "query_mode",
+          "description": "Table 独有的 raw / aggregate 双模式开关。",
+          "data_type": "string | null",
+          "enum_values": [
+            "aggregate",
+            "raw"
+          ],
+          "sample_data": "aggregate",
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": null
+        }
+      },
+      {
+        "source_name": "online-catalog",
+        "category": "图表专属",
+        "field_name": "all_columns",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "description": "raw 模式下展示的明细列集合。",
+        "data_type": "array[string | object]",
+        "sample_data": [
+          "order_id",
+          "customer_name"
+        ],
+        "original_field": {
+          "field_name": "all_columns",
+          "description": "raw 模式下展示的明细列集合。",
+          "data_type": "array[string | object]",
+          "enum_source": "datasource columns",
+          "sample_data": [
+            "order_id",
+            "customer_name"
+          ],
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": []
+        }
+      },
+      {
+        "source_name": "online-catalog",
+        "category": "图表专属",
+        "field_name": "percent_metrics",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "description": "aggregate 模式下追加百分比指标列。",
+        "data_type": "array[string | object]",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          }
+        ],
+        "original_field": {
+          "field_name": "percent_metrics",
+          "description": "aggregate 模式下追加百分比指标列。",
+          "data_type": "array[string | object]",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "sales"
+              },
+              "aggregate": "SUM",
+              "label": "SUM(sales)"
+            }
+          ],
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": []
+        }
+      },
+      {
+        "source_name": "online-catalog",
+        "category": "图表专属",
+        "field_name": "order_by_cols",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "description": "raw 模式专用排序配置。",
+        "data_type": "array[string | [string, boolean]]",
+        "sample_data": [
+          "[\"order_id\",true]"
+        ],
+        "original_field": {
+          "field_name": "order_by_cols",
+          "description": "raw 模式专用排序配置。",
+          "data_type": "array[string | [string, boolean]]",
+          "sample_data": [
+            "[\"order_id\",true]"
+          ],
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": []
+        }
+      },
+      {
+        "source_name": "online-catalog",
+        "category": "图表专属",
+        "field_name": "server_pagination",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "description": "是否启用服务端分页。",
+        "data_type": "boolean",
+        "sample_data": false,
+        "original_field": {
+          "field_name": "server_pagination",
+          "description": "是否启用服务端分页。",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": false
+        }
+      },
+      {
+        "source_name": "online-catalog",
+        "category": "图表专属",
+        "field_name": "server_page_length",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "description": "服务端分页时的每页条数。",
+        "data_type": "integer",
+        "sample_data": 20,
+        "original_field": {
+          "field_name": "server_page_length",
+          "description": "服务端分页时的每页条数。",
+          "data_type": "integer",
+          "enum_values": [
+            10,
+            20,
+            50,
+            100,
+            200
+          ],
+          "sample_data": 20,
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": 10
+        }
+      },
+      {
+        "source_name": "online-catalog",
+        "category": "图表专属",
+        "field_name": "percent_metric_calculation",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "description": "百分比指标基于 row_limit 还是 all_records 计算。",
+        "data_type": "string",
+        "sample_data": "row_limit",
+        "original_field": {
+          "field_name": "percent_metric_calculation",
+          "description": "百分比指标基于 row_limit 还是 all_records 计算。",
+          "data_type": "string",
+          "enum_values": [
+            "row_limit",
+            "all_records"
+          ],
+          "sample_data": "row_limit",
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": "row_limit"
+        }
+      },
+      {
+        "source_name": "online-catalog",
+        "category": "图表专属",
+        "field_name": "show_totals",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "description": "是否额外生成 summary totals。",
+        "data_type": "boolean",
+        "sample_data": false,
+        "original_field": {
+          "field_name": "show_totals",
+          "description": "是否额外生成 summary totals。",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": false
+        }
+      },
+      {
+        "source_name": "online-catalog",
+        "category": "图表专属",
+        "field_name": "table_timestamp_format",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Table 全局时间列格式。",
+        "data_type": "string",
+        "sample_data": "smart_date",
+        "original_field": {
+          "field_name": "table_timestamp_format",
+          "description": "Table 全局时间列格式。",
+          "data_type": "string",
+          "enum_source": "D3_TIME_FORMAT_OPTIONS + freeForm",
+          "sample_data": "smart_date",
+          "required": false,
+          "embedding": "否",
+          "default_value": "smart_date"
+        }
+      },
+      {
+        "source_name": "online-catalog",
+        "category": "图表专属",
+        "field_name": "column_config",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "逐列定制格式、列宽、别名、显示隐藏和 comparison 子列格式。",
+        "data_type": "object[string, TableColumnConfig]",
+        "sample_data": {
+          "sum__num": {
+            "d3NumberFormat": ".3s",
+            "columnWidth": 180,
+            "customColumnName": "Sales"
+          }
+        },
+        "original_field": {
+          "field_name": "column_config",
+          "description": "逐列定制格式、列宽、别名、显示隐藏和 comparison 子列格式。",
+          "data_type": "object[string, TableColumnConfig]",
+          "sample_data": {
+            "sum__num": {
+              "d3NumberFormat": ".3s",
+              "columnWidth": 180,
+              "customColumnName": "Sales"
+            }
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": "未显式 default；transformProps runtime fallback 为 {}"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "query_mode",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "description": "Query mode",
+        "data_type": "string | null",
+        "sample_data": "aggregate",
+        "original_field": {
+          "field_name": "query_mode",
+          "description": "Query mode",
+          "data_type": "string | null",
+          "enum_values": [
+            "aggregate",
+            "raw"
+          ],
+          "sample_data": "aggregate",
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": null,
+          "notes": "未显式设置时，源码会按 `all_columns` 是否非空自动推断模式。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "groupby",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "description": "Dimensions contain qualitative values such as names, dates, or geographical data. Use dimensions to categorize, segment, and reveal the details in your data. Dimensions affect the level of detail in the view.",
+        "data_type": "array[string | object]",
+        "sample_data": [
+          "region"
+        ],
+        "original_field": {
+          "field_name": "groupby",
+          "description": "Dimensions contain qualitative values such as names, dates, or geographical data. Use dimensions to categorize, segment, and reveal the details in your data. Dimensions affect the level of detail in the view.",
+          "data_type": "array[string | object]",
+          "enum_source": "datasource columns",
+          "sample_data": [
+            "region"
+          ],
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": [],
+          "required_rule": "aggregate 模式下，与 `metrics`、`percent_metrics` 三者至少一类非空。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "time_grain_sqla",
+        "runtime_alias": "timeGrainSqla",
+        "required": false,
+        "embedding": "extra_form_data.override（技术上可传，但 guest 下不建议）",
+        "description": "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart.",
+        "data_type": "string | null",
+        "sample_data": "P1D",
+        "original_field": {
+          "field_name": "time_grain_sqla",
+          "runtime_alias": "timeGrainSqla",
+          "description": "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart.",
+          "data_type": "string | null",
+          "enum_source": "datasource.time_grain_sqla",
+          "sample_data": "P1D",
+          "required": false,
+          "embedding": "extra_form_data.override（技术上可传，但 guest 下不建议）",
+          "default_value": "新建未保存图且 metadata 为空时初始为 P1D，否则沿用已有值",
+          "notes": "仅当 `groupby` 里存在 temporal 列或 adhoc column 时才显示；aggregate 模式下它会改写 query.columns。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "temporal_columns_lookup",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "隐藏控件。把 datasource 中所有 temporal physical columns 整理成 `{ column_name: true }` 映射，供 `time_grain_sqla` 可见性判断与 buildQuery 时间列改写使用。",
+        "data_type": "object[string, boolean]",
+        "sample_data": {
+          "order_date": true,
+          "ship_date": true
+        },
+        "original_field": {
+          "field_name": "temporal_columns_lookup",
+          "description": "隐藏控件。把 datasource 中所有 temporal physical columns 整理成 `{ column_name: true }` 映射，供 `time_grain_sqla` 可见性判断与 buildQuery 时间列改写使用。",
+          "data_type": "object[string, boolean]",
+          "sample_data": {
+            "order_date": true,
+            "ship_date": true
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": "由 datasource columns 自动推导"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "metrics",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "description": "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+        "data_type": "array[string | object]",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          }
+        ],
+        "original_field": {
+          "field_name": "metrics",
+          "description": "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+          "data_type": "array[string | object]",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "sales"
+              },
+              "aggregate": "SUM",
+              "label": "SUM(sales)"
+            }
+          ],
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": "未显式 default（UI 空态）",
+          "required_rule": "aggregate 模式下，与 `groupby`、`percent_metrics` 三者至少一类非空。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "all_columns",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "description": "Columns to display",
+        "data_type": "array[string | object]",
+        "sample_data": [
+          "order_id",
+          "customer_name"
+        ],
+        "original_field": {
+          "field_name": "all_columns",
+          "description": "Columns to display",
+          "data_type": "array[string | object]",
+          "enum_source": "datasource columns",
+          "sample_data": [
+            "order_id",
+            "customer_name"
+          ],
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": [],
+          "required_rule": "raw 模式下必须至少 1 项。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "percent_metrics",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "description": "Select one or many metrics to display, that will be displayed in the percentages of total. Percentage metrics will be calculated only from data within the row limit. You can use an aggregation function on a column or write custom SQL to create a percentage metric.",
+        "data_type": "array[string | object]",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          }
+        ],
+        "original_field": {
+          "field_name": "percent_metrics",
+          "description": "Select one or many metrics to display, that will be displayed in the percentages of total. Percentage metrics will be calculated only from data within the row limit. You can use an aggregation function on a column or write custom SQL to create a percentage metric.",
+          "data_type": "array[string | object]",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "sales"
+              },
+              "aggregate": "SUM",
+              "label": "SUM(sales)"
+            }
+          ],
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": [],
+          "required_rule": "aggregate 模式下，与 `groupby`、`metrics` 三者至少一类非空。",
+          "notes": "buildQuery 会把它们并入 `metrics`，并生成 `%metric` 贡献率列。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "adhoc_filters",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "description": "Filters",
+        "data_type": "array[object]",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "original_field": {
+          "field_name": "adhoc_filters",
+          "description": "Filters",
+          "data_type": "array[object]",
+          "enum_source": "dataset filterable columns + saved metrics + current metrics",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "region",
+              "operator": "IN",
+              "comparator": [
+                "East",
+                "West"
+              ]
+            }
+          ],
+          "required": false,
+          "embedding": "extra_form_data.append",
+          "default_value": []
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "timeseries_limit_metric",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "description": "Orders the query result that generates the source data for this chart. If a series or row limit is reached, this determines what data are truncated. If undefined, defaults to the first metric (where appropriate).",
+        "data_type": "string | object | null",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        },
+        "original_field": {
+          "field_name": "timeseries_limit_metric",
+          "description": "Orders the query result that generates the source data for this chart. If a series or row limit is reached, this determines what data are truncated. If undefined, defaults to the first metric (where appropriate).",
+          "data_type": "string | object | null",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          },
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": null
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "order_by_cols",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "description": "Order results by selected columns",
+        "data_type": "array[string | [string, boolean]]",
+        "sample_data": [
+          "[\"order_id\",true]",
+          "[\"customer_name\",false]"
+        ],
+        "original_field": {
+          "field_name": "order_by_cols",
+          "description": "Order results by selected columns",
+          "data_type": "array[string | [string, boolean]]",
+          "enum_source": "datasource.order_by_choices 或 datasource columns 生成的 `[column, asc|desc]` 选项",
+          "sample_data": [
+            "[\"order_id\",true]",
+            "[\"customer_name\",false]"
+          ],
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": [],
+          "notes": "仅 raw 模式显示；会通过 `extractQueryFields()` 编译成 query.orderby。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "order_desc",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "description": "If enabled, this control sorts the results/values descending, otherwise it sorts the results ascending.",
+        "data_type": "boolean",
+        "sample_data": true,
+        "original_field": {
+          "field_name": "order_desc",
+          "description": "If enabled, this control sorts the results/values descending, otherwise it sorts the results ascending.",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": true,
+          "notes": "aggregate 模式下只有当 `timeseries_limit_metric` 非空时才显示。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "server_pagination",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "description": "Enable server side pagination of results (experimental feature)",
+        "data_type": "boolean",
+        "sample_data": true,
+        "original_field": {
+          "field_name": "server_pagination",
+          "description": "Enable server side pagination of results (experimental feature)",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": false
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "server_page_length",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "description": "Rows per page, 0 means no pagination",
+        "data_type": "integer",
+        "sample_data": 20,
+        "original_field": {
+          "field_name": "server_page_length",
+          "description": "Rows per page, 0 means no pagination",
+          "data_type": "integer",
+          "enum_values": [
+            10,
+            20,
+            50,
+            100,
+            200
+          ],
+          "sample_data": 20,
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": 10,
+          "notes": "仅 `server_pagination=true` 时显示。实际翻页页码、搜索与排序来自 ownState，而不是 root form_data。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "row_limit",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+        "data_type": "integer",
+        "sample_data": 1000,
+        "original_field": {
+          "field_name": "row_limit",
+          "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+          "data_type": "integer",
+          "enum_values": [
+            10,
+            50,
+            100,
+            250,
+            500,
+            1000,
+            5000,
+            10000,
+            50000,
+            100000,
+            150000,
+            200000,
+            250000,
+            300000,
+            350000,
+            400000,
+            450000,
+            500000
+          ],
+          "sample_data": 1000,
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": 1000,
+          "notes": "Table 覆盖了 shared row_limit 默认值，root 缺省按 1000 记录。server pagination 打开后，它更像总 cap / rowcount 查询上限。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "percent_metric_calculation",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "description": "Row Limit: percentages are calculated based on the subset of data retrieved, respecting the row limit. All Records: Percentages are calculated based on the total dataset, ignoring the row limit.",
+        "data_type": "string",
+        "sample_data": "row_limit",
+        "original_field": {
+          "field_name": "percent_metric_calculation",
+          "description": "Row Limit: percentages are calculated based on the subset of data retrieved, respecting the row limit. All Records: Percentages are calculated based on the total dataset, ignoring the row limit.",
+          "data_type": "string",
+          "enum_values": [
+            "row_limit",
+            "all_records"
+          ],
+          "sample_data": "row_limit",
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": "row_limit",
+          "notes": "选 `all_records` 时，buildQuery 会额外生成一条 percent-metrics query。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "show_totals",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "description": "Show total aggregations of selected metrics. Note that row limit does not apply to the result.",
+        "data_type": "boolean",
+        "sample_data": false,
+        "original_field": {
+          "field_name": "show_totals",
+          "description": "Show total aggregations of selected metrics. Note that row limit does not apply to the result.",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": false,
+          "notes": "仅 aggregate 模式显示；开启后会额外生成 totals query。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Options",
+        "field_name": "table_timestamp_format",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "D3 time format for datetime columns",
+        "data_type": "string",
+        "sample_data": "smart_date",
+        "original_field": {
+          "field_name": "table_timestamp_format",
+          "description": "D3 time format for datetime columns",
+          "data_type": "string",
+          "enum_source": "D3_TIME_FORMAT_OPTIONS + freeForm",
+          "sample_data": "smart_date",
+          "required": false,
+          "embedding": "否",
+          "default_value": "smart_date"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Options",
+        "field_name": "page_length",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Rows per page, 0 means no pagination",
+        "data_type": "integer | string | null",
+        "sample_data": 20,
+        "original_field": {
+          "field_name": "page_length",
+          "description": "Rows per page, 0 means no pagination",
+          "data_type": "integer | string | null",
+          "enum_values": [
+            0,
+            10,
+            20,
+            50,
+            100,
+            200
+          ],
+          "sample_data": 20,
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "仅 `server_pagination=false` 时显示。`null` 代表自动分页；transformProps 会按 `numRecords * numColumns > 5000` 决定是否回退到 200。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Options",
+        "field_name": "include_search",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Whether to include a client-side search box",
+        "data_type": "boolean",
+        "sample_data": false,
+        "original_field": {
+          "field_name": "include_search",
+          "description": "Whether to include a client-side search box",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Options",
+        "field_name": "allow_rearrange_columns",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Allow end user to drag-and-drop column headers to rearrange them. Note their changes won't persist for the next time they open the chart.",
+        "data_type": "boolean",
+        "sample_data": false,
+        "original_field": {
+          "field_name": "allow_rearrange_columns",
+          "description": "Allow end user to drag-and-drop column headers to rearrange them. Note their changes won't persist for the next time they open the chart.",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false,
+          "notes": "仅 `time_compare` 为空时显示。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Options",
+        "field_name": "allow_render_html",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Renders table cells as HTML when applicable. For example, HTML <a> tags will be rendered as hyperlinks.",
+        "data_type": "boolean",
+        "sample_data": true,
+        "original_field": {
+          "field_name": "allow_render_html",
+          "description": "Renders table cells as HTML when applicable. For example, HTML <a> tags will be rendered as hyperlinks.",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Options",
+        "field_name": "column_config",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Further customize how to display each column",
+        "data_type": "object[string, TableColumnConfig]",
+        "sample_data": {
+          "sum__num": {
+            "d3NumberFormat": ".3s",
+            "columnWidth": 180,
+            "horizontalAlign": "right",
+            "customColumnName": "Sales"
+          }
+        },
+        "original_field": {
+          "field_name": "column_config",
+          "description": "Further customize how to display each column",
+          "data_type": "object[string, TableColumnConfig]",
+          "sample_data": {
+            "sum__num": {
+              "d3NumberFormat": ".3s",
+              "columnWidth": 180,
+              "horizontalAlign": "right",
+              "customColumnName": "Sales"
+            }
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": "未显式 default；transformProps runtime fallback 为 {}",
+          "object_schema": {
+            "d3NumberFormat": "string",
+            "d3SmallNumberFormat": "string",
+            "d3TimeFormat": "string",
+            "columnWidth": "number",
+            "horizontalAlign": [
+              "left",
+              "right",
+              "center"
+            ],
+            "showCellBars": "boolean",
+            "alignPositiveNegative": "boolean",
+            "colorPositiveNegative": "boolean",
+            "truncateLongCells": "boolean",
+            "currencyFormat": "object",
+            "visible": "boolean",
+            "customColumnName": "string",
+            "displayTypeIcon": "boolean"
+          },
+          "notes": "time comparison 场景下还支持以 `Main metric` / `# metric` / `△ metric` / `% metric` 作为 key 单独配置 comparison 子列。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Visual formatting",
+        "field_name": "show_cell_bars",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Whether to display a bar chart background in table columns",
+        "data_type": "boolean",
+        "sample_data": true,
+        "original_field": {
+          "field_name": "show_cell_bars",
+          "description": "Whether to display a bar chart background in table columns",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Visual formatting",
+        "field_name": "align_pn",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Whether to align background charts with both positive and negative values at 0",
+        "data_type": "boolean",
+        "sample_data": false,
+        "original_field": {
+          "field_name": "align_pn",
+          "description": "Whether to align background charts with both positive and negative values at 0",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false,
+          "notes": "controlPanel 默认 `false`，但 transformProps 对字段缺失时的 runtime fallback 是 `true`。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Visual formatting",
+        "field_name": "color_pn",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Whether to colorize numeric values by whether they are positive or negative",
+        "data_type": "boolean",
+        "sample_data": true,
+        "original_field": {
+          "field_name": "color_pn",
+          "description": "Whether to colorize numeric values by whether they are positive or negative",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Visual formatting",
+        "field_name": "comparison_color_enabled",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "This will be applied to the whole table. Arrows (↑ and ↓) will be added to main columns for increase and decrease. Basic conditional formatting can be overwritten by conditional formatting below.",
+        "data_type": "boolean",
+        "sample_data": false,
+        "original_field": {
+          "field_name": "comparison_color_enabled",
+          "description": "This will be applied to the whole table. Arrows (↑ and ↓) will be added to main columns for increase and decrease. Basic conditional formatting can be overwritten by conditional formatting below.",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false,
+          "notes": "仅 `time_compare` 非空时显示。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Visual formatting",
+        "field_name": "comparison_color_scheme",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Adds color to the chart symbols based on the positive or negative change from the comparison value.",
+        "data_type": "string",
+        "sample_data": "Green",
+        "original_field": {
+          "field_name": "comparison_color_scheme",
+          "description": "Adds color to the chart symbols based on the positive or negative change from the comparison value.",
+          "data_type": "string",
+          "enum_values": [
+            "Green",
+            "Red"
+          ],
+          "sample_data": "Green",
+          "required": false,
+          "embedding": "否",
+          "default_value": "Green",
+          "notes": "仅在 `time_compare` 非空且 `comparison_color_enabled=true` 时显示。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Visual formatting",
+        "field_name": "conditional_formatting",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Apply conditional color formatting to numeric columns",
+        "data_type": "array[object]",
+        "sample_data": [
+          {
+            "column": "sum__num",
+            "operator": ">",
+            "targetValue": 2467,
+            "colorScheme": "#ACE1C4"
+          }
+        ],
+        "original_field": {
+          "field_name": "conditional_formatting",
+          "description": "Apply conditional color formatting to numeric columns",
+          "data_type": "array[object]",
+          "sample_data": [
+            {
+              "column": "sum__num",
+              "operator": ">",
+              "targetValue": 2467,
+              "colorScheme": "#ACE1C4"
+            }
+          ],
+          "required": false,
+          "embedding": "否",
+          "default_value": "未显式 default；runtime 按空数组容错",
+          "object_schema": {
+            "column": "string",
+            "operator": [
+              "None",
+              ">",
+              "<",
+              "≥",
+              "≤",
+              "=",
+              "≠",
+              "< x <",
+              "≤ x ≤",
+              "≤ x <",
+              "< x ≤"
+            ],
+            "targetValue": "number",
+            "targetValueLeft": "number",
+            "targetValueRight": "number",
+            "colorScheme": "string"
+          },
+          "notes": "普通单色规则与 comparison 双色方案都可写入这里；源码会按列类型与阈值完整性过滤无效配置。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Time Comparison",
+        "field_name": "time_compare",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "extra_form_data.override（技术上可传，但 guest 下不建议）",
+        "description": "Overlay results from a relative time period. Expects relative time deltas in natural language (example: 24 hours, 7 days, 52 weeks, 365 days). Free text is supported. Use \"Inherit range from time filters\" to shift the comparison time range by the same length as your time range and use \"Custom\" to set a custom comparison range.",
+        "data_type": "string | array[string] | null",
+        "sample_data": "1 year ago",
+        "original_field": {
+          "field_name": "time_compare",
+          "description": "Overlay results from a relative time period. Expects relative time deltas in natural language (example: 24 hours, 7 days, 52 weeks, 365 days). Free text is supported. Use \"Inherit range from time filters\" to shift the comparison time range by the same length as your time range and use \"Custom\" to set a custom comparison range.",
+          "data_type": "string | array[string] | null",
+          "enum_values": [
+            "1 day ago",
+            "1 week ago",
+            "1 month ago",
+            "1 year ago",
+            "custom",
+            "inherit"
+          ],
+          "sample_data": "1 year ago",
+          "required": false,
+          "embedding": "extra_form_data.override（技术上可传，但 guest 下不建议）",
+          "default_value": "未显式 default",
+          "notes": "Table 调用的是 `timeComparisonControls({ multi: false, showCalculationType: false, showFullChoices: false })`，因此 UI 只显示 reduced choices，且是单选。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Time Comparison",
+        "field_name": "start_date_offset",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "extra_form_data.override（技术上可传，但 guest 下不建议）",
+        "description": "Shift start date",
+        "data_type": "string | null",
+        "sample_data": "1 year ago",
+        "original_field": {
+          "field_name": "start_date_offset",
+          "description": "Shift start date",
+          "data_type": "string | null",
+          "sample_data": "1 year ago",
+          "required": false,
+          "embedding": "extra_form_data.override（技术上可传，但 guest 下不建议）",
+          "default_value": null,
+          "notes": "仅当 `time_compare === 'custom'` 时才显示，并且为空会触发 `A date is required when using custom date shift` 校验。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Time Comparison",
+        "field_name": "comparison_type",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "How to display time shifts: as individual lines; as the difference between the main time series and each time shift; as the percentage change; or as the ratio between series and time shifts.",
+        "data_type": "string",
+        "sample_data": "values",
+        "original_field": {
+          "field_name": "comparison_type",
+          "description": "How to display time shifts: as individual lines; as the difference between the main time series and each time shift; as the percentage change; or as the ratio between series and time shifts.",
+          "data_type": "string",
+          "enum_values": [
+            "values",
+            "difference",
+            "percentage",
+            "ratio"
+          ],
+          "sample_data": "values",
+          "required": false,
+          "embedding": "否",
+          "default_value": "values"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Time Comparison",
+        "field_name": "comparison_range_label",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Time Comparison section 的显示型辅助控件，用于回显 comparison range label。",
+        "data_type": "display-only control",
+        "sample_data": null,
+        "original_field": {
+          "field_name": "comparison_range_label",
+          "description": "Time Comparison section 的显示型辅助控件，用于回显 comparison range label。",
+          "data_type": "display-only control",
+          "sample_data": null,
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "api_field": false,
+          "notes": "这是 UI 辅助控件，不是构造 API root form_data 时应主动填写的字段。"
+        }
+      }
+    ],
+    "field_inventory": [
+      {
+        "field_name": "adhoc_filters",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "过滤条件集合。",
+          "Filters"
+        ],
+        "data_types": [
+          "array[object]"
+        ],
+        "sample_data_examples": [
+          [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "region",
+              "operator": "IN",
+              "comparator": [
+                "East",
+                "West"
+              ]
+            }
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "online-catalog",
+            "category": "Query",
+            "field_name": "adhoc_filters",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "extra_form_data.append",
+            "description": "过滤条件集合。",
+            "data_type": "array[object]",
+            "sample_data": [
+              {
+                "expressionType": "SIMPLE",
+                "clause": "WHERE",
+                "subject": "region",
+                "operator": "IN",
+                "comparator": [
+                  "East",
+                  "West"
+                ]
+              }
+            ],
+            "original_field": {
+              "field_name": "adhoc_filters",
+              "description": "过滤条件集合。",
+              "data_type": "array[object]",
+              "enum_source": "dataset filterable columns + saved metrics + current metrics",
+              "sample_data": [
+                {
+                  "expressionType": "SIMPLE",
+                  "clause": "WHERE",
+                  "subject": "region",
+                  "operator": "IN",
+                  "comparator": [
+                    "East",
+                    "West"
+                  ]
+                }
+              ],
+              "required": false,
+              "embedding": "extra_form_data.append",
+              "default_value": []
+            }
+          },
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "adhoc_filters",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "extra_form_data.append",
+            "description": "Filters",
+            "data_type": "array[object]",
+            "sample_data": [
+              {
+                "expressionType": "SIMPLE",
+                "clause": "WHERE",
+                "subject": "region",
+                "operator": "IN",
+                "comparator": [
+                  "East",
+                  "West"
+                ]
+              }
+            ],
+            "original_field": {
+              "field_name": "adhoc_filters",
+              "description": "Filters",
+              "data_type": "array[object]",
+              "enum_source": "dataset filterable columns + saved metrics + current metrics",
+              "sample_data": [
+                {
+                  "expressionType": "SIMPLE",
+                  "clause": "WHERE",
+                  "subject": "region",
+                  "operator": "IN",
+                  "comparator": [
+                    "East",
+                    "West"
+                  ]
+                }
+              ],
+              "required": false,
+              "embedding": "extra_form_data.append",
+              "default_value": []
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "align_pn",
+        "required": false,
+        "categories": [
+          "Chart Options",
+          "Visual formatting"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "正负值数据条是否以 0 为对齐中轴。",
+          "Whether to align background charts with both positive and negative values at 0"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          false
+        ],
+        "occurrences": [
+          {
+            "source_name": "online-catalog",
+            "category": "Chart Options",
+            "field_name": "align_pn",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "正负值数据条是否以 0 为对齐中轴。",
+            "data_type": "boolean",
+            "sample_data": false,
+            "original_field": {
+              "field_name": "align_pn",
+              "description": "正负值数据条是否以 0 为对齐中轴。",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": false,
+              "required": false,
+              "embedding": "否",
+              "default_value": false
+            }
+          },
+          {
+            "source_name": "control-schema",
+            "category": "Visual formatting",
+            "field_name": "align_pn",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Whether to align background charts with both positive and negative values at 0",
+            "data_type": "boolean",
+            "sample_data": false,
+            "original_field": {
+              "field_name": "align_pn",
+              "description": "Whether to align background charts with both positive and negative values at 0",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": false,
+              "required": false,
+              "embedding": "否",
+              "default_value": false,
+              "notes": "controlPanel 默认 `false`，但 transformProps 对字段缺失时的 runtime fallback 是 `true`。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "all_columns",
+        "required": false,
+        "categories": [
+          "图表专属",
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [
+          "否（guest 下不应动态修改）"
+        ],
+        "descriptions": [
+          "raw 模式下展示的明细列集合。",
+          "Columns to display"
+        ],
+        "data_types": [
+          "array[string | object]"
+        ],
+        "sample_data_examples": [
+          [
+            "order_id",
+            "customer_name"
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "online-catalog",
+            "category": "图表专属",
+            "field_name": "all_columns",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "description": "raw 模式下展示的明细列集合。",
+            "data_type": "array[string | object]",
+            "sample_data": [
+              "order_id",
+              "customer_name"
+            ],
+            "original_field": {
+              "field_name": "all_columns",
+              "description": "raw 模式下展示的明细列集合。",
+              "data_type": "array[string | object]",
+              "enum_source": "datasource columns",
+              "sample_data": [
+                "order_id",
+                "customer_name"
+              ],
+              "required": false,
+              "embedding": "否（guest 下不应动态修改）",
+              "default_value": []
+            }
+          },
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "all_columns",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "description": "Columns to display",
+            "data_type": "array[string | object]",
+            "sample_data": [
+              "order_id",
+              "customer_name"
+            ],
+            "original_field": {
+              "field_name": "all_columns",
+              "description": "Columns to display",
+              "data_type": "array[string | object]",
+              "enum_source": "datasource columns",
+              "sample_data": [
+                "order_id",
+                "customer_name"
+              ],
+              "required": false,
+              "embedding": "否（guest 下不应动态修改）",
+              "default_value": [],
+              "required_rule": "raw 模式下必须至少 1 项。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "allow_rearrange_columns",
+        "required": false,
+        "categories": [
+          "Chart Options",
+          "Options"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "是否允许终端用户拖拽重排列顺序。",
+          "Allow end user to drag-and-drop column headers to rearrange them. Note their changes won't persist for the next time they open the chart."
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          false
+        ],
+        "occurrences": [
+          {
+            "source_name": "online-catalog",
+            "category": "Chart Options",
+            "field_name": "allow_rearrange_columns",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "是否允许终端用户拖拽重排列顺序。",
+            "data_type": "boolean",
+            "sample_data": false,
+            "original_field": {
+              "field_name": "allow_rearrange_columns",
+              "description": "是否允许终端用户拖拽重排列顺序。",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": false,
+              "required": false,
+              "embedding": "否",
+              "default_value": false
+            }
+          },
+          {
+            "source_name": "control-schema",
+            "category": "Options",
+            "field_name": "allow_rearrange_columns",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Allow end user to drag-and-drop column headers to rearrange them. Note their changes won't persist for the next time they open the chart.",
+            "data_type": "boolean",
+            "sample_data": false,
+            "original_field": {
+              "field_name": "allow_rearrange_columns",
+              "description": "Allow end user to drag-and-drop column headers to rearrange them. Note their changes won't persist for the next time they open the chart.",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": false,
+              "required": false,
+              "embedding": "否",
+              "default_value": false,
+              "notes": "仅 `time_compare` 为空时显示。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "allow_render_html",
+        "required": false,
+        "categories": [
+          "Chart Options",
+          "Options"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "是否按 HTML 渲染单元格内容。",
+          "Renders table cells as HTML when applicable. For example, HTML <a> tags will be rendered as hyperlinks."
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          true
+        ],
+        "occurrences": [
+          {
+            "source_name": "online-catalog",
+            "category": "Chart Options",
+            "field_name": "allow_render_html",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "是否按 HTML 渲染单元格内容。",
+            "data_type": "boolean",
+            "sample_data": true,
+            "original_field": {
+              "field_name": "allow_render_html",
+              "description": "是否按 HTML 渲染单元格内容。",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": true,
+              "required": false,
+              "embedding": "否",
+              "default_value": true
+            }
+          },
+          {
+            "source_name": "control-schema",
+            "category": "Options",
+            "field_name": "allow_render_html",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Renders table cells as HTML when applicable. For example, HTML <a> tags will be rendered as hyperlinks.",
+            "data_type": "boolean",
+            "sample_data": true,
+            "original_field": {
+              "field_name": "allow_render_html",
+              "description": "Renders table cells as HTML when applicable. For example, HTML <a> tags will be rendered as hyperlinks.",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": true,
+              "required": false,
+              "embedding": "否",
+              "default_value": true
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "color_pn",
+        "required": false,
+        "categories": [
+          "Chart Options",
+          "Visual formatting"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "是否按正负值给数据条着色。",
+          "Whether to colorize numeric values by whether they are positive or negative"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          true
+        ],
+        "occurrences": [
+          {
+            "source_name": "online-catalog",
+            "category": "Chart Options",
+            "field_name": "color_pn",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "是否按正负值给数据条着色。",
+            "data_type": "boolean",
+            "sample_data": true,
+            "original_field": {
+              "field_name": "color_pn",
+              "description": "是否按正负值给数据条着色。",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": true,
+              "required": false,
+              "embedding": "否",
+              "default_value": true
+            }
+          },
+          {
+            "source_name": "control-schema",
+            "category": "Visual formatting",
+            "field_name": "color_pn",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Whether to colorize numeric values by whether they are positive or negative",
+            "data_type": "boolean",
+            "sample_data": true,
+            "original_field": {
+              "field_name": "color_pn",
+              "description": "Whether to colorize numeric values by whether they are positive or negative",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": true,
+              "required": false,
+              "embedding": "否",
+              "default_value": true
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "column_config",
+        "required": false,
+        "categories": [
+          "图表专属",
+          "Options"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "逐列定制格式、列宽、别名、显示隐藏和 comparison 子列格式。",
+          "Further customize how to display each column"
+        ],
+        "data_types": [
+          "object[string, TableColumnConfig]"
+        ],
+        "sample_data_examples": [
+          {
+            "sum__num": {
+              "d3NumberFormat": ".3s",
+              "columnWidth": 180,
+              "customColumnName": "Sales"
+            }
+          },
+          {
+            "sum__num": {
+              "d3NumberFormat": ".3s",
+              "columnWidth": 180,
+              "horizontalAlign": "right",
+              "customColumnName": "Sales"
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "online-catalog",
+            "category": "图表专属",
+            "field_name": "column_config",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "逐列定制格式、列宽、别名、显示隐藏和 comparison 子列格式。",
+            "data_type": "object[string, TableColumnConfig]",
+            "sample_data": {
+              "sum__num": {
+                "d3NumberFormat": ".3s",
+                "columnWidth": 180,
+                "customColumnName": "Sales"
+              }
+            },
+            "original_field": {
+              "field_name": "column_config",
+              "description": "逐列定制格式、列宽、别名、显示隐藏和 comparison 子列格式。",
+              "data_type": "object[string, TableColumnConfig]",
+              "sample_data": {
+                "sum__num": {
+                  "d3NumberFormat": ".3s",
+                  "columnWidth": 180,
+                  "customColumnName": "Sales"
+                }
+              },
+              "required": false,
+              "embedding": "否",
+              "default_value": "未显式 default；transformProps runtime fallback 为 {}"
+            }
+          },
+          {
+            "source_name": "control-schema",
+            "category": "Options",
+            "field_name": "column_config",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Further customize how to display each column",
+            "data_type": "object[string, TableColumnConfig]",
+            "sample_data": {
+              "sum__num": {
+                "d3NumberFormat": ".3s",
+                "columnWidth": 180,
+                "horizontalAlign": "right",
+                "customColumnName": "Sales"
+              }
+            },
+            "original_field": {
+              "field_name": "column_config",
+              "description": "Further customize how to display each column",
+              "data_type": "object[string, TableColumnConfig]",
+              "sample_data": {
+                "sum__num": {
+                  "d3NumberFormat": ".3s",
+                  "columnWidth": 180,
+                  "horizontalAlign": "right",
+                  "customColumnName": "Sales"
+                }
+              },
+              "required": false,
+              "embedding": "否",
+              "default_value": "未显式 default；transformProps runtime fallback 为 {}",
+              "object_schema": {
+                "d3NumberFormat": "string",
+                "d3SmallNumberFormat": "string",
+                "d3TimeFormat": "string",
+                "columnWidth": "number",
+                "horizontalAlign": [
+                  "left",
+                  "right",
+                  "center"
+                ],
+                "showCellBars": "boolean",
+                "alignPositiveNegative": "boolean",
+                "colorPositiveNegative": "boolean",
+                "truncateLongCells": "boolean",
+                "currencyFormat": "object",
+                "visible": "boolean",
+                "customColumnName": "string",
+                "displayTypeIcon": "boolean"
+              },
+              "notes": "time comparison 场景下还支持以 `Main metric` / `# metric` / `△ metric` / `% metric` 作为 key 单独配置 comparison 子列。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "comparison_color_enabled",
+        "required": false,
+        "categories": [
+          "Chart Options",
+          "Visual formatting"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "时间对比模式下，是否启用基础涨跌箭头与底色格式。",
+          "This will be applied to the whole table. Arrows (↑ and ↓) will be added to main columns for increase and decrease. Basic conditional formatting can be overwritten by conditional formatting below."
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          false
+        ],
+        "occurrences": [
+          {
+            "source_name": "online-catalog",
+            "category": "Chart Options",
+            "field_name": "comparison_color_enabled",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "时间对比模式下，是否启用基础涨跌箭头与底色格式。",
+            "data_type": "boolean",
+            "sample_data": false,
+            "original_field": {
+              "field_name": "comparison_color_enabled",
+              "description": "时间对比模式下，是否启用基础涨跌箭头与底色格式。",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": false,
+              "required": false,
+              "embedding": "否",
+              "default_value": false
+            }
+          },
+          {
+            "source_name": "control-schema",
+            "category": "Visual formatting",
+            "field_name": "comparison_color_enabled",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "This will be applied to the whole table. Arrows (↑ and ↓) will be added to main columns for increase and decrease. Basic conditional formatting can be overwritten by conditional formatting below.",
+            "data_type": "boolean",
+            "sample_data": false,
+            "original_field": {
+              "field_name": "comparison_color_enabled",
+              "description": "This will be applied to the whole table. Arrows (↑ and ↓) will be added to main columns for increase and decrease. Basic conditional formatting can be overwritten by conditional formatting below.",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": false,
+              "required": false,
+              "embedding": "否",
+              "default_value": false,
+              "notes": "仅 `time_compare` 非空时显示。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "comparison_color_scheme",
+        "required": false,
+        "categories": [
+          "Chart Options",
+          "Visual formatting"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "时间对比模式下，涨跌配色策略。",
+          "Adds color to the chart symbols based on the positive or negative change from the comparison value."
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "Green"
+        ],
+        "occurrences": [
+          {
+            "source_name": "online-catalog",
+            "category": "Chart Options",
+            "field_name": "comparison_color_scheme",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "时间对比模式下，涨跌配色策略。",
+            "data_type": "string",
+            "sample_data": "Green",
+            "original_field": {
+              "field_name": "comparison_color_scheme",
+              "description": "时间对比模式下，涨跌配色策略。",
+              "data_type": "string",
+              "enum_values": [
+                "Green",
+                "Red"
+              ],
+              "sample_data": "Green",
+              "required": false,
+              "embedding": "否",
+              "default_value": "Green"
+            }
+          },
+          {
+            "source_name": "control-schema",
+            "category": "Visual formatting",
+            "field_name": "comparison_color_scheme",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Adds color to the chart symbols based on the positive or negative change from the comparison value.",
+            "data_type": "string",
+            "sample_data": "Green",
+            "original_field": {
+              "field_name": "comparison_color_scheme",
+              "description": "Adds color to the chart symbols based on the positive or negative change from the comparison value.",
+              "data_type": "string",
+              "enum_values": [
+                "Green",
+                "Red"
+              ],
+              "sample_data": "Green",
+              "required": false,
+              "embedding": "否",
+              "default_value": "Green",
+              "notes": "仅在 `time_compare` 非空且 `comparison_color_enabled=true` 时显示。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "comparison_range_label",
+        "required": false,
+        "categories": [
+          "Time Comparison"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Time Comparison section 的显示型辅助控件，用于回显 comparison range label。"
+        ],
+        "data_types": [
+          "display-only control"
+        ],
+        "sample_data_examples": [],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Time Comparison",
+            "field_name": "comparison_range_label",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Time Comparison section 的显示型辅助控件，用于回显 comparison range label。",
+            "data_type": "display-only control",
+            "sample_data": null,
+            "original_field": {
+              "field_name": "comparison_range_label",
+              "description": "Time Comparison section 的显示型辅助控件，用于回显 comparison range label。",
+              "data_type": "display-only control",
+              "sample_data": null,
+              "required": false,
+              "embedding": "否",
+              "default_value": null,
+              "api_field": false,
+              "notes": "这是 UI 辅助控件，不是构造 API root form_data 时应主动填写的字段。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "comparison_type",
+        "required": false,
+        "categories": [
+          "Advanced analytics",
+          "Time Comparison"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "时间对比展示方式：值、差值、百分比变化或比率。",
+          "How to display time shifts: as individual lines; as the difference between the main time series and each time shift; as the percentage change; or as the ratio between series and time shifts."
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "values"
+        ],
+        "occurrences": [
+          {
+            "source_name": "online-catalog",
+            "category": "Advanced analytics",
+            "field_name": "comparison_type",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "时间对比展示方式：值、差值、百分比变化或比率。",
+            "data_type": "string",
+            "sample_data": "values",
+            "original_field": {
+              "field_name": "comparison_type",
+              "description": "时间对比展示方式：值、差值、百分比变化或比率。",
+              "data_type": "string",
+              "enum_values": [
+                "values",
+                "difference",
+                "percentage",
+                "ratio"
+              ],
+              "sample_data": "values",
+              "required": false,
+              "embedding": "否",
+              "default_value": "values"
+            }
+          },
+          {
+            "source_name": "control-schema",
+            "category": "Time Comparison",
+            "field_name": "comparison_type",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "How to display time shifts: as individual lines; as the difference between the main time series and each time shift; as the percentage change; or as the ratio between series and time shifts.",
+            "data_type": "string",
+            "sample_data": "values",
+            "original_field": {
+              "field_name": "comparison_type",
+              "description": "How to display time shifts: as individual lines; as the difference between the main time series and each time shift; as the percentage change; or as the ratio between series and time shifts.",
+              "data_type": "string",
+              "enum_values": [
+                "values",
+                "difference",
+                "percentage",
+                "ratio"
+              ],
+              "sample_data": "values",
+              "required": false,
+              "embedding": "否",
+              "default_value": "values"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "conditional_formatting",
+        "required": false,
+        "categories": [
+          "Chart Options",
+          "Visual formatting"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "自定义条件着色规则集合。",
+          "Apply conditional color formatting to numeric columns"
+        ],
+        "data_types": [
+          "array[object]"
+        ],
+        "sample_data_examples": [
+          [
+            {
+              "column": "sum__num",
+              "operator": ">",
+              "targetValue": 2467,
+              "colorScheme": "#ACE1C4"
+            }
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "online-catalog",
+            "category": "Chart Options",
+            "field_name": "conditional_formatting",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "自定义条件着色规则集合。",
+            "data_type": "array[object]",
+            "sample_data": [
+              {
+                "column": "sum__num",
+                "operator": ">",
+                "targetValue": 2467,
+                "colorScheme": "#ACE1C4"
+              }
+            ],
+            "original_field": {
+              "field_name": "conditional_formatting",
+              "description": "自定义条件着色规则集合。",
+              "data_type": "array[object]",
+              "sample_data": [
+                {
+                  "column": "sum__num",
+                  "operator": ">",
+                  "targetValue": 2467,
+                  "colorScheme": "#ACE1C4"
+                }
+              ],
+              "required": false,
+              "embedding": "否",
+              "default_value": "未显式 default；runtime 按空数组容错"
+            }
+          },
+          {
+            "source_name": "control-schema",
+            "category": "Visual formatting",
+            "field_name": "conditional_formatting",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Apply conditional color formatting to numeric columns",
+            "data_type": "array[object]",
+            "sample_data": [
+              {
+                "column": "sum__num",
+                "operator": ">",
+                "targetValue": 2467,
+                "colorScheme": "#ACE1C4"
+              }
+            ],
+            "original_field": {
+              "field_name": "conditional_formatting",
+              "description": "Apply conditional color formatting to numeric columns",
+              "data_type": "array[object]",
+              "sample_data": [
+                {
+                  "column": "sum__num",
+                  "operator": ">",
+                  "targetValue": 2467,
+                  "colorScheme": "#ACE1C4"
+                }
+              ],
+              "required": false,
+              "embedding": "否",
+              "default_value": "未显式 default；runtime 按空数组容错",
+              "object_schema": {
+                "column": "string",
+                "operator": [
+                  "None",
+                  ">",
+                  "<",
+                  "≥",
+                  "≤",
+                  "=",
+                  "≠",
+                  "< x <",
+                  "≤ x ≤",
+                  "≤ x <",
+                  "< x ≤"
+                ],
+                "targetValue": "number",
+                "targetValueLeft": "number",
+                "targetValueRight": "number",
+                "colorScheme": "string"
+              },
+              "notes": "普通单色规则与 comparison 双色方案都可写入这里；源码会按列类型与阈值完整性过滤无效配置。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "groupby",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [
+          "否（guest 下不应动态修改）"
+        ],
+        "descriptions": [
+          "聚合模式下的分组维度。",
+          "Dimensions contain qualitative values such as names, dates, or geographical data. Use dimensions to categorize, segment, and reveal the details in your data. Dimensions affect the level of detail in the view."
+        ],
+        "data_types": [
+          "array[string | object]"
+        ],
+        "sample_data_examples": [
+          [
+            "region"
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "online-catalog",
+            "category": "Query",
+            "field_name": "groupby",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "description": "聚合模式下的分组维度。",
+            "data_type": "array[string | object]",
+            "sample_data": [
+              "region"
+            ],
+            "original_field": {
+              "field_name": "groupby",
+              "description": "聚合模式下的分组维度。",
+              "data_type": "array[string | object]",
+              "enum_source": "datasource columns",
+              "sample_data": [
+                "region"
+              ],
+              "required": false,
+              "embedding": "否（guest 下不应动态修改）",
+              "default_value": []
+            }
+          },
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "groupby",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "description": "Dimensions contain qualitative values such as names, dates, or geographical data. Use dimensions to categorize, segment, and reveal the details in your data. Dimensions affect the level of detail in the view.",
+            "data_type": "array[string | object]",
+            "sample_data": [
+              "region"
+            ],
+            "original_field": {
+              "field_name": "groupby",
+              "description": "Dimensions contain qualitative values such as names, dates, or geographical data. Use dimensions to categorize, segment, and reveal the details in your data. Dimensions affect the level of detail in the view.",
+              "data_type": "array[string | object]",
+              "enum_source": "datasource columns",
+              "sample_data": [
+                "region"
+              ],
+              "required": false,
+              "embedding": "否（guest 下不应动态修改）",
+              "default_value": [],
+              "required_rule": "aggregate 模式下，与 `metrics`、`percent_metrics` 三者至少一类非空。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "include_search",
+        "required": false,
+        "categories": [
+          "Chart Options",
+          "Options"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "是否展示客户端搜索框。",
+          "Whether to include a client-side search box"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          false
+        ],
+        "occurrences": [
+          {
+            "source_name": "online-catalog",
+            "category": "Chart Options",
+            "field_name": "include_search",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "是否展示客户端搜索框。",
+            "data_type": "boolean",
+            "sample_data": false,
+            "original_field": {
+              "field_name": "include_search",
+              "description": "是否展示客户端搜索框。",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": false,
+              "required": false,
+              "embedding": "否",
+              "default_value": false
+            }
+          },
+          {
+            "source_name": "control-schema",
+            "category": "Options",
+            "field_name": "include_search",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Whether to include a client-side search box",
+            "data_type": "boolean",
+            "sample_data": false,
+            "original_field": {
+              "field_name": "include_search",
+              "description": "Whether to include a client-side search box",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": false,
+              "required": false,
+              "embedding": "否",
+              "default_value": false
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "metrics",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [
+          "否（guest 下不应动态修改）"
+        ],
+        "descriptions": [
+          "聚合模式下的主指标集合。",
+          "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+        ],
+        "data_types": [
+          "array[string | object]"
+        ],
+        "sample_data_examples": [
+          [
+            {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "sales"
+              },
+              "aggregate": "SUM",
+              "label": "SUM(sales)"
+            }
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "online-catalog",
+            "category": "Query",
+            "field_name": "metrics",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "description": "聚合模式下的主指标集合。",
+            "data_type": "array[string | object]",
+            "sample_data": [
+              {
+                "expressionType": "SIMPLE",
+                "column": {
+                  "column_name": "sales"
+                },
+                "aggregate": "SUM",
+                "label": "SUM(sales)"
+              }
+            ],
+            "original_field": {
+              "field_name": "metrics",
+              "description": "聚合模式下的主指标集合。",
+              "data_type": "array[string | object]",
+              "enum_source": "saved metrics + adhoc metrics",
+              "sample_data": [
+                {
+                  "expressionType": "SIMPLE",
+                  "column": {
+                    "column_name": "sales"
+                  },
+                  "aggregate": "SUM",
+                  "label": "SUM(sales)"
+                }
+              ],
+              "required": false,
+              "embedding": "否（guest 下不应动态修改）",
+              "default_value": "未显式 default（UI 空态）"
+            }
+          },
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "metrics",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "description": "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+            "data_type": "array[string | object]",
+            "sample_data": [
+              {
+                "expressionType": "SIMPLE",
+                "column": {
+                  "column_name": "sales"
+                },
+                "aggregate": "SUM",
+                "label": "SUM(sales)"
+              }
+            ],
+            "original_field": {
+              "field_name": "metrics",
+              "description": "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+              "data_type": "array[string | object]",
+              "enum_source": "saved metrics + adhoc metrics",
+              "sample_data": [
+                {
+                  "expressionType": "SIMPLE",
+                  "column": {
+                    "column_name": "sales"
+                  },
+                  "aggregate": "SUM",
+                  "label": "SUM(sales)"
+                }
+              ],
+              "required": false,
+              "embedding": "否（guest 下不应动态修改）",
+              "default_value": "未显式 default（UI 空态）",
+              "required_rule": "aggregate 模式下，与 `groupby`、`percent_metrics` 三者至少一类非空。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "order_by_cols",
+        "required": false,
+        "categories": [
+          "图表专属",
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [
+          "否（guest 下不应动态修改）"
+        ],
+        "descriptions": [
+          "raw 模式专用排序配置。",
+          "Order results by selected columns"
+        ],
+        "data_types": [
+          "array[string | [string, boolean]]"
+        ],
+        "sample_data_examples": [
+          [
+            "[\"order_id\",true]"
+          ],
+          [
+            "[\"order_id\",true]",
+            "[\"customer_name\",false]"
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "online-catalog",
+            "category": "图表专属",
+            "field_name": "order_by_cols",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "description": "raw 模式专用排序配置。",
+            "data_type": "array[string | [string, boolean]]",
+            "sample_data": [
+              "[\"order_id\",true]"
+            ],
+            "original_field": {
+              "field_name": "order_by_cols",
+              "description": "raw 模式专用排序配置。",
+              "data_type": "array[string | [string, boolean]]",
+              "sample_data": [
+                "[\"order_id\",true]"
+              ],
+              "required": false,
+              "embedding": "否（guest 下不应动态修改）",
+              "default_value": []
+            }
+          },
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "order_by_cols",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "description": "Order results by selected columns",
+            "data_type": "array[string | [string, boolean]]",
+            "sample_data": [
+              "[\"order_id\",true]",
+              "[\"customer_name\",false]"
+            ],
+            "original_field": {
+              "field_name": "order_by_cols",
+              "description": "Order results by selected columns",
+              "data_type": "array[string | [string, boolean]]",
+              "enum_source": "datasource.order_by_choices 或 datasource columns 生成的 `[column, asc|desc]` 选项",
+              "sample_data": [
+                "[\"order_id\",true]",
+                "[\"customer_name\",false]"
+              ],
+              "required": false,
+              "embedding": "否（guest 下不应动态修改）",
+              "default_value": [],
+              "notes": "仅 raw 模式显示；会通过 `extractQueryFields()` 编译成 query.orderby。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "order_desc",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [
+          "否（guest 下不应动态修改）"
+        ],
+        "descriptions": [
+          "aggregate 模式下，是否按 `timeseries_limit_metric` 降序排序。",
+          "If enabled, this control sorts the results/values descending, otherwise it sorts the results ascending."
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          true
+        ],
+        "occurrences": [
+          {
+            "source_name": "online-catalog",
+            "category": "Query",
+            "field_name": "order_desc",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "description": "aggregate 模式下，是否按 `timeseries_limit_metric` 降序排序。",
+            "data_type": "boolean",
+            "sample_data": true,
+            "original_field": {
+              "field_name": "order_desc",
+              "description": "aggregate 模式下，是否按 `timeseries_limit_metric` 降序排序。",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": true,
+              "required": false,
+              "embedding": "否（guest 下不应动态修改）",
+              "default_value": true
+            }
+          },
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "order_desc",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "description": "If enabled, this control sorts the results/values descending, otherwise it sorts the results ascending.",
+            "data_type": "boolean",
+            "sample_data": true,
+            "original_field": {
+              "field_name": "order_desc",
+              "description": "If enabled, this control sorts the results/values descending, otherwise it sorts the results ascending.",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": true,
+              "required": false,
+              "embedding": "否（guest 下不应动态修改）",
+              "default_value": true,
+              "notes": "aggregate 模式下只有当 `timeseries_limit_metric` 非空时才显示。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "page_length",
+        "required": false,
+        "categories": [
+          "Chart Options",
+          "Options"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "前端分页时每页显示行数；`null` 代表自动分页。",
+          "Rows per page, 0 means no pagination"
+        ],
+        "data_types": [
+          "integer | string | null"
+        ],
+        "sample_data_examples": [
+          20
+        ],
+        "occurrences": [
+          {
+            "source_name": "online-catalog",
+            "category": "Chart Options",
+            "field_name": "page_length",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "前端分页时每页显示行数；`null` 代表自动分页。",
+            "data_type": "integer | string | null",
+            "sample_data": 20,
+            "original_field": {
+              "field_name": "page_length",
+              "description": "前端分页时每页显示行数；`null` 代表自动分页。",
+              "data_type": "integer | string | null",
+              "enum_values": [
+                0,
+                10,
+                20,
+                50,
+                100,
+                200
+              ],
+              "sample_data": 20,
+              "required": false,
+              "embedding": "否",
+              "default_value": null
+            }
+          },
+          {
+            "source_name": "control-schema",
+            "category": "Options",
+            "field_name": "page_length",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Rows per page, 0 means no pagination",
+            "data_type": "integer | string | null",
+            "sample_data": 20,
+            "original_field": {
+              "field_name": "page_length",
+              "description": "Rows per page, 0 means no pagination",
+              "data_type": "integer | string | null",
+              "enum_values": [
+                0,
+                10,
+                20,
+                50,
+                100,
+                200
+              ],
+              "sample_data": 20,
+              "required": false,
+              "embedding": "否",
+              "default_value": null,
+              "notes": "仅 `server_pagination=false` 时显示。`null` 代表自动分页；transformProps 会按 `numRecords * numColumns > 5000` 决定是否回退到 200。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "percent_metric_calculation",
+        "required": false,
+        "categories": [
+          "图表专属",
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [
+          "否（guest 下不应动态修改）"
+        ],
+        "descriptions": [
+          "百分比指标基于 row_limit 还是 all_records 计算。",
+          "Row Limit: percentages are calculated based on the subset of data retrieved, respecting the row limit. All Records: Percentages are calculated based on the total dataset, ignoring the row limit."
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "row_limit"
+        ],
+        "occurrences": [
+          {
+            "source_name": "online-catalog",
+            "category": "图表专属",
+            "field_name": "percent_metric_calculation",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "description": "百分比指标基于 row_limit 还是 all_records 计算。",
+            "data_type": "string",
+            "sample_data": "row_limit",
+            "original_field": {
+              "field_name": "percent_metric_calculation",
+              "description": "百分比指标基于 row_limit 还是 all_records 计算。",
+              "data_type": "string",
+              "enum_values": [
+                "row_limit",
+                "all_records"
+              ],
+              "sample_data": "row_limit",
+              "required": false,
+              "embedding": "否（guest 下不应动态修改）",
+              "default_value": "row_limit"
+            }
+          },
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "percent_metric_calculation",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "description": "Row Limit: percentages are calculated based on the subset of data retrieved, respecting the row limit. All Records: Percentages are calculated based on the total dataset, ignoring the row limit.",
+            "data_type": "string",
+            "sample_data": "row_limit",
+            "original_field": {
+              "field_name": "percent_metric_calculation",
+              "description": "Row Limit: percentages are calculated based on the subset of data retrieved, respecting the row limit. All Records: Percentages are calculated based on the total dataset, ignoring the row limit.",
+              "data_type": "string",
+              "enum_values": [
+                "row_limit",
+                "all_records"
+              ],
+              "sample_data": "row_limit",
+              "required": false,
+              "embedding": "否（guest 下不应动态修改）",
+              "default_value": "row_limit",
+              "notes": "选 `all_records` 时，buildQuery 会额外生成一条 percent-metrics query。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "percent_metrics",
+        "required": false,
+        "categories": [
+          "图表专属",
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [
+          "否（guest 下不应动态修改）"
+        ],
+        "descriptions": [
+          "aggregate 模式下追加百分比指标列。",
+          "Select one or many metrics to display, that will be displayed in the percentages of total. Percentage metrics will be calculated only from data within the row limit. You can use an aggregation function on a column or write custom SQL to create a percentage metric."
+        ],
+        "data_types": [
+          "array[string | object]"
+        ],
+        "sample_data_examples": [
+          [
+            {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "sales"
+              },
+              "aggregate": "SUM",
+              "label": "SUM(sales)"
+            }
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "online-catalog",
+            "category": "图表专属",
+            "field_name": "percent_metrics",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "description": "aggregate 模式下追加百分比指标列。",
+            "data_type": "array[string | object]",
+            "sample_data": [
+              {
+                "expressionType": "SIMPLE",
+                "column": {
+                  "column_name": "sales"
+                },
+                "aggregate": "SUM",
+                "label": "SUM(sales)"
+              }
+            ],
+            "original_field": {
+              "field_name": "percent_metrics",
+              "description": "aggregate 模式下追加百分比指标列。",
+              "data_type": "array[string | object]",
+              "enum_source": "saved metrics + adhoc metrics",
+              "sample_data": [
+                {
+                  "expressionType": "SIMPLE",
+                  "column": {
+                    "column_name": "sales"
+                  },
+                  "aggregate": "SUM",
+                  "label": "SUM(sales)"
+                }
+              ],
+              "required": false,
+              "embedding": "否（guest 下不应动态修改）",
+              "default_value": []
+            }
+          },
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "percent_metrics",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "description": "Select one or many metrics to display, that will be displayed in the percentages of total. Percentage metrics will be calculated only from data within the row limit. You can use an aggregation function on a column or write custom SQL to create a percentage metric.",
+            "data_type": "array[string | object]",
+            "sample_data": [
+              {
+                "expressionType": "SIMPLE",
+                "column": {
+                  "column_name": "sales"
+                },
+                "aggregate": "SUM",
+                "label": "SUM(sales)"
+              }
+            ],
+            "original_field": {
+              "field_name": "percent_metrics",
+              "description": "Select one or many metrics to display, that will be displayed in the percentages of total. Percentage metrics will be calculated only from data within the row limit. You can use an aggregation function on a column or write custom SQL to create a percentage metric.",
+              "data_type": "array[string | object]",
+              "enum_source": "saved metrics + adhoc metrics",
+              "sample_data": [
+                {
+                  "expressionType": "SIMPLE",
+                  "column": {
+                    "column_name": "sales"
+                  },
+                  "aggregate": "SUM",
+                  "label": "SUM(sales)"
+                }
+              ],
+              "required": false,
+              "embedding": "否（guest 下不应动态修改）",
+              "default_value": [],
+              "required_rule": "aggregate 模式下，与 `groupby`、`metrics` 三者至少一类非空。",
+              "notes": "buildQuery 会把它们并入 `metrics`，并生成 `%metric` 贡献率列。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "query_mode",
+        "required": false,
+        "categories": [
+          "图表专属",
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [
+          "否（guest 下不应动态修改）"
+        ],
+        "descriptions": [
+          "Table 独有的 raw / aggregate 双模式开关。",
+          "Query mode"
+        ],
+        "data_types": [
+          "string | null"
+        ],
+        "sample_data_examples": [
+          "aggregate"
+        ],
+        "occurrences": [
+          {
+            "source_name": "online-catalog",
+            "category": "图表专属",
+            "field_name": "query_mode",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "description": "Table 独有的 raw / aggregate 双模式开关。",
+            "data_type": "string | null",
+            "sample_data": "aggregate",
+            "original_field": {
+              "field_name": "query_mode",
+              "description": "Table 独有的 raw / aggregate 双模式开关。",
+              "data_type": "string | null",
+              "enum_values": [
+                "aggregate",
+                "raw"
+              ],
+              "sample_data": "aggregate",
+              "required": false,
+              "embedding": "否（guest 下不应动态修改）",
+              "default_value": null
+            }
+          },
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "query_mode",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "description": "Query mode",
+            "data_type": "string | null",
+            "sample_data": "aggregate",
+            "original_field": {
+              "field_name": "query_mode",
+              "description": "Query mode",
+              "data_type": "string | null",
+              "enum_values": [
+                "aggregate",
+                "raw"
+              ],
+              "sample_data": "aggregate",
+              "required": false,
+              "embedding": "否（guest 下不应动态修改）",
+              "default_value": null,
+              "notes": "未显式设置时，源码会按 `all_columns` 是否非空自动推断模式。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "row_limit",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [
+          "否（guest 下不应动态修改）"
+        ],
+        "descriptions": [
+          "查询返回的最大行数上限。",
+          "Limits the number of the rows that are computed in the query that is the source of the data used for this chart."
+        ],
+        "data_types": [
+          "integer"
+        ],
+        "sample_data_examples": [
+          1000
+        ],
+        "occurrences": [
+          {
+            "source_name": "online-catalog",
+            "category": "Query",
+            "field_name": "row_limit",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "description": "查询返回的最大行数上限。",
+            "data_type": "integer",
+            "sample_data": 1000,
+            "original_field": {
+              "field_name": "row_limit",
+              "description": "查询返回的最大行数上限。",
+              "data_type": "integer",
+              "sample_data": 1000,
+              "required": false,
+              "embedding": "否（guest 下不应动态修改）",
+              "default_value": 1000
+            }
+          },
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "row_limit",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+            "data_type": "integer",
+            "sample_data": 1000,
+            "original_field": {
+              "field_name": "row_limit",
+              "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+              "data_type": "integer",
+              "enum_values": [
+                10,
+                50,
+                100,
+                250,
+                500,
+                1000,
+                5000,
+                10000,
+                50000,
+                100000,
+                150000,
+                200000,
+                250000,
+                300000,
+                350000,
+                400000,
+                450000,
+                500000
+              ],
+              "sample_data": 1000,
+              "required": false,
+              "embedding": "否（guest 下不应动态修改）",
+              "default_value": 1000,
+              "notes": "Table 覆盖了 shared row_limit 默认值，root 缺省按 1000 记录。server pagination 打开后，它更像总 cap / rowcount 查询上限。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "server_page_length",
+        "required": false,
+        "categories": [
+          "图表专属",
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [
+          "否（guest 下不应动态修改）"
+        ],
+        "descriptions": [
+          "服务端分页时的每页条数。",
+          "Rows per page, 0 means no pagination"
+        ],
+        "data_types": [
+          "integer"
+        ],
+        "sample_data_examples": [
+          20
+        ],
+        "occurrences": [
+          {
+            "source_name": "online-catalog",
+            "category": "图表专属",
+            "field_name": "server_page_length",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "description": "服务端分页时的每页条数。",
+            "data_type": "integer",
+            "sample_data": 20,
+            "original_field": {
+              "field_name": "server_page_length",
+              "description": "服务端分页时的每页条数。",
+              "data_type": "integer",
+              "enum_values": [
+                10,
+                20,
+                50,
+                100,
+                200
+              ],
+              "sample_data": 20,
+              "required": false,
+              "embedding": "否（guest 下不应动态修改）",
+              "default_value": 10
+            }
+          },
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "server_page_length",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "description": "Rows per page, 0 means no pagination",
+            "data_type": "integer",
+            "sample_data": 20,
+            "original_field": {
+              "field_name": "server_page_length",
+              "description": "Rows per page, 0 means no pagination",
+              "data_type": "integer",
+              "enum_values": [
+                10,
+                20,
+                50,
+                100,
+                200
+              ],
+              "sample_data": 20,
+              "required": false,
+              "embedding": "否（guest 下不应动态修改）",
+              "default_value": 10,
+              "notes": "仅 `server_pagination=true` 时显示。实际翻页页码、搜索与排序来自 ownState，而不是 root form_data。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "server_pagination",
+        "required": false,
+        "categories": [
+          "图表专属",
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [
+          "否（guest 下不应动态修改）"
+        ],
+        "descriptions": [
+          "是否启用服务端分页。",
+          "Enable server side pagination of results (experimental feature)"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          false,
+          true
+        ],
+        "occurrences": [
+          {
+            "source_name": "online-catalog",
+            "category": "图表专属",
+            "field_name": "server_pagination",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "description": "是否启用服务端分页。",
+            "data_type": "boolean",
+            "sample_data": false,
+            "original_field": {
+              "field_name": "server_pagination",
+              "description": "是否启用服务端分页。",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": false,
+              "required": false,
+              "embedding": "否（guest 下不应动态修改）",
+              "default_value": false
+            }
+          },
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "server_pagination",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "description": "Enable server side pagination of results (experimental feature)",
+            "data_type": "boolean",
+            "sample_data": true,
+            "original_field": {
+              "field_name": "server_pagination",
+              "description": "Enable server side pagination of results (experimental feature)",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": true,
+              "required": false,
+              "embedding": "否（guest 下不应动态修改）",
+              "default_value": false
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "show_cell_bars",
+        "required": false,
+        "categories": [
+          "Chart Options",
+          "Visual formatting"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "是否在数值单元格背景显示数据条。",
+          "Whether to display a bar chart background in table columns"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          true
+        ],
+        "occurrences": [
+          {
+            "source_name": "online-catalog",
+            "category": "Chart Options",
+            "field_name": "show_cell_bars",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "是否在数值单元格背景显示数据条。",
+            "data_type": "boolean",
+            "sample_data": true,
+            "original_field": {
+              "field_name": "show_cell_bars",
+              "description": "是否在数值单元格背景显示数据条。",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": true,
+              "required": false,
+              "embedding": "否",
+              "default_value": true
+            }
+          },
+          {
+            "source_name": "control-schema",
+            "category": "Visual formatting",
+            "field_name": "show_cell_bars",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Whether to display a bar chart background in table columns",
+            "data_type": "boolean",
+            "sample_data": true,
+            "original_field": {
+              "field_name": "show_cell_bars",
+              "description": "Whether to display a bar chart background in table columns",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": true,
+              "required": false,
+              "embedding": "否",
+              "default_value": true
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "show_totals",
+        "required": false,
+        "categories": [
+          "图表专属",
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [
+          "否（guest 下不应动态修改）"
+        ],
+        "descriptions": [
+          "是否额外生成 summary totals。",
+          "Show total aggregations of selected metrics. Note that row limit does not apply to the result."
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          false
+        ],
+        "occurrences": [
+          {
+            "source_name": "online-catalog",
+            "category": "图表专属",
+            "field_name": "show_totals",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "description": "是否额外生成 summary totals。",
+            "data_type": "boolean",
+            "sample_data": false,
+            "original_field": {
+              "field_name": "show_totals",
+              "description": "是否额外生成 summary totals。",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": false,
+              "required": false,
+              "embedding": "否（guest 下不应动态修改）",
+              "default_value": false
+            }
+          },
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "show_totals",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "description": "Show total aggregations of selected metrics. Note that row limit does not apply to the result.",
+            "data_type": "boolean",
+            "sample_data": false,
+            "original_field": {
+              "field_name": "show_totals",
+              "description": "Show total aggregations of selected metrics. Note that row limit does not apply to the result.",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": false,
+              "required": false,
+              "embedding": "否（guest 下不应动态修改）",
+              "default_value": false,
+              "notes": "仅 aggregate 模式显示；开启后会额外生成 totals query。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "start_date_offset",
+        "required": false,
+        "categories": [
+          "Advanced analytics",
+          "Time Comparison"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [
+          "extra_form_data.override（guest 下不建议）",
+          "extra_form_data.override（技术上可传，但 guest 下不建议）"
+        ],
+        "descriptions": [
+          "当 `time_compare='custom'` 时的自定义偏移量。",
+          "Shift start date"
+        ],
+        "data_types": [
+          "string | null"
+        ],
+        "sample_data_examples": [
+          "1 year ago"
+        ],
+        "occurrences": [
+          {
+            "source_name": "online-catalog",
+            "category": "Advanced analytics",
+            "field_name": "start_date_offset",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "extra_form_data.override（guest 下不建议）",
+            "description": "当 `time_compare='custom'` 时的自定义偏移量。",
+            "data_type": "string | null",
+            "sample_data": "1 year ago",
+            "original_field": {
+              "field_name": "start_date_offset",
+              "description": "当 `time_compare='custom'` 时的自定义偏移量。",
+              "data_type": "string | null",
+              "sample_data": "1 year ago",
+              "required": false,
+              "embedding": "extra_form_data.override（guest 下不建议）",
+              "default_value": null
+            }
+          },
+          {
+            "source_name": "control-schema",
+            "category": "Time Comparison",
+            "field_name": "start_date_offset",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "extra_form_data.override（技术上可传，但 guest 下不建议）",
+            "description": "Shift start date",
+            "data_type": "string | null",
+            "sample_data": "1 year ago",
+            "original_field": {
+              "field_name": "start_date_offset",
+              "description": "Shift start date",
+              "data_type": "string | null",
+              "sample_data": "1 year ago",
+              "required": false,
+              "embedding": "extra_form_data.override（技术上可传，但 guest 下不建议）",
+              "default_value": null,
+              "notes": "仅当 `time_compare === 'custom'` 时才显示，并且为空会触发 `A date is required when using custom date shift` 校验。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "table_timestamp_format",
+        "required": false,
+        "categories": [
+          "图表专属",
+          "Options"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Table 全局时间列格式。",
+          "D3 time format for datetime columns"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "smart_date"
+        ],
+        "occurrences": [
+          {
+            "source_name": "online-catalog",
+            "category": "图表专属",
+            "field_name": "table_timestamp_format",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Table 全局时间列格式。",
+            "data_type": "string",
+            "sample_data": "smart_date",
+            "original_field": {
+              "field_name": "table_timestamp_format",
+              "description": "Table 全局时间列格式。",
+              "data_type": "string",
+              "enum_source": "D3_TIME_FORMAT_OPTIONS + freeForm",
+              "sample_data": "smart_date",
+              "required": false,
+              "embedding": "否",
+              "default_value": "smart_date"
+            }
+          },
+          {
+            "source_name": "control-schema",
+            "category": "Options",
+            "field_name": "table_timestamp_format",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "D3 time format for datetime columns",
+            "data_type": "string",
+            "sample_data": "smart_date",
+            "original_field": {
+              "field_name": "table_timestamp_format",
+              "description": "D3 time format for datetime columns",
+              "data_type": "string",
+              "enum_source": "D3_TIME_FORMAT_OPTIONS + freeForm",
+              "sample_data": "smart_date",
+              "required": false,
+              "embedding": "否",
+              "default_value": "smart_date"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "temporal_columns_lookup",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "隐藏映射，用来标记哪些分组列是 temporal physical columns。",
+          "隐藏控件。把 datasource 中所有 temporal physical columns 整理成 `{ column_name: true }` 映射，供 `time_grain_sqla` 可见性判断与 buildQuery 时间列改写使用。"
+        ],
+        "data_types": [
+          "object[string, boolean]"
+        ],
+        "sample_data_examples": [
+          {
+            "order_date": true
+          },
+          {
+            "order_date": true,
+            "ship_date": true
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "online-catalog",
+            "category": "Query",
+            "field_name": "temporal_columns_lookup",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "隐藏映射，用来标记哪些分组列是 temporal physical columns。",
+            "data_type": "object[string, boolean]",
+            "sample_data": {
+              "order_date": true
+            },
+            "original_field": {
+              "field_name": "temporal_columns_lookup",
+              "description": "隐藏映射，用来标记哪些分组列是 temporal physical columns。",
+              "data_type": "object[string, boolean]",
+              "sample_data": {
+                "order_date": true
+              },
+              "required": false,
+              "embedding": "否",
+              "default_value": "由 datasource 自动生成"
+            }
+          },
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "temporal_columns_lookup",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "隐藏控件。把 datasource 中所有 temporal physical columns 整理成 `{ column_name: true }` 映射，供 `time_grain_sqla` 可见性判断与 buildQuery 时间列改写使用。",
+            "data_type": "object[string, boolean]",
+            "sample_data": {
+              "order_date": true,
+              "ship_date": true
+            },
+            "original_field": {
+              "field_name": "temporal_columns_lookup",
+              "description": "隐藏控件。把 datasource 中所有 temporal physical columns 整理成 `{ column_name: true }` 映射，供 `time_grain_sqla` 可见性判断与 buildQuery 时间列改写使用。",
+              "data_type": "object[string, boolean]",
+              "sample_data": {
+                "order_date": true,
+                "ship_date": true
+              },
+              "required": false,
+              "embedding": "否",
+              "default_value": "由 datasource columns 自动推导"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "time_compare",
+        "required": false,
+        "categories": [
+          "Advanced analytics",
+          "Time Comparison"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [
+          "extra_form_data.override（guest 下不建议）",
+          "extra_form_data.override（技术上可传，但 guest 下不建议）"
+        ],
+        "descriptions": [
+          "时间位移对比字段。开启后会生成 comparison columns。",
+          "Overlay results from a relative time period. Expects relative time deltas in natural language (example: 24 hours, 7 days, 52 weeks, 365 days). Free text is supported. Use \"Inherit range from time filters\" to shift the comparison time range by the same length as your time range and use \"Custom\" to set a custom comparison range."
+        ],
+        "data_types": [
+          "string | null",
+          "string | array[string] | null"
+        ],
+        "sample_data_examples": [
+          "1 year ago"
+        ],
+        "occurrences": [
+          {
+            "source_name": "online-catalog",
+            "category": "Advanced analytics",
+            "field_name": "time_compare",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "extra_form_data.override（guest 下不建议）",
+            "description": "时间位移对比字段。开启后会生成 comparison columns。",
+            "data_type": "string | null",
+            "sample_data": "1 year ago",
+            "original_field": {
+              "field_name": "time_compare",
+              "description": "时间位移对比字段。开启后会生成 comparison columns。",
+              "data_type": "string | null",
+              "enum_values": [
+                "1 day ago",
+                "1 week ago",
+                "1 month ago",
+                "1 year ago",
+                "custom",
+                "inherit"
+              ],
+              "sample_data": "1 year ago",
+              "required": false,
+              "embedding": "extra_form_data.override（guest 下不建议）",
+              "default_value": "未显式 default"
+            }
+          },
+          {
+            "source_name": "control-schema",
+            "category": "Time Comparison",
+            "field_name": "time_compare",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "extra_form_data.override（技术上可传，但 guest 下不建议）",
+            "description": "Overlay results from a relative time period. Expects relative time deltas in natural language (example: 24 hours, 7 days, 52 weeks, 365 days). Free text is supported. Use \"Inherit range from time filters\" to shift the comparison time range by the same length as your time range and use \"Custom\" to set a custom comparison range.",
+            "data_type": "string | array[string] | null",
+            "sample_data": "1 year ago",
+            "original_field": {
+              "field_name": "time_compare",
+              "description": "Overlay results from a relative time period. Expects relative time deltas in natural language (example: 24 hours, 7 days, 52 weeks, 365 days). Free text is supported. Use \"Inherit range from time filters\" to shift the comparison time range by the same length as your time range and use \"Custom\" to set a custom comparison range.",
+              "data_type": "string | array[string] | null",
+              "enum_values": [
+                "1 day ago",
+                "1 week ago",
+                "1 month ago",
+                "1 year ago",
+                "custom",
+                "inherit"
+              ],
+              "sample_data": "1 year ago",
+              "required": false,
+              "embedding": "extra_form_data.override（技术上可传，但 guest 下不建议）",
+              "default_value": "未显式 default",
+              "notes": "Table 调用的是 `timeComparisonControls({ multi: false, showCalculationType: false, showFullChoices: false })`，因此 UI 只显示 reduced choices，且是单选。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [
+          "timeGrainSqla"
+        ],
+        "embedding_modes": [
+          "extra_form_data.override（guest 下不建议）",
+          "extra_form_data.override（技术上可传，但 guest 下不建议）"
+        ],
+        "descriptions": [
+          "时间粒度。仅当 `groupby` 中包含 temporal 列时才生效。",
+          "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart."
+        ],
+        "data_types": [
+          "string | null"
+        ],
+        "sample_data_examples": [
+          "P1D"
+        ],
+        "occurrences": [
+          {
+            "source_name": "online-catalog",
+            "category": "Query",
+            "field_name": "time_grain_sqla",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "extra_form_data.override（guest 下不建议）",
+            "description": "时间粒度。仅当 `groupby` 中包含 temporal 列时才生效。",
+            "data_type": "string | null",
+            "sample_data": "P1D",
+            "original_field": {
+              "field_name": "time_grain_sqla",
+              "description": "时间粒度。仅当 `groupby` 中包含 temporal 列时才生效。",
+              "data_type": "string | null",
+              "enum_source": "datasource.time_grain_sqla",
+              "sample_data": "P1D",
+              "required": false,
+              "embedding": "extra_form_data.override（guest 下不建议）",
+              "default_value": "新建未保存图且 metadata 为空时初始为 P1D，否则沿用已有值"
+            }
+          },
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "time_grain_sqla",
+            "runtime_alias": "timeGrainSqla",
+            "required": false,
+            "embedding": "extra_form_data.override（技术上可传，但 guest 下不建议）",
+            "description": "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart.",
+            "data_type": "string | null",
+            "sample_data": "P1D",
+            "original_field": {
+              "field_name": "time_grain_sqla",
+              "runtime_alias": "timeGrainSqla",
+              "description": "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart.",
+              "data_type": "string | null",
+              "enum_source": "datasource.time_grain_sqla",
+              "sample_data": "P1D",
+              "required": false,
+              "embedding": "extra_form_data.override（技术上可传，但 guest 下不建议）",
+              "default_value": "新建未保存图且 metadata 为空时初始为 P1D，否则沿用已有值",
+              "notes": "仅当 `groupby` 里存在 temporal 列或 adhoc column 时才显示；aggregate 模式下它会改写 query.columns。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "timeseries_limit_metric",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [
+          "否（guest 下不应动态修改）"
+        ],
+        "descriptions": [
+          "aggregate 模式下用于决定 top rows 排序与截断依据的指标。",
+          "Orders the query result that generates the source data for this chart. If a series or row limit is reached, this determines what data are truncated. If undefined, defaults to the first metric (where appropriate)."
+        ],
+        "data_types": [
+          "string | object | null"
+        ],
+        "sample_data_examples": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "online-catalog",
+            "category": "Query",
+            "field_name": "timeseries_limit_metric",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "description": "aggregate 模式下用于决定 top rows 排序与截断依据的指标。",
+            "data_type": "string | object | null",
+            "sample_data": {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "sales"
+              },
+              "aggregate": "SUM",
+              "label": "SUM(sales)"
+            },
+            "original_field": {
+              "field_name": "timeseries_limit_metric",
+              "description": "aggregate 模式下用于决定 top rows 排序与截断依据的指标。",
+              "data_type": "string | object | null",
+              "enum_source": "saved metrics + adhoc metrics",
+              "sample_data": {
+                "expressionType": "SIMPLE",
+                "column": {
+                  "column_name": "sales"
+                },
+                "aggregate": "SUM",
+                "label": "SUM(sales)"
+              },
+              "required": false,
+              "embedding": "否（guest 下不应动态修改）",
+              "default_value": null
+            }
+          },
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "timeseries_limit_metric",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "description": "Orders the query result that generates the source data for this chart. If a series or row limit is reached, this determines what data are truncated. If undefined, defaults to the first metric (where appropriate).",
+            "data_type": "string | object | null",
+            "sample_data": {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "sales"
+              },
+              "aggregate": "SUM",
+              "label": "SUM(sales)"
+            },
+            "original_field": {
+              "field_name": "timeseries_limit_metric",
+              "description": "Orders the query result that generates the source data for this chart. If a series or row limit is reached, this determines what data are truncated. If undefined, defaults to the first metric (where appropriate).",
+              "data_type": "string | object | null",
+              "enum_source": "saved metrics + adhoc metrics",
+              "sample_data": {
+                "expressionType": "SIMPLE",
+                "column": {
+                  "column_name": "sales"
+                },
+                "aggregate": "SUM",
+                "label": "SUM(sales)"
+              },
+              "required": false,
+              "embedding": "否（guest 下不应动态修改）",
+              "default_value": null
+            }
+          }
+        ]
+      }
+    ],
+    "required_field_names": [],
+    "embedding_enabled_field_names": [
+      "adhoc_filters",
+      "all_columns",
+      "groupby",
+      "metrics",
+      "order_by_cols",
+      "order_desc",
+      "percent_metric_calculation",
+      "percent_metrics",
+      "query_mode",
+      "row_limit",
+      "server_page_length",
+      "server_pagination",
+      "show_totals",
+      "start_date_offset",
+      "time_compare",
+      "time_grain_sqla",
+      "timeseries_limit_metric"
+    ],
+    "runtime_alias_index": {
+      "time_grain_sqla": [
+        "timeGrainSqla"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "table",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/table-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/table-form-data-schema.json",
+      "control-schema": "form-data-schema/table-schema.json"
+    }
+  },
+  "fallback_online_field_categories": {
+    "Query": [
+      {
+        "field_name": "groupby",
+        "description": "聚合模式下的分组维度。",
+        "data_type": "array[string | object]",
+        "enum_source": "datasource columns",
+        "sample_data": [
+          "region"
+        ],
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "default_value": []
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "description": "时间粒度。仅当 `groupby` 中包含 temporal 列时才生效。",
+        "data_type": "string | null",
+        "enum_source": "datasource.time_grain_sqla",
+        "sample_data": "P1D",
+        "required": false,
+        "embedding": "extra_form_data.override（guest 下不建议）",
+        "default_value": "新建未保存图且 metadata 为空时初始为 P1D，否则沿用已有值"
+      },
+      {
+        "field_name": "temporal_columns_lookup",
+        "description": "隐藏映射，用来标记哪些分组列是 temporal physical columns。",
+        "data_type": "object[string, boolean]",
+        "sample_data": {
+          "order_date": true
+        },
+        "required": false,
+        "embedding": "否",
+        "default_value": "由 datasource 自动生成"
+      },
+      {
+        "field_name": "metrics",
+        "description": "聚合模式下的主指标集合。",
+        "data_type": "array[string | object]",
+        "enum_source": "saved metrics + adhoc metrics",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          }
+        ],
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "default_value": "未显式 default（UI 空态）"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "description": "过滤条件集合。",
+        "data_type": "array[object]",
+        "enum_source": "dataset filterable columns + saved metrics + current metrics",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "default_value": []
+      },
+      {
+        "field_name": "timeseries_limit_metric",
+        "description": "aggregate 模式下用于决定 top rows 排序与截断依据的指标。",
+        "data_type": "string | object | null",
+        "enum_source": "saved metrics + adhoc metrics",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        },
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "default_value": null
+      },
+      {
+        "field_name": "order_desc",
+        "description": "aggregate 模式下，是否按 `timeseries_limit_metric` 降序排序。",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "default_value": true
+      },
+      {
+        "field_name": "row_limit",
+        "description": "查询返回的最大行数上限。",
+        "data_type": "integer",
+        "sample_data": 1000,
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "default_value": 1000
+      }
+    ],
+    "Advanced analytics": [
+      {
+        "field_name": "time_compare",
+        "description": "时间位移对比字段。开启后会生成 comparison columns。",
+        "data_type": "string | null",
+        "enum_values": [
+          "1 day ago",
+          "1 week ago",
+          "1 month ago",
+          "1 year ago",
+          "custom",
+          "inherit"
+        ],
+        "sample_data": "1 year ago",
+        "required": false,
+        "embedding": "extra_form_data.override（guest 下不建议）",
+        "default_value": "未显式 default"
+      },
+      {
+        "field_name": "start_date_offset",
+        "description": "当 `time_compare='custom'` 时的自定义偏移量。",
+        "data_type": "string | null",
+        "sample_data": "1 year ago",
+        "required": false,
+        "embedding": "extra_form_data.override（guest 下不建议）",
+        "default_value": null
+      },
+      {
+        "field_name": "comparison_type",
+        "description": "时间对比展示方式：值、差值、百分比变化或比率。",
+        "data_type": "string",
+        "enum_values": [
+          "values",
+          "difference",
+          "percentage",
+          "ratio"
+        ],
+        "sample_data": "values",
+        "required": false,
+        "embedding": "否",
+        "default_value": "values"
+      }
+    ],
+    "Annotations & Layers": [],
+    "Predictive Analytics（Forecast）": [],
+    "Chart Options": [
+      {
+        "field_name": "page_length",
+        "description": "前端分页时每页显示行数；`null` 代表自动分页。",
+        "data_type": "integer | string | null",
+        "enum_values": [
+          0,
+          10,
+          20,
+          50,
+          100,
+          200
+        ],
+        "sample_data": 20,
+        "required": false,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "include_search",
+        "description": "是否展示客户端搜索框。",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      },
+      {
+        "field_name": "allow_rearrange_columns",
+        "description": "是否允许终端用户拖拽重排列顺序。",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      },
+      {
+        "field_name": "allow_render_html",
+        "description": "是否按 HTML 渲染单元格内容。",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true
+      },
+      {
+        "field_name": "show_cell_bars",
+        "description": "是否在数值单元格背景显示数据条。",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true
+      },
+      {
+        "field_name": "align_pn",
+        "description": "正负值数据条是否以 0 为对齐中轴。",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      },
+      {
+        "field_name": "color_pn",
+        "description": "是否按正负值给数据条着色。",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true
+      },
+      {
+        "field_name": "comparison_color_enabled",
+        "description": "时间对比模式下，是否启用基础涨跌箭头与底色格式。",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      },
+      {
+        "field_name": "comparison_color_scheme",
+        "description": "时间对比模式下，涨跌配色策略。",
+        "data_type": "string",
+        "enum_values": [
+          "Green",
+          "Red"
+        ],
+        "sample_data": "Green",
+        "required": false,
+        "embedding": "否",
+        "default_value": "Green"
+      },
+      {
+        "field_name": "conditional_formatting",
+        "description": "自定义条件着色规则集合。",
+        "data_type": "array[object]",
+        "sample_data": [
+          {
+            "column": "sum__num",
+            "operator": ">",
+            "targetValue": 2467,
+            "colorScheme": "#ACE1C4"
+          }
+        ],
+        "required": false,
+        "embedding": "否",
+        "default_value": "未显式 default；runtime 按空数组容错"
+      }
+    ],
+    "Chart Title": [],
+    "图表专属": [
+      {
+        "field_name": "query_mode",
+        "description": "Table 独有的 raw / aggregate 双模式开关。",
+        "data_type": "string | null",
+        "enum_values": [
+          "aggregate",
+          "raw"
+        ],
+        "sample_data": "aggregate",
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "default_value": null
+      },
+      {
+        "field_name": "all_columns",
+        "description": "raw 模式下展示的明细列集合。",
+        "data_type": "array[string | object]",
+        "enum_source": "datasource columns",
+        "sample_data": [
+          "order_id",
+          "customer_name"
+        ],
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "default_value": []
+      },
+      {
+        "field_name": "percent_metrics",
+        "description": "aggregate 模式下追加百分比指标列。",
+        "data_type": "array[string | object]",
+        "enum_source": "saved metrics + adhoc metrics",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          }
+        ],
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "default_value": []
+      },
+      {
+        "field_name": "order_by_cols",
+        "description": "raw 模式专用排序配置。",
+        "data_type": "array[string | [string, boolean]]",
+        "sample_data": [
+          "[\"order_id\",true]"
+        ],
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "default_value": []
+      },
+      {
+        "field_name": "server_pagination",
+        "description": "是否启用服务端分页。",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "default_value": false
+      },
+      {
+        "field_name": "server_page_length",
+        "description": "服务端分页时的每页条数。",
+        "data_type": "integer",
+        "enum_values": [
+          10,
+          20,
+          50,
+          100,
+          200
+        ],
+        "sample_data": 20,
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "default_value": 10
+      },
+      {
+        "field_name": "percent_metric_calculation",
+        "description": "百分比指标基于 row_limit 还是 all_records 计算。",
+        "data_type": "string",
+        "enum_values": [
+          "row_limit",
+          "all_records"
+        ],
+        "sample_data": "row_limit",
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "default_value": "row_limit"
+      },
+      {
+        "field_name": "show_totals",
+        "description": "是否额外生成 summary totals。",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否（guest 下不应动态修改）",
+        "default_value": false
+      },
+      {
+        "field_name": "table_timestamp_format",
+        "description": "Table 全局时间列格式。",
+        "data_type": "string",
+        "enum_source": "D3_TIME_FORMAT_OPTIONS + freeForm",
+        "sample_data": "smart_date",
+        "required": false,
+        "embedding": "否",
+        "default_value": "smart_date"
+      },
+      {
+        "field_name": "column_config",
+        "description": "逐列定制格式、列宽、别名、显示隐藏和 comparison 子列格式。",
+        "data_type": "object[string, TableColumnConfig]",
+        "sample_data": {
+          "sum__num": {
+            "d3NumberFormat": ".3s",
+            "columnWidth": 180,
+            "customColumnName": "Sales"
+          }
+        },
+        "required": false,
+        "embedding": "否",
+        "default_value": "未显式 default；transformProps runtime fallback 为 {}"
+      }
+    ],
+    "通用图表选项": []
+  },
+  "original_control_schema": {
+    "viz_type": "table",
+    "display_name": "Table",
+    "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-table/src/controlPanel.tsx",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-table/src/index.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-table/src/controlPanel.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-table/src/buildQuery.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-table/src/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-table/src/types.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-table/src/consts.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-table/test/buildQuery.test.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-table/test/TableChart.test.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-table/test/testData.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/sections/timeComparison.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractQueryFields.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/constants.ts",
+      "D:/vsx/sources/superset-6.0.0/superset/security/manager.py"
+    ],
+    "notes": [
+      "Table 是现代 chart data API 图，前端请求走 `/api/v1/chart/data`，不是 legacy `/superset/explore_json/`。",
+      "插件 metadata.description 明确说明它既可以展示底层原始数据，也可以展示聚合后的指标结果；这正对应 `query_mode` 的 raw / aggregate 双模式。",
+      "`query_mode` 的 root 默认值是 `null`。controlPanel 与 buildQuery 都会在未显式设置时，根据 `all_columns` 是否非空自动推断：有 `all_columns` 就走 raw，否则走 aggregate。",
+      "Table 的 root form_data 既有 snake_case，也有少量共享控件别名。构造 API form_data 时必须保留 control name 原样键名，例如 `all_columns`、`order_by_cols`、`table_timestamp_format`、`comparison_color_enabled`。",
+      "`extractQueryFields()` 的核心别名链为：`all_columns -> columns`、`groupby -> columns`、`order_by_cols -> orderby`。raw 模式会忽略 `groupby/metrics`，aggregate 模式会忽略 `all_columns`。",
+      "Table 有两类源码级必填规则：raw 模式下 `all_columns` 至少 1 项；aggregate 模式下 `groupby`、`metrics`、`percent_metrics` 三者至少一类非空。",
+      "它还存在多处默认值差异：例如 `align_pn` 在 controlPanel 默认 `false`，但 transformProps 缺失时 runtime fallback 是 `true`；`column_config` 与 `conditional_formatting` 在 controlPanel 未给显式 default，但 runtime 都按空对象/空数组容错。"
+    ],
+    "metadata_summary": {
+      "description": "Classic row-by-column spreadsheet like view of a dataset. Use tables to showcase a view into the underlying data or to show aggregated metrics.",
+      "category": "Table",
+      "behaviors": [
+        "InteractiveChart",
+        "DrillToDetail",
+        "DrillBy"
+      ],
+      "canBeAnnotationTypes": [
+        "EVENT",
+        "INTERVAL"
+      ],
+      "tags": [
+        "Additive",
+        "Business",
+        "Pattern",
+        "Featured",
+        "Report",
+        "Sequential",
+        "Tabular"
+      ]
+    },
+    "chart_data_api_behavior": {
+      "useLegacyApi": false,
+      "frontend_request_endpoint": "/api/v1/chart/data",
+      "build_query_summary": "先由 core `extractQueryFields()` 提取 columns / metrics / orderby，再由 Table/buildQuery.ts 根据 query_mode、percent_metrics、time_compare、server_pagination、show_totals 等补充或改写 query。",
+      "core_aliasing": {
+        "all_columns": "columns",
+        "groupby": "columns",
+        "order_by_cols": "orderby"
+      }
+    },
+    "query_compilation": {
+      "query_mode_resolution": "若 `query_mode` 为 `aggregate` 或 `raw` 则直接使用；否则读取 `all_columns`，非空则 raw，否则 aggregate。",
+      "raw_mode": [
+        "`all_columns` 会进入 query.columns。",
+        "`buildQuery.ts` 会强制把 `include_time` 设为 `false`。",
+        "`order_by_cols` 会通过 `extractQueryFields()` 编译成 query.orderby。",
+        "`metrics`、`groupby`、`percent_metrics` 在 raw 模式下都不进入 query。"
+      ],
+      "aggregate_mode": [
+        "`groupby` 会进入 query.columns，`metrics` 与 `percent_metrics` 会进入 query.metrics。",
+        "若设置了 `timeseries_limit_metric`，则 orderby = [[timeseries_limit_metric, !order_desc]]；否则若 `metrics` 非空，则退回 `[[metrics[0], false]]`。",
+        "`percent_metrics` 会并入 metrics，并追加 `contribution` post_processing。",
+        "`show_totals=true` 且 aggregate 模式且有 metrics 时，会额外生成 totals query。"
+      ],
+      "time_grain_injection": "aggregate 模式下，如果 `groupby` 中存在 physical temporal column 且 `time_grain_sqla` 非空，buildQuery 会把该列改写成带 `timeGrain` 的 AdhocColumn 并放到 query.columns 首位。",
+      "server_pagination": "非下载请求且 `server_pagination=true` 时，会生成主 query + rowcount query；`ownState.currentPage/pageSize/sortBy/searchText/searchColumn` 会继续改写 row_limit、row_offset、orderby 和 filters。",
+      "time_comparison": "启用 `time_compare` 后，buildQuery 会为 comparison 追加 `time_offsets` 与 `timeCompareOperator()` post_processing；transformProps 会把指标列改写成 `Main / # / △ / %` 四类 comparison columns。",
+      "embedding_sensitive_query_outputs": [
+        "queries[*].columns",
+        "queries[*].metrics",
+        "queries[*].orderby",
+        "queries[*].post_processing",
+        "queries[*].time_offsets"
+      ]
+    },
+    "form_data_overrides": {
+      "metrics": "getStandardizedControls().popAllMetrics()",
+      "groupby": "getStandardizedControls().popAllColumns()",
+      "notes": "这只在 standardized controls 跨图表迁移时起作用，不是平时手工构造 Table API form_data 的必经步骤。"
+    },
+    "field_categories": {
+      "Query": [
+        {
+          "field_name": "query_mode",
+          "description": "Query mode",
+          "data_type": "string | null",
+          "enum_values": [
+            "aggregate",
+            "raw"
+          ],
+          "sample_data": "aggregate",
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": null,
+          "notes": "未显式设置时，源码会按 `all_columns` 是否非空自动推断模式。"
+        },
+        {
+          "field_name": "groupby",
+          "description": "Dimensions contain qualitative values such as names, dates, or geographical data. Use dimensions to categorize, segment, and reveal the details in your data. Dimensions affect the level of detail in the view.",
+          "data_type": "array[string | object]",
+          "enum_source": "datasource columns",
+          "sample_data": [
+            "region"
+          ],
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": [],
+          "required_rule": "aggregate 模式下，与 `metrics`、`percent_metrics` 三者至少一类非空。"
+        },
+        {
+          "field_name": "time_grain_sqla",
+          "runtime_alias": "timeGrainSqla",
+          "description": "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart.",
+          "data_type": "string | null",
+          "enum_source": "datasource.time_grain_sqla",
+          "sample_data": "P1D",
+          "required": false,
+          "embedding": "extra_form_data.override（技术上可传，但 guest 下不建议）",
+          "default_value": "新建未保存图且 metadata 为空时初始为 P1D，否则沿用已有值",
+          "notes": "仅当 `groupby` 里存在 temporal 列或 adhoc column 时才显示；aggregate 模式下它会改写 query.columns。"
+        },
+        {
+          "field_name": "temporal_columns_lookup",
+          "description": "隐藏控件。把 datasource 中所有 temporal physical columns 整理成 `{ column_name: true }` 映射，供 `time_grain_sqla` 可见性判断与 buildQuery 时间列改写使用。",
+          "data_type": "object[string, boolean]",
+          "sample_data": {
+            "order_date": true,
+            "ship_date": true
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": "由 datasource columns 自动推导"
+        },
+        {
+          "field_name": "metrics",
+          "description": "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+          "data_type": "array[string | object]",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "sales"
+              },
+              "aggregate": "SUM",
+              "label": "SUM(sales)"
+            }
+          ],
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": "未显式 default（UI 空态）",
+          "required_rule": "aggregate 模式下，与 `groupby`、`percent_metrics` 三者至少一类非空。"
+        },
+        {
+          "field_name": "all_columns",
+          "description": "Columns to display",
+          "data_type": "array[string | object]",
+          "enum_source": "datasource columns",
+          "sample_data": [
+            "order_id",
+            "customer_name"
+          ],
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": [],
+          "required_rule": "raw 模式下必须至少 1 项。"
+        },
+        {
+          "field_name": "percent_metrics",
+          "description": "Select one or many metrics to display, that will be displayed in the percentages of total. Percentage metrics will be calculated only from data within the row limit. You can use an aggregation function on a column or write custom SQL to create a percentage metric.",
+          "data_type": "array[string | object]",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "sales"
+              },
+              "aggregate": "SUM",
+              "label": "SUM(sales)"
+            }
+          ],
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": [],
+          "required_rule": "aggregate 模式下，与 `groupby`、`metrics` 三者至少一类非空。",
+          "notes": "buildQuery 会把它们并入 `metrics`，并生成 `%metric` 贡献率列。"
+        },
+        {
+          "field_name": "adhoc_filters",
+          "description": "Filters",
+          "data_type": "array[object]",
+          "enum_source": "dataset filterable columns + saved metrics + current metrics",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "region",
+              "operator": "IN",
+              "comparator": [
+                "East",
+                "West"
+              ]
+            }
+          ],
+          "required": false,
+          "embedding": "extra_form_data.append",
+          "default_value": []
+        },
+        {
+          "field_name": "timeseries_limit_metric",
+          "description": "Orders the query result that generates the source data for this chart. If a series or row limit is reached, this determines what data are truncated. If undefined, defaults to the first metric (where appropriate).",
+          "data_type": "string | object | null",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          },
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": null
+        },
+        {
+          "field_name": "order_by_cols",
+          "description": "Order results by selected columns",
+          "data_type": "array[string | [string, boolean]]",
+          "enum_source": "datasource.order_by_choices 或 datasource columns 生成的 `[column, asc|desc]` 选项",
+          "sample_data": [
+            "[\"order_id\",true]",
+            "[\"customer_name\",false]"
+          ],
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": [],
+          "notes": "仅 raw 模式显示；会通过 `extractQueryFields()` 编译成 query.orderby。"
+        },
+        {
+          "field_name": "order_desc",
+          "description": "If enabled, this control sorts the results/values descending, otherwise it sorts the results ascending.",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": true,
+          "notes": "aggregate 模式下只有当 `timeseries_limit_metric` 非空时才显示。"
+        },
+        {
+          "field_name": "server_pagination",
+          "description": "Enable server side pagination of results (experimental feature)",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": false
+        },
+        {
+          "field_name": "server_page_length",
+          "description": "Rows per page, 0 means no pagination",
+          "data_type": "integer",
+          "enum_values": [
+            10,
+            20,
+            50,
+            100,
+            200
+          ],
+          "sample_data": 20,
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": 10,
+          "notes": "仅 `server_pagination=true` 时显示。实际翻页页码、搜索与排序来自 ownState，而不是 root form_data。"
+        },
+        {
+          "field_name": "row_limit",
+          "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+          "data_type": "integer",
+          "enum_values": [
+            10,
+            50,
+            100,
+            250,
+            500,
+            1000,
+            5000,
+            10000,
+            50000,
+            100000,
+            150000,
+            200000,
+            250000,
+            300000,
+            350000,
+            400000,
+            450000,
+            500000
+          ],
+          "sample_data": 1000,
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": 1000,
+          "notes": "Table 覆盖了 shared row_limit 默认值，root 缺省按 1000 记录。server pagination 打开后，它更像总 cap / rowcount 查询上限。"
+        },
+        {
+          "field_name": "percent_metric_calculation",
+          "description": "Row Limit: percentages are calculated based on the subset of data retrieved, respecting the row limit. All Records: Percentages are calculated based on the total dataset, ignoring the row limit.",
+          "data_type": "string",
+          "enum_values": [
+            "row_limit",
+            "all_records"
+          ],
+          "sample_data": "row_limit",
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": "row_limit",
+          "notes": "选 `all_records` 时，buildQuery 会额外生成一条 percent-metrics query。"
+        },
+        {
+          "field_name": "show_totals",
+          "description": "Show total aggregations of selected metrics. Note that row limit does not apply to the result.",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": false,
+          "notes": "仅 aggregate 模式显示；开启后会额外生成 totals query。"
+        }
+      ],
+      "Options": [
+        {
+          "field_name": "table_timestamp_format",
+          "description": "D3 time format for datetime columns",
+          "data_type": "string",
+          "enum_source": "D3_TIME_FORMAT_OPTIONS + freeForm",
+          "sample_data": "smart_date",
+          "required": false,
+          "embedding": "否",
+          "default_value": "smart_date"
+        },
+        {
+          "field_name": "page_length",
+          "description": "Rows per page, 0 means no pagination",
+          "data_type": "integer | string | null",
+          "enum_values": [
+            0,
+            10,
+            20,
+            50,
+            100,
+            200
+          ],
+          "sample_data": 20,
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "仅 `server_pagination=false` 时显示。`null` 代表自动分页；transformProps 会按 `numRecords * numColumns > 5000` 决定是否回退到 200。"
+        },
+        {
+          "field_name": "include_search",
+          "description": "Whether to include a client-side search box",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false
+        },
+        {
+          "field_name": "allow_rearrange_columns",
+          "description": "Allow end user to drag-and-drop column headers to rearrange them. Note their changes won't persist for the next time they open the chart.",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false,
+          "notes": "仅 `time_compare` 为空时显示。"
+        },
+        {
+          "field_name": "allow_render_html",
+          "description": "Renders table cells as HTML when applicable. For example, HTML <a> tags will be rendered as hyperlinks.",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true
+        },
+        {
+          "field_name": "column_config",
+          "description": "Further customize how to display each column",
+          "data_type": "object[string, TableColumnConfig]",
+          "sample_data": {
+            "sum__num": {
+              "d3NumberFormat": ".3s",
+              "columnWidth": 180,
+              "horizontalAlign": "right",
+              "customColumnName": "Sales"
+            }
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": "未显式 default；transformProps runtime fallback 为 {}",
+          "object_schema": {
+            "d3NumberFormat": "string",
+            "d3SmallNumberFormat": "string",
+            "d3TimeFormat": "string",
+            "columnWidth": "number",
+            "horizontalAlign": [
+              "left",
+              "right",
+              "center"
+            ],
+            "showCellBars": "boolean",
+            "alignPositiveNegative": "boolean",
+            "colorPositiveNegative": "boolean",
+            "truncateLongCells": "boolean",
+            "currencyFormat": "object",
+            "visible": "boolean",
+            "customColumnName": "string",
+            "displayTypeIcon": "boolean"
+          },
+          "notes": "time comparison 场景下还支持以 `Main metric` / `# metric` / `△ metric` / `% metric` 作为 key 单独配置 comparison 子列。"
+        }
+      ],
+      "Visual formatting": [
+        {
+          "field_name": "show_cell_bars",
+          "description": "Whether to display a bar chart background in table columns",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true
+        },
+        {
+          "field_name": "align_pn",
+          "description": "Whether to align background charts with both positive and negative values at 0",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false,
+          "notes": "controlPanel 默认 `false`，但 transformProps 对字段缺失时的 runtime fallback 是 `true`。"
+        },
+        {
+          "field_name": "color_pn",
+          "description": "Whether to colorize numeric values by whether they are positive or negative",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true
+        },
+        {
+          "field_name": "comparison_color_enabled",
+          "description": "This will be applied to the whole table. Arrows (↑ and ↓) will be added to main columns for increase and decrease. Basic conditional formatting can be overwritten by conditional formatting below.",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false,
+          "notes": "仅 `time_compare` 非空时显示。"
+        },
+        {
+          "field_name": "comparison_color_scheme",
+          "description": "Adds color to the chart symbols based on the positive or negative change from the comparison value.",
+          "data_type": "string",
+          "enum_values": [
+            "Green",
+            "Red"
+          ],
+          "sample_data": "Green",
+          "required": false,
+          "embedding": "否",
+          "default_value": "Green",
+          "notes": "仅在 `time_compare` 非空且 `comparison_color_enabled=true` 时显示。"
+        },
+        {
+          "field_name": "conditional_formatting",
+          "description": "Apply conditional color formatting to numeric columns",
+          "data_type": "array[object]",
+          "sample_data": [
+            {
+              "column": "sum__num",
+              "operator": ">",
+              "targetValue": 2467,
+              "colorScheme": "#ACE1C4"
+            }
+          ],
+          "required": false,
+          "embedding": "否",
+          "default_value": "未显式 default；runtime 按空数组容错",
+          "object_schema": {
+            "column": "string",
+            "operator": [
+              "None",
+              ">",
+              "<",
+              "≥",
+              "≤",
+              "=",
+              "≠",
+              "< x <",
+              "≤ x ≤",
+              "≤ x <",
+              "< x ≤"
+            ],
+            "targetValue": "number",
+            "targetValueLeft": "number",
+            "targetValueRight": "number",
+            "colorScheme": "string"
+          },
+          "notes": "普通单色规则与 comparison 双色方案都可写入这里；源码会按列类型与阈值完整性过滤无效配置。"
+        }
+      ],
+      "Time Comparison": [
+        {
+          "field_name": "time_compare",
+          "description": "Overlay results from a relative time period. Expects relative time deltas in natural language (example: 24 hours, 7 days, 52 weeks, 365 days). Free text is supported. Use \"Inherit range from time filters\" to shift the comparison time range by the same length as your time range and use \"Custom\" to set a custom comparison range.",
+          "data_type": "string | array[string] | null",
+          "enum_values": [
+            "1 day ago",
+            "1 week ago",
+            "1 month ago",
+            "1 year ago",
+            "custom",
+            "inherit"
+          ],
+          "sample_data": "1 year ago",
+          "required": false,
+          "embedding": "extra_form_data.override（技术上可传，但 guest 下不建议）",
+          "default_value": "未显式 default",
+          "notes": "Table 调用的是 `timeComparisonControls({ multi: false, showCalculationType: false, showFullChoices: false })`，因此 UI 只显示 reduced choices，且是单选。"
+        },
+        {
+          "field_name": "start_date_offset",
+          "description": "Shift start date",
+          "data_type": "string | null",
+          "sample_data": "1 year ago",
+          "required": false,
+          "embedding": "extra_form_data.override（技术上可传，但 guest 下不建议）",
+          "default_value": null,
+          "notes": "仅当 `time_compare === 'custom'` 时才显示，并且为空会触发 `A date is required when using custom date shift` 校验。"
+        },
+        {
+          "field_name": "comparison_type",
+          "description": "How to display time shifts: as individual lines; as the difference between the main time series and each time shift; as the percentage change; or as the ratio between series and time shifts.",
+          "data_type": "string",
+          "enum_values": [
+            "values",
+            "difference",
+            "percentage",
+            "ratio"
+          ],
+          "sample_data": "values",
+          "required": false,
+          "embedding": "否",
+          "default_value": "values"
+        },
+        {
+          "field_name": "comparison_range_label",
+          "description": "Time Comparison section 的显示型辅助控件，用于回显 comparison range label。",
+          "data_type": "display-only control",
+          "sample_data": null,
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "api_field": false,
+          "notes": "这是 UI 辅助控件，不是构造 API root form_data 时应主动填写的字段。"
+        }
+      ]
+    }
+  }
+}

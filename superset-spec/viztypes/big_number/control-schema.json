@@ -1,0 +1,2600 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "big_number",
+  "display_name": "Big Number with Trendline",
+  "source_kind": "schema_file",
+  "normalized_control_schema": {
+    "field_category_order": [
+      "Query",
+      "Options",
+      "Chart Options / Color",
+      "Chart Options / Typography",
+      "Chart Options / Display Text",
+      "Chart Options / Number & Date Formatting",
+      "Advanced Analytics"
+    ],
+    "field_occurrences": [
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "x_axis",
+        "runtime_alias": "xAxis",
+        "required": true,
+        "embedding": "否",
+        "description": "Dimension to use on x-axis. 在 big_number 中此控件显示名被重写为 Temporal X-Axis，并限制只能选时间列。",
+        "data_type": "string | object",
+        "sample_data": "order_date",
+        "original_field": {
+          "field_name": "x_axis",
+          "runtime_alias": "xAxis",
+          "description": "Dimension to use on x-axis. 在 big_number 中此控件显示名被重写为 Temporal X-Axis，并限制只能选时间列。",
+          "data_type": "string | object",
+          "enum_source": "datasource temporal columns; xAxisMixin 会在 legacy 的 granularity_sqla 已存在且 x_axis 为空时做初始回填",
+          "sample_data": "order_date",
+          "required": true,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "getXAxisColumn(formData) 优先读取 x_axis；如果 x_axis 为空但 granularity_sqla 存在，则回退为 DTTM_ALIAS。这是兼容逻辑，不是新模板的主路径。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "time_grain_sqla",
+        "runtime_alias": "timeGrainSqla",
+        "required": false,
+        "embedding": "extra_form_data.override",
+        "description": "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart.",
+        "data_type": "string | null",
+        "sample_data": "P1D",
+        "original_field": {
+          "field_name": "time_grain_sqla",
+          "runtime_alias": "timeGrainSqla",
+          "description": "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart.",
+          "data_type": "string | null",
+          "enum_source": "datasource.time_grain_sqla",
+          "sample_data": "P1D",
+          "required": false,
+          "embedding": "extra_form_data.override",
+          "default_value": "P1D"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "aggregation",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Method to compute the displayed value. \"Overall value\" calculates a single metric across the entire filtered time period, ideal for non-additive metrics like ratios, averages, or distinct counts. Other methods operate over the time series data points.",
+        "data_type": "string",
+        "sample_data": "LAST_VALUE",
+        "original_field": {
+          "field_name": "aggregation",
+          "description": "Method to compute the displayed value. \"Overall value\" calculates a single metric across the entire filtered time period, ideal for non-additive metrics like ratios, averages, or distinct counts. Other methods operate over the time series data points.",
+          "data_type": "string",
+          "enum_values": [
+            "raw",
+            "LAST_VALUE",
+            "sum",
+            "mean",
+            "min",
+            "max",
+            "median"
+          ],
+          "sample_data": "LAST_VALUE",
+          "required": false,
+          "embedding": "否",
+          "default_value": "LAST_VALUE",
+          "notes": "aggregation='raw' 时 buildQuery.ts 会追加第 2 个 query，并用服务端返回的聚合结果做 big number；其它值只发 1 个 query，并在前端按 aggregationChoices 做客户端聚合。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "metric",
+        "runtime_alias": null,
+        "required": true,
+        "embedding": "否",
+        "description": "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+        "data_type": "string | object",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        },
+        "original_field": {
+          "field_name": "metric",
+          "description": "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+          "data_type": "string | object",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          },
+          "required": true,
+          "embedding": "否",
+          "default_value": null
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "adhoc_filters",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "description": "字段标签为 Filters。当前图表没有独立 time_range 控件，时间过滤通常通过此字段中的 TEMPORAL_RANGE 过滤条件表达。",
+        "data_type": "array[object]",
+        "sample_data": [
+          {
+            "clause": "WHERE",
+            "subject": "order_date",
+            "operator": "TEMPORAL_RANGE",
+            "comparator": "No filter",
+            "expressionType": "SIMPLE"
+          }
+        ],
+        "original_field": {
+          "field_name": "adhoc_filters",
+          "description": "字段标签为 Filters。当前图表没有独立 time_range 控件，时间过滤通常通过此字段中的 TEMPORAL_RANGE 过滤条件表达。",
+          "data_type": "array[object]",
+          "enum_source": "dataset columns + saved metrics + 当前 metric",
+          "sample_data": [
+            {
+              "clause": "WHERE",
+              "subject": "order_date",
+              "operator": "TEMPORAL_RANGE",
+              "comparator": "No filter",
+              "expressionType": "SIMPLE"
+            }
+          ],
+          "required": false,
+          "embedding": "extra_form_data.append",
+          "default_value": []
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Options",
+        "field_name": "compare_lag",
+        "runtime_alias": "compareLag",
+        "required": false,
+        "embedding": "否",
+        "description": "Based on granularity, number of time periods to compare against",
+        "data_type": "integer | string | null",
+        "sample_data": 1,
+        "original_field": {
+          "field_name": "compare_lag",
+          "runtime_alias": "compareLag",
+          "description": "Based on granularity, number of time periods to compare against",
+          "data_type": "integer | string | null",
+          "sample_data": 1,
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "transformProps.ts 会执行 Number(compareLag) || 0。只有 compare_lag > 0 且趋势线数据点足够时，才会生成百分比比较摘要。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Options",
+        "field_name": "compare_suffix",
+        "runtime_alias": "compareSuffix",
+        "required": false,
+        "embedding": "否",
+        "description": "Suffix to apply after the percentage display",
+        "data_type": "string",
+        "sample_data": "WoW",
+        "original_field": {
+          "field_name": "compare_suffix",
+          "runtime_alias": "compareSuffix",
+          "description": "Suffix to apply after the percentage display",
+          "data_type": "string",
+          "sample_data": "WoW",
+          "required": false,
+          "embedding": "否",
+          "default_value": "",
+          "notes": "与 compare_lag 联动，仅影响运行时生成的 subheader 文本。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Options",
+        "field_name": "show_timestamp",
+        "runtime_alias": "showTimestamp",
+        "required": false,
+        "embedding": "否",
+        "description": "Whether to display the timestamp",
+        "data_type": "boolean",
+        "sample_data": false,
+        "original_field": {
+          "field_name": "show_timestamp",
+          "runtime_alias": "showTimestamp",
+          "description": "Whether to display the timestamp",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Options",
+        "field_name": "show_trend_line",
+        "runtime_alias": "showTrendLine",
+        "required": false,
+        "embedding": "否",
+        "description": "Whether to display the trend line",
+        "data_type": "boolean",
+        "sample_data": true,
+        "original_field": {
+          "field_name": "show_trend_line",
+          "runtime_alias": "showTrendLine",
+          "description": "Whether to display the trend line",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Options",
+        "field_name": "start_y_axis_at_zero",
+        "runtime_alias": "startYAxisAtZero",
+        "required": false,
+        "embedding": "否",
+        "description": "Start y-axis at zero. Uncheck to start y-axis at minimum value in the data.",
+        "data_type": "boolean",
+        "sample_data": true,
+        "original_field": {
+          "field_name": "start_y_axis_at_zero",
+          "runtime_alias": "startYAxisAtZero",
+          "description": "Start y-axis at zero. Uncheck to start y-axis at minimum value in the data.",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true,
+          "notes": "transformProps.ts 会把它翻译成 ECharts yAxis.scale = !startYAxisAtZero。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Options",
+        "field_name": "time_range_fixed",
+        "runtime_alias": "timeRangeFixed",
+        "required": false,
+        "embedding": "否",
+        "description": "Fix the trend line to the full time range specified in case filtered results do not include the start or end dates",
+        "data_type": "boolean | null",
+        "sample_data": true,
+        "original_field": {
+          "field_name": "time_range_fixed",
+          "runtime_alias": "timeRangeFixed",
+          "description": "Fix the trend line to the full time range specified in case filtered results do not include the start or end dates",
+          "data_type": "boolean | null",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "源码未声明显式 default。UI 仅在 form_data.time_range 存在且不为 No filter 时显示；运行时仅在 trendLineData 存在并且查询结果返回 from_dttm/to_dttm 时生效。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options / Color",
+        "field_name": "color_picker",
+        "runtime_alias": "colorPicker",
+        "required": false,
+        "embedding": "否",
+        "description": "Use this to define a static color for all circles",
+        "data_type": "object",
+        "sample_data": {
+          "r": 0,
+          "g": 122,
+          "b": 135,
+          "a": 1
+        },
+        "original_field": {
+          "field_name": "color_picker",
+          "runtime_alias": "colorPicker",
+          "description": "Use this to define a static color for all circles",
+          "data_type": "object",
+          "sample_data": {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          },
+          "notes": "共享控件默认值来自 PRIMARY_COLOR。transformProps.ts 仅读取 r/g/b 生成 rgb(...) 主色。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options / Typography",
+        "field_name": "header_font_size",
+        "runtime_alias": "headerFontSize",
+        "required": false,
+        "embedding": "否",
+        "description": "Big Number Font Size",
+        "data_type": "number",
+        "sample_data": 0.4,
+        "original_field": {
+          "field_name": "header_font_size",
+          "runtime_alias": "headerFontSize",
+          "description": "Big Number Font Size",
+          "data_type": "number",
+          "enum_values": [
+            0.2,
+            0.3,
+            0.4,
+            0.5,
+            0.6
+          ],
+          "sample_data": 0.4,
+          "required": false,
+          "embedding": "否",
+          "default_value": 0.4
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options / Typography",
+        "field_name": "subheader_font_size",
+        "runtime_alias": "subheaderFontSize",
+        "required": false,
+        "embedding": "否",
+        "description": "Subheader Font Size",
+        "data_type": "number",
+        "sample_data": 0.15,
+        "original_field": {
+          "field_name": "subheader_font_size",
+          "runtime_alias": "subheaderFontSize",
+          "description": "Subheader Font Size",
+          "data_type": "number",
+          "enum_values": [
+            0.125,
+            0.15,
+            0.2,
+            0.3,
+            0.4
+          ],
+          "sample_data": 0.15,
+          "required": false,
+          "embedding": "否",
+          "default_value": 0.15,
+          "notes": "当前控制的是比较摘要/legacy subheader 行的字号。controlPanel 有该字体控件，但没有对应的 subheader 文本输入控件。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options / Typography",
+        "field_name": "subtitle_font_size",
+        "runtime_alias": "subtitleFontSize",
+        "required": false,
+        "embedding": "否",
+        "description": "Subtitle Font Size",
+        "data_type": "number",
+        "sample_data": 0.15,
+        "original_field": {
+          "field_name": "subtitle_font_size",
+          "runtime_alias": "subtitleFontSize",
+          "description": "Subtitle Font Size",
+          "data_type": "number",
+          "enum_values": [
+            0.125,
+            0.15,
+            0.2,
+            0.3,
+            0.4
+          ],
+          "sample_data": 0.15,
+          "required": false,
+          "embedding": "否",
+          "default_value": 0.15
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options / Typography",
+        "field_name": "show_metric_name",
+        "runtime_alias": "showMetricName",
+        "required": false,
+        "embedding": "否",
+        "description": "Whether to display the metric name",
+        "data_type": "boolean",
+        "sample_data": false,
+        "original_field": {
+          "field_name": "show_metric_name",
+          "runtime_alias": "showMetricName",
+          "description": "Whether to display the metric name",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options / Typography",
+        "field_name": "metric_name_font_size",
+        "runtime_alias": "metricNameFontSize",
+        "required": false,
+        "embedding": "否",
+        "description": "Metric Name Font Size",
+        "data_type": "number",
+        "sample_data": 0.15,
+        "original_field": {
+          "field_name": "metric_name_font_size",
+          "runtime_alias": "metricNameFontSize",
+          "description": "Metric Name Font Size",
+          "data_type": "number",
+          "enum_values": [
+            0.125,
+            0.15,
+            0.2,
+            0.3,
+            0.4
+          ],
+          "sample_data": 0.15,
+          "required": false,
+          "embedding": "否",
+          "default_value": 0.15,
+          "notes": "仅在 show_metric_name=true 时显示，且 resetOnHide=false。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options / Display Text",
+        "field_name": "subtitle",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Description text that shows up below your Big Number",
+        "data_type": "string | null",
+        "sample_data": "Total Sales",
+        "original_field": {
+          "field_name": "subtitle",
+          "description": "Description text that shows up below your Big Number",
+          "data_type": "string | null",
+          "sample_data": "Total Sales",
+          "required": false,
+          "embedding": "否",
+          "default_value": null
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options / Number & Date Formatting",
+        "field_name": "y_axis_format",
+        "runtime_alias": "yAxisFormat",
+        "required": false,
+        "embedding": "否",
+        "description": "D3 format syntax: https://github.com/d3/d3-format",
+        "data_type": "string",
+        "sample_data": "SMART_NUMBER",
+        "original_field": {
+          "field_name": "y_axis_format",
+          "runtime_alias": "yAxisFormat",
+          "description": "D3 format syntax: https://github.com/d3/d3-format",
+          "data_type": "string",
+          "enum_source": "D3_FORMAT_OPTIONS",
+          "sample_data": "SMART_NUMBER",
+          "required": false,
+          "embedding": "否",
+          "default_value": "SMART_NUMBER",
+          "notes": "controlOverrides 把显示标签从 Y Axis Format 改成了 Number format。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options / Number & Date Formatting",
+        "field_name": "currency_format",
+        "runtime_alias": "currencyFormat",
+        "required": false,
+        "embedding": "否",
+        "description": "Currency format",
+        "data_type": "string | object | null",
+        "sample_data": {
+          "symbol": "$",
+          "symbolPosition": "prefix"
+        },
+        "original_field": {
+          "field_name": "currency_format",
+          "runtime_alias": "currencyFormat",
+          "description": "Currency format",
+          "data_type": "string | object | null",
+          "sample_data": {
+            "symbol": "$",
+            "symbolPosition": "prefix"
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": null
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options / Number & Date Formatting",
+        "field_name": "time_format",
+        "runtime_alias": "timeFormat",
+        "required": false,
+        "embedding": "否",
+        "description": "D3 format syntax: https://github.com/d3/d3-format",
+        "data_type": "string",
+        "sample_data": "smart_date",
+        "original_field": {
+          "field_name": "time_format",
+          "runtime_alias": "timeFormat",
+          "description": "D3 format syntax: https://github.com/d3/d3-format",
+          "data_type": "string",
+          "enum_source": "D3_TIME_FORMAT_OPTIONS",
+          "sample_data": "smart_date",
+          "required": false,
+          "embedding": "否",
+          "default_value": "smart_date"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options / Number & Date Formatting",
+        "field_name": "force_timestamp_formatting",
+        "runtime_alias": "forceTimestampFormatting",
+        "required": false,
+        "embedding": "否",
+        "description": "Use date formatting even when metric value is not a timestamp",
+        "data_type": "boolean",
+        "sample_data": false,
+        "original_field": {
+          "field_name": "force_timestamp_formatting",
+          "runtime_alias": "forceTimestampFormatting",
+          "description": "Use date formatting even when metric value is not a timestamp",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Advanced Analytics",
+        "field_name": "rolling_type",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Defines a rolling window function to apply, works along with the [Periods] text box",
+        "data_type": "string",
+        "sample_data": "sum",
+        "original_field": {
+          "field_name": "rolling_type",
+          "description": "Defines a rolling window function to apply, works along with the [Periods] text box",
+          "data_type": "string",
+          "enum_values": [
+            "None",
+            "mean",
+            "sum",
+            "std",
+            "cumsum"
+          ],
+          "sample_data": "sum",
+          "required": false,
+          "embedding": "否",
+          "default_value": "None",
+          "notes": "rollingWindowOperator.ts 只有 mean/sum/std/cumsum 会生成 post_processing；'None' 不生成任何 rolling/cum 操作。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Advanced Analytics",
+        "field_name": "rolling_periods",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Defines the size of the rolling window function, relative to the time granularity selected",
+        "data_type": "integer | string | null",
+        "sample_data": 7,
+        "original_field": {
+          "field_name": "rolling_periods",
+          "description": "Defines the size of the rolling window function, relative to the time granularity selected",
+          "data_type": "integer | string | null",
+          "sample_data": 7,
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "仅在 rolling_type 为 mean/sum/std 时作为 rolling window 的 window 参数。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Advanced Analytics",
+        "field_name": "min_periods",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "The minimum number of rolling periods required to show a value. For instance if you do a cumulative sum on 7 days you may want your \"Min Period\" to be 7, so that all data points shown are the total of 7 periods. This will hide the \"ramp up\" taking place over the first 7 periods",
+        "data_type": "integer | string | null",
+        "sample_data": 7,
+        "original_field": {
+          "field_name": "min_periods",
+          "description": "The minimum number of rolling periods required to show a value. For instance if you do a cumulative sum on 7 days you may want your \"Min Period\" to be 7, so that all data points shown are the total of 7 periods. This will hide the \"ramp up\" taking place over the first 7 periods",
+          "data_type": "integer | string | null",
+          "sample_data": 7,
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "rollingWindowOperator.ts 会把它转换成 rolling 的 min_periods；缺省时回退为 0。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Advanced Analytics",
+        "field_name": "resample_rule",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Pandas resample rule",
+        "data_type": "string | null",
+        "sample_data": "1D",
+        "original_field": {
+          "field_name": "resample_rule",
+          "description": "Pandas resample rule",
+          "data_type": "string | null",
+          "enum_values": [
+            "1T",
+            "1H",
+            "1D",
+            "7D",
+            "1MS",
+            "1M",
+            "1AS",
+            "1A"
+          ],
+          "sample_data": "1D",
+          "required": false,
+          "embedding": "否",
+          "default_value": null
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Advanced Analytics",
+        "field_name": "resample_method",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Pandas resample method",
+        "data_type": "string | null",
+        "sample_data": "ffill",
+        "original_field": {
+          "field_name": "resample_method",
+          "description": "Pandas resample method",
+          "data_type": "string | null",
+          "enum_values": [
+            "asfreq",
+            "zerofill",
+            "linear",
+            "ffill",
+            "bfill",
+            "median",
+            "mean",
+            "sum"
+          ],
+          "sample_data": "ffill",
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "resampleOperator.ts 只有 resample_rule 与 resample_method 同时存在时才生成 resample post_processing；zerofill 会被翻译成 method='asfreq' 且 fill_value=0。"
+        }
+      }
+    ],
+    "field_inventory": [
+      {
+        "field_name": "adhoc_filters",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "字段标签为 Filters。当前图表没有独立 time_range 控件，时间过滤通常通过此字段中的 TEMPORAL_RANGE 过滤条件表达。"
+        ],
+        "data_types": [
+          "array[object]"
+        ],
+        "sample_data_examples": [
+          [
+            {
+              "clause": "WHERE",
+              "subject": "order_date",
+              "operator": "TEMPORAL_RANGE",
+              "comparator": "No filter",
+              "expressionType": "SIMPLE"
+            }
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "adhoc_filters",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "extra_form_data.append",
+            "description": "字段标签为 Filters。当前图表没有独立 time_range 控件，时间过滤通常通过此字段中的 TEMPORAL_RANGE 过滤条件表达。",
+            "data_type": "array[object]",
+            "sample_data": [
+              {
+                "clause": "WHERE",
+                "subject": "order_date",
+                "operator": "TEMPORAL_RANGE",
+                "comparator": "No filter",
+                "expressionType": "SIMPLE"
+              }
+            ],
+            "original_field": {
+              "field_name": "adhoc_filters",
+              "description": "字段标签为 Filters。当前图表没有独立 time_range 控件，时间过滤通常通过此字段中的 TEMPORAL_RANGE 过滤条件表达。",
+              "data_type": "array[object]",
+              "enum_source": "dataset columns + saved metrics + 当前 metric",
+              "sample_data": [
+                {
+                  "clause": "WHERE",
+                  "subject": "order_date",
+                  "operator": "TEMPORAL_RANGE",
+                  "comparator": "No filter",
+                  "expressionType": "SIMPLE"
+                }
+              ],
+              "required": false,
+              "embedding": "extra_form_data.append",
+              "default_value": []
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "aggregation",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Method to compute the displayed value. \"Overall value\" calculates a single metric across the entire filtered time period, ideal for non-additive metrics like ratios, averages, or distinct counts. Other methods operate over the time series data points."
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "LAST_VALUE"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "aggregation",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Method to compute the displayed value. \"Overall value\" calculates a single metric across the entire filtered time period, ideal for non-additive metrics like ratios, averages, or distinct counts. Other methods operate over the time series data points.",
+            "data_type": "string",
+            "sample_data": "LAST_VALUE",
+            "original_field": {
+              "field_name": "aggregation",
+              "description": "Method to compute the displayed value. \"Overall value\" calculates a single metric across the entire filtered time period, ideal for non-additive metrics like ratios, averages, or distinct counts. Other methods operate over the time series data points.",
+              "data_type": "string",
+              "enum_values": [
+                "raw",
+                "LAST_VALUE",
+                "sum",
+                "mean",
+                "min",
+                "max",
+                "median"
+              ],
+              "sample_data": "LAST_VALUE",
+              "required": false,
+              "embedding": "否",
+              "default_value": "LAST_VALUE",
+              "notes": "aggregation='raw' 时 buildQuery.ts 会追加第 2 个 query，并用服务端返回的聚合结果做 big number；其它值只发 1 个 query，并在前端按 aggregationChoices 做客户端聚合。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "color_picker",
+        "required": false,
+        "categories": [
+          "Chart Options / Color"
+        ],
+        "runtime_aliases": [
+          "colorPicker"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Use this to define a static color for all circles"
+        ],
+        "data_types": [
+          "object"
+        ],
+        "sample_data_examples": [
+          {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options / Color",
+            "field_name": "color_picker",
+            "runtime_alias": "colorPicker",
+            "required": false,
+            "embedding": "否",
+            "description": "Use this to define a static color for all circles",
+            "data_type": "object",
+            "sample_data": {
+              "r": 0,
+              "g": 122,
+              "b": 135,
+              "a": 1
+            },
+            "original_field": {
+              "field_name": "color_picker",
+              "runtime_alias": "colorPicker",
+              "description": "Use this to define a static color for all circles",
+              "data_type": "object",
+              "sample_data": {
+                "r": 0,
+                "g": 122,
+                "b": 135,
+                "a": 1
+              },
+              "required": false,
+              "embedding": "否",
+              "default_value": {
+                "r": 0,
+                "g": 122,
+                "b": 135,
+                "a": 1
+              },
+              "notes": "共享控件默认值来自 PRIMARY_COLOR。transformProps.ts 仅读取 r/g/b 生成 rgb(...) 主色。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "compare_lag",
+        "required": false,
+        "categories": [
+          "Options"
+        ],
+        "runtime_aliases": [
+          "compareLag"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Based on granularity, number of time periods to compare against"
+        ],
+        "data_types": [
+          "integer | string | null"
+        ],
+        "sample_data_examples": [
+          1
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Options",
+            "field_name": "compare_lag",
+            "runtime_alias": "compareLag",
+            "required": false,
+            "embedding": "否",
+            "description": "Based on granularity, number of time periods to compare against",
+            "data_type": "integer | string | null",
+            "sample_data": 1,
+            "original_field": {
+              "field_name": "compare_lag",
+              "runtime_alias": "compareLag",
+              "description": "Based on granularity, number of time periods to compare against",
+              "data_type": "integer | string | null",
+              "sample_data": 1,
+              "required": false,
+              "embedding": "否",
+              "default_value": null,
+              "notes": "transformProps.ts 会执行 Number(compareLag) || 0。只有 compare_lag > 0 且趋势线数据点足够时，才会生成百分比比较摘要。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "compare_suffix",
+        "required": false,
+        "categories": [
+          "Options"
+        ],
+        "runtime_aliases": [
+          "compareSuffix"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Suffix to apply after the percentage display"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "WoW"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Options",
+            "field_name": "compare_suffix",
+            "runtime_alias": "compareSuffix",
+            "required": false,
+            "embedding": "否",
+            "description": "Suffix to apply after the percentage display",
+            "data_type": "string",
+            "sample_data": "WoW",
+            "original_field": {
+              "field_name": "compare_suffix",
+              "runtime_alias": "compareSuffix",
+              "description": "Suffix to apply after the percentage display",
+              "data_type": "string",
+              "sample_data": "WoW",
+              "required": false,
+              "embedding": "否",
+              "default_value": "",
+              "notes": "与 compare_lag 联动，仅影响运行时生成的 subheader 文本。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "currency_format",
+        "required": false,
+        "categories": [
+          "Chart Options / Number & Date Formatting"
+        ],
+        "runtime_aliases": [
+          "currencyFormat"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Currency format"
+        ],
+        "data_types": [
+          "string | object | null"
+        ],
+        "sample_data_examples": [
+          {
+            "symbol": "$",
+            "symbolPosition": "prefix"
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options / Number & Date Formatting",
+            "field_name": "currency_format",
+            "runtime_alias": "currencyFormat",
+            "required": false,
+            "embedding": "否",
+            "description": "Currency format",
+            "data_type": "string | object | null",
+            "sample_data": {
+              "symbol": "$",
+              "symbolPosition": "prefix"
+            },
+            "original_field": {
+              "field_name": "currency_format",
+              "runtime_alias": "currencyFormat",
+              "description": "Currency format",
+              "data_type": "string | object | null",
+              "sample_data": {
+                "symbol": "$",
+                "symbolPosition": "prefix"
+              },
+              "required": false,
+              "embedding": "否",
+              "default_value": null
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "force_timestamp_formatting",
+        "required": false,
+        "categories": [
+          "Chart Options / Number & Date Formatting"
+        ],
+        "runtime_aliases": [
+          "forceTimestampFormatting"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Use date formatting even when metric value is not a timestamp"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          false
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options / Number & Date Formatting",
+            "field_name": "force_timestamp_formatting",
+            "runtime_alias": "forceTimestampFormatting",
+            "required": false,
+            "embedding": "否",
+            "description": "Use date formatting even when metric value is not a timestamp",
+            "data_type": "boolean",
+            "sample_data": false,
+            "original_field": {
+              "field_name": "force_timestamp_formatting",
+              "runtime_alias": "forceTimestampFormatting",
+              "description": "Use date formatting even when metric value is not a timestamp",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": false,
+              "required": false,
+              "embedding": "否",
+              "default_value": false
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "header_font_size",
+        "required": false,
+        "categories": [
+          "Chart Options / Typography"
+        ],
+        "runtime_aliases": [
+          "headerFontSize"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Big Number Font Size"
+        ],
+        "data_types": [
+          "number"
+        ],
+        "sample_data_examples": [
+          0.4
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options / Typography",
+            "field_name": "header_font_size",
+            "runtime_alias": "headerFontSize",
+            "required": false,
+            "embedding": "否",
+            "description": "Big Number Font Size",
+            "data_type": "number",
+            "sample_data": 0.4,
+            "original_field": {
+              "field_name": "header_font_size",
+              "runtime_alias": "headerFontSize",
+              "description": "Big Number Font Size",
+              "data_type": "number",
+              "enum_values": [
+                0.2,
+                0.3,
+                0.4,
+                0.5,
+                0.6
+              ],
+              "sample_data": 0.4,
+              "required": false,
+              "embedding": "否",
+              "default_value": 0.4
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "metric",
+        "required": true,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+        ],
+        "data_types": [
+          "string | object"
+        ],
+        "sample_data_examples": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "metric",
+            "runtime_alias": null,
+            "required": true,
+            "embedding": "否",
+            "description": "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+            "data_type": "string | object",
+            "sample_data": {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "sales"
+              },
+              "aggregate": "SUM",
+              "label": "SUM(sales)"
+            },
+            "original_field": {
+              "field_name": "metric",
+              "description": "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+              "data_type": "string | object",
+              "enum_source": "saved metrics + adhoc metrics",
+              "sample_data": {
+                "expressionType": "SIMPLE",
+                "column": {
+                  "column_name": "sales"
+                },
+                "aggregate": "SUM",
+                "label": "SUM(sales)"
+              },
+              "required": true,
+              "embedding": "否",
+              "default_value": null
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "metric_name_font_size",
+        "required": false,
+        "categories": [
+          "Chart Options / Typography"
+        ],
+        "runtime_aliases": [
+          "metricNameFontSize"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Metric Name Font Size"
+        ],
+        "data_types": [
+          "number"
+        ],
+        "sample_data_examples": [
+          0.15
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options / Typography",
+            "field_name": "metric_name_font_size",
+            "runtime_alias": "metricNameFontSize",
+            "required": false,
+            "embedding": "否",
+            "description": "Metric Name Font Size",
+            "data_type": "number",
+            "sample_data": 0.15,
+            "original_field": {
+              "field_name": "metric_name_font_size",
+              "runtime_alias": "metricNameFontSize",
+              "description": "Metric Name Font Size",
+              "data_type": "number",
+              "enum_values": [
+                0.125,
+                0.15,
+                0.2,
+                0.3,
+                0.4
+              ],
+              "sample_data": 0.15,
+              "required": false,
+              "embedding": "否",
+              "default_value": 0.15,
+              "notes": "仅在 show_metric_name=true 时显示，且 resetOnHide=false。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "min_periods",
+        "required": false,
+        "categories": [
+          "Advanced Analytics"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "The minimum number of rolling periods required to show a value. For instance if you do a cumulative sum on 7 days you may want your \"Min Period\" to be 7, so that all data points shown are the total of 7 periods. This will hide the \"ramp up\" taking place over the first 7 periods"
+        ],
+        "data_types": [
+          "integer | string | null"
+        ],
+        "sample_data_examples": [
+          7
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Advanced Analytics",
+            "field_name": "min_periods",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "The minimum number of rolling periods required to show a value. For instance if you do a cumulative sum on 7 days you may want your \"Min Period\" to be 7, so that all data points shown are the total of 7 periods. This will hide the \"ramp up\" taking place over the first 7 periods",
+            "data_type": "integer | string | null",
+            "sample_data": 7,
+            "original_field": {
+              "field_name": "min_periods",
+              "description": "The minimum number of rolling periods required to show a value. For instance if you do a cumulative sum on 7 days you may want your \"Min Period\" to be 7, so that all data points shown are the total of 7 periods. This will hide the \"ramp up\" taking place over the first 7 periods",
+              "data_type": "integer | string | null",
+              "sample_data": 7,
+              "required": false,
+              "embedding": "否",
+              "default_value": null,
+              "notes": "rollingWindowOperator.ts 会把它转换成 rolling 的 min_periods；缺省时回退为 0。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "resample_method",
+        "required": false,
+        "categories": [
+          "Advanced Analytics"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Pandas resample method"
+        ],
+        "data_types": [
+          "string | null"
+        ],
+        "sample_data_examples": [
+          "ffill"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Advanced Analytics",
+            "field_name": "resample_method",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Pandas resample method",
+            "data_type": "string | null",
+            "sample_data": "ffill",
+            "original_field": {
+              "field_name": "resample_method",
+              "description": "Pandas resample method",
+              "data_type": "string | null",
+              "enum_values": [
+                "asfreq",
+                "zerofill",
+                "linear",
+                "ffill",
+                "bfill",
+                "median",
+                "mean",
+                "sum"
+              ],
+              "sample_data": "ffill",
+              "required": false,
+              "embedding": "否",
+              "default_value": null,
+              "notes": "resampleOperator.ts 只有 resample_rule 与 resample_method 同时存在时才生成 resample post_processing；zerofill 会被翻译成 method='asfreq' 且 fill_value=0。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "resample_rule",
+        "required": false,
+        "categories": [
+          "Advanced Analytics"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Pandas resample rule"
+        ],
+        "data_types": [
+          "string | null"
+        ],
+        "sample_data_examples": [
+          "1D"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Advanced Analytics",
+            "field_name": "resample_rule",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Pandas resample rule",
+            "data_type": "string | null",
+            "sample_data": "1D",
+            "original_field": {
+              "field_name": "resample_rule",
+              "description": "Pandas resample rule",
+              "data_type": "string | null",
+              "enum_values": [
+                "1T",
+                "1H",
+                "1D",
+                "7D",
+                "1MS",
+                "1M",
+                "1AS",
+                "1A"
+              ],
+              "sample_data": "1D",
+              "required": false,
+              "embedding": "否",
+              "default_value": null
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "rolling_periods",
+        "required": false,
+        "categories": [
+          "Advanced Analytics"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Defines the size of the rolling window function, relative to the time granularity selected"
+        ],
+        "data_types": [
+          "integer | string | null"
+        ],
+        "sample_data_examples": [
+          7
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Advanced Analytics",
+            "field_name": "rolling_periods",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Defines the size of the rolling window function, relative to the time granularity selected",
+            "data_type": "integer | string | null",
+            "sample_data": 7,
+            "original_field": {
+              "field_name": "rolling_periods",
+              "description": "Defines the size of the rolling window function, relative to the time granularity selected",
+              "data_type": "integer | string | null",
+              "sample_data": 7,
+              "required": false,
+              "embedding": "否",
+              "default_value": null,
+              "notes": "仅在 rolling_type 为 mean/sum/std 时作为 rolling window 的 window 参数。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "rolling_type",
+        "required": false,
+        "categories": [
+          "Advanced Analytics"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Defines a rolling window function to apply, works along with the [Periods] text box"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "sum"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Advanced Analytics",
+            "field_name": "rolling_type",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Defines a rolling window function to apply, works along with the [Periods] text box",
+            "data_type": "string",
+            "sample_data": "sum",
+            "original_field": {
+              "field_name": "rolling_type",
+              "description": "Defines a rolling window function to apply, works along with the [Periods] text box",
+              "data_type": "string",
+              "enum_values": [
+                "None",
+                "mean",
+                "sum",
+                "std",
+                "cumsum"
+              ],
+              "sample_data": "sum",
+              "required": false,
+              "embedding": "否",
+              "default_value": "None",
+              "notes": "rollingWindowOperator.ts 只有 mean/sum/std/cumsum 会生成 post_processing；'None' 不生成任何 rolling/cum 操作。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "show_metric_name",
+        "required": false,
+        "categories": [
+          "Chart Options / Typography"
+        ],
+        "runtime_aliases": [
+          "showMetricName"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Whether to display the metric name"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          false
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options / Typography",
+            "field_name": "show_metric_name",
+            "runtime_alias": "showMetricName",
+            "required": false,
+            "embedding": "否",
+            "description": "Whether to display the metric name",
+            "data_type": "boolean",
+            "sample_data": false,
+            "original_field": {
+              "field_name": "show_metric_name",
+              "runtime_alias": "showMetricName",
+              "description": "Whether to display the metric name",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": false,
+              "required": false,
+              "embedding": "否",
+              "default_value": false
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "show_timestamp",
+        "required": false,
+        "categories": [
+          "Options"
+        ],
+        "runtime_aliases": [
+          "showTimestamp"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Whether to display the timestamp"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          false
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Options",
+            "field_name": "show_timestamp",
+            "runtime_alias": "showTimestamp",
+            "required": false,
+            "embedding": "否",
+            "description": "Whether to display the timestamp",
+            "data_type": "boolean",
+            "sample_data": false,
+            "original_field": {
+              "field_name": "show_timestamp",
+              "runtime_alias": "showTimestamp",
+              "description": "Whether to display the timestamp",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": false,
+              "required": false,
+              "embedding": "否",
+              "default_value": false
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "show_trend_line",
+        "required": false,
+        "categories": [
+          "Options"
+        ],
+        "runtime_aliases": [
+          "showTrendLine"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Whether to display the trend line"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          true
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Options",
+            "field_name": "show_trend_line",
+            "runtime_alias": "showTrendLine",
+            "required": false,
+            "embedding": "否",
+            "description": "Whether to display the trend line",
+            "data_type": "boolean",
+            "sample_data": true,
+            "original_field": {
+              "field_name": "show_trend_line",
+              "runtime_alias": "showTrendLine",
+              "description": "Whether to display the trend line",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": true,
+              "required": false,
+              "embedding": "否",
+              "default_value": true
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "start_y_axis_at_zero",
+        "required": false,
+        "categories": [
+          "Options"
+        ],
+        "runtime_aliases": [
+          "startYAxisAtZero"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Start y-axis at zero. Uncheck to start y-axis at minimum value in the data."
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          true
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Options",
+            "field_name": "start_y_axis_at_zero",
+            "runtime_alias": "startYAxisAtZero",
+            "required": false,
+            "embedding": "否",
+            "description": "Start y-axis at zero. Uncheck to start y-axis at minimum value in the data.",
+            "data_type": "boolean",
+            "sample_data": true,
+            "original_field": {
+              "field_name": "start_y_axis_at_zero",
+              "runtime_alias": "startYAxisAtZero",
+              "description": "Start y-axis at zero. Uncheck to start y-axis at minimum value in the data.",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": true,
+              "required": false,
+              "embedding": "否",
+              "default_value": true,
+              "notes": "transformProps.ts 会把它翻译成 ECharts yAxis.scale = !startYAxisAtZero。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "subheader_font_size",
+        "required": false,
+        "categories": [
+          "Chart Options / Typography"
+        ],
+        "runtime_aliases": [
+          "subheaderFontSize"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Subheader Font Size"
+        ],
+        "data_types": [
+          "number"
+        ],
+        "sample_data_examples": [
+          0.15
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options / Typography",
+            "field_name": "subheader_font_size",
+            "runtime_alias": "subheaderFontSize",
+            "required": false,
+            "embedding": "否",
+            "description": "Subheader Font Size",
+            "data_type": "number",
+            "sample_data": 0.15,
+            "original_field": {
+              "field_name": "subheader_font_size",
+              "runtime_alias": "subheaderFontSize",
+              "description": "Subheader Font Size",
+              "data_type": "number",
+              "enum_values": [
+                0.125,
+                0.15,
+                0.2,
+                0.3,
+                0.4
+              ],
+              "sample_data": 0.15,
+              "required": false,
+              "embedding": "否",
+              "default_value": 0.15,
+              "notes": "当前控制的是比较摘要/legacy subheader 行的字号。controlPanel 有该字体控件，但没有对应的 subheader 文本输入控件。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "subtitle",
+        "required": false,
+        "categories": [
+          "Chart Options / Display Text"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Description text that shows up below your Big Number"
+        ],
+        "data_types": [
+          "string | null"
+        ],
+        "sample_data_examples": [
+          "Total Sales"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options / Display Text",
+            "field_name": "subtitle",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Description text that shows up below your Big Number",
+            "data_type": "string | null",
+            "sample_data": "Total Sales",
+            "original_field": {
+              "field_name": "subtitle",
+              "description": "Description text that shows up below your Big Number",
+              "data_type": "string | null",
+              "sample_data": "Total Sales",
+              "required": false,
+              "embedding": "否",
+              "default_value": null
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "subtitle_font_size",
+        "required": false,
+        "categories": [
+          "Chart Options / Typography"
+        ],
+        "runtime_aliases": [
+          "subtitleFontSize"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Subtitle Font Size"
+        ],
+        "data_types": [
+          "number"
+        ],
+        "sample_data_examples": [
+          0.15
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options / Typography",
+            "field_name": "subtitle_font_size",
+            "runtime_alias": "subtitleFontSize",
+            "required": false,
+            "embedding": "否",
+            "description": "Subtitle Font Size",
+            "data_type": "number",
+            "sample_data": 0.15,
+            "original_field": {
+              "field_name": "subtitle_font_size",
+              "runtime_alias": "subtitleFontSize",
+              "description": "Subtitle Font Size",
+              "data_type": "number",
+              "enum_values": [
+                0.125,
+                0.15,
+                0.2,
+                0.3,
+                0.4
+              ],
+              "sample_data": 0.15,
+              "required": false,
+              "embedding": "否",
+              "default_value": 0.15
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "time_format",
+        "required": false,
+        "categories": [
+          "Chart Options / Number & Date Formatting"
+        ],
+        "runtime_aliases": [
+          "timeFormat"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "D3 format syntax: https://github.com/d3/d3-format"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "smart_date"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options / Number & Date Formatting",
+            "field_name": "time_format",
+            "runtime_alias": "timeFormat",
+            "required": false,
+            "embedding": "否",
+            "description": "D3 format syntax: https://github.com/d3/d3-format",
+            "data_type": "string",
+            "sample_data": "smart_date",
+            "original_field": {
+              "field_name": "time_format",
+              "runtime_alias": "timeFormat",
+              "description": "D3 format syntax: https://github.com/d3/d3-format",
+              "data_type": "string",
+              "enum_source": "D3_TIME_FORMAT_OPTIONS",
+              "sample_data": "smart_date",
+              "required": false,
+              "embedding": "否",
+              "default_value": "smart_date"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [
+          "timeGrainSqla"
+        ],
+        "embedding_modes": [
+          "extra_form_data.override"
+        ],
+        "descriptions": [
+          "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart."
+        ],
+        "data_types": [
+          "string | null"
+        ],
+        "sample_data_examples": [
+          "P1D"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "time_grain_sqla",
+            "runtime_alias": "timeGrainSqla",
+            "required": false,
+            "embedding": "extra_form_data.override",
+            "description": "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart.",
+            "data_type": "string | null",
+            "sample_data": "P1D",
+            "original_field": {
+              "field_name": "time_grain_sqla",
+              "runtime_alias": "timeGrainSqla",
+              "description": "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart.",
+              "data_type": "string | null",
+              "enum_source": "datasource.time_grain_sqla",
+              "sample_data": "P1D",
+              "required": false,
+              "embedding": "extra_form_data.override",
+              "default_value": "P1D"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "time_range_fixed",
+        "required": false,
+        "categories": [
+          "Options"
+        ],
+        "runtime_aliases": [
+          "timeRangeFixed"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Fix the trend line to the full time range specified in case filtered results do not include the start or end dates"
+        ],
+        "data_types": [
+          "boolean | null"
+        ],
+        "sample_data_examples": [
+          true
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Options",
+            "field_name": "time_range_fixed",
+            "runtime_alias": "timeRangeFixed",
+            "required": false,
+            "embedding": "否",
+            "description": "Fix the trend line to the full time range specified in case filtered results do not include the start or end dates",
+            "data_type": "boolean | null",
+            "sample_data": true,
+            "original_field": {
+              "field_name": "time_range_fixed",
+              "runtime_alias": "timeRangeFixed",
+              "description": "Fix the trend line to the full time range specified in case filtered results do not include the start or end dates",
+              "data_type": "boolean | null",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": true,
+              "required": false,
+              "embedding": "否",
+              "default_value": null,
+              "notes": "源码未声明显式 default。UI 仅在 form_data.time_range 存在且不为 No filter 时显示；运行时仅在 trendLineData 存在并且查询结果返回 from_dttm/to_dttm 时生效。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "x_axis",
+        "required": true,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [
+          "xAxis"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Dimension to use on x-axis. 在 big_number 中此控件显示名被重写为 Temporal X-Axis，并限制只能选时间列。"
+        ],
+        "data_types": [
+          "string | object"
+        ],
+        "sample_data_examples": [
+          "order_date"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "x_axis",
+            "runtime_alias": "xAxis",
+            "required": true,
+            "embedding": "否",
+            "description": "Dimension to use on x-axis. 在 big_number 中此控件显示名被重写为 Temporal X-Axis，并限制只能选时间列。",
+            "data_type": "string | object",
+            "sample_data": "order_date",
+            "original_field": {
+              "field_name": "x_axis",
+              "runtime_alias": "xAxis",
+              "description": "Dimension to use on x-axis. 在 big_number 中此控件显示名被重写为 Temporal X-Axis，并限制只能选时间列。",
+              "data_type": "string | object",
+              "enum_source": "datasource temporal columns; xAxisMixin 会在 legacy 的 granularity_sqla 已存在且 x_axis 为空时做初始回填",
+              "sample_data": "order_date",
+              "required": true,
+              "embedding": "否",
+              "default_value": null,
+              "notes": "getXAxisColumn(formData) 优先读取 x_axis；如果 x_axis 为空但 granularity_sqla 存在，则回退为 DTTM_ALIAS。这是兼容逻辑，不是新模板的主路径。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "y_axis_format",
+        "required": false,
+        "categories": [
+          "Chart Options / Number & Date Formatting"
+        ],
+        "runtime_aliases": [
+          "yAxisFormat"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "D3 format syntax: https://github.com/d3/d3-format"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "SMART_NUMBER"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options / Number & Date Formatting",
+            "field_name": "y_axis_format",
+            "runtime_alias": "yAxisFormat",
+            "required": false,
+            "embedding": "否",
+            "description": "D3 format syntax: https://github.com/d3/d3-format",
+            "data_type": "string",
+            "sample_data": "SMART_NUMBER",
+            "original_field": {
+              "field_name": "y_axis_format",
+              "runtime_alias": "yAxisFormat",
+              "description": "D3 format syntax: https://github.com/d3/d3-format",
+              "data_type": "string",
+              "enum_source": "D3_FORMAT_OPTIONS",
+              "sample_data": "SMART_NUMBER",
+              "required": false,
+              "embedding": "否",
+              "default_value": "SMART_NUMBER",
+              "notes": "controlOverrides 把显示标签从 Y Axis Format 改成了 Number format。"
+            }
+          }
+        ]
+      }
+    ],
+    "required_field_names": [
+      "metric",
+      "x_axis"
+    ],
+    "embedding_enabled_field_names": [
+      "adhoc_filters",
+      "time_grain_sqla"
+    ],
+    "runtime_alias_index": {
+      "color_picker": [
+        "colorPicker"
+      ],
+      "compare_lag": [
+        "compareLag"
+      ],
+      "compare_suffix": [
+        "compareSuffix"
+      ],
+      "currency_format": [
+        "currencyFormat"
+      ],
+      "force_timestamp_formatting": [
+        "forceTimestampFormatting"
+      ],
+      "header_font_size": [
+        "headerFontSize"
+      ],
+      "metric_name_font_size": [
+        "metricNameFontSize"
+      ],
+      "show_metric_name": [
+        "showMetricName"
+      ],
+      "show_timestamp": [
+        "showTimestamp"
+      ],
+      "show_trend_line": [
+        "showTrendLine"
+      ],
+      "start_y_axis_at_zero": [
+        "startYAxisAtZero"
+      ],
+      "subheader_font_size": [
+        "subheaderFontSize"
+      ],
+      "subtitle_font_size": [
+        "subtitleFontSize"
+      ],
+      "time_format": [
+        "timeFormat"
+      ],
+      "time_grain_sqla": [
+        "timeGrainSqla"
+      ],
+      "time_range_fixed": [
+        "timeRangeFixed"
+      ],
+      "x_axis": [
+        "xAxis"
+      ],
+      "y_axis_format": [
+        "yAxisFormat"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "big_number",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/big_number-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/big_number-form-data-schema.json",
+      "control-schema": "form-data-schema/big_number-schema.json"
+    }
+  },
+  "fallback_online_field_categories": {
+    "Query": [],
+    "Advanced analytics": [],
+    "Annotations & Layers": [],
+    "Predictive Analytics（Forecast）": [],
+    "Chart Options": [],
+    "Chart Title": [],
+    "图表专属": [],
+    "通用图表选项": []
+  },
+  "original_control_schema": {
+    "viz_type": "big_number",
+    "display_name": "Big Number with Trendline",
+    "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/BigNumberWithTrendline/controlPanel.tsx",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/BigNumberWithTrendline/controlPanel.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/BigNumberWithTrendline/index.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/BigNumberWithTrendline/buildQuery.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/BigNumberWithTrendline/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/BigNumberWithTrendline/buildQuery.test.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/BigNumberWithTrendline/transformProps.test.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/BigNumberViz.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/sharedControls.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/types.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/utils.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/mixins.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/customControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/getXAxis.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/models/ChartProps.ts"
+    ],
+    "notes": [
+      "big_number 不是 big_number_total 的简单变体。它的 Query 区包含 temporal x_axis、time_grain_sqla、aggregation、metric 和 adhoc_filters，并且会生成趋势线查询。",
+      "字段名优先取 controlPanel 配置中的 name；如 transformProps/types 中确认了 camelCase 运行时别名，则补充 runtime_alias。",
+      "x_axis 在 controlOverrides 中被重命名为 Temporal X-Axis，并用 temporalColumnMixin 把可选项限制为数据源的时间列；但 API form_data 键名仍然是 x_axis。",
+      "buildQuery.ts 明确只有 aggregation='raw' 时才会追加第 2 个 query；其它聚合方式都只发 1 个 query，并在 transformProps.ts 中用 aggregationChoices 做客户端聚合。",
+      "compare_lag 和 compare_suffix 产出的不是单独的持久化 subheader 字段，而是 transformProps.ts 运行时计算出的比较摘要。当前 controlPanel 没有 subheader 文本输入框。",
+      "time_range_fixed 只是趋势线渲染选项。controlPanel 里它仅在 form_data.time_range 存在且不为 No filter 时显示；transformProps.ts 里它只会在趋势线数据存在且 from_dttm/to_dttm 可得时补齐首尾空点。",
+      "y_axis_format 在 controlPanel 中被重命名为 Number format；color_picker 的共享默认值来自 PRIMARY_COLOR={r:0,g:122,b:135,a:1}，而趋势图运行时仅读取 r/g/b。"
+    ],
+    "control_overrides": {
+      "y_axis_format": {
+        "label": "Number format"
+      },
+      "x_axis": {
+        "label": "Temporal X-Axis",
+        "mapStateToProps": "temporalColumnMixin"
+      }
+    },
+    "form_data_overrides": {
+      "metric": "getStandardizedControls().shiftMetric()"
+    },
+    "field_categories": {
+      "Query": [
+        {
+          "field_name": "x_axis",
+          "runtime_alias": "xAxis",
+          "description": "Dimension to use on x-axis. 在 big_number 中此控件显示名被重写为 Temporal X-Axis，并限制只能选时间列。",
+          "data_type": "string | object",
+          "enum_source": "datasource temporal columns; xAxisMixin 会在 legacy 的 granularity_sqla 已存在且 x_axis 为空时做初始回填",
+          "sample_data": "order_date",
+          "required": true,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "getXAxisColumn(formData) 优先读取 x_axis；如果 x_axis 为空但 granularity_sqla 存在，则回退为 DTTM_ALIAS。这是兼容逻辑，不是新模板的主路径。"
+        },
+        {
+          "field_name": "time_grain_sqla",
+          "runtime_alias": "timeGrainSqla",
+          "description": "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart.",
+          "data_type": "string | null",
+          "enum_source": "datasource.time_grain_sqla",
+          "sample_data": "P1D",
+          "required": false,
+          "embedding": "extra_form_data.override",
+          "default_value": "P1D"
+        },
+        {
+          "field_name": "aggregation",
+          "description": "Method to compute the displayed value. \"Overall value\" calculates a single metric across the entire filtered time period, ideal for non-additive metrics like ratios, averages, or distinct counts. Other methods operate over the time series data points.",
+          "data_type": "string",
+          "enum_values": [
+            "raw",
+            "LAST_VALUE",
+            "sum",
+            "mean",
+            "min",
+            "max",
+            "median"
+          ],
+          "sample_data": "LAST_VALUE",
+          "required": false,
+          "embedding": "否",
+          "default_value": "LAST_VALUE",
+          "notes": "aggregation='raw' 时 buildQuery.ts 会追加第 2 个 query，并用服务端返回的聚合结果做 big number；其它值只发 1 个 query，并在前端按 aggregationChoices 做客户端聚合。"
+        },
+        {
+          "field_name": "metric",
+          "description": "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+          "data_type": "string | object",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          },
+          "required": true,
+          "embedding": "否",
+          "default_value": null
+        },
+        {
+          "field_name": "adhoc_filters",
+          "description": "字段标签为 Filters。当前图表没有独立 time_range 控件，时间过滤通常通过此字段中的 TEMPORAL_RANGE 过滤条件表达。",
+          "data_type": "array[object]",
+          "enum_source": "dataset columns + saved metrics + 当前 metric",
+          "sample_data": [
+            {
+              "clause": "WHERE",
+              "subject": "order_date",
+              "operator": "TEMPORAL_RANGE",
+              "comparator": "No filter",
+              "expressionType": "SIMPLE"
+            }
+          ],
+          "required": false,
+          "embedding": "extra_form_data.append",
+          "default_value": []
+        }
+      ],
+      "Options": [
+        {
+          "field_name": "compare_lag",
+          "runtime_alias": "compareLag",
+          "description": "Based on granularity, number of time periods to compare against",
+          "data_type": "integer | string | null",
+          "sample_data": 1,
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "transformProps.ts 会执行 Number(compareLag) || 0。只有 compare_lag > 0 且趋势线数据点足够时，才会生成百分比比较摘要。"
+        },
+        {
+          "field_name": "compare_suffix",
+          "runtime_alias": "compareSuffix",
+          "description": "Suffix to apply after the percentage display",
+          "data_type": "string",
+          "sample_data": "WoW",
+          "required": false,
+          "embedding": "否",
+          "default_value": "",
+          "notes": "与 compare_lag 联动，仅影响运行时生成的 subheader 文本。"
+        },
+        {
+          "field_name": "show_timestamp",
+          "runtime_alias": "showTimestamp",
+          "description": "Whether to display the timestamp",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false
+        },
+        {
+          "field_name": "show_trend_line",
+          "runtime_alias": "showTrendLine",
+          "description": "Whether to display the trend line",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true
+        },
+        {
+          "field_name": "start_y_axis_at_zero",
+          "runtime_alias": "startYAxisAtZero",
+          "description": "Start y-axis at zero. Uncheck to start y-axis at minimum value in the data.",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true,
+          "notes": "transformProps.ts 会把它翻译成 ECharts yAxis.scale = !startYAxisAtZero。"
+        },
+        {
+          "field_name": "time_range_fixed",
+          "runtime_alias": "timeRangeFixed",
+          "description": "Fix the trend line to the full time range specified in case filtered results do not include the start or end dates",
+          "data_type": "boolean | null",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "源码未声明显式 default。UI 仅在 form_data.time_range 存在且不为 No filter 时显示；运行时仅在 trendLineData 存在并且查询结果返回 from_dttm/to_dttm 时生效。"
+        }
+      ],
+      "Chart Options / Color": [
+        {
+          "field_name": "color_picker",
+          "runtime_alias": "colorPicker",
+          "description": "Use this to define a static color for all circles",
+          "data_type": "object",
+          "sample_data": {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          },
+          "notes": "共享控件默认值来自 PRIMARY_COLOR。transformProps.ts 仅读取 r/g/b 生成 rgb(...) 主色。"
+        }
+      ],
+      "Chart Options / Typography": [
+        {
+          "field_name": "header_font_size",
+          "runtime_alias": "headerFontSize",
+          "description": "Big Number Font Size",
+          "data_type": "number",
+          "enum_values": [
+            0.2,
+            0.3,
+            0.4,
+            0.5,
+            0.6
+          ],
+          "sample_data": 0.4,
+          "required": false,
+          "embedding": "否",
+          "default_value": 0.4
+        },
+        {
+          "field_name": "subheader_font_size",
+          "runtime_alias": "subheaderFontSize",
+          "description": "Subheader Font Size",
+          "data_type": "number",
+          "enum_values": [
+            0.125,
+            0.15,
+            0.2,
+            0.3,
+            0.4
+          ],
+          "sample_data": 0.15,
+          "required": false,
+          "embedding": "否",
+          "default_value": 0.15,
+          "notes": "当前控制的是比较摘要/legacy subheader 行的字号。controlPanel 有该字体控件，但没有对应的 subheader 文本输入控件。"
+        },
+        {
+          "field_name": "subtitle_font_size",
+          "runtime_alias": "subtitleFontSize",
+          "description": "Subtitle Font Size",
+          "data_type": "number",
+          "enum_values": [
+            0.125,
+            0.15,
+            0.2,
+            0.3,
+            0.4
+          ],
+          "sample_data": 0.15,
+          "required": false,
+          "embedding": "否",
+          "default_value": 0.15
+        },
+        {
+          "field_name": "show_metric_name",
+          "runtime_alias": "showMetricName",
+          "description": "Whether to display the metric name",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false
+        },
+        {
+          "field_name": "metric_name_font_size",
+          "runtime_alias": "metricNameFontSize",
+          "description": "Metric Name Font Size",
+          "data_type": "number",
+          "enum_values": [
+            0.125,
+            0.15,
+            0.2,
+            0.3,
+            0.4
+          ],
+          "sample_data": 0.15,
+          "required": false,
+          "embedding": "否",
+          "default_value": 0.15,
+          "notes": "仅在 show_metric_name=true 时显示，且 resetOnHide=false。"
+        }
+      ],
+      "Chart Options / Display Text": [
+        {
+          "field_name": "subtitle",
+          "description": "Description text that shows up below your Big Number",
+          "data_type": "string | null",
+          "sample_data": "Total Sales",
+          "required": false,
+          "embedding": "否",
+          "default_value": null
+        }
+      ],
+      "Chart Options / Number & Date Formatting": [
+        {
+          "field_name": "y_axis_format",
+          "runtime_alias": "yAxisFormat",
+          "description": "D3 format syntax: https://github.com/d3/d3-format",
+          "data_type": "string",
+          "enum_source": "D3_FORMAT_OPTIONS",
+          "sample_data": "SMART_NUMBER",
+          "required": false,
+          "embedding": "否",
+          "default_value": "SMART_NUMBER",
+          "notes": "controlOverrides 把显示标签从 Y Axis Format 改成了 Number format。"
+        },
+        {
+          "field_name": "currency_format",
+          "runtime_alias": "currencyFormat",
+          "description": "Currency format",
+          "data_type": "string | object | null",
+          "sample_data": {
+            "symbol": "$",
+            "symbolPosition": "prefix"
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": null
+        },
+        {
+          "field_name": "time_format",
+          "runtime_alias": "timeFormat",
+          "description": "D3 format syntax: https://github.com/d3/d3-format",
+          "data_type": "string",
+          "enum_source": "D3_TIME_FORMAT_OPTIONS",
+          "sample_data": "smart_date",
+          "required": false,
+          "embedding": "否",
+          "default_value": "smart_date"
+        },
+        {
+          "field_name": "force_timestamp_formatting",
+          "runtime_alias": "forceTimestampFormatting",
+          "description": "Use date formatting even when metric value is not a timestamp",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false
+        }
+      ],
+      "Advanced Analytics": [
+        {
+          "field_name": "rolling_type",
+          "description": "Defines a rolling window function to apply, works along with the [Periods] text box",
+          "data_type": "string",
+          "enum_values": [
+            "None",
+            "mean",
+            "sum",
+            "std",
+            "cumsum"
+          ],
+          "sample_data": "sum",
+          "required": false,
+          "embedding": "否",
+          "default_value": "None",
+          "notes": "rollingWindowOperator.ts 只有 mean/sum/std/cumsum 会生成 post_processing；'None' 不生成任何 rolling/cum 操作。"
+        },
+        {
+          "field_name": "rolling_periods",
+          "description": "Defines the size of the rolling window function, relative to the time granularity selected",
+          "data_type": "integer | string | null",
+          "sample_data": 7,
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "仅在 rolling_type 为 mean/sum/std 时作为 rolling window 的 window 参数。"
+        },
+        {
+          "field_name": "min_periods",
+          "description": "The minimum number of rolling periods required to show a value. For instance if you do a cumulative sum on 7 days you may want your \"Min Period\" to be 7, so that all data points shown are the total of 7 periods. This will hide the \"ramp up\" taking place over the first 7 periods",
+          "data_type": "integer | string | null",
+          "sample_data": 7,
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "rollingWindowOperator.ts 会把它转换成 rolling 的 min_periods；缺省时回退为 0。"
+        },
+        {
+          "field_name": "resample_rule",
+          "description": "Pandas resample rule",
+          "data_type": "string | null",
+          "enum_values": [
+            "1T",
+            "1H",
+            "1D",
+            "7D",
+            "1MS",
+            "1M",
+            "1AS",
+            "1A"
+          ],
+          "sample_data": "1D",
+          "required": false,
+          "embedding": "否",
+          "default_value": null
+        },
+        {
+          "field_name": "resample_method",
+          "description": "Pandas resample method",
+          "data_type": "string | null",
+          "enum_values": [
+            "asfreq",
+            "zerofill",
+            "linear",
+            "ffill",
+            "bfill",
+            "median",
+            "mean",
+            "sum"
+          ],
+          "sample_data": "ffill",
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "resampleOperator.ts 只有 resample_rule 与 resample_method 同时存在时才生成 resample post_processing；zerofill 会被翻译成 method='asfreq' 且 fill_value=0。"
+        }
+      ]
+    }
+  }
+}

@@ -15,6 +15,10 @@ public class SupersetDashboardInfo {
 
     private List<String> tags;
 
+    private Long ownerId;
+
+    private String ownerName;
+
     private String supersetDomain;
 
     private String editUrl;

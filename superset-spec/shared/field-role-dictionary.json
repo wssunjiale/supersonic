@@ -1,0 +1,917 @@
+{
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "exact_field_rules": {
+    "metrics": {
+      "slot_kind": "metric_list",
+      "accepted_dataset_roles": [
+        "metric",
+        "saved_metric",
+        "adhoc_metric"
+      ],
+      "cardinality": "1..n",
+      "placeholder": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        }
+      ]
+    },
+    "metric": {
+      "slot_kind": "metric",
+      "accepted_dataset_roles": [
+        "metric",
+        "saved_metric",
+        "adhoc_metric"
+      ],
+      "cardinality": "1",
+      "placeholder": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      }
+    },
+    "metrics_b": {
+      "slot_kind": "secondary_metric_list",
+      "accepted_dataset_roles": [
+        "metric",
+        "saved_metric",
+        "adhoc_metric"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<secondary_metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<secondary_metric_column>)"
+        }
+      ]
+    },
+    "secondary_metric": {
+      "slot_kind": "secondary_metric",
+      "accepted_dataset_roles": [
+        "metric",
+        "saved_metric",
+        "adhoc_metric"
+      ],
+      "cardinality": "0..1",
+      "placeholder": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<secondary_metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<secondary_metric_column>)"
+      }
+    },
+    "tooltip_metrics": {
+      "slot_kind": "tooltip_metric_list",
+      "accepted_dataset_roles": [
+        "metric",
+        "saved_metric",
+        "adhoc_metric"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<tooltip_metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<tooltip_metric_column>)"
+        }
+      ]
+    },
+    "groupby": {
+      "slot_kind": "dimension_list",
+      "accepted_dataset_roles": [
+        "dimension",
+        "category_dimension"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [
+        "<dimension_column>"
+      ]
+    },
+    "groupbyrows": {
+      "slot_kind": "row_dimension_list",
+      "accepted_dataset_roles": [
+        "dimension",
+        "category_dimension"
+      ],
+      "cardinality": "1..n",
+      "placeholder": [
+        "<row_dimension_column>"
+      ]
+    },
+    "groupbycolumns": {
+      "slot_kind": "column_dimension_list",
+      "accepted_dataset_roles": [
+        "dimension",
+        "category_dimension"
+      ],
+      "cardinality": "1..n",
+      "placeholder": [
+        "<column_dimension_column>"
+      ]
+    },
+    "columns": {
+      "slot_kind": "dimension_list",
+      "accepted_dataset_roles": [
+        "dimension",
+        "category_dimension"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [
+        "<dimension_column>"
+      ]
+    },
+    "column": {
+      "slot_kind": "dimension",
+      "accepted_dataset_roles": [
+        "dimension",
+        "category_dimension"
+      ],
+      "cardinality": "0..1",
+      "placeholder": "<dimension_column>"
+    },
+    "all_columns": {
+      "slot_kind": "dimension_list",
+      "accepted_dataset_roles": [
+        "dimension",
+        "category_dimension"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [
+        "<dimension_column>"
+      ]
+    },
+    "all_columns_x": {
+      "slot_kind": "x_dimension_list",
+      "accepted_dataset_roles": [
+        "dimension",
+        "category_dimension"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [
+        "<x_dimension_column>"
+      ]
+    },
+    "all_columns_y": {
+      "slot_kind": "y_dimension_list",
+      "accepted_dataset_roles": [
+        "dimension",
+        "category_dimension"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [
+        "<y_dimension_column>"
+      ]
+    },
+    "x_axis": {
+      "slot_kind": "x_axis",
+      "accepted_dataset_roles": [
+        "time_dimension",
+        "dimension"
+      ],
+      "cardinality": "1",
+      "placeholder": "<x_axis_column>"
+    },
+    "y_axis": {
+      "slot_kind": "y_axis",
+      "accepted_dataset_roles": [
+        "metric",
+        "dimension"
+      ],
+      "cardinality": "0..1",
+      "placeholder": "<y_axis_column_or_metric>"
+    },
+    "granularity_sqla": {
+      "slot_kind": "time_column",
+      "accepted_dataset_roles": [
+        "time_dimension"
+      ],
+      "cardinality": "0..1",
+      "placeholder": "<time_column>"
+    },
+    "time_grain_sqla": {
+      "slot_kind": "time_grain",
+      "accepted_dataset_roles": [
+        "time_grain"
+      ],
+      "cardinality": "0..1",
+      "placeholder": "P1D"
+    },
+    "source": {
+      "slot_kind": "graph_source",
+      "accepted_dataset_roles": [
+        "entity_id",
+        "dimension"
+      ],
+      "cardinality": "1",
+      "placeholder": "<source_column>"
+    },
+    "target": {
+      "slot_kind": "graph_target",
+      "accepted_dataset_roles": [
+        "entity_id",
+        "dimension"
+      ],
+      "cardinality": "1",
+      "placeholder": "<target_column>"
+    },
+    "entity": {
+      "slot_kind": "entity",
+      "accepted_dataset_roles": [
+        "entity",
+        "entity_id",
+        "dimension"
+      ],
+      "cardinality": "0..1",
+      "placeholder": "<entity_column>"
+    },
+    "latitude": {
+      "slot_kind": "latitude",
+      "accepted_dataset_roles": [
+        "geo_latitude"
+      ],
+      "cardinality": "1",
+      "placeholder": "<latitude_column>"
+    },
+    "longitude": {
+      "slot_kind": "longitude",
+      "accepted_dataset_roles": [
+        "geo_longitude"
+      ],
+      "cardinality": "1",
+      "placeholder": "<longitude_column>"
+    },
+    "start": {
+      "slot_kind": "range_start",
+      "accepted_dataset_roles": [
+        "time_dimension",
+        "numeric_measure"
+      ],
+      "cardinality": "1",
+      "placeholder": "<start_column>"
+    },
+    "end": {
+      "slot_kind": "range_end",
+      "accepted_dataset_roles": [
+        "time_dimension",
+        "numeric_measure"
+      ],
+      "cardinality": "1",
+      "placeholder": "<end_column>"
+    },
+    "id": {
+      "slot_kind": "node_id",
+      "accepted_dataset_roles": [
+        "entity_id",
+        "dimension"
+      ],
+      "cardinality": "1",
+      "placeholder": "<id_column>"
+    },
+    "parent": {
+      "slot_kind": "parent_id",
+      "accepted_dataset_roles": [
+        "entity_id",
+        "dimension"
+      ],
+      "cardinality": "0..1",
+      "placeholder": "<parent_id_column>"
+    },
+    "select_country": {
+      "slot_kind": "geo_region",
+      "accepted_dataset_roles": [
+        "geo_country_code",
+        "geo_country_name"
+      ],
+      "cardinality": "0..1",
+      "placeholder": "<country_code_or_name_column>"
+    },
+    "adhoc_filters": {
+      "slot_kind": "filter_list",
+      "accepted_dataset_roles": [
+        "filter_context"
+      ],
+      "cardinality": "0..n",
+      "placeholder": []
+    },
+    "filters": {
+      "slot_kind": "filter_list",
+      "accepted_dataset_roles": [
+        "filter_context"
+      ],
+      "cardinality": "0..n",
+      "placeholder": []
+    },
+    "selected_chart": {
+      "slot_kind": "chart_reference",
+      "accepted_dataset_roles": [
+        "chart_reference"
+      ],
+      "cardinality": "1",
+      "placeholder": "<saved_chart_reference_json>"
+    },
+    "deck_slices": {
+      "slot_kind": "chart_reference_list",
+      "accepted_dataset_roles": [
+        "chart_reference"
+      ],
+      "cardinality": "1..n",
+      "placeholder": [
+        "<saved_chart_reference_json>"
+      ]
+    },
+    "geom_column": {
+      "slot_kind": "geo_geometry",
+      "accepted_dataset_roles": [
+        "geo_geometry"
+      ],
+      "cardinality": "1",
+      "placeholder": "<geometry_column>"
+    },
+    "spatial": {
+      "slot_kind": "geo_spatial",
+      "accepted_dataset_roles": [
+        "geo_point",
+        "geo_geometry"
+      ],
+      "cardinality": "1",
+      "placeholder": "<spatial_column_or_expression>"
+    },
+    "start_spatial": {
+      "slot_kind": "geo_path_start",
+      "accepted_dataset_roles": [
+        "geo_point",
+        "geo_geometry"
+      ],
+      "cardinality": "1",
+      "placeholder": "<start_spatial_column>"
+    },
+    "end_spatial": {
+      "slot_kind": "geo_path_end",
+      "accepted_dataset_roles": [
+        "geo_point",
+        "geo_geometry"
+      ],
+      "cardinality": "1",
+      "placeholder": "<end_spatial_column>"
+    },
+    "size": {
+      "slot_kind": "metric",
+      "accepted_dataset_roles": [
+        "metric",
+        "saved_metric",
+        "adhoc_metric"
+      ],
+      "cardinality": "1",
+      "placeholder": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      }
+    },
+    "series": {
+      "slot_kind": "dimension",
+      "accepted_dataset_roles": [
+        "dimension",
+        "category_dimension"
+      ],
+      "cardinality": "1",
+      "placeholder": "<dimension_column>"
+    }
+  },
+  "pattern_field_rules": [
+    {
+      "contains_any": [
+        "metric"
+      ],
+      "slot_kind": "metric",
+      "accepted_dataset_roles": [
+        "metric",
+        "saved_metric",
+        "adhoc_metric"
+      ],
+      "cardinality": "0..n",
+      "placeholder": "<metric_or_metric_list>"
+    },
+    {
+      "contains_any": [
+        "group",
+        "column",
+        "series"
+      ],
+      "slot_kind": "dimension",
+      "accepted_dataset_roles": [
+        "dimension",
+        "category_dimension"
+      ],
+      "cardinality": "0..n",
+      "placeholder": "<dimension_column_or_list>"
+    },
+    {
+      "contains_any": [
+        "axis",
+        "granularity",
+        "time",
+        "date"
+      ],
+      "slot_kind": "time_or_axis",
+      "accepted_dataset_roles": [
+        "time_dimension",
+        "dimension"
+      ],
+      "cardinality": "0..1",
+      "placeholder": "<time_or_axis_column>"
+    },
+    {
+      "contains_any": [
+        "lat"
+      ],
+      "slot_kind": "latitude",
+      "accepted_dataset_roles": [
+        "geo_latitude"
+      ],
+      "cardinality": "0..1",
+      "placeholder": "<latitude_column>"
+    },
+    {
+      "contains_any": [
+        "lon",
+        "lng",
+        "longitude"
+      ],
+      "slot_kind": "longitude",
+      "accepted_dataset_roles": [
+        "geo_longitude"
+      ],
+      "cardinality": "0..1",
+      "placeholder": "<longitude_column>"
+    },
+    {
+      "contains_any": [
+        "country",
+        "province",
+        "state",
+        "region"
+      ],
+      "slot_kind": "geo_region",
+      "accepted_dataset_roles": [
+        "geo_country_code",
+        "geo_country_name",
+        "geo_region"
+      ],
+      "cardinality": "0..1",
+      "placeholder": "<region_column>"
+    },
+    {
+      "contains_any": [
+        "source",
+        "target",
+        "parent",
+        "entity",
+        "node",
+        "id"
+      ],
+      "slot_kind": "graph_or_hierarchy",
+      "accepted_dataset_roles": [
+        "entity_id",
+        "entity",
+        "dimension"
+      ],
+      "cardinality": "0..1",
+      "placeholder": "<entity_or_relation_column>"
+    },
+    {
+      "contains_any": [
+        "filter"
+      ],
+      "slot_kind": "filter_list",
+      "accepted_dataset_roles": [
+        "filter_context"
+      ],
+      "cardinality": "0..n",
+      "placeholder": []
+    }
+  ],
+  "observed_field_usage_count": {
+    "adhoc_filters": 55,
+    "adhoc_filters_b": 1,
+    "aggregateFunction": 1,
+    "aggregation": 3,
+    "align_pn": 1,
+    "all_columns": 2,
+    "all_columns_x": 1,
+    "all_columns_y": 1,
+    "allow_rearrange_columns": 1,
+    "allow_render_html": 2,
+    "animation": 1,
+    "annotation_layers": 9,
+    "area": 4,
+    "areaB": 1,
+    "autozoom": 10,
+    "baseEdgeWidth": 1,
+    "baseNodeSize": 1,
+    "bins": 1,
+    "border_color": 1,
+    "border_width": 1,
+    "bottom_margin": 4,
+    "break_points": 1,
+    "cellSize": 1,
+    "cell_padding": 1,
+    "cell_radius": 1,
+    "cell_size": 1,
+    "chart_background_border_radius": 1,
+    "chart_background_color": 1,
+    "chart_size": 1,
+    "child_label_position": 1,
+    "clustering_radius": 1,
+    "colOrder": 1,
+    "colSubTotals": 1,
+    "colSubtotalPosition": 1,
+    "colTotals": 1,
+    "color_breakpoints": 4,
+    "color_by": 1,
+    "color_picker": 10,
+    "color_pn": 1,
+    "color_scheme": 32,
+    "color_scheme_type": 7,
+    "column": 1,
+    "column_collection": 1,
+    "column_collection[].bounds": 1,
+    "column_collection[].colType": 1,
+    "column_collection[].comparisonType": 1,
+    "column_collection[].d3format": 1,
+    "column_collection[].dateFormat": 1,
+    "column_collection[].height": 1,
+    "column_collection[].key": 1,
+    "column_collection[].label": 1,
+    "column_collection[].showYAxis": 1,
+    "column_collection[].timeLag": 1,
+    "column_collection[].timeRatio": 1,
+    "column_collection[].tooltip": 1,
+    "column_collection[].width": 1,
+    "column_collection[].yAxisBounds": 1,
+    "column_config": 2,
+    "columns": 3,
+    "combineMetric": 1,
+    "compare_lag": 1,
+    "compare_suffix": 1,
+    "comparison_color_enabled": 1,
+    "comparison_color_scheme": 1,
+    "comparison_range_label": 1,
+    "comparison_type": 12,
+    "comparison_type_b": 1,
+    "conditional_formatting": 3,
+    "contours": 1,
+    "contribution": 5,
+    "contributionMode": 7,
+    "country_fieldtype": 1,
+    "cumulative": 1,
+    "currency_format": 19,
+    "currency_format_secondary": 1,
+    "date_format": 6,
+    "date_time_format": 2,
+    "deafult_breakpoint_color": 4,
+    "deck_slices": 1,
+    "decrease_color": 1,
+    "dimension": 2,
+    "domain_granularity": 1,
+    "donut": 1,
+    "draggable": 1,
+    "edgeLength": 1,
+    "edgeSymbol": 1,
+    "emphasis": 1,
+    "end_angle": 1,
+    "end_spatial": 1,
+    "end_time": 1,
+    "entity": 4,
+    "equal_date_size": 1,
+    "extruded": 4,
+    "fill_color_picker": 2,
+    "filled": 2,
+    "filter_nulls": 10,
+    "font_size": 1,
+    "force_timestamp_formatting": 2,
+    "forecastEnabled": 7,
+    "forecastInterval": 7,
+    "forecastPeriods": 7,
+    "forecastSeasonalityDaily": 7,
+    "forecastSeasonalityWeekly": 7,
+    "forecastSeasonalityYearly": 7,
+    "freq": 1,
+    "friction": 1,
+    "geojson": 1,
+    "geom_column": 1,
+    "global_opacity": 1,
+    "granularity": 4,
+    "granularity_sqla": 8,
+    "gravity": 1,
+    "grid_size": 3,
+    "group_others_when_limit_reached": 7,
+    "groupby": 27,
+    "groupbyColumns": 1,
+    "groupbyRows": 1,
+    "groupby_b": 1,
+    "handlebarsTemplate": 1,
+    "header_font_size": 2,
+    "horizon_color_scale": 1,
+    "id": 1,
+    "include_search": 1,
+    "include_series": 1,
+    "include_time": 1,
+    "increase_color": 1,
+    "innerRadius": 1,
+    "intensity": 1,
+    "interval_color_indices": 1,
+    "intervals": 1,
+    "is_circle": 1,
+    "js_agg_function": 1,
+    "js_columns": 10,
+    "js_data_mutator": 10,
+    "js_onclick_href": 10,
+    "js_tooltip": 10,
+    "label_line": 1,
+    "label_position": 1,
+    "label_template": 1,
+    "label_type": 5,
+    "labels_outside": 1,
+    "layer_configs": 1,
+    "layout": 2,
+    "left_margin": 4,
+    "legendMargin": 14,
+    "legendOrientation": 14,
+    "legendType": 13,
+    "legend_format": 3,
+    "legend_position": 4,
+    "legend_type": 1,
+    "liftvalue_precision": 1,
+    "limit": 16,
+    "limit_b": 1,
+    "line_column": 2,
+    "line_interpolation": 1,
+    "line_type": 2,
+    "line_width": 3,
+    "line_width_unit": 3,
+    "linear_color_scheme": 8,
+    "logAxis": 8,
+    "logAxisSecondary": 1,
+    "logXAxis": 1,
+    "logYAxis": 1,
+    "log_scale": 1,
+    "map_view": 1,
+    "mapbox_color": 1,
+    "mapbox_label": 1,
+    "mapbox_style": 12,
+    "markerEnabled": 7,
+    "markerEnabledB": 1,
+    "markerSize": 7,
+    "markerSizeB": 1,
+    "marker_labels": 1,
+    "marker_line_labels": 1,
+    "marker_lines": 1,
+    "markers": 1,
+    "max_bubble_size": 3,
+    "max_radius": 1,
+    "max_val": 1,
+    "metric": 19,
+    "metric_name_font_size": 2,
+    "metrics": 21,
+    "metricsLayout": 1,
+    "metrics_b": 1,
+    "min_periods": 12,
+    "min_periods_b": 1,
+    "min_radius": 1,
+    "min_val": 1,
+    "minorSplitLine": 8,
+    "minorTicks": 8,
+    "multiplier": 2,
+    "name": 1,
+    "node_label_position": 1,
+    "normalize": 1,
+    "normalize_across": 1,
+    "normalized": 1,
+    "num_buckets": 1,
+    "number_format": 10,
+    "only_total": 8,
+    "only_totalB": 1,
+    "opacity": 7,
+    "opacityB": 1,
+    "order_by_cols": 3,
+    "order_desc": 18,
+    "order_desc_b": 1,
+    "orderby": 1,
+    "orient": 1,
+    "orientation": 1,
+    "outerRadius": 1,
+    "overlap": 1,
+    "page_length": 1,
+    "pandas_aggfunc": 1,
+    "parent": 1,
+    "partition_limit": 1,
+    "partition_threshold": 1,
+    "percent_calculation_type": 1,
+    "percent_metric_calculation": 1,
+    "percent_metrics": 2,
+    "percentage_threshold": 6,
+    "point_radius": 1,
+    "point_radius_fixed": 2,
+    "point_radius_scale": 1,
+    "point_radius_unit": 1,
+    "point_unit": 1,
+    "pvalue_precision": 1,
+    "query_mode": 2,
+    "radius_pixels": 1,
+    "range_labels": 1,
+    "ranges": 1,
+    "render_while_dragging": 1,
+    "repulsion": 1,
+    "resample_method": 12,
+    "resample_method_b": 1,
+    "resample_rule": 12,
+    "resample_rule_b": 1,
+    "reverse_long_lat": 2,
+    "rich_tooltip": 10,
+    "roam": 2,
+    "rolling_periods": 12,
+    "rolling_periods_b": 1,
+    "rolling_type": 12,
+    "rolling_type_b": 1,
+    "root_node_id": 1,
+    "roseType": 1,
+    "rose_area_proportion": 1,
+    "rotation": 1,
+    "round_cap": 1,
+    "rowOrder": 1,
+    "rowSubTotals": 1,
+    "rowSubtotalPosition": 1,
+    "rowTotals": 1,
+    "row_limit": 47,
+    "row_limit_b": 1,
+    "secondary_metric": 3,
+    "select_country": 1,
+    "selectedMode": 1,
+    "selected_chart": 1,
+    "series": 5,
+    "seriesType": 3,
+    "seriesTypeB": 1,
+    "series_height": 1,
+    "series_limit": 2,
+    "series_limit_metric": 2,
+    "server_page_length": 1,
+    "server_pagination": 1,
+    "showSymbolThreshold": 1,
+    "showTooltipPercentage": 7,
+    "showTooltipTotal": 7,
+    "show_axis_tick": 1,
+    "show_bubbles": 1,
+    "show_cell_bars": 1,
+    "show_datatable": 1,
+    "show_empty_columns": 7,
+    "show_extra_controls": 3,
+    "show_labels": 5,
+    "show_labels_threshold": 2,
+    "show_legend": 20,
+    "show_metric_name": 3,
+    "show_percentage": 1,
+    "show_pointer": 1,
+    "show_progress": 1,
+    "show_query_identifiers": 1,
+    "show_split_line": 1,
+    "show_timestamp": 1,
+    "show_tooltip_labels": 1,
+    "show_total": 2,
+    "show_totals": 2,
+    "show_trend_line": 1,
+    "show_upper_labels": 1,
+    "show_value": 10,
+    "show_valueB": 1,
+    "show_values": 2,
+    "significance_level": 1,
+    "size": 7,
+    "size_from": 1,
+    "size_to": 1,
+    "sort_by_metric": 9,
+    "sort_series_ascending": 8,
+    "sort_series_ascendingB": 1,
+    "sort_series_type": 8,
+    "sort_series_typeB": 1,
+    "sort_x_axis": 1,
+    "sort_y_axis": 1,
+    "source": 2,
+    "source_category": 1,
+    "spatial": 6,
+    "split_number": 1,
+    "stack": 7,
+    "stackB": 1,
+    "stackDimension": 1,
+    "start_angle": 1,
+    "start_date_offset": 1,
+    "start_spatial": 1,
+    "start_time": 1,
+    "start_y_axis_at_zero": 1,
+    "steps": 1,
+    "stroke_color_picker": 2,
+    "stroke_width": 1,
+    "stroked": 2,
+    "styleTemplate": 1,
+    "subcategories": 1,
+    "subdomain_granularity": 1,
+    "subheader_font_size": 1,
+    "subtitle": 2,
+    "subtitle_font_size": 2,
+    "symbol": 1,
+    "symbolSize": 1,
+    "table_timestamp_format": 1,
+    "target": 2,
+    "target_category": 1,
+    "target_color_picker": 1,
+    "temporal_columns_lookup": 3,
+    "threshold_for_other": 1,
+    "time_compare": 12,
+    "time_compare_b": 1,
+    "time_format": 2,
+    "time_grain_sqla": 19,
+    "time_range": 8,
+    "time_range_fixed": 1,
+    "time_series_option": 1,
+    "time_shift_color": 8,
+    "timeseries_limit_metric": 17,
+    "timeseries_limit_metric_b": 1,
+    "tooltipSizeFormat": 1,
+    "tooltipSortByMetric": 8,
+    "tooltipTimeFormat": 9,
+    "tooltipValuesFormat": 1,
+    "tooltip_columns": 1,
+    "tooltip_label_type": 1,
+    "tooltip_metrics": 1,
+    "total_color": 1,
+    "transposePivot": 1,
+    "truncateXAxis": 9,
+    "truncateYAxis": 9,
+    "truncate_metric": 8,
+    "truncate_metric_b": 1,
+    "url": 1,
+    "valueFormat": 1,
+    "value_bounds": 1,
+    "value_formatter": 1,
+    "viewport": 11,
+    "viewport_latitude": 1,
+    "viewport_longitude": 1,
+    "viewport_zoom": 1,
+    "whiskerOptions": 1,
+    "x": 2,
+    "xAxisBounds": 9,
+    "xAxisForceCategorical": 7,
+    "xAxisFormat": 1,
+    "xAxisLabelInterval": 9,
+    "xAxisLabelRotation": 10,
+    "x_axis": 11,
+    "x_axis_format": 4,
+    "x_axis_label": 5,
+    "x_axis_showminmax": 3,
+    "x_axis_sort": 7,
+    "x_axis_sort_asc": 7,
+    "x_axis_time_bounds": 1,
+    "x_axis_time_format": 12,
+    "x_axis_title": 11,
+    "x_axis_title_margin": 11,
+    "x_log_scale": 1,
+    "x_ticks_layout": 4,
+    "xscale_interval": 1,
+    "y": 2,
+    "yAxisIndex": 1,
+    "yAxisIndexB": 1,
+    "yAxisLabelRotation": 1,
+    "yAxisTitleSecondary": 1,
+    "y_axis": 1,
+    "y_axis_bounds": 12,
+    "y_axis_bounds_secondary": 1,
+    "y_axis_format": 20,
+    "y_axis_format_secondary": 1,
+    "y_axis_label": 5,
+    "y_axis_showminmax": 3,
+    "y_axis_title": 11,
+    "y_axis_title_margin": 11,
+    "y_axis_title_position": 9,
+    "y_log_scale": 3,
+    "yscale_interval": 1,
+    "zoomable": 9
+  }
+}

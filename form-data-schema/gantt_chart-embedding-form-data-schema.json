@@ -1,0 +1,322 @@
+{
+  "viz_type": "gantt_chart",
+  "display_name": "Gantt Chart",
+  "purpose": "第三方 embedding / guest token 场景下安全传输的 Gantt Chart form_data 模板",
+  "base_form_data_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/gantt_chart-form-data-schema.json",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset/security/manager.py",
+    "D:/vsx/sources/superset-6.0.0/superset/charts/data/api.py",
+    "D:/vsx/sources/superset-6.0.0/superset/commands/chart/data/get_data_command.py",
+    "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+    "D:/vsx/sources/superset-6.0.0/superset/constants.py",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/constants.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/processExtraFormData.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/QueryFormData.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Gantt/controlPanel.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Gantt/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Gantt/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Gantt/EchartsGantt.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Gantt/types.ts"
+  ],
+  "notes": [
+    "embedded guest 的核心限制在后端 `security/manager.py::query_context_modified()`。抛错文案是 `Guest user cannot modify chart payload`。",
+    "Gantt 是标准 chart data API 图表。guest 请求的安全做法不是重新拼装一份新的 gantt form_data，而是直接复制已保存图表的 form_data 作为 base，再把动态筛选放进 `extra_form_data`。",
+    "Gantt 最容易被误判成“只是展示字段”的几项，其实都会进入受保护的 query_context：`start_time`、`end_time`、`y_axis`、`series`、`tooltip_columns` 会改变 `query.columns`，`tooltip_metrics` 会改变 `query.metrics`，`order_by_cols` 会改变 `query.orderby`。",
+    "当前 Gantt 源码里没有专属 click cross-filter serializer；`EchartsGantt.tsx` 只处理 legend state 和 `Plain/Subcategories` 顶部切换。因此 embedding 场景下的动态过滤通常应由宿主页面手工构造 `extra_form_data.filters` 或 `extra_form_data.adhoc_filters`。",
+    "`show_extra_controls`、`subcategories`、标题、legend、颜色与格式化等字段大多不进入 `query_context_modified()` 的核心校验集合，但为了避免 guest 请求与保存态图表分叉，仍建议根层原样复制。"
+  ],
+  "security_enforcement": {
+    "backend_check_function": "superset/security/manager.py::query_context_modified",
+    "validation_entry": "superset/charts/data/api.py -> ChartDataCommand.validate() -> QueryContext.raise_for_access()",
+    "error_message": "Guest user cannot modify chart payload",
+    "hard_block_fields": [
+      "slice_id",
+      "metrics",
+      "groupby",
+      "columns",
+      "orderby"
+    ],
+    "indirectly_sensitive_fields_for_gantt": [
+      "start_time",
+      "end_time",
+      "y_axis",
+      "series",
+      "tooltip_columns",
+      "tooltip_metrics",
+      "order_by_cols"
+    ],
+    "recommended_strategy": "复制保存态 chart form_data 作为 base，仅通过 extra_form_data 追加过滤条件。"
+  },
+  "safe_base_rule": {
+    "description": "第三方 embedding 请求中的根层 form_data，应直接复制保存态 Gantt 图表的 form_data，不要自行重构字段名或删改查询定义。",
+    "must_be_copied_from_saved_chart": [
+      "slice_id",
+      "datasource",
+      "viz_type",
+      "start_time",
+      "end_time",
+      "y_axis",
+      "series",
+      "tooltip_metrics",
+      "tooltip_columns",
+      "adhoc_filters",
+      "order_by_cols",
+      "row_limit",
+      "subcategories",
+      "color_scheme",
+      "show_legend",
+      "legendType",
+      "legendOrientation",
+      "legendMargin",
+      "zoomable",
+      "show_extra_controls",
+      "x_axis_time_bounds",
+      "x_axis_time_format",
+      "tooltipTimeFormat",
+      "tooltipValuesFormat",
+      "x_axis_title",
+      "x_axis_title_margin",
+      "y_axis_title",
+      "y_axis_title_margin",
+      "all other saved chart definition fields"
+    ],
+    "why": [
+      "`query_context_modified()` 会把请求中的 `queries[*].metrics`、`queries[*].columns`、`queries[*].orderby` 与保存态图表对比。",
+      "Gantt 的 `start_time`、`end_time`、`y_axis`、`series`、`tooltip_columns`、`order_by_cols` 都会影响 `query.columns`；`tooltip_metrics` 会影响 `query.metrics`。",
+      "guest 模式下，哪怕你只是觉得某个字段“像 tooltip 选项”，只要它会改变 query_context，就可能触发安全错误。"
+    ]
+  },
+  "safe_embedding_form_data_template": {
+    "description": "这是 guest embedding 下的保守安全写法。根层以保存态 Gantt 图表为 base，仅改 extra_form_data。",
+    "template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "gantt_chart",
+      "start_time": "<copied_from_saved_chart>",
+      "end_time": "<copied_from_saved_chart>",
+      "y_axis": "<copied_from_saved_chart>",
+      "series": "<copied_from_saved_chart_if_present>",
+      "tooltip_metrics": "<copied_from_saved_chart_if_present>",
+      "tooltip_columns": "<copied_from_saved_chart_if_present>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "order_by_cols": "<copied_from_saved_chart_if_present>",
+      "row_limit": "<copied_from_saved_chart_if_present>",
+      "subcategories": "<copied_from_saved_chart_if_present>",
+      "color_scheme": "<copied_from_saved_chart_if_present>",
+      "show_legend": "<copied_from_saved_chart_if_present>",
+      "legendType": "<copied_from_saved_chart_if_present>",
+      "legendOrientation": "<copied_from_saved_chart_if_present>",
+      "legendMargin": "<copied_from_saved_chart_if_present>",
+      "zoomable": "<copied_from_saved_chart_if_present>",
+      "show_extra_controls": "<copied_from_saved_chart_if_present>",
+      "x_axis_time_bounds": "<copied_from_saved_chart_if_present>",
+      "x_axis_time_format": "<copied_from_saved_chart_if_present>",
+      "tooltipTimeFormat": "<copied_from_saved_chart_if_present>",
+      "tooltipValuesFormat": "<copied_from_saved_chart_if_present>",
+      "x_axis_title": "<copied_from_saved_chart_if_present>",
+      "x_axis_title_margin": "<copied_from_saved_chart_if_present>",
+      "y_axis_title": "<copied_from_saved_chart_if_present>",
+      "y_axis_title_margin": "<copied_from_saved_chart_if_present>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "task_name",
+            "op": "IN",
+            "val": [
+              "Deploy"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "owner",
+            "operator": "IN",
+            "comparator": [
+              "Ops"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    }
+  },
+  "preferred_dynamic_container": {
+    "field_name": "extra_form_data",
+    "description": "第三方 embedding 允许动态传入的上下文容器；后端会在 `merge_extra_form_data()` 中把它并入实际查询。",
+    "append_keys": [
+      "adhoc_filters",
+      "filters",
+      "interactive_groupby",
+      "interactive_highlight",
+      "interactive_drilldown",
+      "custom_form_data"
+    ],
+    "override_keys_backend_high_confidence": [
+      "granularity_sqla",
+      "granularity",
+      "time_column",
+      "time_grain",
+      "time_range",
+      "time_compare",
+      "time_grain_sqla",
+      "relative_start",
+      "relative_end"
+    ],
+    "notes": "Gantt 当前 controlPanel 没有正式时间过滤区块，因此最实用的动态入口仍然是 `filters` 和 `adhoc_filters`。"
+  },
+  "extra_form_data_field_schema": [
+    {
+      "field_name": "filters",
+      "data_type": "array[QueryObjectFilterClause]",
+      "behavior": "append",
+      "safe_for_gantt": true,
+      "recommended": true,
+      "sample_data": [
+        {
+          "col": "task_name",
+          "op": "IN",
+          "val": [
+            "Deploy"
+          ]
+        }
+      ],
+      "effect": "追加 simple filters；后端会把它们转换为额外 adhoc filters 并并入实际查询。",
+      "source": "superset/constants.py + superset/utils/core.py + frontend QueryFormData.ts"
+    },
+    {
+      "field_name": "adhoc_filters",
+      "data_type": "array[AdhocFilter]",
+      "behavior": "append",
+      "safe_for_gantt": true,
+      "recommended": true,
+      "sample_data": [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "owner",
+          "operator": "IN",
+          "comparator": [
+            "Ops"
+          ]
+        }
+      ],
+      "effect": "追加 adhoc filters；后端会标记为 `isExtra` 并并入查询。",
+      "source": "superset/utils/core.py"
+    },
+    {
+      "field_name": "custom_form_data",
+      "data_type": "object",
+      "behavior": "append",
+      "safe_for_gantt": true,
+      "recommended": false,
+      "sample_data": {},
+      "effect": "可以传递非标准附加数据；Gantt 默认 buildQuery / transformProps 不直接消费它。",
+      "source": "frontend QueryFormData.ts"
+    },
+    {
+      "field_name": "time_range",
+      "data_type": "string",
+      "behavior": "override",
+      "safe_for_gantt": false,
+      "recommended": false,
+      "sample_data": "Last 7 days",
+      "effect": "这是通用 extra_form_data override 字段，但 Gantt 当前 controlPanel 不以标准时间过滤控件为主，guest embedding 不建议依赖它。",
+      "source": "frontend query/constants.ts + processExtraFormData.ts",
+      "status": "低相关，不建议作为 Gantt guest embedding 的主要动态入口"
+    }
+  ],
+  "minimal_extra_form_data_template": {
+    "filters": [
+      {
+        "col": "task_name",
+        "op": "IN",
+        "val": [
+          "Deploy"
+        ]
+      }
+    ]
+  },
+  "recommended_extra_form_data_template": {
+    "filters": [
+      {
+        "col": "task_name",
+        "op": "IN",
+        "val": [
+          "Deploy",
+          "Review"
+        ]
+      }
+    ],
+    "adhoc_filters": [
+      {
+        "expressionType": "SIMPLE",
+        "clause": "WHERE",
+        "subject": "owner",
+        "operator": "IN",
+        "comparator": [
+          "Ops"
+        ]
+      }
+    ],
+    "custom_form_data": {}
+  },
+  "unsafe_root_form_data_changes": [
+    {
+      "field_name": "slice_id",
+      "reason": "与保存态图表 id 不一致会被后端立即判定为请求了另一张图。"
+    },
+    {
+      "field_name": "start_time",
+      "reason": "它会进入 `query.columns`，guest 模式下改它就等于改查询定义。"
+    },
+    {
+      "field_name": "end_time",
+      "reason": "它会进入 `query.columns`，guest 模式下改它就等于改查询定义。"
+    },
+    {
+      "field_name": "y_axis",
+      "reason": "它会进入 `query.columns`，同时决定 y 轴 category。"
+    },
+    {
+      "field_name": "series",
+      "reason": "它会进入 `query.columns` 和 `series_columns`，同时改变颜色分组。"
+    },
+    {
+      "field_name": "tooltip_columns",
+      "reason": "它会进入 `query.columns`；看似只是 tooltip 选项，实际会触发 guest payload 差异。"
+    },
+    {
+      "field_name": "tooltip_metrics",
+      "reason": "它会进入 `query.metrics`；看似只是 tooltip 选项，实际会触发 guest payload 差异。"
+    },
+    {
+      "field_name": "order_by_cols",
+      "reason": "它会改变 `query.orderby`，属于 `query_context_modified()` 的核心比较对象。"
+    },
+    {
+      "field_name": "datasource",
+      "reason": "embedded guest 不应改图表绑定数据集。"
+    },
+    {
+      "field_name": "viz_type",
+      "reason": "embedded guest 不应把已分享图表改成另一种图。"
+    }
+  ],
+  "practical_guidance": {
+    "best_practice": [
+      "先从保存态 Gantt 图表读取完整 form_data。",
+      "根层字段保持不变，尤其保留 `start_time`、`end_time`、`y_axis`、`tooltip_metrics`、`tooltip_columns`、`order_by_cols`。",
+      "只在 `extra_form_data` 中放动态 `filters` / `adhoc_filters`。",
+      "如果嵌入页只需要外部筛选 gantt 任务，优先使用 `extra_form_data.filters`。"
+    ],
+    "avoid": [
+      "不要在 guest embedding 请求里手工重写 `start_time`、`end_time`、`y_axis`、`series`、`tooltip_metrics`、`tooltip_columns` 或 `order_by_cols`。",
+      "不要把 runtime camelCase 字段名当成 API root 键名。",
+      "不要把 `tooltip_metrics` / `tooltip_columns` 误当成纯展示字段。"
+    ]
+  }
+}

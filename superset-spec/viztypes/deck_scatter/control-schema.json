@@ -1,0 +1,2338 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "deck_scatter",
+  "display_name": "deck.gl Scatterplot",
+  "source_kind": "schema_file",
+  "normalized_control_schema": {
+    "field_category_order": [
+      "Query",
+      "Map",
+      "Point Size",
+      "Point Color",
+      "Advanced"
+    ],
+    "field_occurrences": [
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "spatial",
+        "runtime_alias": null,
+        "required": true,
+        "embedding": "否",
+        "description": "Point to your spatial columns",
+        "data_type": "object",
+        "sample_data": {
+          "type": "latlong",
+          "lonCol": "LON",
+          "latCol": "LAT"
+        },
+        "original_field": {
+          "field_name": "spatial",
+          "description": "Point to your spatial columns",
+          "data_type": "object",
+          "enum_values": [
+            "latlong",
+            "delimited",
+            "geohash"
+          ],
+          "sample_data": {
+            "type": "latlong",
+            "lonCol": "LON",
+            "latCol": "LAT"
+          },
+          "required": true,
+          "embedding": "否",
+          "default_value": {
+            "type": "latlong"
+          },
+          "notes": "控件是 `SpatialControl` + `validateNonEmpty`。源码支持三种对象形状：`{type:'latlong', lonCol, latCol}`、`{type:'delimited', lonlatCol, delimiter, reverseCheckbox}`、`{type:'geohash', geohashCol, reverseCheckbox}`。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "row_limit",
+        "runtime_alias": "rowLimit",
+        "required": false,
+        "embedding": "否",
+        "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+        "data_type": "integer",
+        "sample_data": 5000,
+        "original_field": {
+          "field_name": "row_limit",
+          "runtime_alias": "rowLimit",
+          "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+          "data_type": "integer",
+          "enum_values": [
+            10,
+            50,
+            100,
+            250,
+            500,
+            1000,
+            5000,
+            10000,
+            50000
+          ],
+          "sample_data": 5000,
+          "required": false,
+          "embedding": "否",
+          "default_value": 10000
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "filter_nulls",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Whether to ignore locations that are null",
+        "data_type": "boolean",
+        "sample_data": true,
+        "original_field": {
+          "field_name": "filter_nulls",
+          "description": "Whether to ignore locations that are null",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true,
+          "notes": "为 true 时，`BaseDeckGLViz.query_obj()` 会自动为 `spatial` 用到的列注入 `IS NOT NULL` 过滤条件。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "adhoc_filters",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "description": "字段标签为 Filters。legacy `/superset/explore_json/` 路径会先把 legacy filters 归并进 `adhoc_filters`，再继续 merge `extra_form_data`。",
+        "data_type": "array[object]",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "LAT",
+            "operator": "IS NOT NULL",
+            "comparator": ""
+          }
+        ],
+        "original_field": {
+          "field_name": "adhoc_filters",
+          "description": "字段标签为 Filters。legacy `/superset/explore_json/` 路径会先把 legacy filters 归并进 `adhoc_filters`，再继续 merge `extra_form_data`。",
+          "data_type": "array[object]",
+          "enum_source": "datasource columns + 当前 spatial 列",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "LAT",
+              "operator": "IS NOT NULL",
+              "comparator": ""
+            }
+          ],
+          "required": false,
+          "embedding": "extra_form_data.append",
+          "default_value": [],
+          "notes": "即便 root 不显式提供，若 `filter_nulls=true`，后端也会在查询前自动把空间列的 `IS NOT NULL` 过滤补进来。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Map",
+        "field_name": "mapbox_style",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/ or tile server URL.",
+        "data_type": "string",
+        "sample_data": "mapbox://styles/mapbox/light-v9",
+        "original_field": {
+          "field_name": "mapbox_style",
+          "description": "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/ or tile server URL.",
+          "data_type": "string",
+          "enum_source": "bootstrap common.deckgl_tiles or DEFAULT_DECKGL_TILES",
+          "sample_data": "mapbox://styles/mapbox/light-v9",
+          "required": false,
+          "embedding": "否",
+          "default_value": "getDeckGLTiles()[0][0]"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Map",
+        "field_name": "autozoom",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "When checked, the map will zoom to your data after each query",
+        "data_type": "boolean",
+        "sample_data": true,
+        "original_field": {
+          "field_name": "autozoom",
+          "description": "When checked, the map will zoom to your data after each query",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Map",
+        "field_name": "viewport",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Parameters related to the view and perspective on the map",
+        "data_type": "object",
+        "sample_data": {
+          "bearing": -4.952916738791771,
+          "latitude": 37.78926922909199,
+          "longitude": -122.42613341901688,
+          "pitch": 4.750411100577438,
+          "zoom": 12.729132798697304
+        },
+        "original_field": {
+          "field_name": "viewport",
+          "description": "Parameters related to the view and perspective on the map",
+          "data_type": "object",
+          "sample_data": {
+            "bearing": -4.952916738791771,
+            "latitude": 37.78926922909199,
+            "longitude": -122.42613341901688,
+            "pitch": 4.750411100577438,
+            "zoom": 12.729132798697304
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": {
+            "longitude": 6.85236157047845,
+            "latitude": 31.222656842808707,
+            "zoom": 1,
+            "bearing": 0,
+            "pitch": 0
+          },
+          "notes": "运行时 `transformProps.ts` 会把当前图表的 `width`/`height` 合并进 viewport，但 root form_data 不需要自己提供宽高。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Point Size",
+        "field_name": "point_radius_fixed",
+        "runtime_alias": null,
+        "required": true,
+        "embedding": "否",
+        "description": "Fixed point radius",
+        "data_type": "object",
+        "sample_data": {
+          "type": "metric",
+          "value": "count"
+        },
+        "original_field": {
+          "field_name": "point_radius_fixed",
+          "description": "Fixed point radius",
+          "data_type": "object",
+          "enum_values": [
+            "fix",
+            "metric"
+          ],
+          "sample_data": {
+            "type": "metric",
+            "value": "count"
+          },
+          "required": true,
+          "embedding": "否",
+          "default_value": {
+            "type": "fix",
+            "value": 1000
+          },
+          "notes": "这是 scatter 当前正式的点大小驱动字段。`type='metric'` 时其 `value` 会进入 query metrics；`type='fix'` 时返回固定半径值。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Point Size",
+        "field_name": "point_unit",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "The unit of measure for the specified point radius",
+        "data_type": "string",
+        "sample_data": "square_m",
+        "original_field": {
+          "field_name": "point_unit",
+          "description": "The unit of measure for the specified point radius",
+          "data_type": "string",
+          "enum_values": [
+            "square_m",
+            "square_km",
+            "square_miles",
+            "radius_m",
+            "radius_km",
+            "radius_miles"
+          ],
+          "sample_data": "square_m",
+          "required": false,
+          "embedding": "否",
+          "default_value": "square_m",
+          "notes": "`unitToRadius()` 会把面积或半径单位统一换算成 deck.gl 使用的米制半径。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Point Size",
+        "field_name": "min_radius",
+        "runtime_alias": null,
+        "required": true,
+        "embedding": "否",
+        "description": "Minimum radius size of the circle, in pixels. As the zoom level changes, this insures that the circle respects this minimum radius.",
+        "data_type": "number | string",
+        "sample_data": 2,
+        "original_field": {
+          "field_name": "min_radius",
+          "description": "Minimum radius size of the circle, in pixels. As the zoom level changes, this insures that the circle respects this minimum radius.",
+          "data_type": "number | string",
+          "sample_data": 2,
+          "required": true,
+          "embedding": "否",
+          "default_value": 2,
+          "notes": "控件带 `validateNonEmpty`。运行时映射到 `ScatterplotLayer.radiusMinPixels`。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Point Size",
+        "field_name": "max_radius",
+        "runtime_alias": null,
+        "required": true,
+        "embedding": "否",
+        "description": "Maximum radius size of the circle, in pixels. As the zoom level changes, this insures that the circle respects this maximum radius.",
+        "data_type": "number | string",
+        "sample_data": 250,
+        "original_field": {
+          "field_name": "max_radius",
+          "description": "Maximum radius size of the circle, in pixels. As the zoom level changes, this insures that the circle respects this maximum radius.",
+          "data_type": "number | string",
+          "sample_data": 250,
+          "required": true,
+          "embedding": "否",
+          "default_value": 250,
+          "notes": "控件带 `validateNonEmpty`。运行时映射到 `ScatterplotLayer.radiusMaxPixels`。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Point Size",
+        "field_name": "multiplier",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Factor to multiply the metric by",
+        "data_type": "number | string",
+        "sample_data": 10,
+        "original_field": {
+          "field_name": "multiplier",
+          "description": "Factor to multiply the metric by",
+          "data_type": "number | string",
+          "sample_data": 10,
+          "required": false,
+          "embedding": "否",
+          "default_value": 1,
+          "notes": "运行时会在 `unitToRadius()` 的结果上继续乘这个倍率。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Point Color",
+        "field_name": "legend_position",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Choose the position of the legend",
+        "data_type": "string | null",
+        "sample_data": "tr",
+        "original_field": {
+          "field_name": "legend_position",
+          "description": "Choose the position of the legend",
+          "data_type": "string | null",
+          "enum_values": [
+            null,
+            "tl",
+            "tr",
+            "bl",
+            "br"
+          ],
+          "sample_data": "tr",
+          "required": false,
+          "embedding": "否",
+          "default_value": "tr"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Point Color",
+        "field_name": "legend_format",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Choose the format for legend values",
+        "data_type": "string | null",
+        "sample_data": null,
+        "original_field": {
+          "field_name": "legend_format",
+          "description": "Choose the format for legend values",
+          "data_type": "string | null",
+          "enum_source": "D3_FORMAT_OPTIONS",
+          "sample_data": null,
+          "required": false,
+          "embedding": "否",
+          "default_value": "D3_FORMAT_OPTIONS[0][0]"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Point Color",
+        "field_name": "color_scheme_type",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Select the type of color scheme to use.",
+        "data_type": "string",
+        "sample_data": "categorical_palette",
+        "original_field": {
+          "field_name": "color_scheme_type",
+          "description": "Select the type of color scheme to use.",
+          "data_type": "string",
+          "enum_values": [
+            "fixed_color",
+            "categorical_palette",
+            "color_breakpoints"
+          ],
+          "sample_data": "categorical_palette",
+          "required": false,
+          "embedding": "否",
+          "default_value": "categorical_palette",
+          "notes": "scatter 没有 `linear_palette`。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Point Color",
+        "field_name": "color_picker",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Select the fixed color",
+        "data_type": "object",
+        "sample_data": {
+          "r": 205,
+          "g": 0,
+          "b": 3,
+          "a": 0.82
+        },
+        "original_field": {
+          "field_name": "color_picker",
+          "description": "Select the fixed color",
+          "data_type": "object",
+          "sample_data": {
+            "r": 205,
+            "g": 0,
+            "b": 3,
+            "a": 0.82
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          },
+          "notes": "仅当 `color_scheme_type='fixed_color'` 时可见；但在 `categorical_palette` 且 `dimension` 为空时，运行时也会把它当作回退固定色。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Point Color",
+        "field_name": "dimension",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Pick a dimension from which categorical colors are defined",
+        "data_type": "string | object | null",
+        "sample_data": "category",
+        "original_field": {
+          "field_name": "dimension",
+          "description": "Pick a dimension from which categorical colors are defined",
+          "data_type": "string | object | null",
+          "enum_source": "datasource columns",
+          "sample_data": "category",
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "仅当 `color_scheme_type='categorical_palette'` 时真正有意义。后端会把该列映射成 `cat_color`。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Point Color",
+        "field_name": "color_scheme",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "The color scheme for rendering chart",
+        "data_type": "string",
+        "sample_data": "bnbColors",
+        "original_field": {
+          "field_name": "color_scheme",
+          "description": "The color scheme for rendering chart",
+          "data_type": "string",
+          "enum_source": "categoricalSchemeRegistry.keys()",
+          "sample_data": "bnbColors",
+          "required": false,
+          "embedding": "否",
+          "default_value": "categoricalSchemeRegistry.getDefaultKey()",
+          "notes": "仅当 `color_scheme_type='categorical_palette'` 时真正参与分类配色。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Point Color",
+        "field_name": "deafult_breakpoint_color",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "The color used when a value doesn't match any defined breakpoints.",
+        "data_type": "object",
+        "sample_data": {
+          "r": 158,
+          "g": 158,
+          "b": 158,
+          "a": 1
+        },
+        "original_field": {
+          "field_name": "deafult_breakpoint_color",
+          "description": "The color used when a value doesn't match any defined breakpoints.",
+          "data_type": "object",
+          "sample_data": {
+            "r": 158,
+            "g": 158,
+            "b": 158,
+            "a": 1
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": {
+            "r": 158,
+            "g": 158,
+            "b": 158,
+            "a": 1
+          },
+          "notes": "保存态字段名必须使用 `deafult_breakpoint_color`。但当前通用分类容器代码读取的是 `default_breakpoint_color`，因此未命中断点时通常仍会回退到默认灰色。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Point Color",
+        "field_name": "color_breakpoints",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Define color breakpoints for the data",
+        "data_type": "array[ColorBreakpointType]",
+        "sample_data": [
+          {
+            "minValue": 0,
+            "maxValue": 100,
+            "color": {
+              "r": 255,
+              "g": 0,
+              "b": 0,
+              "a": 1
+            }
+          }
+        ],
+        "original_field": {
+          "field_name": "color_breakpoints",
+          "description": "Define color breakpoints for the data",
+          "data_type": "array[ColorBreakpointType]",
+          "sample_data": [
+            {
+              "minValue": 0,
+              "maxValue": 100,
+              "color": {
+                "r": 255,
+                "g": 0,
+                "b": 0,
+                "a": 1
+              }
+            }
+          ],
+          "required": false,
+          "embedding": "否",
+          "default_value": [],
+          "notes": "该模式按 `feature.metric` 着色，所以只有 `point_radius_fixed.type='metric'` 时才真正有意义。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Advanced",
+        "field_name": "js_columns",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "List of extra columns made available in JavaScript functions",
+        "data_type": "array[string | object]",
+        "sample_data": [
+          "category"
+        ],
+        "original_field": {
+          "field_name": "js_columns",
+          "description": "List of extra columns made available in JavaScript functions",
+          "data_type": "array[string | object]",
+          "enum_source": "datasource columns",
+          "sample_data": [
+            "category"
+          ],
+          "required": false,
+          "embedding": "否",
+          "default_value": [],
+          "notes": "`BaseDeckGLViz.query_obj()` 会把它们并入 query columns/groupby，并在返回特征中以 `extraProps` 暴露给自定义 JS。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Advanced",
+        "field_name": "js_data_mutator",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Define a javascript function that receives the data array used in the visualization and is expected to return a modified version of that array.",
+        "data_type": "string",
+        "sample_data": "data => data",
+        "original_field": {
+          "field_name": "js_data_mutator",
+          "description": "Define a javascript function that receives the data array used in the visualization and is expected to return a modified version of that array.",
+          "data_type": "string",
+          "sample_data": "data => data",
+          "required": false,
+          "embedding": "否",
+          "default_value": "",
+          "notes": "如果功能开关 `EnableJavascriptControls` 关闭，该控件会变成只读并显示安全提示。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Advanced",
+        "field_name": "js_tooltip",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Define a function that receives the input and outputs the content for a tooltip",
+        "data_type": "string",
+        "sample_data": "o => `<div>${o.object.metric}</div>`",
+        "original_field": {
+          "field_name": "js_tooltip",
+          "description": "Define a function that receives the input and outputs the content for a tooltip",
+          "data_type": "string",
+          "sample_data": "o => `<div>${o.object.metric}</div>`",
+          "required": false,
+          "embedding": "否",
+          "default_value": "",
+          "notes": "若未提供，默认 tooltip 显示经纬度、可选 Category 和 metric。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Advanced",
+        "field_name": "js_onclick_href",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Define a function that returns a URL to navigate to when user clicks",
+        "data_type": "string",
+        "sample_data": "o => `https://example.com/?lon=${o.object.position[0]}&lat=${o.object.position[1]}`",
+        "original_field": {
+          "field_name": "js_onclick_href",
+          "description": "Define a function that returns a URL to navigate to when user clicks",
+          "data_type": "string",
+          "sample_data": "o => `https://example.com/?lon=${o.object.position[0]}&lat=${o.object.position[1]}`",
+          "required": false,
+          "embedding": "否",
+          "default_value": "",
+          "notes": "若提供，`commonLayerProps()` 会在点击时打开该 URL。"
+        }
+      }
+    ],
+    "field_inventory": [
+      {
+        "field_name": "adhoc_filters",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "字段标签为 Filters。legacy `/superset/explore_json/` 路径会先把 legacy filters 归并进 `adhoc_filters`，再继续 merge `extra_form_data`。"
+        ],
+        "data_types": [
+          "array[object]"
+        ],
+        "sample_data_examples": [
+          [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "LAT",
+              "operator": "IS NOT NULL",
+              "comparator": ""
+            }
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "adhoc_filters",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "extra_form_data.append",
+            "description": "字段标签为 Filters。legacy `/superset/explore_json/` 路径会先把 legacy filters 归并进 `adhoc_filters`，再继续 merge `extra_form_data`。",
+            "data_type": "array[object]",
+            "sample_data": [
+              {
+                "expressionType": "SIMPLE",
+                "clause": "WHERE",
+                "subject": "LAT",
+                "operator": "IS NOT NULL",
+                "comparator": ""
+              }
+            ],
+            "original_field": {
+              "field_name": "adhoc_filters",
+              "description": "字段标签为 Filters。legacy `/superset/explore_json/` 路径会先把 legacy filters 归并进 `adhoc_filters`，再继续 merge `extra_form_data`。",
+              "data_type": "array[object]",
+              "enum_source": "datasource columns + 当前 spatial 列",
+              "sample_data": [
+                {
+                  "expressionType": "SIMPLE",
+                  "clause": "WHERE",
+                  "subject": "LAT",
+                  "operator": "IS NOT NULL",
+                  "comparator": ""
+                }
+              ],
+              "required": false,
+              "embedding": "extra_form_data.append",
+              "default_value": [],
+              "notes": "即便 root 不显式提供，若 `filter_nulls=true`，后端也会在查询前自动把空间列的 `IS NOT NULL` 过滤补进来。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "autozoom",
+        "required": false,
+        "categories": [
+          "Map"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "When checked, the map will zoom to your data after each query"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          true
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Map",
+            "field_name": "autozoom",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "When checked, the map will zoom to your data after each query",
+            "data_type": "boolean",
+            "sample_data": true,
+            "original_field": {
+              "field_name": "autozoom",
+              "description": "When checked, the map will zoom to your data after each query",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": true,
+              "required": false,
+              "embedding": "否",
+              "default_value": true
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "color_breakpoints",
+        "required": false,
+        "categories": [
+          "Point Color"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Define color breakpoints for the data"
+        ],
+        "data_types": [
+          "array[ColorBreakpointType]"
+        ],
+        "sample_data_examples": [
+          [
+            {
+              "minValue": 0,
+              "maxValue": 100,
+              "color": {
+                "r": 255,
+                "g": 0,
+                "b": 0,
+                "a": 1
+              }
+            }
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Point Color",
+            "field_name": "color_breakpoints",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Define color breakpoints for the data",
+            "data_type": "array[ColorBreakpointType]",
+            "sample_data": [
+              {
+                "minValue": 0,
+                "maxValue": 100,
+                "color": {
+                  "r": 255,
+                  "g": 0,
+                  "b": 0,
+                  "a": 1
+                }
+              }
+            ],
+            "original_field": {
+              "field_name": "color_breakpoints",
+              "description": "Define color breakpoints for the data",
+              "data_type": "array[ColorBreakpointType]",
+              "sample_data": [
+                {
+                  "minValue": 0,
+                  "maxValue": 100,
+                  "color": {
+                    "r": 255,
+                    "g": 0,
+                    "b": 0,
+                    "a": 1
+                  }
+                }
+              ],
+              "required": false,
+              "embedding": "否",
+              "default_value": [],
+              "notes": "该模式按 `feature.metric` 着色，所以只有 `point_radius_fixed.type='metric'` 时才真正有意义。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "color_picker",
+        "required": false,
+        "categories": [
+          "Point Color"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select the fixed color"
+        ],
+        "data_types": [
+          "object"
+        ],
+        "sample_data_examples": [
+          {
+            "r": 205,
+            "g": 0,
+            "b": 3,
+            "a": 0.82
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Point Color",
+            "field_name": "color_picker",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Select the fixed color",
+            "data_type": "object",
+            "sample_data": {
+              "r": 205,
+              "g": 0,
+              "b": 3,
+              "a": 0.82
+            },
+            "original_field": {
+              "field_name": "color_picker",
+              "description": "Select the fixed color",
+              "data_type": "object",
+              "sample_data": {
+                "r": 205,
+                "g": 0,
+                "b": 3,
+                "a": 0.82
+              },
+              "required": false,
+              "embedding": "否",
+              "default_value": {
+                "r": 0,
+                "g": 122,
+                "b": 135,
+                "a": 1
+              },
+              "notes": "仅当 `color_scheme_type='fixed_color'` 时可见；但在 `categorical_palette` 且 `dimension` 为空时，运行时也会把它当作回退固定色。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "color_scheme",
+        "required": false,
+        "categories": [
+          "Point Color"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "The color scheme for rendering chart"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "bnbColors"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Point Color",
+            "field_name": "color_scheme",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "The color scheme for rendering chart",
+            "data_type": "string",
+            "sample_data": "bnbColors",
+            "original_field": {
+              "field_name": "color_scheme",
+              "description": "The color scheme for rendering chart",
+              "data_type": "string",
+              "enum_source": "categoricalSchemeRegistry.keys()",
+              "sample_data": "bnbColors",
+              "required": false,
+              "embedding": "否",
+              "default_value": "categoricalSchemeRegistry.getDefaultKey()",
+              "notes": "仅当 `color_scheme_type='categorical_palette'` 时真正参与分类配色。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "color_scheme_type",
+        "required": false,
+        "categories": [
+          "Point Color"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select the type of color scheme to use."
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "categorical_palette"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Point Color",
+            "field_name": "color_scheme_type",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Select the type of color scheme to use.",
+            "data_type": "string",
+            "sample_data": "categorical_palette",
+            "original_field": {
+              "field_name": "color_scheme_type",
+              "description": "Select the type of color scheme to use.",
+              "data_type": "string",
+              "enum_values": [
+                "fixed_color",
+                "categorical_palette",
+                "color_breakpoints"
+              ],
+              "sample_data": "categorical_palette",
+              "required": false,
+              "embedding": "否",
+              "default_value": "categorical_palette",
+              "notes": "scatter 没有 `linear_palette`。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "deafult_breakpoint_color",
+        "required": false,
+        "categories": [
+          "Point Color"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "The color used when a value doesn't match any defined breakpoints."
+        ],
+        "data_types": [
+          "object"
+        ],
+        "sample_data_examples": [
+          {
+            "r": 158,
+            "g": 158,
+            "b": 158,
+            "a": 1
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Point Color",
+            "field_name": "deafult_breakpoint_color",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "The color used when a value doesn't match any defined breakpoints.",
+            "data_type": "object",
+            "sample_data": {
+              "r": 158,
+              "g": 158,
+              "b": 158,
+              "a": 1
+            },
+            "original_field": {
+              "field_name": "deafult_breakpoint_color",
+              "description": "The color used when a value doesn't match any defined breakpoints.",
+              "data_type": "object",
+              "sample_data": {
+                "r": 158,
+                "g": 158,
+                "b": 158,
+                "a": 1
+              },
+              "required": false,
+              "embedding": "否",
+              "default_value": {
+                "r": 158,
+                "g": 158,
+                "b": 158,
+                "a": 1
+              },
+              "notes": "保存态字段名必须使用 `deafult_breakpoint_color`。但当前通用分类容器代码读取的是 `default_breakpoint_color`，因此未命中断点时通常仍会回退到默认灰色。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "dimension",
+        "required": false,
+        "categories": [
+          "Point Color"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Pick a dimension from which categorical colors are defined"
+        ],
+        "data_types": [
+          "string | object | null"
+        ],
+        "sample_data_examples": [
+          "category"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Point Color",
+            "field_name": "dimension",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Pick a dimension from which categorical colors are defined",
+            "data_type": "string | object | null",
+            "sample_data": "category",
+            "original_field": {
+              "field_name": "dimension",
+              "description": "Pick a dimension from which categorical colors are defined",
+              "data_type": "string | object | null",
+              "enum_source": "datasource columns",
+              "sample_data": "category",
+              "required": false,
+              "embedding": "否",
+              "default_value": null,
+              "notes": "仅当 `color_scheme_type='categorical_palette'` 时真正有意义。后端会把该列映射成 `cat_color`。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "filter_nulls",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Whether to ignore locations that are null"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          true
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "filter_nulls",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Whether to ignore locations that are null",
+            "data_type": "boolean",
+            "sample_data": true,
+            "original_field": {
+              "field_name": "filter_nulls",
+              "description": "Whether to ignore locations that are null",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": true,
+              "required": false,
+              "embedding": "否",
+              "default_value": true,
+              "notes": "为 true 时，`BaseDeckGLViz.query_obj()` 会自动为 `spatial` 用到的列注入 `IS NOT NULL` 过滤条件。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "js_columns",
+        "required": false,
+        "categories": [
+          "Advanced"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "List of extra columns made available in JavaScript functions"
+        ],
+        "data_types": [
+          "array[string | object]"
+        ],
+        "sample_data_examples": [
+          [
+            "category"
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Advanced",
+            "field_name": "js_columns",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "List of extra columns made available in JavaScript functions",
+            "data_type": "array[string | object]",
+            "sample_data": [
+              "category"
+            ],
+            "original_field": {
+              "field_name": "js_columns",
+              "description": "List of extra columns made available in JavaScript functions",
+              "data_type": "array[string | object]",
+              "enum_source": "datasource columns",
+              "sample_data": [
+                "category"
+              ],
+              "required": false,
+              "embedding": "否",
+              "default_value": [],
+              "notes": "`BaseDeckGLViz.query_obj()` 会把它们并入 query columns/groupby，并在返回特征中以 `extraProps` 暴露给自定义 JS。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "js_data_mutator",
+        "required": false,
+        "categories": [
+          "Advanced"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Define a javascript function that receives the data array used in the visualization and is expected to return a modified version of that array."
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "data => data"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Advanced",
+            "field_name": "js_data_mutator",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Define a javascript function that receives the data array used in the visualization and is expected to return a modified version of that array.",
+            "data_type": "string",
+            "sample_data": "data => data",
+            "original_field": {
+              "field_name": "js_data_mutator",
+              "description": "Define a javascript function that receives the data array used in the visualization and is expected to return a modified version of that array.",
+              "data_type": "string",
+              "sample_data": "data => data",
+              "required": false,
+              "embedding": "否",
+              "default_value": "",
+              "notes": "如果功能开关 `EnableJavascriptControls` 关闭，该控件会变成只读并显示安全提示。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "js_onclick_href",
+        "required": false,
+        "categories": [
+          "Advanced"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Define a function that returns a URL to navigate to when user clicks"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "o => `https://example.com/?lon=${o.object.position[0]}&lat=${o.object.position[1]}`"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Advanced",
+            "field_name": "js_onclick_href",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Define a function that returns a URL to navigate to when user clicks",
+            "data_type": "string",
+            "sample_data": "o => `https://example.com/?lon=${o.object.position[0]}&lat=${o.object.position[1]}`",
+            "original_field": {
+              "field_name": "js_onclick_href",
+              "description": "Define a function that returns a URL to navigate to when user clicks",
+              "data_type": "string",
+              "sample_data": "o => `https://example.com/?lon=${o.object.position[0]}&lat=${o.object.position[1]}`",
+              "required": false,
+              "embedding": "否",
+              "default_value": "",
+              "notes": "若提供，`commonLayerProps()` 会在点击时打开该 URL。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "js_tooltip",
+        "required": false,
+        "categories": [
+          "Advanced"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Define a function that receives the input and outputs the content for a tooltip"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "o => `<div>${o.object.metric}</div>`"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Advanced",
+            "field_name": "js_tooltip",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Define a function that receives the input and outputs the content for a tooltip",
+            "data_type": "string",
+            "sample_data": "o => `<div>${o.object.metric}</div>`",
+            "original_field": {
+              "field_name": "js_tooltip",
+              "description": "Define a function that receives the input and outputs the content for a tooltip",
+              "data_type": "string",
+              "sample_data": "o => `<div>${o.object.metric}</div>`",
+              "required": false,
+              "embedding": "否",
+              "default_value": "",
+              "notes": "若未提供，默认 tooltip 显示经纬度、可选 Category 和 metric。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "legend_format",
+        "required": false,
+        "categories": [
+          "Point Color"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Choose the format for legend values"
+        ],
+        "data_types": [
+          "string | null"
+        ],
+        "sample_data_examples": [],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Point Color",
+            "field_name": "legend_format",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Choose the format for legend values",
+            "data_type": "string | null",
+            "sample_data": null,
+            "original_field": {
+              "field_name": "legend_format",
+              "description": "Choose the format for legend values",
+              "data_type": "string | null",
+              "enum_source": "D3_FORMAT_OPTIONS",
+              "sample_data": null,
+              "required": false,
+              "embedding": "否",
+              "default_value": "D3_FORMAT_OPTIONS[0][0]"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "legend_position",
+        "required": false,
+        "categories": [
+          "Point Color"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Choose the position of the legend"
+        ],
+        "data_types": [
+          "string | null"
+        ],
+        "sample_data_examples": [
+          "tr"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Point Color",
+            "field_name": "legend_position",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Choose the position of the legend",
+            "data_type": "string | null",
+            "sample_data": "tr",
+            "original_field": {
+              "field_name": "legend_position",
+              "description": "Choose the position of the legend",
+              "data_type": "string | null",
+              "enum_values": [
+                null,
+                "tl",
+                "tr",
+                "bl",
+                "br"
+              ],
+              "sample_data": "tr",
+              "required": false,
+              "embedding": "否",
+              "default_value": "tr"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "mapbox_style",
+        "required": false,
+        "categories": [
+          "Map"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/ or tile server URL."
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "mapbox://styles/mapbox/light-v9"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Map",
+            "field_name": "mapbox_style",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/ or tile server URL.",
+            "data_type": "string",
+            "sample_data": "mapbox://styles/mapbox/light-v9",
+            "original_field": {
+              "field_name": "mapbox_style",
+              "description": "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/ or tile server URL.",
+              "data_type": "string",
+              "enum_source": "bootstrap common.deckgl_tiles or DEFAULT_DECKGL_TILES",
+              "sample_data": "mapbox://styles/mapbox/light-v9",
+              "required": false,
+              "embedding": "否",
+              "default_value": "getDeckGLTiles()[0][0]"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "max_radius",
+        "required": true,
+        "categories": [
+          "Point Size"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Maximum radius size of the circle, in pixels. As the zoom level changes, this insures that the circle respects this maximum radius."
+        ],
+        "data_types": [
+          "number | string"
+        ],
+        "sample_data_examples": [
+          250
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Point Size",
+            "field_name": "max_radius",
+            "runtime_alias": null,
+            "required": true,
+            "embedding": "否",
+            "description": "Maximum radius size of the circle, in pixels. As the zoom level changes, this insures that the circle respects this maximum radius.",
+            "data_type": "number | string",
+            "sample_data": 250,
+            "original_field": {
+              "field_name": "max_radius",
+              "description": "Maximum radius size of the circle, in pixels. As the zoom level changes, this insures that the circle respects this maximum radius.",
+              "data_type": "number | string",
+              "sample_data": 250,
+              "required": true,
+              "embedding": "否",
+              "default_value": 250,
+              "notes": "控件带 `validateNonEmpty`。运行时映射到 `ScatterplotLayer.radiusMaxPixels`。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "min_radius",
+        "required": true,
+        "categories": [
+          "Point Size"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Minimum radius size of the circle, in pixels. As the zoom level changes, this insures that the circle respects this minimum radius."
+        ],
+        "data_types": [
+          "number | string"
+        ],
+        "sample_data_examples": [
+          2
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Point Size",
+            "field_name": "min_radius",
+            "runtime_alias": null,
+            "required": true,
+            "embedding": "否",
+            "description": "Minimum radius size of the circle, in pixels. As the zoom level changes, this insures that the circle respects this minimum radius.",
+            "data_type": "number | string",
+            "sample_data": 2,
+            "original_field": {
+              "field_name": "min_radius",
+              "description": "Minimum radius size of the circle, in pixels. As the zoom level changes, this insures that the circle respects this minimum radius.",
+              "data_type": "number | string",
+              "sample_data": 2,
+              "required": true,
+              "embedding": "否",
+              "default_value": 2,
+              "notes": "控件带 `validateNonEmpty`。运行时映射到 `ScatterplotLayer.radiusMinPixels`。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "multiplier",
+        "required": false,
+        "categories": [
+          "Point Size"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Factor to multiply the metric by"
+        ],
+        "data_types": [
+          "number | string"
+        ],
+        "sample_data_examples": [
+          10
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Point Size",
+            "field_name": "multiplier",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Factor to multiply the metric by",
+            "data_type": "number | string",
+            "sample_data": 10,
+            "original_field": {
+              "field_name": "multiplier",
+              "description": "Factor to multiply the metric by",
+              "data_type": "number | string",
+              "sample_data": 10,
+              "required": false,
+              "embedding": "否",
+              "default_value": 1,
+              "notes": "运行时会在 `unitToRadius()` 的结果上继续乘这个倍率。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "point_radius_fixed",
+        "required": true,
+        "categories": [
+          "Point Size"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Fixed point radius"
+        ],
+        "data_types": [
+          "object"
+        ],
+        "sample_data_examples": [
+          {
+            "type": "metric",
+            "value": "count"
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Point Size",
+            "field_name": "point_radius_fixed",
+            "runtime_alias": null,
+            "required": true,
+            "embedding": "否",
+            "description": "Fixed point radius",
+            "data_type": "object",
+            "sample_data": {
+              "type": "metric",
+              "value": "count"
+            },
+            "original_field": {
+              "field_name": "point_radius_fixed",
+              "description": "Fixed point radius",
+              "data_type": "object",
+              "enum_values": [
+                "fix",
+                "metric"
+              ],
+              "sample_data": {
+                "type": "metric",
+                "value": "count"
+              },
+              "required": true,
+              "embedding": "否",
+              "default_value": {
+                "type": "fix",
+                "value": 1000
+              },
+              "notes": "这是 scatter 当前正式的点大小驱动字段。`type='metric'` 时其 `value` 会进入 query metrics；`type='fix'` 时返回固定半径值。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "point_unit",
+        "required": false,
+        "categories": [
+          "Point Size"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "The unit of measure for the specified point radius"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "square_m"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Point Size",
+            "field_name": "point_unit",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "The unit of measure for the specified point radius",
+            "data_type": "string",
+            "sample_data": "square_m",
+            "original_field": {
+              "field_name": "point_unit",
+              "description": "The unit of measure for the specified point radius",
+              "data_type": "string",
+              "enum_values": [
+                "square_m",
+                "square_km",
+                "square_miles",
+                "radius_m",
+                "radius_km",
+                "radius_miles"
+              ],
+              "sample_data": "square_m",
+              "required": false,
+              "embedding": "否",
+              "default_value": "square_m",
+              "notes": "`unitToRadius()` 会把面积或半径单位统一换算成 deck.gl 使用的米制半径。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "row_limit",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [
+          "rowLimit"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Limits the number of the rows that are computed in the query that is the source of the data used for this chart."
+        ],
+        "data_types": [
+          "integer"
+        ],
+        "sample_data_examples": [
+          5000
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "row_limit",
+            "runtime_alias": "rowLimit",
+            "required": false,
+            "embedding": "否",
+            "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+            "data_type": "integer",
+            "sample_data": 5000,
+            "original_field": {
+              "field_name": "row_limit",
+              "runtime_alias": "rowLimit",
+              "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+              "data_type": "integer",
+              "enum_values": [
+                10,
+                50,
+                100,
+                250,
+                500,
+                1000,
+                5000,
+                10000,
+                50000
+              ],
+              "sample_data": 5000,
+              "required": false,
+              "embedding": "否",
+              "default_value": 10000
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "spatial",
+        "required": true,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Point to your spatial columns"
+        ],
+        "data_types": [
+          "object"
+        ],
+        "sample_data_examples": [
+          {
+            "type": "latlong",
+            "lonCol": "LON",
+            "latCol": "LAT"
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "spatial",
+            "runtime_alias": null,
+            "required": true,
+            "embedding": "否",
+            "description": "Point to your spatial columns",
+            "data_type": "object",
+            "sample_data": {
+              "type": "latlong",
+              "lonCol": "LON",
+              "latCol": "LAT"
+            },
+            "original_field": {
+              "field_name": "spatial",
+              "description": "Point to your spatial columns",
+              "data_type": "object",
+              "enum_values": [
+                "latlong",
+                "delimited",
+                "geohash"
+              ],
+              "sample_data": {
+                "type": "latlong",
+                "lonCol": "LON",
+                "latCol": "LAT"
+              },
+              "required": true,
+              "embedding": "否",
+              "default_value": {
+                "type": "latlong"
+              },
+              "notes": "控件是 `SpatialControl` + `validateNonEmpty`。源码支持三种对象形状：`{type:'latlong', lonCol, latCol}`、`{type:'delimited', lonlatCol, delimiter, reverseCheckbox}`、`{type:'geohash', geohashCol, reverseCheckbox}`。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "viewport",
+        "required": false,
+        "categories": [
+          "Map"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Parameters related to the view and perspective on the map"
+        ],
+        "data_types": [
+          "object"
+        ],
+        "sample_data_examples": [
+          {
+            "bearing": -4.952916738791771,
+            "latitude": 37.78926922909199,
+            "longitude": -122.42613341901688,
+            "pitch": 4.750411100577438,
+            "zoom": 12.729132798697304
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Map",
+            "field_name": "viewport",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Parameters related to the view and perspective on the map",
+            "data_type": "object",
+            "sample_data": {
+              "bearing": -4.952916738791771,
+              "latitude": 37.78926922909199,
+              "longitude": -122.42613341901688,
+              "pitch": 4.750411100577438,
+              "zoom": 12.729132798697304
+            },
+            "original_field": {
+              "field_name": "viewport",
+              "description": "Parameters related to the view and perspective on the map",
+              "data_type": "object",
+              "sample_data": {
+                "bearing": -4.952916738791771,
+                "latitude": 37.78926922909199,
+                "longitude": -122.42613341901688,
+                "pitch": 4.750411100577438,
+                "zoom": 12.729132798697304
+              },
+              "required": false,
+              "embedding": "否",
+              "default_value": {
+                "longitude": 6.85236157047845,
+                "latitude": 31.222656842808707,
+                "zoom": 1,
+                "bearing": 0,
+                "pitch": 0
+              },
+              "notes": "运行时 `transformProps.ts` 会把当前图表的 `width`/`height` 合并进 viewport，但 root form_data 不需要自己提供宽高。"
+            }
+          }
+        ]
+      }
+    ],
+    "required_field_names": [
+      "max_radius",
+      "min_radius",
+      "point_radius_fixed",
+      "spatial"
+    ],
+    "embedding_enabled_field_names": [
+      "adhoc_filters"
+    ],
+    "runtime_alias_index": {
+      "row_limit": [
+        "rowLimit"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "deck_scatter",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/deck_scatter-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/deck_scatter-form-data-schema.json",
+      "control-schema": "form-data-schema/deck_scatter-schema.json"
+    }
+  },
+  "fallback_online_field_categories": {
+    "Query": [],
+    "Advanced analytics": [],
+    "Annotations & Layers": [],
+    "Predictive Analytics（Forecast）": [],
+    "Chart Options": [],
+    "Chart Title": [],
+    "图表专属": [],
+    "通用图表选项": []
+  },
+  "original_control_schema": {
+    "viz_type": "deck_scatter",
+    "display_name": "deck.gl Scatterplot",
+    "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Scatter/controlPanel.ts",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Scatter/controlPanel.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Scatter/index.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Scatter/Scatter.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/factory.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/CategoricalDeckGLContainer.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/common.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/Shared_DeckGL.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/controls.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/utils.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utils/geo.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utils/crossFiltersDataMask.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/types.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-demo/storybook/stories/plugins/legacy-preset-chart-deckgl/Scatter/payload.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-demo/storybook/stories/plugins/legacy-preset-chart-deckgl/Scatter/Scatter.stories.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+      "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+      "D:/vsx/sources/superset-6.0.0/superset/views/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/utils/core.py"
+    ],
+    "notes": [
+      "deck_scatter 位于 `legacy-preset-chart-deckgl/src/layers/Scatter`，metadata 明确声明 `useLegacyApi=true`，因此真实请求路径是 `/superset/explore_json/`。",
+      "前端展示名是 `deck.gl Scatterplot`，后端类名是 `superset/viz.py::DeckScatterViz`。构造模板时应以 `viz_type='deck_scatter'` 为准。",
+      "当前图的正式空间输入是 `spatial` 对象。后端 `BaseDeckGLViz` 会把它解析成 `latlong`、`delimited` 或 `geohash` 三种编码中的一种。",
+      "当前图的正式点大小输入是 `point_radius_fixed`，不是 legacy `size`。`DeckScatterViz.get_metrics()` 只会读取 `point_radius_fixed.type/value`；storybook payload 中出现的 `size` 是旧保存态残留，当前 controlPanel 和后端都不依赖它。",
+      "`point_radius_fixed.type='metric'` 时，后端会把它的 `value` 当作唯一 query metric；`type='fix'` 时，查询不带 metrics，前端直接用固定半径值绘图。",
+      "`min_radius` 和 `max_radius` 都带 `validateNonEmpty` 且有默认值，当前 UI 视角下它们是必填的像素钳位字段。",
+      "`Point Color` 区域来自 `generateDeckGLColorSchemeControls({})`，因此当前图的正式配色字段包括 `color_scheme_type`、`color_picker`、`dimension`、`color_scheme`、`deafult_breakpoint_color`、`color_breakpoints`。",
+      "`CategoricalDeckGLContainer` 在 `categorical_palette` 模式下如果 `dimension` 为空，会回退到 `color_picker` 固定色；也就是说，`dimension` 不是全局必填，但在真正需要分类着色时会变成条件必填。",
+      "`deafult_breakpoint_color` 的控件键名来自 `Shared_DeckGL.tsx`，但 `CategoricalDeckGLContainer.tsx` 运行时读取的是 `default_breakpoint_color`。因此当前 scatter 的断点回退色存在命名错位；构造保存态仍应使用源码控件键名 `deafult_breakpoint_color`。",
+      "`controlPanel.onInit` 会把隐藏的 `time_grain_sqla` 和 `granularity` 置为 `null`。虽然后端仍支持基于 `time_grain_sqla` 的 timeseries 路径，但这不属于当前 controlPanel 的正式输入。"
+    ],
+    "control_overrides": {
+      "size": {
+        "validators": []
+      },
+      "time_grain_sqla": {
+        "source": "timeGrainSqlaAnimationOverrides"
+      }
+    },
+    "legacy_api_behavior": {
+      "useLegacyApi": true,
+      "frontend_request_endpoint": "/superset/explore_json/",
+      "frontend_request_payload": {
+        "form_data": "<raw form_data>"
+      },
+      "query_builder": "deck_scatter 没有专属前端 buildQuery。ChartClient.ts 在 `useLegacyApi=true` 且未注册 buildQuery 时，会把原始 form_data 直接包装进 legacy payload。"
+    },
+    "query_compilation": {
+      "backend_class": "superset/viz.py::DeckScatterViz",
+      "base_query": "继承 `BaseDeckGLViz.query_obj()` -> `BaseViz.query_obj()`，因此会先执行 `convert_legacy_filters_into_adhoc(form_data)` 与 `merge_extra_filters(form_data)`。",
+      "timeseries_toggle": "`DeckScatterViz.query_obj()` 先做 `self.is_timeseries = bool(self.form_data.get('time_grain_sqla'))`，再复用 `BaseDeckGLViz.query_obj()`。但当前 controlPanel 的 `onInit` 会把 `time_grain_sqla` 置空。",
+      "null_filter_injection": "当 `filter_nulls=true`（默认值）时，`BaseDeckGLViz.add_null_filters()` 会为 `spatial` 引用到的经纬度列、delimited 列或 geohash 列自动追加 `IS NOT NULL` adhoc filter。",
+      "groupby_and_metrics": "`BaseDeckGLViz.query_obj()` 会先把 `spatial` 展开的真实列、可选 `dimension` 和 `js_columns` 合成 `group_by`。随后 `DeckScatterViz.get_metrics()` 只有在 `point_radius_fixed.type='metric'` 时才返回 `[point_radius_fixed.value]`；否则 query 会退回纯 columns 查询。",
+      "returned_data": "`DeckScatterViz.get_properties()` 为每个点返回 `{ metric, radius, cat_color, position, __timestamp }`。其中 `metric` 与 `radius` 都来自 `point_radius_fixed` 驱动的指标或固定值，`cat_color` 来自可选 `dimension`。",
+      "runtime_rendering": "`Scatter.tsx` 运行时把 `radius` 经 `unitToRadius(point_unit, radius)` 换算，再乘 `multiplier`，并将结果传给 `ScatterplotLayer.getRadius`。`min_radius` / `max_radius` 分别映射到 `radiusMinPixels` / `radiusMaxPixels`。",
+      "color_pipeline": "`createCategoricalDeckGLComponent()` 会先经过 `CategoricalDeckGLContainer` 给 feature 注入 `color`。`fixed_color` 用 `color_picker`，`categorical_palette` 用 `dimension + color_scheme`，`color_breakpoints` 用 `d.metric` 匹配 `color_breakpoints`。如果 `dimension` 为空，categorical palette 会回退固定色。"
+    },
+    "field_categories": {
+      "Query": [
+        {
+          "field_name": "spatial",
+          "description": "Point to your spatial columns",
+          "data_type": "object",
+          "enum_values": [
+            "latlong",
+            "delimited",
+            "geohash"
+          ],
+          "sample_data": {
+            "type": "latlong",
+            "lonCol": "LON",
+            "latCol": "LAT"
+          },
+          "required": true,
+          "embedding": "否",
+          "default_value": {
+            "type": "latlong"
+          },
+          "notes": "控件是 `SpatialControl` + `validateNonEmpty`。源码支持三种对象形状：`{type:'latlong', lonCol, latCol}`、`{type:'delimited', lonlatCol, delimiter, reverseCheckbox}`、`{type:'geohash', geohashCol, reverseCheckbox}`。"
+        },
+        {
+          "field_name": "row_limit",
+          "runtime_alias": "rowLimit",
+          "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+          "data_type": "integer",
+          "enum_values": [
+            10,
+            50,
+            100,
+            250,
+            500,
+            1000,
+            5000,
+            10000,
+            50000
+          ],
+          "sample_data": 5000,
+          "required": false,
+          "embedding": "否",
+          "default_value": 10000
+        },
+        {
+          "field_name": "filter_nulls",
+          "description": "Whether to ignore locations that are null",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true,
+          "notes": "为 true 时，`BaseDeckGLViz.query_obj()` 会自动为 `spatial` 用到的列注入 `IS NOT NULL` 过滤条件。"
+        },
+        {
+          "field_name": "adhoc_filters",
+          "description": "字段标签为 Filters。legacy `/superset/explore_json/` 路径会先把 legacy filters 归并进 `adhoc_filters`，再继续 merge `extra_form_data`。",
+          "data_type": "array[object]",
+          "enum_source": "datasource columns + 当前 spatial 列",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "LAT",
+              "operator": "IS NOT NULL",
+              "comparator": ""
+            }
+          ],
+          "required": false,
+          "embedding": "extra_form_data.append",
+          "default_value": [],
+          "notes": "即便 root 不显式提供，若 `filter_nulls=true`，后端也会在查询前自动把空间列的 `IS NOT NULL` 过滤补进来。"
+        }
+      ],
+      "Map": [
+        {
+          "field_name": "mapbox_style",
+          "description": "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/ or tile server URL.",
+          "data_type": "string",
+          "enum_source": "bootstrap common.deckgl_tiles or DEFAULT_DECKGL_TILES",
+          "sample_data": "mapbox://styles/mapbox/light-v9",
+          "required": false,
+          "embedding": "否",
+          "default_value": "getDeckGLTiles()[0][0]"
+        },
+        {
+          "field_name": "autozoom",
+          "description": "When checked, the map will zoom to your data after each query",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true
+        },
+        {
+          "field_name": "viewport",
+          "description": "Parameters related to the view and perspective on the map",
+          "data_type": "object",
+          "sample_data": {
+            "bearing": -4.952916738791771,
+            "latitude": 37.78926922909199,
+            "longitude": -122.42613341901688,
+            "pitch": 4.750411100577438,
+            "zoom": 12.729132798697304
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": {
+            "longitude": 6.85236157047845,
+            "latitude": 31.222656842808707,
+            "zoom": 1,
+            "bearing": 0,
+            "pitch": 0
+          },
+          "notes": "运行时 `transformProps.ts` 会把当前图表的 `width`/`height` 合并进 viewport，但 root form_data 不需要自己提供宽高。"
+        }
+      ],
+      "Point Size": [
+        {
+          "field_name": "point_radius_fixed",
+          "description": "Fixed point radius",
+          "data_type": "object",
+          "enum_values": [
+            "fix",
+            "metric"
+          ],
+          "sample_data": {
+            "type": "metric",
+            "value": "count"
+          },
+          "required": true,
+          "embedding": "否",
+          "default_value": {
+            "type": "fix",
+            "value": 1000
+          },
+          "notes": "这是 scatter 当前正式的点大小驱动字段。`type='metric'` 时其 `value` 会进入 query metrics；`type='fix'` 时返回固定半径值。"
+        },
+        {
+          "field_name": "point_unit",
+          "description": "The unit of measure for the specified point radius",
+          "data_type": "string",
+          "enum_values": [
+            "square_m",
+            "square_km",
+            "square_miles",
+            "radius_m",
+            "radius_km",
+            "radius_miles"
+          ],
+          "sample_data": "square_m",
+          "required": false,
+          "embedding": "否",
+          "default_value": "square_m",
+          "notes": "`unitToRadius()` 会把面积或半径单位统一换算成 deck.gl 使用的米制半径。"
+        },
+        {
+          "field_name": "min_radius",
+          "description": "Minimum radius size of the circle, in pixels. As the zoom level changes, this insures that the circle respects this minimum radius.",
+          "data_type": "number | string",
+          "sample_data": 2,
+          "required": true,
+          "embedding": "否",
+          "default_value": 2,
+          "notes": "控件带 `validateNonEmpty`。运行时映射到 `ScatterplotLayer.radiusMinPixels`。"
+        },
+        {
+          "field_name": "max_radius",
+          "description": "Maximum radius size of the circle, in pixels. As the zoom level changes, this insures that the circle respects this maximum radius.",
+          "data_type": "number | string",
+          "sample_data": 250,
+          "required": true,
+          "embedding": "否",
+          "default_value": 250,
+          "notes": "控件带 `validateNonEmpty`。运行时映射到 `ScatterplotLayer.radiusMaxPixels`。"
+        },
+        {
+          "field_name": "multiplier",
+          "description": "Factor to multiply the metric by",
+          "data_type": "number | string",
+          "sample_data": 10,
+          "required": false,
+          "embedding": "否",
+          "default_value": 1,
+          "notes": "运行时会在 `unitToRadius()` 的结果上继续乘这个倍率。"
+        }
+      ],
+      "Point Color": [
+        {
+          "field_name": "legend_position",
+          "description": "Choose the position of the legend",
+          "data_type": "string | null",
+          "enum_values": [
+            null,
+            "tl",
+            "tr",
+            "bl",
+            "br"
+          ],
+          "sample_data": "tr",
+          "required": false,
+          "embedding": "否",
+          "default_value": "tr"
+        },
+        {
+          "field_name": "legend_format",
+          "description": "Choose the format for legend values",
+          "data_type": "string | null",
+          "enum_source": "D3_FORMAT_OPTIONS",
+          "sample_data": null,
+          "required": false,
+          "embedding": "否",
+          "default_value": "D3_FORMAT_OPTIONS[0][0]"
+        },
+        {
+          "field_name": "color_scheme_type",
+          "description": "Select the type of color scheme to use.",
+          "data_type": "string",
+          "enum_values": [
+            "fixed_color",
+            "categorical_palette",
+            "color_breakpoints"
+          ],
+          "sample_data": "categorical_palette",
+          "required": false,
+          "embedding": "否",
+          "default_value": "categorical_palette",
+          "notes": "scatter 没有 `linear_palette`。"
+        },
+        {
+          "field_name": "color_picker",
+          "description": "Select the fixed color",
+          "data_type": "object",
+          "sample_data": {
+            "r": 205,
+            "g": 0,
+            "b": 3,
+            "a": 0.82
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          },
+          "notes": "仅当 `color_scheme_type='fixed_color'` 时可见；但在 `categorical_palette` 且 `dimension` 为空时，运行时也会把它当作回退固定色。"
+        },
+        {
+          "field_name": "dimension",
+          "description": "Pick a dimension from which categorical colors are defined",
+          "data_type": "string | object | null",
+          "enum_source": "datasource columns",
+          "sample_data": "category",
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "仅当 `color_scheme_type='categorical_palette'` 时真正有意义。后端会把该列映射成 `cat_color`。"
+        },
+        {
+          "field_name": "color_scheme",
+          "description": "The color scheme for rendering chart",
+          "data_type": "string",
+          "enum_source": "categoricalSchemeRegistry.keys()",
+          "sample_data": "bnbColors",
+          "required": false,
+          "embedding": "否",
+          "default_value": "categoricalSchemeRegistry.getDefaultKey()",
+          "notes": "仅当 `color_scheme_type='categorical_palette'` 时真正参与分类配色。"
+        },
+        {
+          "field_name": "deafult_breakpoint_color",
+          "description": "The color used when a value doesn't match any defined breakpoints.",
+          "data_type": "object",
+          "sample_data": {
+            "r": 158,
+            "g": 158,
+            "b": 158,
+            "a": 1
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": {
+            "r": 158,
+            "g": 158,
+            "b": 158,
+            "a": 1
+          },
+          "notes": "保存态字段名必须使用 `deafult_breakpoint_color`。但当前通用分类容器代码读取的是 `default_breakpoint_color`，因此未命中断点时通常仍会回退到默认灰色。"
+        },
+        {
+          "field_name": "color_breakpoints",
+          "description": "Define color breakpoints for the data",
+          "data_type": "array[ColorBreakpointType]",
+          "sample_data": [
+            {
+              "minValue": 0,
+              "maxValue": 100,
+              "color": {
+                "r": 255,
+                "g": 0,
+                "b": 0,
+                "a": 1
+              }
+            }
+          ],
+          "required": false,
+          "embedding": "否",
+          "default_value": [],
+          "notes": "该模式按 `feature.metric` 着色，所以只有 `point_radius_fixed.type='metric'` 时才真正有意义。"
+        }
+      ],
+      "Advanced": [
+        {
+          "field_name": "js_columns",
+          "description": "List of extra columns made available in JavaScript functions",
+          "data_type": "array[string | object]",
+          "enum_source": "datasource columns",
+          "sample_data": [
+            "category"
+          ],
+          "required": false,
+          "embedding": "否",
+          "default_value": [],
+          "notes": "`BaseDeckGLViz.query_obj()` 会把它们并入 query columns/groupby，并在返回特征中以 `extraProps` 暴露给自定义 JS。"
+        },
+        {
+          "field_name": "js_data_mutator",
+          "description": "Define a javascript function that receives the data array used in the visualization and is expected to return a modified version of that array.",
+          "data_type": "string",
+          "sample_data": "data => data",
+          "required": false,
+          "embedding": "否",
+          "default_value": "",
+          "notes": "如果功能开关 `EnableJavascriptControls` 关闭，该控件会变成只读并显示安全提示。"
+        },
+        {
+          "field_name": "js_tooltip",
+          "description": "Define a function that receives the input and outputs the content for a tooltip",
+          "data_type": "string",
+          "sample_data": "o => `<div>${o.object.metric}</div>`",
+          "required": false,
+          "embedding": "否",
+          "default_value": "",
+          "notes": "若未提供，默认 tooltip 显示经纬度、可选 Category 和 metric。"
+        },
+        {
+          "field_name": "js_onclick_href",
+          "description": "Define a function that returns a URL to navigate to when user clicks",
+          "data_type": "string",
+          "sample_data": "o => `https://example.com/?lon=${o.object.position[0]}&lat=${o.object.position[1]}`",
+          "required": false,
+          "embedding": "否",
+          "default_value": "",
+          "notes": "若提供，`commonLayerProps()` 会在点击时打开该 URL。"
+        }
+      ]
+    }
+  }
+}

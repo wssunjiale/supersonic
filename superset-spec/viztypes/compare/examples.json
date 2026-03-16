@@ -1,0 +1,455 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "compare",
+  "display_name": "Time-series Percent Change",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "region",
+          "operator": "IN",
+          "comparator": [
+            "East"
+          ]
+        }
+      ]
+    ],
+    "annotation_layers": [
+      []
+    ],
+    "bottom_margin": [
+      "auto"
+    ],
+    "color_scheme": [
+      "SUPERSET_DEFAULT"
+    ],
+    "comparison_type": [
+      "values"
+    ],
+    "contribution": [
+      false
+    ],
+    "granularity": [
+      "P1D"
+    ],
+    "granularity_sqla": [
+      "ds"
+    ],
+    "groupby": [
+      [
+        "region"
+      ]
+    ],
+    "left_margin": [
+      "auto"
+    ],
+    "limit": [
+      10
+    ],
+    "metrics": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        }
+      ]
+    ],
+    "min_periods": [
+      7
+    ],
+    "order_desc": [
+      true
+    ],
+    "resample_method": [
+      "mean"
+    ],
+    "resample_rule": [
+      "1D"
+    ],
+    "rolling_periods": [
+      7
+    ],
+    "rolling_type": [
+      "mean"
+    ],
+    "row_limit": [
+      10000
+    ],
+    "time_compare": [
+      [
+        "1 year"
+      ]
+    ],
+    "time_grain_sqla": [
+      "P1D"
+    ],
+    "time_range": [
+      "Last 30 days"
+    ],
+    "timeseries_limit_metric": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "sales"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(sales)"
+      }
+    ],
+    "x_axis_format": [
+      "smart_date"
+    ],
+    "x_axis_label": [
+      "Order Date"
+    ],
+    "x_axis_showminmax": [
+      false
+    ],
+    "x_ticks_layout": [
+      "auto"
+    ],
+    "y_axis_bounds": [
+      [
+        0,
+        1
+      ]
+    ],
+    "y_axis_format": [
+      "SMART_NUMBER"
+    ],
+    "y_axis_label": [
+      "Percent Change"
+    ],
+    "y_axis_showminmax": [
+      false
+    ],
+    "y_log_scale": [
+      false
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "compare",
+      "granularity_sqla": "<temporal_column>",
+      "time_range": "2025-01-01 : 2025-01-31",
+      "metrics": [
+        "<metric_or_saved_metric>"
+      ],
+      "adhoc_filters": []
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "compare",
+      "granularity_sqla": "ds",
+      "time_grain_sqla": "P1D",
+      "time_range": "2025-01-01 : 2025-01-31",
+      "metrics": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        }
+      ],
+      "adhoc_filters": [],
+      "groupby": [],
+      "limit": null,
+      "timeseries_limit_metric": null,
+      "order_desc": true,
+      "contribution": false,
+      "row_limit": 10000,
+      "color_scheme": "SUPERSET_DEFAULT",
+      "x_axis_label": "",
+      "bottom_margin": "auto",
+      "x_ticks_layout": "auto",
+      "x_axis_format": "smart_date",
+      "x_axis_showminmax": false,
+      "y_axis_label": "",
+      "left_margin": "auto",
+      "y_axis_showminmax": false,
+      "y_log_scale": false,
+      "y_axis_format": "SMART_NUMBER",
+      "y_axis_bounds": [
+        null,
+        null
+      ],
+      "rolling_type": "None",
+      "rolling_periods": null,
+      "min_periods": null,
+      "time_compare": [],
+      "comparison_type": "values",
+      "resample_rule": null,
+      "resample_method": null,
+      "annotation_layers": []
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "compare",
+      "granularity_sqla": "<copied_from_saved_chart>",
+      "time_grain_sqla": "<copied_from_saved_chart_if_present>",
+      "time_range": "<copied_from_saved_chart>",
+      "metrics": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "groupby": "<copied_from_saved_chart_if_present>",
+      "limit": "<copied_from_saved_chart_if_present>",
+      "timeseries_limit_metric": "<copied_from_saved_chart_if_present>",
+      "order_desc": "<copied_from_saved_chart_if_present>",
+      "contribution": "<copied_from_saved_chart_if_present>",
+      "row_limit": "<copied_from_saved_chart_if_present>",
+      "color_scheme": "<copied_from_saved_chart_if_present>",
+      "x_axis_label": "<copied_from_saved_chart_if_present>",
+      "bottom_margin": "<copied_from_saved_chart_if_present>",
+      "x_ticks_layout": "<copied_from_saved_chart_if_present>",
+      "x_axis_format": "<copied_from_saved_chart_if_present>",
+      "x_axis_showminmax": "<copied_from_saved_chart_if_present>",
+      "y_axis_label": "<copied_from_saved_chart_if_present>",
+      "left_margin": "<copied_from_saved_chart_if_present>",
+      "y_axis_showminmax": "<copied_from_saved_chart_if_present>",
+      "y_log_scale": "<copied_from_saved_chart_if_present>",
+      "y_axis_format": "<copied_from_saved_chart_if_present>",
+      "y_axis_bounds": "<copied_from_saved_chart_if_present>",
+      "rolling_type": "<copied_from_saved_chart_if_present>",
+      "rolling_periods": "<copied_from_saved_chart_if_present>",
+      "min_periods": "<copied_from_saved_chart_if_present>",
+      "time_compare": "<copied_from_saved_chart_if_present>",
+      "comparison_type": "<copied_from_saved_chart_if_present>",
+      "resample_rule": "<copied_from_saved_chart_if_present>",
+      "resample_method": "<copied_from_saved_chart_if_present>",
+      "annotation_layers": "<copied_from_saved_chart_if_present>",
+      "extra_form_data": {
+        "time_range": "Last 30 days",
+        "filters": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "East"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_compare_legacy": true,
+        "recommended": true,
+        "sample_data": "Last 30 days",
+        "effect": "merge 后直接写入 root `form_data.time_range`；当 `time_compare` 有值时，这个字段还决定是否能通过后端封闭时间范围校验。",
+        "source": "superset/constants.py + superset/utils/core.py + superset/viz.py"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_compare_legacy": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "legacy merge 路径支持把它写回 root `time_grain_sqla`，因此技术上会直接改变 Compare 的聚合粒度；guest embedding 下默认不建议动态改写。",
+        "source": "superset/constants.py + superset/utils/core.py + superset/viz.py",
+        "status": "高置信有效，但不属于保守 guest 模式推荐写法"
+      },
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_compare_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "East"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters；后端会把它们并入额外过滤条件。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_compare_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会标记为 `isExtra` 并并入查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_compare_legacy": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；Compare 默认不直接消费它。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_compare_legacy": false,
+        "recommended": false,
+        "sample_data": "ds",
+        "effect": "前端类型声明支持，但 legacy 后端 `merge_extra_form_data()` 会把它映射到 root `granularity` 而不是 `granularity_sqla`；`BaseViz.query_obj()` 实际读取的是 root `granularity_sqla`，因此不是高置信有效 override。",
+        "source": "QueryFormData.ts + query/constants.ts + superset/constants.py + superset/utils/core.py + superset/viz.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "granularity",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_compare_legacy": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "这是 legacy 时间粒度字段。Compare 在 SQLA datasource 下的稳定主时间列仍是 `granularity_sqla`，因此不建议把它当成动态 root override 入口。",
+        "source": "QueryFormData.ts + superset/viz.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_column",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_compare_legacy": false,
+        "recommended": false,
+        "sample_data": "ds",
+        "effect": "前端类型声明支持，但 legacy `BaseViz.query_obj()` 并不直接读取 `time_column`；当前图没有对应的正式 root controlPanel 字段。",
+        "source": "QueryFormData.ts + superset/constants.py + superset/viz.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_grain",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_compare_legacy": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "前端类型声明支持，但 legacy `BaseViz.query_obj()` 实际读取的是 `time_grain_sqla`；对 Compare 不是高置信有效 override。",
+        "source": "QueryFormData.ts + superset/constants.py + superset/viz.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "relative_start",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_compare_legacy": false,
+        "recommended": false,
+        "sample_data": "now",
+        "effect": "后端会把它写进 `extras`，但 Compare 的主时间路径仍然优先由 root `time_range` / `time_grain_sqla` 决定；当前图没有证据表明单独传它即可稳定生效。",
+        "source": "superset/charts/schemas.py + superset/constants.py + superset/utils/core.py + superset/viz.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "relative_end",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_compare_legacy": false,
+        "recommended": false,
+        "sample_data": "today",
+        "effect": "后端会把它写进 `extras`，但 Compare 的主时间路径仍然优先由 root `time_range` / `time_grain_sqla` 决定；当前图没有证据表明单独传它即可稳定生效。",
+        "source": "superset/charts/schemas.py + superset/constants.py + superset/utils/core.py + superset/viz.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_compare_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用 ExtraFormData 字段。Compare 默认不直接消费它。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_compare_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用交互字段；Compare 默认不直接消费。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_compare_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用交互字段；Compare 默认不直接消费。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "time_compare",
+        "data_type": "string | array[string]",
+        "behavior": "override",
+        "safe_for_compare_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "1 year"
+        ],
+        "effect": "frontend 类型声明存在，但 legacy 后端 `superset/constants.py` 的 merge whitelist 未把它列为高置信 override；当前图也没有直接从 `extra_form_data.time_compare` 取值的证据。",
+        "source": "QueryFormData.ts + query/constants.ts + superset/constants.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "compare",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/compare-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/compare-form-data-schema.json",
+      "control-schema": "form-data-schema/compare-schema.json"
+    }
+  }
+}

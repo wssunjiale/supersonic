@@ -1,0 +1,131 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "radar",
+  "display_name": "Radar Chart",
+  "normalized_summary": {
+    "category": "relationship",
+    "tags": [
+      "radar",
+      "multi_dimensional",
+      "polar",
+      "comparison"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "groupby",
+        "required": true,
+        "description": "分类维度字段，用于定义雷达图的系列（不同多边形）。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "多维数值指标列表，用于定义雷达图的维度（辐条）。"
+      },
+      {
+        "key": "normalize",
+        "required": false,
+        "description": "是否归一化数值（true/false），用于跨维度数值的可比化。"
+      },
+      {
+        "key": "fill",
+        "required": false,
+        "description": "是否填充多边形（true/false），控制雷达图的展示样式。"
+      }
+    ],
+    "description_zh": "Radar Chart displays multi-dimensional numerical data on a polar coordinate system, with each dimension as a spoke and data points as a polygon connecting values across spokes.",
+    "visual_shape_zh": "雷达图（多维对比型）",
+    "use_cases_zh": [
+      "多维度指标对比（如产品多维度评分、用户多特征分析）",
+      "多维特征的相似度分析",
+      "综合能力/性能评估"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "radar",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/radar-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/radar-form-data-schema.json",
+      "control-schema": "form-data-schema/radar-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Radar Chart",
+    "viztype": "radar",
+    "详细描述": "Radar Chart displays multi-dimensional numerical data on a polar coordinate system, with each dimension as a spoke and data points as a polygon connecting values across spokes.",
+    "表现形态": "雷达图（多维对比型）",
+    "适用场景": [
+      "多维度指标对比（如产品多维度评分、用户多特征分析）",
+      "多维特征的相似度分析",
+      "综合能力/性能评估"
+    ],
+    "vizKey": "Radar",
+    "pluginCategory": "Relationship",
+    "pluginTags": [],
+    "category": "relationship",
+    "tags": [
+      "radar",
+      "multi_dimensional",
+      "polar",
+      "comparison"
+    ],
+    "关键字段": [
+      {
+        "key": "groupby",
+        "required": true,
+        "description": "分类维度字段，用于定义雷达图的系列（不同多边形）。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "多维数值指标列表，用于定义雷达图的维度（辐条）。"
+      },
+      {
+        "key": "normalize",
+        "required": false,
+        "description": "是否归一化数值（true/false），用于跨维度数值的可比化。"
+      },
+      {
+        "key": "fill",
+        "required": false,
+        "description": "是否填充多边形（true/false），控制雷达图的展示样式。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

@@ -1,0 +1,298 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "graph_chart",
+  "display_name": "Graph Chart",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      []
+    ],
+    "baseEdgeWidth": [
+      3
+    ],
+    "baseNodeSize": [
+      20
+    ],
+    "color_scheme": [
+      "supersetColors"
+    ],
+    "draggable": [
+      false
+    ],
+    "edgeLength": [
+      400
+    ],
+    "edgeSymbol": [
+      "none,arrow"
+    ],
+    "friction": [
+      0.2
+    ],
+    "gravity": [
+      0.3
+    ],
+    "layout": [
+      "force"
+    ],
+    "legendMargin": [
+      12
+    ],
+    "legendOrientation": [
+      "top"
+    ],
+    "legendType": [
+      "scroll"
+    ],
+    "metric": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "weight"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(weight)"
+      }
+    ],
+    "repulsion": [
+      1000
+    ],
+    "roam": [
+      true
+    ],
+    "row_limit": [
+      10000
+    ],
+    "selectedMode": [
+      "single"
+    ],
+    "showSymbolThreshold": [
+      0
+    ],
+    "show_legend": [
+      true
+    ],
+    "source": [
+      "source_name"
+    ],
+    "source_category": [
+      "source_type"
+    ],
+    "target": [
+      "target_name"
+    ],
+    "target_category": [
+      "target_type"
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "graph_chart",
+      "source": "<source_dimension>",
+      "target": "<target_dimension>",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "adhoc_filters": []
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "graph_chart",
+      "source": "source_name",
+      "target": "target_name",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "weight"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(weight)"
+      },
+      "source_category": null,
+      "target_category": null,
+      "adhoc_filters": [],
+      "row_limit": 10000,
+      "color_scheme": "<categoricalSchemeRegistry.defaultKey>",
+      "show_legend": true,
+      "legendType": "scroll",
+      "legendOrientation": "top",
+      "legendMargin": null,
+      "layout": "force",
+      "edgeSymbol": "none,arrow",
+      "draggable": false,
+      "roam": true,
+      "selectedMode": "single",
+      "showSymbolThreshold": 0,
+      "baseNodeSize": 20,
+      "baseEdgeWidth": 3,
+      "edgeLength": 400,
+      "gravity": 0.3,
+      "repulsion": 1000,
+      "friction": 0.2
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "graph_chart",
+      "source": "<copied_from_saved_chart>",
+      "target": "<copied_from_saved_chart>",
+      "metric": "<copied_from_saved_chart>",
+      "source_category": "<copied_from_saved_chart>",
+      "target_category": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "row_limit": "<copied_from_saved_chart>",
+      "layout": "<copied_from_saved_chart>",
+      "edgeSymbol": "<copied_from_saved_chart>",
+      "roam": "<copied_from_saved_chart>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "source_type",
+            "op": "IN",
+            "val": [
+              "person"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "source_type",
+            "operator": "IN",
+            "comparator": [
+              "person"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_graph_chart": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "source_type",
+            "op": "IN",
+            "val": [
+              "person"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters；后端会把它们并入额外过滤条件。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_graph_chart": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "source_type",
+            "operator": "IN",
+            "comparator": [
+              "person"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会标记为 isExtra 并并入查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_graph_chart": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "可传非标准附加数据；Graph Chart 默认 buildQuery/transformProps 不直接消费它。",
+        "source": "superset/constants.py + frontend QueryFormData.ts"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_graph_chart": false,
+        "recommended": false,
+        "sample_data": [
+          "source_type"
+        ],
+        "effect": "通用 ExtraFormData 字段。Graph Chart 默认不直接消费它。",
+        "source": "frontend QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_graph_chart": false,
+        "recommended": false,
+        "sample_data": [
+          "source_type"
+        ],
+        "effect": "通用交互字段；Graph Chart 默认不直接消费。",
+        "source": "frontend QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_graph_chart": false,
+        "recommended": false,
+        "sample_data": [
+          "source_type"
+        ],
+        "effect": "通用交互字段；Graph Chart 默认不直接消费。",
+        "source": "frontend QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_graph_chart": false,
+        "recommended": false,
+        "sample_data": "Last 7 days",
+        "effect": "通用时间范围 override；Graph Chart controlPanel 没有对应时间字段，不建议依赖它重构 guest 请求。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_graph_chart": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "通用时间粒度 override；Graph Chart 常规场景不需要。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "graph_chart",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/graph_chart-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/graph_chart-form-data-schema.json",
+      "control-schema": "form-data-schema/graph_chart-schema.json"
+    }
+  }
+}

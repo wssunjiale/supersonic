@@ -1,0 +1,423 @@
+{
+  "viz_type": "partition",
+  "display_name": "Partition Chart",
+  "purpose": "用于调用 API 创建或保存 Partition Chart 时填写的 form_data 模板",
+  "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/partition-schema.json",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-partition/src/controlPanel.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-partition/src/index.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-partition/src/transformProps.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-partition/src/Partition.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-partition/src/OptionDescription.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/utils/getStandardizedControls.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+    "D:/vsx/sources/superset-6.0.0/superset/viz.py"
+  ],
+  "notes": [
+    "Explore 导出 form_data 时走 `getFormDataFromControls()`，它按 control name 原样写入 root form_data。API 根层必须使用 `time_series_option`、`date_time_format`、`partition_limit`、`partition_threshold`、`log_scale`、`equal_date_size`、`rich_tooltip` 这些 snake_case 键名，而不是 runtime camelCase 别名。",
+    "Partition Chart 没有专属前端 buildQuery。ChartClient.ts 对它会退回 `() => formData`，因此 API 层真正应该构造的是原始 root `form_data`，然后由 legacy `/superset/explore_json/` 包装成 `{ form_data: ... }`。",
+    "`formDataOverrides` 会把标准化拖拽控件里的列和指标弹回 root `groupby` / `metrics`。因此当前图正式创建模板仍然要直接传 `groupby` 与 `metrics`。",
+    "`PartitionViz.get_data()` 在 `groupby` 为空时会直接报错，因此 `groupby` 是当前图的高置信必填字段。",
+    "`time_series_option` 决定后端计算路径；高级分析字段只有在 `time_series_option='adv_anal'` 时才有高置信作用。",
+    "`time_compare` 与 `comparison_type` 虽然在 controlPanel 暴露出来，但当前 PartitionViz 覆盖后的 `get_data()` 没有读取 `_extra_chart_data`，也没有读取 `comparison_type`。从当前源码看，它们不属于 partition 的稳定有效模板字段。"
+  ],
+  "naming_and_pipeline": {
+    "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写成 form_data[name]。",
+    "api_form_data_to_backend_request": "ChartClient.ts 在 `useLegacyApi=true` 时，把原始 form_data 包装成 `{ form_data }` POST 到 `/superset/explore_json/`。",
+    "backend_form_data_to_query_obj": "Partition Chart 通过 BaseViz.query_obj() + NVD3TimeSeriesViz.query_obj() + PartitionViz.query_obj() 构造查询；`time_series_option` 进一步决定 `get_data()` 的后处理分支。",
+    "runtime_chart_props": "transformProps.js 会把 raw form_data 映射成 runtime props：`colorScheme <- color_scheme`、`dateTimeFormat <- date_time_format`、`equalDateSize <- equal_date_size`、`logScale <- log_scale`、`richTooltip <- rich_tooltip`、`timeSeriesOption <- time_series_option`，并把 `groupby` 转成 `levels`。"
+  },
+  "global_required_fields": {
+    "datasource": {
+      "data_type": "string",
+      "required": true,
+      "sample_data": "<dataset_id>__table",
+      "source": "explore_json() + datasourceAndVizType hidden control"
+    },
+    "viz_type": {
+      "data_type": "string",
+      "required": true,
+      "fixed_value": "partition",
+      "source": "PartitionViz.viz_type + plugin metadata"
+    }
+  },
+  "global_optional_fields": {
+    "slice_id": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 0,
+      "source": "datasourceAndVizType hidden control"
+    },
+    "cache_timeout": {
+      "data_type": "integer | null",
+      "required": false,
+      "sample_data": null,
+      "source": "datasourceAndVizType hidden control"
+    },
+    "metrics": {
+      "data_type": "array[string | object]",
+      "required": true,
+      "sample_data": [
+        "SUM(sales)"
+      ],
+      "source": "Query section"
+    },
+    "groupby": {
+      "data_type": "array[string | object]",
+      "required": true,
+      "sample_data": [
+        "region",
+        "product_line"
+      ],
+      "source": "Query section"
+    },
+    "adhoc_filters": {
+      "data_type": "array[object]",
+      "required": false,
+      "sample_data": [],
+      "source": "Query section"
+    },
+    "limit": {
+      "data_type": "integer | null",
+      "required": false,
+      "sample_data": 10,
+      "source": "Query section"
+    },
+    "timeseries_limit_metric": {
+      "data_type": "string | object | null",
+      "required": false,
+      "sample_data": "SUM(sales)",
+      "source": "Query section"
+    },
+    "order_desc": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": true,
+      "source": "Query section"
+    },
+    "contribution": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": false,
+      "source": "Query section"
+    },
+    "row_limit": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 10000,
+      "source": "Query section"
+    },
+    "time_series_option": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "not_time",
+      "source": "Time Series Options section"
+    },
+    "color_scheme": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "supersetColors",
+      "source": "Chart Options section"
+    },
+    "number_format": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "SMART_NUMBER",
+      "source": "Chart Options section"
+    },
+    "date_time_format": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "smart_date",
+      "source": "Chart Options section"
+    },
+    "partition_limit": {
+      "data_type": "integer | string",
+      "required": false,
+      "sample_data": "5",
+      "source": "Chart Options section"
+    },
+    "partition_threshold": {
+      "data_type": "number | string",
+      "required": false,
+      "sample_data": "0.05",
+      "source": "Chart Options section"
+    },
+    "log_scale": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": false,
+      "source": "Chart Options section"
+    },
+    "equal_date_size": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": true,
+      "source": "Chart Options section"
+    },
+    "rich_tooltip": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": true,
+      "source": "Chart Options section"
+    },
+    "rolling_type": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "None",
+      "source": "Advanced Analytics section"
+    },
+    "rolling_periods": {
+      "data_type": "integer | string | null",
+      "required": false,
+      "sample_data": 7,
+      "source": "Advanced Analytics section"
+    },
+    "min_periods": {
+      "data_type": "integer | string | null",
+      "required": false,
+      "sample_data": 7,
+      "source": "Advanced Analytics section"
+    },
+    "time_compare": {
+      "data_type": "array[string] | null",
+      "required": false,
+      "sample_data": [
+        "1 year"
+      ],
+      "source": "Advanced Analytics section"
+    },
+    "comparison_type": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "values",
+      "source": "Advanced Analytics section"
+    },
+    "resample_rule": {
+      "data_type": "string | null",
+      "required": false,
+      "sample_data": "1D",
+      "source": "Advanced Analytics section"
+    },
+    "resample_method": {
+      "data_type": "string | null",
+      "required": false,
+      "sample_data": "mean",
+      "source": "Advanced Analytics section"
+    },
+    "url_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "QueryFormData"
+    },
+    "custom_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "QueryFormData"
+    }
+  },
+  "minimal_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "partition",
+    "metrics": [
+      "<metric>"
+    ],
+    "adhoc_filters": [],
+    "groupby": [
+      "<dimension_1>"
+    ],
+    "time_series_option": "not_time"
+  },
+  "recommended_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "partition",
+    "metrics": [
+      "<metric>"
+    ],
+    "adhoc_filters": [],
+    "groupby": [
+      "<dimension_1>",
+      "<dimension_2>"
+    ],
+    "limit": null,
+    "timeseries_limit_metric": null,
+    "order_desc": true,
+    "contribution": false,
+    "row_limit": 10000,
+    "time_series_option": "not_time",
+    "color_scheme": "supersetColors",
+    "number_format": "SMART_NUMBER",
+    "date_time_format": "smart_date",
+    "partition_limit": "5",
+    "partition_threshold": "0.05",
+    "log_scale": false,
+    "equal_date_size": true,
+    "rich_tooltip": true,
+    "rolling_type": "None",
+    "rolling_periods": null,
+    "min_periods": null,
+    "time_compare": null,
+    "comparison_type": "values",
+    "resample_rule": null,
+    "resample_method": null
+  },
+  "conditional_blocks": {
+    "time_series_mode": {
+      "condition": "需要在层级树中加入时间层级时",
+      "fields": {
+        "time_series_option": "time_series",
+        "date_time_format": "smart_date",
+        "equal_date_size": true
+      },
+      "notes": "后端会走 `levels_for('agg_sum', [DTTM_ALIAS] + groups, df)`，前端 `Partition.js` 会把第一层 group 识别为日期。"
+    },
+    "aggregate_mean_mode": {
+      "condition": "需要按时间窗口对每层取均值时",
+      "fields": {
+        "time_series_option": "agg_mean"
+      }
+    },
+    "aggregate_sum_mode": {
+      "condition": "需要按时间窗口对每层取总和时",
+      "fields": {
+        "time_series_option": "agg_sum"
+      }
+    },
+    "point_comparison_mode": {
+      "condition": "需要比较首尾时间点差异、比例或百分比时",
+      "fields": {
+        "time_series_option": "point_diff"
+      },
+      "notes": "可替换成 `point_percent` 或 `point_factor`。partition 真正的差异模式由 `time_series_option` 控制，而不是 `comparison_type`。"
+    },
+    "advanced_analytics_mode": {
+      "condition": "需要 rolling / resample / contribution 后处理时",
+      "fields": {
+        "time_series_option": "adv_anal",
+        "rolling_type": "mean",
+        "rolling_periods": 7,
+        "min_periods": 7,
+        "contribution": false,
+        "resample_rule": "1D",
+        "resample_method": "mean"
+      },
+      "notes": "只有 `adv_anal` 分支会调用 `process_data()`，因此这些高级分析字段在该模式下才有高置信作用。"
+    },
+    "pruning_options": {
+      "condition": "需要裁剪层级节点数量或阈值时",
+      "fields": {
+        "partition_limit": "5",
+        "partition_threshold": "0.05"
+      },
+      "notes": "`partition_threshold` 当前运行时会经过 `parseInt()`；像 `0.05` 这样的值会被转成 `0`。"
+    },
+    "custom_tooltip_and_scale": {
+      "condition": "需要调整展示样式时",
+      "fields": {
+        "color_scheme": "supersetColors",
+        "number_format": "SMART_NUMBER",
+        "date_time_format": "smart_date",
+        "log_scale": false,
+        "equal_date_size": true,
+        "rich_tooltip": true
+      }
+    }
+  },
+  "runtime_only_or_non_template_fields": {
+    "runtime_aliases_generated_by_transformProps": [
+      {
+        "field_name": "colorScheme",
+        "reason": "由 raw form_data.color_scheme 派生的运行时别名，不是 API root 键。"
+      },
+      {
+        "field_name": "dateTimeFormat",
+        "reason": "由 raw form_data.date_time_format 派生的运行时别名，不是 API root 键。"
+      },
+      {
+        "field_name": "equalDateSize",
+        "reason": "由 raw form_data.equal_date_size 派生的运行时别名，不是 API root 键。"
+      },
+      {
+        "field_name": "numberFormat",
+        "reason": "由 raw form_data.number_format 派生的运行时别名，不是 API root 键。"
+      },
+      {
+        "field_name": "partitionLimit",
+        "reason": "由 raw form_data.partition_limit 派生的运行时别名，不是 API root 键。"
+      },
+      {
+        "field_name": "partitionThreshold",
+        "reason": "由 raw form_data.partition_threshold 派生的运行时别名，不是 API root 键。"
+      },
+      {
+        "field_name": "timeSeriesOption",
+        "reason": "由 raw form_data.time_series_option 派生的运行时别名，不是 API root 键。"
+      },
+      {
+        "field_name": "useLogScale",
+        "reason": "这是组件 props 里的最终字段名，由 raw form_data.log_scale 间接派生，不是 root form_data 键。"
+      },
+      {
+        "field_name": "useRichTooltip",
+        "reason": "这是组件 props 里的最终字段名，由 raw form_data.rich_tooltip 间接派生，不是 root form_data 键。"
+      },
+      {
+        "field_name": "levels",
+        "reason": "这是 `transformProps.js` 由 `groupby` 和 `datasource.verboseMap` 派生的运行时字段，不是 root form_data 键。"
+      },
+      {
+        "field_name": "sliceId",
+        "reason": "这是运行时 chart props 里的 camelCase 字段，不是 root form_data 键。"
+      }
+    ],
+    "backend_response_only_fields": [
+      {
+        "field_name": "queriesData[0].data",
+        "reason": "PartitionViz.get_data() 返回的是层级树数据，不是 root form_data 字段。"
+      }
+    ],
+    "legacy_request_wrapper": [
+      {
+        "field_name": "payload.form_data",
+        "reason": "这是 legacy `/superset/explore_json/` 请求外层包裹字段，不是图表保存态内部的 root form_data 字段。"
+      }
+    ]
+  },
+  "api_usage_guidance": {
+    "high_confidence_required_fields": [
+      "datasource",
+      "viz_type",
+      "metrics",
+      "groupby"
+    ],
+    "recommended_always_set": [
+      "adhoc_filters",
+      "time_series_option",
+      "row_limit",
+      "color_scheme",
+      "number_format",
+      "partition_limit",
+      "partition_threshold",
+      "rich_tooltip"
+    ],
+    "api_field_examples": [
+      "groupby",
+      "time_series_option",
+      "partition_limit",
+      "partition_threshold",
+      "contribution",
+      "rolling_type",
+      "resample_rule"
+    ],
+    "avoid_confusion": [
+      "不要把 `partition` 当成标准 chart data API 图表去套 `/api/v1/chart/data` 的 `query_context` 模板；当前图真实入口是 legacy `/superset/explore_json/`。",
+      "不要遗漏 `groupby`；当前图后端会直接报错。",
+      "不要把 `comparison_type` 误当成 partition 的差异模式主开关；当前图真正切换差异计算的是 `time_series_option`。",
+      "不要把运行时 camelCase 名称 `timeSeriesOption`、`partitionLimit`、`partitionThreshold`、`colorScheme`、`dateTimeFormat`、`sliceId` 写回 root form_data。",
+      "不要忽略 `partition_threshold` 当前的 `parseInt()` 行为；传入小于 1 的小数时，运行时很可能变成 `0`。"
+    ]
+  }
+}

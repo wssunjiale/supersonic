@@ -1,0 +1,307 @@
+{
+  "viz_type": "waterfall",
+  "display_name": "Waterfall Chart",
+  "purpose": "第三方 embedding / guest token 场景下安全传输的 Waterfall form_data 模板",
+  "base_form_data_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/waterfall-form-data-schema.json",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset/security/manager.py",
+    "D:/vsx/sources/superset-6.0.0/superset/constants.py",
+    "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+    "D:/vsx/sources/superset-6.0.0/superset/charts/data/api.py",
+    "D:/vsx/sources/superset-6.0.0/superset/commands/chart/data/get_data_command.py",
+    "D:/vsx/sources/superset-6.0.0/superset/charts/schemas.py",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/constants.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/QueryFormData.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/processExtraFormData.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/dashboard/components/nativeFilters/utils.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataWithDashboardContext.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Waterfall/controlPanel.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Waterfall/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Waterfall/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Waterfall/types.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractQueryFields.ts"
+  ],
+  "notes": [
+    "waterfall 是现代 chart data API 图。embedded guest 的限制核心在后端 `security/manager.py::query_context_modified()`，而不是前端控件层。",
+    "安全做法不是在 guest 请求里重新拼装一份新的 Waterfall form_data，而是以已保存图表的 form_data 原样复制为 base，只把动态条件放进 `extra_form_data`。",
+    "Waterfall 的 query 关键字段是 `x_axis` / `granularity_sqla`、`time_grain_sqla`、`groupby`、`metric`、`adhoc_filters`、`row_limit`。其中 `x_axis`/`granularity_sqla` 与 `groupby` 会直接影响 query.columns，`metric` 会影响 query.metrics。",
+    "Waterfall/buildQuery.ts 会强制生成 `orderby`，因此 guest 请求里临时改 `x_axis`、`granularity_sqla` 或 `groupby`，也会间接改写排序。",
+    "`show_value`、`show_legend`、三种颜色、轴标签、格式字段虽然不改 query，但仍属于图表定义字段；guest 请求里不应临时改写。",
+    "`time_grain_sqla` 在 Waterfall 中是可见控件，但 guest 场景下同样不建议把它作为动态可改字段。"
+  ],
+  "security_enforcement": {
+    "backend_check_function": "superset/security/manager.py::query_context_modified",
+    "checked_when": "ChartDataCommand.validate() -> QueryContext.raise_for_access()",
+    "error_message": "Guest user cannot modify chart payload",
+    "hard_block_fields": [
+      "slice_id",
+      "metrics",
+      "columns",
+      "groupby",
+      "orderby"
+    ],
+    "indirectly_sensitive_fields_for_waterfall": [
+      "x_axis",
+      "granularity_sqla",
+      "time_grain_sqla",
+      "groupby",
+      "metric",
+      "adhoc_filters",
+      "row_limit",
+      "show_value",
+      "show_legend",
+      "increase_color",
+      "decrease_color",
+      "total_color",
+      "x_axis_label",
+      "x_axis_time_format",
+      "x_ticks_layout",
+      "y_axis_label",
+      "y_axis_format",
+      "currency_format"
+    ],
+    "recommended_strategy": "复制保存态 chart form_data 作为 base，仅通过 extra_form_data 追加 filters / adhoc_filters；不要在 guest 请求里重构 Waterfall 的 root 查询字段或展示字段。"
+  },
+  "safe_base_rule": {
+    "description": "第三方 embedding 请求中的根层 form_data，应当从已保存图表的 form_data 直接复制，不要重构。",
+    "must_be_copied_from_saved_chart": [
+      "slice_id",
+      "datasource",
+      "viz_type",
+      "x_axis",
+      "granularity_sqla",
+      "time_grain_sqla",
+      "groupby",
+      "metric",
+      "adhoc_filters",
+      "row_limit",
+      "show_value",
+      "show_legend",
+      "increase_color",
+      "decrease_color",
+      "total_color",
+      "x_axis_label",
+      "x_axis_time_format",
+      "x_ticks_layout",
+      "y_axis_label",
+      "y_axis_format",
+      "currency_format",
+      "all other chart-definition fields"
+    ],
+    "why": [
+      "query_context_modified() 会把请求 query_context 与保存态图表对比。",
+      "Waterfall/buildQuery.ts 会根据 `x_axis 或 granularity_sqla + groupby` 自动生成 query.columns 与 query.orderby。",
+      "core `extractQueryFields()` 会把 `metric` 归并到 query.metrics。",
+      "`time_grain_sqla`、`adhoc_filters`、`row_limit` 会直接影响查询结果。",
+      "展示字段虽然不改 query，但会改变图表定义；保守 guest 模式也应直接复制保存态。"
+    ]
+  },
+  "safe_embedding_form_data_template": {
+    "description": "这是 guest embedding 下的安全写法。根层以保存态图表为 base，仅改 extra_form_data。",
+    "template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "waterfall",
+      "x_axis": "<copied_from_saved_chart_if_present>",
+      "granularity_sqla": "<copied_from_saved_chart_if_present>",
+      "time_grain_sqla": "<copied_from_saved_chart_if_present>",
+      "groupby": "<copied_from_saved_chart_if_present>",
+      "metric": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "row_limit": "<copied_from_saved_chart>",
+      "show_value": "<copied_from_saved_chart>",
+      "show_legend": "<copied_from_saved_chart>",
+      "increase_color": "<copied_from_saved_chart>",
+      "decrease_color": "<copied_from_saved_chart>",
+      "total_color": "<copied_from_saved_chart>",
+      "x_axis_label": "<copied_from_saved_chart>",
+      "x_axis_time_format": "<copied_from_saved_chart>",
+      "x_ticks_layout": "<copied_from_saved_chart>",
+      "y_axis_label": "<copied_from_saved_chart>",
+      "y_axis_format": "<copied_from_saved_chart>",
+      "currency_format": "<copied_from_saved_chart>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "APAC"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "APAC"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    }
+  },
+  "preferred_dynamic_container": {
+    "field_name": "extra_form_data",
+    "description": "chart data API 与 dashboard filter context 都会把动态过滤条件并入这里。",
+    "append_keys": [
+      "adhoc_filters",
+      "filters",
+      "custom_form_data"
+    ],
+    "override_keys_backend_high_confidence": [],
+    "notes": "Waterfall 的常规 guest 动态入口应聚焦 `filters` / `adhoc_filters`，不要在 guest 请求里临时改主轴、metric 或展示字段。"
+  },
+  "extra_form_data_field_schema": [
+    {
+      "field_name": "filters",
+      "data_type": "array[QueryObjectFilterClause]",
+      "behavior": "append",
+      "safe_for_waterfall": true,
+      "recommended": true,
+      "sample_data": [
+        {
+          "col": "region",
+          "op": "IN",
+          "val": [
+            "APAC"
+          ]
+        }
+      ],
+      "effect": "追加 simple filters。",
+      "source": "superset/constants.py + superset/utils/core.py"
+    },
+    {
+      "field_name": "adhoc_filters",
+      "data_type": "array[AdhocFilter]",
+      "behavior": "append",
+      "safe_for_waterfall": true,
+      "recommended": true,
+      "sample_data": [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "region",
+          "operator": "IN",
+          "comparator": [
+            "APAC"
+          ]
+        }
+      ],
+      "effect": "追加 adhoc filters。",
+      "source": "superset/constants.py + superset/utils/core.py"
+    },
+    {
+      "field_name": "custom_form_data",
+      "data_type": "object",
+      "behavior": "append",
+      "safe_for_waterfall": true,
+      "recommended": false,
+      "sample_data": {},
+      "effect": "传递非标准附加数据；Waterfall 默认不直接消费它。",
+      "source": "QueryFormData.ts + superset/constants.py"
+    },
+    {
+      "field_name": "time_range",
+      "data_type": "string",
+      "behavior": "override",
+      "safe_for_waterfall": false,
+      "recommended": false,
+      "sample_data": "Last 90 days",
+      "effect": "虽然 extra_form_data 支持 override 类时间字段，但 Waterfall guest 场景下不建议把时间范围当成常规动态入口。",
+      "source": "QueryFormData.ts + query/constants.ts"
+    }
+  ],
+  "unsafe_root_form_data_changes": [
+    {
+      "field_name": "slice_id",
+      "reason": "与保存态图表 id 不一致会被后端立即判定为请求了另一张图。"
+    },
+    {
+      "field_name": "x_axis",
+      "reason": "会改变 query.columns 首列，并间接改变自动生成的 orderby。"
+    },
+    {
+      "field_name": "granularity_sqla",
+      "reason": "在兼容路径下会替代 `x_axis` 进入 query.columns，并改变排序。"
+    },
+    {
+      "field_name": "time_grain_sqla",
+      "reason": "会改变时序查询的聚合粒度。"
+    },
+    {
+      "field_name": "groupby",
+      "reason": "会改变 breakdown 列、query.columns 以及自动生成的 orderby。"
+    },
+    {
+      "field_name": "metric",
+      "reason": "会改变 query.metrics 与瀑布条的累计值。"
+    },
+    {
+      "field_name": "adhoc_filters",
+      "reason": "会直接改变查询结果；guest 动态过滤应走 extra_form_data。"
+    },
+    {
+      "field_name": "row_limit",
+      "reason": "会改变查询结果规模。"
+    },
+    {
+      "field_name": "show_value",
+      "reason": "属于图表定义字段；会改变 bar label 展示。"
+    },
+    {
+      "field_name": "show_legend",
+      "reason": "属于图表定义字段；会改变 legend 展示状态。"
+    },
+    {
+      "field_name": "increase_color",
+      "reason": "属于图表定义字段；会改变正向 bar 颜色。"
+    },
+    {
+      "field_name": "decrease_color",
+      "reason": "属于图表定义字段；会改变负向 bar 颜色。"
+    },
+    {
+      "field_name": "total_color",
+      "reason": "属于图表定义字段；会改变 total bar 颜色。"
+    },
+    {
+      "field_name": "x_axis_label",
+      "reason": "属于图表定义字段；会改变 X 轴标题。"
+    },
+    {
+      "field_name": "x_axis_time_format",
+      "reason": "属于图表定义字段；会改变 temporal X 轴标签与 tooltip 时间格式。"
+    },
+    {
+      "field_name": "x_ticks_layout",
+      "reason": "属于图表定义字段；会改变 X 轴 tick 布局。"
+    },
+    {
+      "field_name": "y_axis_label",
+      "reason": "属于图表定义字段；会改变 Y 轴标题。"
+    },
+    {
+      "field_name": "y_axis_format",
+      "reason": "属于图表定义字段；会改变数值格式。"
+    },
+    {
+      "field_name": "currency_format",
+      "reason": "属于图表定义字段；会改变货币格式。"
+    }
+  ],
+  "practical_guidance": {
+    "best_practice": [
+      "先从保存态图表读取完整 form_data。",
+      "根层字段保持不变。",
+      "Waterfall 优先只在 extra_form_data 中放 filters / adhoc_filters / custom_form_data。",
+      "如果页面需要 guest 联动筛选，优先使用 filters 或 adhoc_filters，而不是改 x_axis、groupby、metric、time_grain_sqla 或颜色/标签字段。"
+    ],
+    "do_not_rebuild_root_form_data": true
+  }
+}

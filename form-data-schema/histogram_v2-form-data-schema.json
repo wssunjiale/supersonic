@@ -1,0 +1,281 @@
+{
+  "viz_type": "histogram_v2",
+  "display_name": "Histogram",
+  "purpose": "用于调用 API 创建或保存 Histogram 图表时填写的 form_data 模板",
+  "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/histogram_v2-schema.json",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Histogram/controlPanel.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Histogram/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Histogram/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Histogram/types.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/controls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/operators/histogramOperator.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryObject.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts"
+  ],
+  "notes": [
+    "Histogram 的根层高置信必填字段是 `datasource`、`viz_type`、`column`。",
+    "`column` 必须是数值型物理列。源码显式禁用了 saved metric 与 SQL expression tabs，因此这不是一个 metric 型图表模板。",
+    "`buildQuery.ts` 会把 query `metrics` 置空，把 `columns` 设为 `groupby + column`，再追加 `histogram` post_processing。",
+    "如果 `bins` 不是合法数字，源码 post_processing 会回退到 5；直接调 API 时最好显式给出合法整数，避免隐式 fallback。",
+    "有 `groupby` 时，Histogram 会渲染多 series；无 `groupby` 时，series name 会退回为 `column` 标签。"
+  ],
+  "naming_and_pipeline": {
+    "control_to_api_form_data": "`getFormDataFromControls()` 会按控件名原样写 root form_data。",
+    "api_form_data_to_query_context": "`buildQuery.ts` 先调通用 `buildQueryContext()`，再显式覆盖 `columns`、`post_processing` 和 `metrics`。",
+    "api_form_data_to_runtime_props": "进入前端渲染后，Histogram 主要读取 standardized camelCase 别名，例如 `color_scheme -> colorScheme`、`show_legend -> showLegend`、`x_axis_format -> xAxisFormat`。"
+  },
+  "global_required_fields": {
+    "datasource": {
+      "data_type": "string",
+      "required": true,
+      "sample_data": "<dataset_id>__table",
+      "source": "datasourceAndVizType section"
+    },
+    "viz_type": {
+      "data_type": "string",
+      "required": true,
+      "fixed_value": "histogram_v2",
+      "source": "plugin metadata"
+    },
+    "column": {
+      "data_type": "string | object",
+      "required": true,
+      "sample_data": "price",
+      "source": "Histogram Query / Column control"
+    }
+  },
+  "conditional_required_rules": {
+    "grouped_histogram": {
+      "when": "需要按类别拆成多条 histogram series 时",
+      "ui_validator_rule": "`groupby` 是可选项。",
+      "practical_api_rule": "传非空 `groupby` 数组即可；`buildQuery.ts` 会把它排在 `column` 之前编译到 `columns`。"
+    },
+    "bin_count": {
+      "when": "需要明确指定分箱数量时",
+      "ui_validator_rule": "`bins` 使用 `validateInteger`。",
+      "practical_api_rule": "建议显式传整数；如果不传或传了非法值，post_processing 会回退到 5。"
+    },
+    "distribution_mode": {
+      "when": "需要切换相对频率或累计频率时",
+      "ui_validator_rule": "`normalize` 与 `cumulative` 都是可选布尔字段。",
+      "practical_api_rule": "两者都只影响 histogram post_processing 语义，不会替代 `column`。"
+    }
+  },
+  "global_optional_fields": {
+    "groupby": {
+      "data_type": "array[string | object]",
+      "required": false,
+      "sample_data": [
+        "region"
+      ],
+      "source": "shared groupby control"
+    },
+    "adhoc_filters": {
+      "data_type": "array[object]",
+      "required": false,
+      "sample_data": [],
+      "source": "shared Filters control"
+    },
+    "row_limit": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 10000,
+      "source": "shared Row limit control"
+    },
+    "bins": {
+      "data_type": "integer | string",
+      "required": false,
+      "sample_data": 10,
+      "source": "Histogram Query / Bins control"
+    },
+    "normalize": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": false,
+      "source": "Histogram Query / Normalize control"
+    },
+    "cumulative": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": false,
+      "source": "Histogram Query / Cumulative control"
+    },
+    "color_scheme": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "<categorical_scheme_key>",
+      "source": "shared Color Scheme control"
+    },
+    "show_value": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": false,
+      "source": "plugin-chart-echarts shared Show Value control"
+    },
+    "show_legend": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": true,
+      "source": "plugin-chart-echarts shared Show legend control"
+    },
+    "x_axis_title": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "Price Range",
+      "source": "Histogram Chart Options"
+    },
+    "x_axis_format": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "SMART_NUMBER",
+      "source": "Histogram Chart Options"
+    },
+    "y_axis_title": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "Count",
+      "source": "Histogram Chart Options"
+    },
+    "y_axis_format": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "SMART_NUMBER",
+      "source": "Histogram Chart Options"
+    },
+    "slice_id": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 0,
+      "source": "datasourceAndVizType hidden control",
+      "notes": "新建图表时通常省略；编辑已存在图表时由服务端或上层调用方提供。"
+    },
+    "cache_timeout": {
+      "data_type": "integer | null",
+      "required": false,
+      "sample_data": null,
+      "source": "datasourceAndVizType hidden control"
+    },
+    "url_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "datasourceAndVizType hidden control"
+    },
+    "custom_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "datasourceAndVizType hidden control"
+    }
+  },
+  "minimal_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "histogram_v2",
+    "column": "price"
+  },
+  "recommended_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "histogram_v2",
+    "column": "price",
+    "groupby": [
+      "region"
+    ],
+    "adhoc_filters": [],
+    "row_limit": 10000,
+    "bins": 10,
+    "normalize": false,
+    "cumulative": false,
+    "color_scheme": "<categorical_scheme_key>",
+    "show_value": false,
+    "show_legend": true,
+    "x_axis_title": "Price Range",
+    "x_axis_format": "SMART_NUMBER",
+    "y_axis_title": "Count",
+    "y_axis_format": "SMART_NUMBER"
+  },
+  "conditional_blocks": {
+    "grouped_histogram": {
+      "condition": "需要按类别拆成多条柱形分布",
+      "fields": {
+        "groupby": [
+          "region"
+        ],
+        "show_legend": true
+      }
+    },
+    "normalized_histogram": {
+      "condition": "需要展示相对频率而不是原始计数",
+      "fields": {
+        "normalize": true,
+        "y_axis_title": "Probability"
+      }
+    },
+    "cumulative_histogram": {
+      "condition": "需要展示累计频率",
+      "fields": {
+        "cumulative": true,
+        "y_axis_title": "Cumulative Count"
+      }
+    },
+    "custom_bin_count": {
+      "condition": "需要更细或更粗的分箱粒度",
+      "fields": {
+        "bins": 20
+      }
+    }
+  },
+  "runtime_only_or_non_template_fields": {
+    "query_context_only": [
+      {
+        "field_name": "query_context.queries[*].columns",
+        "reason": "由 `groupby + column` 编译得到。"
+      },
+      {
+        "field_name": "query_context.queries[*].metrics",
+        "reason": "Histogram 会把它显式置为 `undefined`。"
+      },
+      {
+        "field_name": "query_context.queries[*].post_processing",
+        "reason": "这里会放 `histogram` operator；不是 root form_data 直接填写字段。"
+      }
+    ],
+    "runtime_aliases": [
+      {
+        "field_name": "colorScheme / showLegend / showValue / xAxisTitle / xAxisFormat / yAxisTitle / yAxisFormat / sliceId",
+        "reason": "这些是 standardized runtime props；创建 API form_data 时应使用 control name。"
+      }
+    ],
+    "noncanonical_or_carryover_fields": [
+      {
+        "field_name": "metrics",
+        "reason": "Histogram 并不以 metric 为根查询字段；canonical 根字段是 `column`。"
+      }
+    ]
+  },
+  "api_usage_guidance": {
+    "high_confidence_required_fields": [
+      "datasource",
+      "viz_type",
+      "column"
+    ],
+    "recommended_always_set": [
+      "bins",
+      "normalize",
+      "cumulative",
+      "row_limit",
+      "adhoc_filters",
+      "color_scheme",
+      "show_value",
+      "show_legend"
+    ],
+    "important_caveats": [
+      "不要把 Histogram 当成 metric 型图来写；其核心字段是数值列 `column`。",
+      "不要给 `column` 传 saved metric 或 SQL expression；源码显式禁用了这些入口。",
+      "若 `bins` 是非法值，后端 histogram post_processing 会回退到 5。",
+      "Histogram 的 query `metrics` 会被置空，分布计算完全依赖 `histogram` post_processing。"
+    ]
+  }
+}

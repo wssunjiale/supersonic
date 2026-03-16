@@ -39,6 +39,24 @@
                             </resources>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>copy-superset-spec-catalog</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.outputDirectory}/superset-spec/catalog</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}/../../superset-spec/catalog</directory>
+                                    <includes>
+                                        <include>viztypes.json</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>

@@ -1,0 +1,427 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "world_map",
+  "display_name": "World Map",
+  "selection_summary": {
+    "category": "geospatial",
+    "tags": [
+      "world_map",
+      "geospatial",
+      "global",
+      "geographic",
+      "spatial"
+    ],
+    "description_zh": "World Map displays geographic data on a global map canvas, with regions/countries colored or sized based on metric values to visualize spatial distribution of data.",
+    "visual_shape_zh": "世界地图（地理空间型）",
+    "use_cases_zh": [
+      "全球范围内的数值分布展示（如各国人口、GDP、销售额）",
+      "地理维度的指标对比分析",
+      "跨国/跨区域业务数据的空间可视化"
+    ],
+    "required_slots": [
+      {
+        "field_name": "entity",
+        "required": true,
+        "slot_kind": "entity",
+        "accepted_dataset_roles": [
+          "entity",
+          "entity_id",
+          "dimension"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<entity_column>",
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "3 letter code of the country"
+        ]
+      },
+      {
+        "field_name": "metric",
+        "required": true,
+        "slot_kind": "metric",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1",
+        "placeholder": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        },
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+        ]
+      },
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "聚合指标，用于计算每个地理区域的数值（地图配色/尺寸依据）。"
+        ]
+      }
+    ],
+    "optional_slots": [
+      {
+        "field_name": "adhoc_filters",
+        "required": false,
+        "slot_kind": "filter_list",
+        "accepted_dataset_roles": [
+          "filter_context"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [],
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "Filters"
+        ]
+      },
+      {
+        "field_name": "country_fieldtype",
+        "required": false,
+        "slot_kind": "geo_region",
+        "accepted_dataset_roles": [
+          "geo_country_code",
+          "geo_country_name",
+          "geo_region"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<region_column>",
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "The country code standard that Superset should expect to find in the [country] column"
+        ]
+      },
+      {
+        "field_name": "secondary_metric",
+        "required": false,
+        "slot_kind": "secondary_metric",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "0..1",
+        "placeholder": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<secondary_metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<secondary_metric_column>)"
+        },
+        "source_categories": [
+          "Options"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Metric that defines the size of the bubble"
+        ]
+      }
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "dimension",
+      "entity",
+      "entity_id",
+      "metric",
+      "saved_metric"
+    ],
+    "optional_dataset_roles": [
+      "adhoc_metric",
+      "filter_context",
+      "geo_country_code",
+      "geo_country_name",
+      "geo_region",
+      "metric",
+      "saved_metric"
+    ],
+    "dataset_role_inventory": {
+      "adhoc_metric": [
+        "metric",
+        "metrics",
+        "secondary_metric"
+      ],
+      "dimension": [
+        "entity"
+      ],
+      "entity": [
+        "entity"
+      ],
+      "entity_id": [
+        "entity"
+      ],
+      "filter_context": [
+        "adhoc_filters"
+      ],
+      "geo_country_code": [
+        "country_fieldtype"
+      ],
+      "geo_country_name": [
+        "country_fieldtype"
+      ],
+      "geo_region": [
+        "country_fieldtype"
+      ],
+      "metric": [
+        "metric",
+        "metrics",
+        "secondary_metric"
+      ],
+      "saved_metric": [
+        "metric",
+        "metrics",
+        "secondary_metric"
+      ]
+    },
+    "non_binding_control_names": [
+      "color_by",
+      "color_picker",
+      "color_scheme",
+      "currency_format",
+      "linear_color_scheme",
+      "max_bubble_size",
+      "row_limit",
+      "show_bubbles",
+      "sort_by_metric",
+      "y_axis_format"
+    ],
+    "embedding_runtime_field_names": [
+      "adhoc_filters",
+      "custom_form_data",
+      "filters"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "country_fieldtype",
+      "datasource",
+      "entity",
+      "metric",
+      "row_limit",
+      "sort_by_metric",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "color_by",
+      "color_picker",
+      "color_scheme",
+      "country_fieldtype",
+      "currency_format",
+      "datasource",
+      "entity",
+      "linear_color_scheme",
+      "max_bubble_size",
+      "metric",
+      "row_limit",
+      "show_bubbles",
+      "sort_by_metric",
+      "viz_type",
+      "y_axis_format"
+    ],
+    "structural_flags": {
+      "time_series": false,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": true,
+      "flow_like": false,
+      "distribution_like": false,
+      "supports_breakdown": true,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": false,
+      "needs_dimension": true
+    },
+    "selection_hints": [
+      "至少需要 1 个可聚合指标字段。",
+      "需要至少 1 个维度字段用于分组、拆分或定位。",
+      "需要地理信息字段；点位地图优先经纬度，区域地图优先行政区维度。",
+      "支持按维度拆分多序列或子组。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：全球范围内的数值分布展示（如各国人口、GDP、销售额）；地理维度的指标对比分析；跨国/跨区域业务数据的空间可视化"
+    ]
+  },
+  "selection_prompt_card": {
+    "viz_type": "world_map",
+    "display_name": "World Map",
+    "category": "geospatial",
+    "description_zh": "World Map displays geographic data on a global map canvas, with regions/countries colored or sized based on metric values to visualize spatial distribution of data.",
+    "visual_shape_zh": "世界地图（地理空间型）",
+    "best_for": [
+      "全球范围内的数值分布展示（如各国人口、GDP、销售额）",
+      "地理维度的指标对比分析",
+      "跨国/跨区域业务数据的空间可视化"
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "dimension",
+      "entity",
+      "entity_id",
+      "metric",
+      "saved_metric"
+    ],
+    "optional_dataset_roles": [
+      "adhoc_metric",
+      "filter_context",
+      "geo_country_code",
+      "geo_country_name",
+      "geo_region",
+      "metric",
+      "saved_metric"
+    ],
+    "required_slots": [
+      {
+        "field_name": "entity",
+        "required": true,
+        "slot_kind": "entity",
+        "accepted_dataset_roles": [
+          "entity",
+          "entity_id",
+          "dimension"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<entity_column>",
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "3 letter code of the country"
+        ]
+      },
+      {
+        "field_name": "metric",
+        "required": true,
+        "slot_kind": "metric",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1",
+        "placeholder": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        },
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+        ]
+      },
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "聚合指标，用于计算每个地理区域的数值（地图配色/尺寸依据）。"
+        ]
+      }
+    ],
+    "optional_slot_names": [
+      "adhoc_filters",
+      "country_fieldtype",
+      "secondary_metric"
+    ],
+    "structural_flags": {
+      "time_series": false,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": true,
+      "flow_like": false,
+      "distribution_like": false,
+      "supports_breakdown": true,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": false,
+      "needs_dimension": true
+    },
+    "selection_hints": [
+      "至少需要 1 个可聚合指标字段。",
+      "需要至少 1 个维度字段用于分组、拆分或定位。",
+      "需要地理信息字段；点位地图优先经纬度，区域地图优先行政区维度。",
+      "支持按维度拆分多序列或子组。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：全球范围内的数值分布展示（如各国人口、GDP、销售额）；地理维度的指标对比分析；跨国/跨区域业务数据的空间可视化"
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "world_map",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/world_map-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/world_map-form-data-schema.json",
+      "control-schema": "form-data-schema/world_map-schema.json"
+    }
+  }
+}

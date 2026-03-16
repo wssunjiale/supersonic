@@ -1,0 +1,417 @@
+{
+  "viz_type": "time_pivot",
+  "display_name": "Time-series Period Pivot",
+  "purpose": "用于调用 API 创建或保存 Time-series Period Pivot 时填写的 form_data 模板",
+  "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/time_pivot-schema.json",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/TimePivot/controlPanel.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/TimePivot/index.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/NVD3Controls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/transformProps.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/NVD3Vis.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/sections/sections.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/mixins.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+    "D:/vsx/sources/superset-6.0.0/superset/views/core.py",
+    "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+    "D:/vsx/sources/superset-6.0.0/superset/viz.py"
+  ],
+  "notes": [
+    "TimePivot 是 legacy 图，前端真实请求路径是 `/superset/explore_json/`，不是 `/api/v1/chart/data`。",
+    "Explore 导出 form_data 时走 `getFormDataFromControls()`，它按 control name 原样写入 root form_data。因此手工 API 模板必须使用 `granularity_sqla`、`time_grain_sqla`、`time_range`、`metric`、`freq`、`show_legend` 这些原始 snake_case 键。",
+    "TimePivotViz.query_obj() 会强制把查询指标改成 `[form_data.metric]`；这进一步说明当前图只接受单 metric。",
+    "TimePivotViz.get_data() 直接依赖 `freq` 进行 period rollback 和 current / -1 / -2 系列构造。因此手工 API 创建时不建议省略它，即使 UI 控件有默认值。",
+    "对于 SQLA / temporal dataset，`granularity_sqla` + `time_grain_sqla` + `time_range` 是最实用、最接近 UI 创建路径的时间配置组合。",
+    "`granularity` 仍然出现在 Time section 中，但当前 `BaseViz.query_obj()` 主路径直接读取的是 `granularity_sqla`。如果你的 datasource 仍依赖 legacy `granularity`，应显式作为条件字段处理，而不是无脑套进所有 time_pivot 模板。",
+    "当前图把 `x_axis_format` override 成 `SMART_NUMBER + D3_FORMAT_OPTIONS`，但 NVD3Vis 仍按 timeseries 用 `getTimeFormatter(xAxisFormat)` 消费它。模板记录时应保留这一源码事实，不做修正。"
+  ],
+  "naming_and_pipeline": {
+    "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写成 form_data[name]。",
+    "api_form_data_to_backend_request": "ChartClient.ts 在 `useLegacyApi=true` 时，把原始 form_data 包装为 `{ form_data }` POST 到 `/superset/explore_json/`。",
+    "backend_form_data_normalization": "`explore_json()` 会补 datasource，再执行 `convert_legacy_filters_into_adhoc(form_data)` 与 `merge_extra_filters(form_data)`。",
+    "backend_form_data_to_query_obj": "BaseViz.query_obj() 先把 `granularity_sqla/time_range/time_grain_sqla` 编译进 query_obj；TimePivotViz.query_obj() 再把 `metrics` 改成单元素数组 `[metric]`。",
+    "backend_query_result_to_runtime_props": "TimePivotViz.get_data() 返回 NVD3 line chart 所需的 series 数组；transformProps.js 再把 root `color_picker/show_legend/line_interpolation/x_axis_format/y_axis_format` 等映射到 NVD3Vis.js。"
+  },
+  "global_required_fields": {
+    "datasource": {
+      "data_type": "string",
+      "required": true,
+      "sample_data": "<dataset_id>__table",
+      "source": "datasourceAndVizType hidden control + explore_json()"
+    },
+    "viz_type": {
+      "data_type": "string",
+      "required": true,
+      "fixed_value": "time_pivot",
+      "source": "TimePivotViz.viz_type + TimePivot/index.js"
+    },
+    "metric": {
+      "data_type": "string | object",
+      "required": true,
+      "sample_data": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "sales"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(sales)"
+      },
+      "source": "TimePivot Query section + TimePivotViz.query_obj()"
+    },
+    "freq": {
+      "data_type": "string",
+      "required": true,
+      "sample_data": "W-MON",
+      "source": "TimePivot Query section + TimePivotViz.get_data()",
+      "notes": "控件有默认值 `W-MON`，但手工 API 模板建议显式传，避免后端 `to_offset(None)` 这类不稳定输入。"
+    }
+  },
+  "global_conditionally_required_fields": {
+    "granularity_sqla": {
+      "data_type": "string | object | null",
+      "required_when": "datasource 是 SQLA / temporal dataset，并且需要明确指定 Time Column",
+      "sample_data": "order_date",
+      "source": "legacyTimeseriesTime + dndGranularitySqlaControl + BaseViz.query_obj()"
+    },
+    "time_grain_sqla": {
+      "data_type": "string | null",
+      "required_when": "需要显式复现 UI 保存态时间粒度",
+      "sample_data": "P1D",
+      "source": "legacyTimeseriesTime + shared control"
+    },
+    "time_range": {
+      "data_type": "string",
+      "required_when": "需要显式复现 UI 保存态时间范围",
+      "sample_data": "No filter",
+      "source": "legacyTimeseriesTime + BaseViz.query_obj()"
+    }
+  },
+  "global_optional_fields": {
+    "granularity": {
+      "data_type": "string | null",
+      "required": false,
+      "sample_data": "P1D",
+      "source": "legacyTimeseriesTime shared control",
+      "notes": "legacy datasource-specific 的 `Time Granularity` 字段；不是所有 time_pivot 场景都需要它。"
+    },
+    "adhoc_filters": {
+      "data_type": "array[object]",
+      "required": false,
+      "sample_data": [],
+      "source": "TimePivot Query section"
+    },
+    "show_legend": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": true,
+      "source": "Chart Options section"
+    },
+    "line_interpolation": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "linear",
+      "source": "Chart Options section"
+    },
+    "color_picker": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      },
+      "source": "Chart Options section"
+    },
+    "x_axis_label": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "",
+      "source": "X Axis section"
+    },
+    "bottom_margin": {
+      "data_type": "string | integer",
+      "required": false,
+      "sample_data": "auto",
+      "source": "X Axis section"
+    },
+    "x_axis_showminmax": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": false,
+      "source": "X Axis section"
+    },
+    "x_axis_format": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "SMART_NUMBER",
+      "source": "X Axis section"
+    },
+    "y_axis_label": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "",
+      "source": "Y Axis section"
+    },
+    "left_margin": {
+      "data_type": "string | integer",
+      "required": false,
+      "sample_data": "auto",
+      "source": "Y Axis section"
+    },
+    "y_axis_showminmax": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": false,
+      "source": "Y Axis section"
+    },
+    "y_log_scale": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": false,
+      "source": "Y Axis section"
+    },
+    "y_axis_format": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "SMART_NUMBER",
+      "source": "Y Axis section"
+    },
+    "y_axis_bounds": {
+      "data_type": "array[number | null, number | null]",
+      "required": false,
+      "sample_data": [
+        null,
+        null
+      ],
+      "source": "Y Axis section"
+    },
+    "slice_id": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 0,
+      "source": "datasourceAndVizType hidden control",
+      "notes": "新建图表时通常省略；编辑已存在图表时由服务端或上层调用方提供。"
+    },
+    "cache_timeout": {
+      "data_type": "integer | null",
+      "required": false,
+      "sample_data": null,
+      "source": "datasourceAndVizType hidden control"
+    },
+    "url_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "datasourceAndVizType hidden control"
+    },
+    "custom_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "datasourceAndVizType hidden control"
+    },
+    "extra_form_data": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "utils.merge_extra_form_data() + merge_extra_filters()",
+      "notes": "虽然不属于 controlPanel 字段，但 legacy explore_json 路径会消费它。"
+    }
+  },
+  "minimal_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "time_pivot",
+    "granularity_sqla": "<temporal_column>",
+    "time_grain_sqla": "P1D",
+    "time_range": "No filter",
+    "metric": {
+      "expressionType": "SIMPLE",
+      "column": {
+        "column_name": "<metric_column>"
+      },
+      "aggregate": "SUM",
+      "label": "SUM(<metric_column>)"
+    },
+    "adhoc_filters": [],
+    "freq": "W-MON"
+  },
+  "recommended_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "time_pivot",
+    "granularity_sqla": "<temporal_column>",
+    "time_grain_sqla": "P1D",
+    "time_range": "No filter",
+    "metric": {
+      "expressionType": "SIMPLE",
+      "column": {
+        "column_name": "<metric_column>"
+      },
+      "aggregate": "SUM",
+      "label": "SUM(<metric_column>)"
+    },
+    "adhoc_filters": [],
+    "freq": "W-MON",
+    "show_legend": true,
+    "line_interpolation": "linear",
+    "color_picker": {
+      "r": 0,
+      "g": 122,
+      "b": 135,
+      "a": 1
+    },
+    "x_axis_label": "",
+    "bottom_margin": "auto",
+    "x_axis_showminmax": false,
+    "x_axis_format": "SMART_NUMBER",
+    "y_axis_label": "",
+    "left_margin": "auto",
+    "y_axis_showminmax": false,
+    "y_log_scale": false,
+    "y_axis_format": "SMART_NUMBER",
+    "y_axis_bounds": [
+      null,
+      null
+    ]
+  },
+  "conditional_blocks": {
+    "legacy_datasource_time_granularity": {
+      "condition": "datasource 仍依赖 legacy `Time Granularity` 路径时",
+      "fields": {
+        "granularity": "P1D"
+      },
+      "notes": "该字段虽然仍在 Time section 中，但当前 BaseViz.query_obj() 主路径直接消费的是 `granularity_sqla`。"
+    },
+    "period_frequency": {
+      "condition": "需要改变 period pivot 的对齐周期时",
+      "fields": {
+        "freq": "52W-MON"
+      },
+      "notes": "后端 TimePivotViz.get_data() 会据此重新回滚周期起点并生成 current / -1 / -2 系列。"
+    },
+    "filters": {
+      "condition": "需要限制参与 period pivot 计算的底层数据时",
+      "fields": {
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "APAC"
+            ]
+          }
+        ]
+      }
+    },
+    "display_styling": {
+      "condition": "需要控制图例、线型和 period 颜色基色时",
+      "fields": {
+        "show_legend": true,
+        "line_interpolation": "linear",
+        "color_picker": {
+          "r": 0,
+          "g": 122,
+          "b": 135,
+          "a": 1
+        }
+      }
+    },
+    "axis_layout": {
+      "condition": "需要调整轴标签、边距、坐标格式或 Y 轴范围时",
+      "fields": {
+        "x_axis_label": "Time",
+        "bottom_margin": "auto",
+        "x_axis_showminmax": false,
+        "x_axis_format": "SMART_NUMBER",
+        "y_axis_label": "Sales",
+        "left_margin": "auto",
+        "y_axis_showminmax": false,
+        "y_log_scale": false,
+        "y_axis_format": "SMART_NUMBER",
+        "y_axis_bounds": [
+          null,
+          null
+        ]
+      }
+    }
+  },
+  "runtime_only_or_non_template_fields": {
+    "runtime_aliases_generated_by_transformProps": [
+      {
+        "field_name": "showLegend / lineInterpolation / xAxisFormat / yAxisFormat / colorPicker",
+        "reason": "这些是 transformProps.js 里的运行时 prop 名，不是 API root 键。"
+      },
+      {
+        "field_name": "baseColor",
+        "reason": "这是 transformProps.js 从 `color_picker` 派生给 NVD3Vis.js 的运行时 prop，不是 root form_data 键。"
+      },
+      {
+        "field_name": "xAxisShowMinMax / yAxisShowMinMax",
+        "reason": "它们由 `x_axis_showminmax`、`y_axis_showminmax` 派生，不是 root form_data 键。"
+      }
+    ],
+    "backend_response_only_fields": [
+      {
+        "field_name": "series.rank / series.perc / series.values",
+        "reason": "这些是 TimePivotViz.get_data() 为 NVD3 渲染生成的响应字段，不是 root form_data。"
+      }
+    ],
+    "legacy_request_wrapper": [
+      {
+        "field_name": "payload.form_data",
+        "reason": "这是 legacy `/superset/explore_json/` 的请求外层包裹，不是图表保存态内部的 root form_data。"
+      }
+    ],
+    "viz_switch_only": [
+      {
+        "field_name": "formDataOverrides.metric",
+        "reason": "源码里它属于 standardized controls 切换图表时的迁移逻辑，而且当前实现是函数引用，不是常规 API 模板应主动构造的字段。"
+      }
+    ]
+  },
+  "api_usage_guidance": {
+    "high_confidence_required_fields": [
+      "datasource",
+      "viz_type",
+      "metric",
+      "freq"
+    ],
+    "conditional_required_fields": [
+      "granularity_sqla（SQLA / temporal dataset）",
+      "time_grain_sqla（需要显式控制粒度时）",
+      "time_range（需要显式控制时间范围时）"
+    ],
+    "recommended_always_set": [
+      "granularity_sqla",
+      "time_grain_sqla",
+      "time_range",
+      "adhoc_filters",
+      "show_legend",
+      "line_interpolation",
+      "color_picker",
+      "x_axis_format",
+      "y_axis_format"
+    ],
+    "do_not_send_as_root_form_data": [
+      "showLegend",
+      "lineInterpolation",
+      "colorPicker",
+      "baseColor",
+      "xAxisFormat",
+      "yAxisFormat",
+      "xAxisShowMinMax",
+      "yAxisShowMinMax"
+    ],
+    "avoid_confusion": [
+      "不要把 `time_pivot` 当成标准 chart data API 图表去套 `/api/v1/chart/data` 的 `query_context` 模板。",
+      "不要省略 `freq`，因为 period pivot 的后端数据重排直接依赖它。",
+      "不要把运行时 camelCase 字段名写回 root form_data。",
+      "如果你的 datasource 是 SQLA，优先使用 `granularity_sqla + time_grain_sqla + time_range` 这条源码主路径。"
+    ]
+  }
+}

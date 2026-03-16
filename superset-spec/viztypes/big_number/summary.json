@@ -1,0 +1,129 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "big_number",
+  "display_name": "Big Number with Trendline",
+  "normalized_summary": {
+    "category": "kpi",
+    "tags": [
+      "kpi",
+      "single_value",
+      "metric"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标（仅单个），用于展示核心KPI数值。"
+      },
+      {
+        "key": "number_format",
+        "required": false,
+        "description": "数字格式化（如 SMART_NUMBER、PERCENT），控制数值展示格式。"
+      },
+      {
+        "key": "subtitle_text",
+        "required": false,
+        "description": "副标题文本，用于补充说明指标含义。"
+      },
+      {
+        "key": "comparison_type",
+        "required": false,
+        "description": "对比类型（如 previous_period、previous_year），用于展示指标同比/环比变化。"
+      }
+    ],
+    "description_zh": "Big Number chart displays a single key metric value in a prominent format, often used for KPI dashboards to highlight key values.",
+    "visual_shape_zh": "单值指标（大数字）",
+    "use_cases_zh": [
+      "核心KPI展示（如总销售额、用户数）",
+      "仪表盘关键指标突出显示",
+      "无维度对比的单值展示"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "big_number",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/big_number-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/big_number-form-data-schema.json",
+      "control-schema": "form-data-schema/big_number-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Big Number with Trendline",
+    "viztype": "big_number",
+    "详细描述": "Big Number chart displays a single key metric value in a prominent format, often used for KPI dashboards to highlight key values.",
+    "表现形态": "单值指标（大数字）",
+    "适用场景": [
+      "核心KPI展示（如总销售额、用户数）",
+      "仪表盘关键指标突出显示",
+      "无维度对比的单值展示"
+    ],
+    "vizKey": "BigNumber",
+    "pluginCategory": "KPI",
+    "pluginTags": [],
+    "category": "kpi",
+    "tags": [
+      "kpi",
+      "single_value",
+      "metric"
+    ],
+    "关键字段": [
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标（仅单个），用于展示核心KPI数值。"
+      },
+      {
+        "key": "number_format",
+        "required": false,
+        "description": "数字格式化（如 SMART_NUMBER、PERCENT），控制数值展示格式。"
+      },
+      {
+        "key": "subtitle_text",
+        "required": false,
+        "description": "副标题文本，用于补充说明指标含义。"
+      },
+      {
+        "key": "comparison_type",
+        "required": false,
+        "description": "对比类型（如 previous_period、previous_year），用于展示指标同比/环比变化。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

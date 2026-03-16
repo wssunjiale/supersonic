@@ -1,0 +1,121 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "time_pivot",
+  "display_name": "Time-series Period Pivot",
+  "normalized_summary": {
+    "category": "table",
+    "tags": [
+      "time_pivot",
+      "pivot",
+      "time_series",
+      "aggregation"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "granularity_sqla",
+        "required": true,
+        "description": "时间粒度字段，定义透视表的时间轴维度（如小时、天、月）。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于透视表中数值单元格的计算。"
+      },
+      {
+        "key": "show_totals",
+        "required": false,
+        "description": "是否显示总计（true/false），展示行/列的汇总数值。"
+      }
+    ],
+    "description_zh": "Time Pivot Table aggregates and displays time-series data in a pivot format, with time as rows/columns and metrics as values.",
+    "visual_shape_zh": "时间透视表（时间维度聚合型）",
+    "use_cases_zh": [
+      "时间维度的交叉分析（如按周/月聚合的销售数据）",
+      "多指标的时间对比（如同比/环比分析）",
+      "时间粒度下的维度钻取"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "time_pivot",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/time_pivot-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/time_pivot-form-data-schema.json",
+      "control-schema": "form-data-schema/time_pivot-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Time-series Period Pivot",
+    "viztype": "time_pivot",
+    "详细描述": "Time Pivot Table aggregates and displays time-series data in a pivot format, with time as rows/columns and metrics as values.",
+    "表现形态": "时间透视表（时间维度聚合型）",
+    "适用场景": [
+      "时间维度的交叉分析（如按周/月聚合的销售数据）",
+      "多指标的时间对比（如同比/环比分析）",
+      "时间粒度下的维度钻取"
+    ],
+    "vizKey": "TimePivot",
+    "pluginCategory": "Table",
+    "pluginTags": [],
+    "category": "table",
+    "tags": [
+      "time_pivot",
+      "pivot",
+      "time_series",
+      "aggregation"
+    ],
+    "关键字段": [
+      {
+        "key": "granularity_sqla",
+        "required": true,
+        "description": "时间粒度字段，定义透视表的时间轴维度（如小时、天、月）。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于透视表中数值单元格的计算。"
+      },
+      {
+        "key": "show_totals",
+        "required": false,
+        "description": "是否显示总计（true/false），展示行/列的汇总数值。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

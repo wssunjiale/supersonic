@@ -367,6 +367,20 @@ class SqlReplaceHelperTest {
     }
 
     @Test
+    void testReplaceAliasFieldNameWithWith() {
+        Map<String, String> map = new HashMap<>();
+        map.put("总销售金额", "total_sales_amount");
+        String sql =
+                "WITH 产品销售额 AS (SELECT product_key, SUM(sales_amount) AS 总销售金额 FROM t GROUP BY product_key) "
+                        + "SELECT product_key, 总销售金额 FROM 产品销售额 ORDER BY 总销售金额 DESC";
+        String replaceSql = SqlReplaceHelper.replaceAliasFieldName(sql, map);
+        Assert.assertEquals(
+                "WITH 产品销售额 AS (SELECT product_key, SUM(sales_amount) AS total_sales_amount FROM t GROUP BY product_key) "
+                        + "SELECT product_key, total_sales_amount FROM 产品销售额 ORDER BY total_sales_amount DESC",
+                replaceSql);
+    }
+
+    @Test
     void testReplaceAggAliasOrderbyField() {
         String sql = "SELECT SUM(访问次数) AS top10总播放量 FROM (SELECT 部门, SUM(访问次数) AS 访问次数 FROM 超音数  "
                 + "GROUP BY 部门 ORDER BY SUM(访问次数) DESC LIMIT 10) AS top10";
@@ -375,6 +389,35 @@ class SqlReplaceHelperTest {
                 "SELECT SUM(访问次数) AS top10总播放量 FROM (SELECT 部门, SUM(访问次数) AS 访问次数 FROM 超音数 "
                         + "GROUP BY 部门 ORDER BY 2 DESC LIMIT 10) AS top10",
                 replaceSql);
+    }
+
+    @Test
+    void testReplaceExpressionWithAnalyticOrderBy() {
+        String expr = "ROW_NUMBER() OVER (PARTITION BY 部门 ORDER BY SUM(访问次数) DESC)";
+        Map<String, String> replace = new HashMap<>();
+        replace.put("部门", "department");
+        replace.put("访问次数", "count(1)");
+
+        String replaced = SqlReplaceHelper.replaceExpression(expr, replace);
+
+        Assert.assertEquals(
+                "ROW_NUMBER() OVER (PARTITION BY department ORDER BY count(1) DESC)", replaced);
+    }
+
+    @Test
+    void testReplaceSqlByExpressionWithAnalyticOrderBy() {
+        String sql = "WITH department_visits AS (SELECT department, SUM(pv) AS _总访问次数, "
+                + "ROW_NUMBER() OVER (ORDER BY SUM(pv) DESC) AS _排名 FROM t_1 GROUP BY department) "
+                + "SELECT department, _总访问次数, _排名 FROM department_visits WHERE _排名 <= 3 ORDER BY _排名";
+        Map<String, String> replace = new HashMap<>();
+        replace.put("pv", "count(1)");
+
+        String replaced = SqlReplaceHelper.replaceSqlByExpression("t_1", sql, replace);
+
+        Assert.assertEquals("WITH department_visits AS (SELECT department, count(1) AS _总访问次数, "
+                + "ROW_NUMBER() OVER (ORDER BY count(1) DESC) AS _排名 FROM t_1 GROUP BY department) "
+                + "SELECT department, _总访问次数, _排名 FROM department_visits WHERE _排名 <= 3 ORDER BY _排名",
+                replaced);
     }
 
     protected Map<String, String> initParams() {

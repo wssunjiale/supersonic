@@ -1,0 +1,625 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "table",
+  "display_name": "Table",
+  "normalized_summary": {
+    "category": "table",
+    "tags": [
+      "additive",
+      "business",
+      "pattern",
+      "featured",
+      "report",
+      "sequential",
+      "tabular"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "query_mode",
+        "required": false,
+        "description": "查询模式。`raw` 表示明细记录，`aggregate` 表示聚合模式；源码会在未显式设置时根据 `all_columns` 是否非空自动推断。"
+      },
+      {
+        "key": "all_columns",
+        "required": false,
+        "description": "明细模式下展示的列集合。处于 `raw` 模式时至少需要 1 列。"
+      },
+      {
+        "key": "groupby",
+        "required": false,
+        "description": "聚合模式下的分组维度。与 `metrics` / `percent_metrics` 共同决定聚合结果粒度。"
+      },
+      {
+        "key": "metrics",
+        "required": false,
+        "description": "聚合模式下的主指标集合。源码校验要求 `groupby`、`metrics`、`percent_metrics` 至少有一类非空。"
+      },
+      {
+        "key": "percent_metrics",
+        "required": false,
+        "description": "聚合模式下的百分比指标集合，是 Table 图表相对其他普通表格的特色字段之一。"
+      },
+      {
+        "key": "order_by_cols",
+        "required": false,
+        "description": "raw 模式下的排序字段集合，会编译成 query.orderby。"
+      },
+      {
+        "key": "server_pagination",
+        "required": false,
+        "description": "是否开启服务端分页。打开后查询会拆成主查询与 rowcount 查询。"
+      },
+      {
+        "key": "column_config",
+        "required": false,
+        "description": "逐列格式配置对象，可定义列宽、别名、数值/时间格式、显示隐藏等，是 Table 的展示核心字段。"
+      },
+      {
+        "key": "time_compare",
+        "required": false,
+        "description": "启用时间对比后，Table 会把指标列展开成 Main / # / △ / % 四类 comparison columns。"
+      }
+    ],
+    "description_zh": "Table 是 Superset 6.0.0 的标准二维数据表插件，既可按 raw 模式直接展示底层明细记录，也可按 aggregate 模式展示分组后的聚合指标、百分比指标和时间对比结果。",
+    "visual_shape_zh": "经典二维数据表（明细表 / 聚合报表 / 对比表）",
+    "use_cases_zh": [
+      "查看原始明细记录与字段值",
+      "按维度分组后展示聚合指标或百分比指标",
+      "服务端分页、列表检索、报表导出与 Drill to Detail 入口"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "table",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/table-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/table-form-data-schema.json",
+      "control-schema": "form-data-schema/table-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Table",
+    "viztype": "table",
+    "详细描述": "Table 是 Superset 6.0.0 的标准二维数据表插件，既可按 raw 模式直接展示底层明细记录，也可按 aggregate 模式展示分组后的聚合指标、百分比指标和时间对比结果。",
+    "表现形态": "经典二维数据表（明细表 / 聚合报表 / 对比表）",
+    "适用场景": [
+      "查看原始明细记录与字段值",
+      "按维度分组后展示聚合指标或百分比指标",
+      "服务端分页、列表检索、报表导出与 Drill to Detail 入口"
+    ],
+    "vizKey": "Table",
+    "pluginCategory": "Table",
+    "pluginTags": [
+      "Additive",
+      "Business",
+      "Pattern",
+      "Featured",
+      "Report",
+      "Sequential",
+      "Tabular"
+    ],
+    "category": "table",
+    "tags": [
+      "additive",
+      "business",
+      "pattern",
+      "featured",
+      "report",
+      "sequential",
+      "tabular"
+    ],
+    "关键字段": [
+      {
+        "key": "query_mode",
+        "required": false,
+        "description": "查询模式。`raw` 表示明细记录，`aggregate` 表示聚合模式；源码会在未显式设置时根据 `all_columns` 是否非空自动推断。"
+      },
+      {
+        "key": "all_columns",
+        "required": false,
+        "description": "明细模式下展示的列集合。处于 `raw` 模式时至少需要 1 列。"
+      },
+      {
+        "key": "groupby",
+        "required": false,
+        "description": "聚合模式下的分组维度。与 `metrics` / `percent_metrics` 共同决定聚合结果粒度。"
+      },
+      {
+        "key": "metrics",
+        "required": false,
+        "description": "聚合模式下的主指标集合。源码校验要求 `groupby`、`metrics`、`percent_metrics` 至少有一类非空。"
+      },
+      {
+        "key": "percent_metrics",
+        "required": false,
+        "description": "聚合模式下的百分比指标集合，是 Table 图表相对其他普通表格的特色字段之一。"
+      },
+      {
+        "key": "order_by_cols",
+        "required": false,
+        "description": "raw 模式下的排序字段集合，会编译成 query.orderby。"
+      },
+      {
+        "key": "server_pagination",
+        "required": false,
+        "description": "是否开启服务端分页。打开后查询会拆成主查询与 rowcount 查询。"
+      },
+      {
+        "key": "column_config",
+        "required": false,
+        "description": "逐列格式配置对象，可定义列宽、别名、数值/时间格式、显示隐藏等，是 Table 的展示核心字段。"
+      },
+      {
+        "key": "time_compare",
+        "required": false,
+        "description": "启用时间对比后，Table 会把指标列展开成 Main / # / △ / % 四类 comparison columns。"
+      }
+    ],
+    "field_categories": {
+      "Query": [
+        {
+          "field_name": "groupby",
+          "description": "聚合模式下的分组维度。",
+          "data_type": "array[string | object]",
+          "enum_source": "datasource columns",
+          "sample_data": [
+            "region"
+          ],
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": []
+        },
+        {
+          "field_name": "time_grain_sqla",
+          "description": "时间粒度。仅当 `groupby` 中包含 temporal 列时才生效。",
+          "data_type": "string | null",
+          "enum_source": "datasource.time_grain_sqla",
+          "sample_data": "P1D",
+          "required": false,
+          "embedding": "extra_form_data.override（guest 下不建议）",
+          "default_value": "新建未保存图且 metadata 为空时初始为 P1D，否则沿用已有值"
+        },
+        {
+          "field_name": "temporal_columns_lookup",
+          "description": "隐藏映射，用来标记哪些分组列是 temporal physical columns。",
+          "data_type": "object[string, boolean]",
+          "sample_data": {
+            "order_date": true
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": "由 datasource 自动生成"
+        },
+        {
+          "field_name": "metrics",
+          "description": "聚合模式下的主指标集合。",
+          "data_type": "array[string | object]",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "sales"
+              },
+              "aggregate": "SUM",
+              "label": "SUM(sales)"
+            }
+          ],
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": "未显式 default（UI 空态）"
+        },
+        {
+          "field_name": "adhoc_filters",
+          "description": "过滤条件集合。",
+          "data_type": "array[object]",
+          "enum_source": "dataset filterable columns + saved metrics + current metrics",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "region",
+              "operator": "IN",
+              "comparator": [
+                "East",
+                "West"
+              ]
+            }
+          ],
+          "required": false,
+          "embedding": "extra_form_data.append",
+          "default_value": []
+        },
+        {
+          "field_name": "timeseries_limit_metric",
+          "description": "aggregate 模式下用于决定 top rows 排序与截断依据的指标。",
+          "data_type": "string | object | null",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          },
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": null
+        },
+        {
+          "field_name": "order_desc",
+          "description": "aggregate 模式下，是否按 `timeseries_limit_metric` 降序排序。",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": true
+        },
+        {
+          "field_name": "row_limit",
+          "description": "查询返回的最大行数上限。",
+          "data_type": "integer",
+          "sample_data": 1000,
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": 1000
+        }
+      ],
+      "Advanced analytics": [
+        {
+          "field_name": "time_compare",
+          "description": "时间位移对比字段。开启后会生成 comparison columns。",
+          "data_type": "string | null",
+          "enum_values": [
+            "1 day ago",
+            "1 week ago",
+            "1 month ago",
+            "1 year ago",
+            "custom",
+            "inherit"
+          ],
+          "sample_data": "1 year ago",
+          "required": false,
+          "embedding": "extra_form_data.override（guest 下不建议）",
+          "default_value": "未显式 default"
+        },
+        {
+          "field_name": "start_date_offset",
+          "description": "当 `time_compare='custom'` 时的自定义偏移量。",
+          "data_type": "string | null",
+          "sample_data": "1 year ago",
+          "required": false,
+          "embedding": "extra_form_data.override（guest 下不建议）",
+          "default_value": null
+        },
+        {
+          "field_name": "comparison_type",
+          "description": "时间对比展示方式：值、差值、百分比变化或比率。",
+          "data_type": "string",
+          "enum_values": [
+            "values",
+            "difference",
+            "percentage",
+            "ratio"
+          ],
+          "sample_data": "values",
+          "required": false,
+          "embedding": "否",
+          "default_value": "values"
+        }
+      ],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [
+        {
+          "field_name": "page_length",
+          "description": "前端分页时每页显示行数；`null` 代表自动分页。",
+          "data_type": "integer | string | null",
+          "enum_values": [
+            0,
+            10,
+            20,
+            50,
+            100,
+            200
+          ],
+          "sample_data": 20,
+          "required": false,
+          "embedding": "否",
+          "default_value": null
+        },
+        {
+          "field_name": "include_search",
+          "description": "是否展示客户端搜索框。",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false
+        },
+        {
+          "field_name": "allow_rearrange_columns",
+          "description": "是否允许终端用户拖拽重排列顺序。",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false
+        },
+        {
+          "field_name": "allow_render_html",
+          "description": "是否按 HTML 渲染单元格内容。",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true
+        },
+        {
+          "field_name": "show_cell_bars",
+          "description": "是否在数值单元格背景显示数据条。",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true
+        },
+        {
+          "field_name": "align_pn",
+          "description": "正负值数据条是否以 0 为对齐中轴。",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false
+        },
+        {
+          "field_name": "color_pn",
+          "description": "是否按正负值给数据条着色。",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true
+        },
+        {
+          "field_name": "comparison_color_enabled",
+          "description": "时间对比模式下，是否启用基础涨跌箭头与底色格式。",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false
+        },
+        {
+          "field_name": "comparison_color_scheme",
+          "description": "时间对比模式下，涨跌配色策略。",
+          "data_type": "string",
+          "enum_values": [
+            "Green",
+            "Red"
+          ],
+          "sample_data": "Green",
+          "required": false,
+          "embedding": "否",
+          "default_value": "Green"
+        },
+        {
+          "field_name": "conditional_formatting",
+          "description": "自定义条件着色规则集合。",
+          "data_type": "array[object]",
+          "sample_data": [
+            {
+              "column": "sum__num",
+              "operator": ">",
+              "targetValue": 2467,
+              "colorScheme": "#ACE1C4"
+            }
+          ],
+          "required": false,
+          "embedding": "否",
+          "default_value": "未显式 default；runtime 按空数组容错"
+        }
+      ],
+      "Chart Title": [],
+      "图表专属": [
+        {
+          "field_name": "query_mode",
+          "description": "Table 独有的 raw / aggregate 双模式开关。",
+          "data_type": "string | null",
+          "enum_values": [
+            "aggregate",
+            "raw"
+          ],
+          "sample_data": "aggregate",
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": null
+        },
+        {
+          "field_name": "all_columns",
+          "description": "raw 模式下展示的明细列集合。",
+          "data_type": "array[string | object]",
+          "enum_source": "datasource columns",
+          "sample_data": [
+            "order_id",
+            "customer_name"
+          ],
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": []
+        },
+        {
+          "field_name": "percent_metrics",
+          "description": "aggregate 模式下追加百分比指标列。",
+          "data_type": "array[string | object]",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "sales"
+              },
+              "aggregate": "SUM",
+              "label": "SUM(sales)"
+            }
+          ],
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": []
+        },
+        {
+          "field_name": "order_by_cols",
+          "description": "raw 模式专用排序配置。",
+          "data_type": "array[string | [string, boolean]]",
+          "sample_data": [
+            "[\"order_id\",true]"
+          ],
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": []
+        },
+        {
+          "field_name": "server_pagination",
+          "description": "是否启用服务端分页。",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": false
+        },
+        {
+          "field_name": "server_page_length",
+          "description": "服务端分页时的每页条数。",
+          "data_type": "integer",
+          "enum_values": [
+            10,
+            20,
+            50,
+            100,
+            200
+          ],
+          "sample_data": 20,
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": 10
+        },
+        {
+          "field_name": "percent_metric_calculation",
+          "description": "百分比指标基于 row_limit 还是 all_records 计算。",
+          "data_type": "string",
+          "enum_values": [
+            "row_limit",
+            "all_records"
+          ],
+          "sample_data": "row_limit",
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": "row_limit"
+        },
+        {
+          "field_name": "show_totals",
+          "description": "是否额外生成 summary totals。",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否（guest 下不应动态修改）",
+          "default_value": false
+        },
+        {
+          "field_name": "table_timestamp_format",
+          "description": "Table 全局时间列格式。",
+          "data_type": "string",
+          "enum_source": "D3_TIME_FORMAT_OPTIONS + freeForm",
+          "sample_data": "smart_date",
+          "required": false,
+          "embedding": "否",
+          "default_value": "smart_date"
+        },
+        {
+          "field_name": "column_config",
+          "description": "逐列定制格式、列宽、别名、显示隐藏和 comparison 子列格式。",
+          "data_type": "object[string, TableColumnConfig]",
+          "sample_data": {
+            "sum__num": {
+              "d3NumberFormat": ".3s",
+              "columnWidth": 180,
+              "customColumnName": "Sales"
+            }
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": "未显式 default；transformProps runtime fallback 为 {}"
+        }
+      ],
+      "通用图表选项": []
+    }
+  }
+}

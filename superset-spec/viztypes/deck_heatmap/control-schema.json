@@ -1,0 +1,1840 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "deck_heatmap",
+  "display_name": "deck.gl Heatmap",
+  "source_kind": "schema_file",
+  "normalized_control_schema": {
+    "field_category_order": [
+      "Query",
+      "Map",
+      "Advanced"
+    ],
+    "field_occurrences": [
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "spatial",
+        "runtime_alias": null,
+        "required": true,
+        "embedding": "否",
+        "description": "Point to your spatial columns",
+        "data_type": "object",
+        "sample_data": {
+          "type": "latlong",
+          "lonCol": "LON",
+          "latCol": "LAT"
+        },
+        "original_field": {
+          "field_name": "spatial",
+          "description": "Point to your spatial columns",
+          "data_type": "object",
+          "enum_values": [
+            "latlong",
+            "delimited",
+            "geohash"
+          ],
+          "sample_data": {
+            "type": "latlong",
+            "lonCol": "LON",
+            "latCol": "LAT"
+          },
+          "required": true,
+          "embedding": "否",
+          "default_value": {
+            "type": "latlong"
+          },
+          "notes": "控件是 `SpatialControl` + `validateNonEmpty`。源码支持三种对象形状：`{type:'latlong', lonCol, latCol}`、`{type:'delimited', lonlatCol, delimiter, reverseCheckbox}`、`{type:'geohash', geohashCol, reverseCheckbox}`。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "size",
+        "runtime_alias": null,
+        "required": true,
+        "embedding": "否",
+        "description": "Metric used as a weight for the grid's coloring",
+        "data_type": "string | object",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "count"
+          },
+          "aggregate": "COUNT",
+          "label": "COUNT(*)"
+        },
+        "original_field": {
+          "field_name": "size",
+          "description": "Metric used as a weight for the grid's coloring",
+          "data_type": "string | object",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "count"
+            },
+            "aggregate": "COUNT",
+            "label": "COUNT(*)"
+          },
+          "required": true,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "底层共享控件仍是 `dndSizeControl`，但当前图通过 `controlOverrides.size` 把它改名为 `Weight` 并加上 `validateNonEmpty`。后端把它当成唯一指标，并将对应指标标签映射成每个点的 `weight`。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "row_limit",
+        "runtime_alias": "rowLimit",
+        "required": false,
+        "embedding": "否",
+        "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+        "data_type": "integer",
+        "sample_data": 10000,
+        "original_field": {
+          "field_name": "row_limit",
+          "runtime_alias": "rowLimit",
+          "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+          "data_type": "integer",
+          "enum_values": [
+            10,
+            50,
+            100,
+            250,
+            500,
+            1000,
+            5000,
+            10000,
+            50000
+          ],
+          "sample_data": 10000,
+          "required": false,
+          "embedding": "否",
+          "default_value": 10000
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "filter_nulls",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Whether to ignore locations that are null",
+        "data_type": "boolean",
+        "sample_data": true,
+        "original_field": {
+          "field_name": "filter_nulls",
+          "description": "Whether to ignore locations that are null",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true,
+          "notes": "为 true 时，`BaseDeckGLViz.query_obj()` 会自动为 `spatial` 用到的列注入 `IS NOT NULL` 过滤条件。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "adhoc_filters",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "description": "字段标签为 Filters。legacy `/superset/explore_json/` 路径会先把 legacy filters 归并进 `adhoc_filters`，再继续 merge `extra_form_data`。",
+        "data_type": "array[object]",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "LAT",
+            "operator": "IS NOT NULL",
+            "comparator": ""
+          }
+        ],
+        "original_field": {
+          "field_name": "adhoc_filters",
+          "description": "字段标签为 Filters。legacy `/superset/explore_json/` 路径会先把 legacy filters 归并进 `adhoc_filters`，再继续 merge `extra_form_data`。",
+          "data_type": "array[object]",
+          "enum_source": "datasource columns + saved metrics + 当前 size 指标",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "LAT",
+              "operator": "IS NOT NULL",
+              "comparator": ""
+            }
+          ],
+          "required": false,
+          "embedding": "extra_form_data.append",
+          "default_value": [],
+          "notes": "即便 root 不显式提供，若 `filter_nulls=true`，后端也会在查询前自动把空间列的 `IS NOT NULL` 过滤补进来。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "intensity",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Intensity is the value multiplied by the weight to obtain the final weight",
+        "data_type": "number | string",
+        "sample_data": 1,
+        "original_field": {
+          "field_name": "intensity",
+          "description": "Intensity is the value multiplied by the weight to obtain the final weight",
+          "data_type": "number | string",
+          "enum_values": [
+            0.1,
+            0.2,
+            0.3,
+            0.4,
+            0.5,
+            0.6,
+            0.7,
+            0.8,
+            0.9,
+            1
+          ],
+          "sample_data": 1,
+          "required": false,
+          "embedding": "否",
+          "default_value": 1,
+          "notes": "control 允许 free-form 数值输入，枚举列表只是默认 choices。运行时若 root 缺失，会回退到 1。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "radius_pixels",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Intensity Radius is the radius at which the weight is distributed",
+        "data_type": "integer | string",
+        "sample_data": 30,
+        "original_field": {
+          "field_name": "radius_pixels",
+          "description": "Intensity Radius is the radius at which the weight is distributed",
+          "data_type": "integer | string",
+          "enum_values": [
+            5,
+            10,
+            15,
+            20,
+            25,
+            30,
+            35,
+            40,
+            45,
+            50,
+            55,
+            60,
+            65,
+            70
+          ],
+          "sample_data": 30,
+          "required": false,
+          "embedding": "否",
+          "default_value": 30,
+          "notes": "control 允许 free-form 整数输入，枚举列表只是默认 choices。运行时若 root 缺失，会回退到 30。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Map",
+        "field_name": "mapbox_style",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/ or tile server URL.",
+        "data_type": "string",
+        "sample_data": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+        "original_field": {
+          "field_name": "mapbox_style",
+          "description": "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/ or tile server URL.",
+          "data_type": "string",
+          "enum_source": "bootstrap common.deckgl_tiles or DEFAULT_DECKGL_TILES",
+          "sample_data": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+          "required": false,
+          "embedding": "否",
+          "default_value": "getDeckGLTiles()[0][0]"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Map",
+        "field_name": "viewport",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Parameters related to the view and perspective on the map",
+        "data_type": "object",
+        "sample_data": {
+          "longitude": 6.85236157047845,
+          "latitude": 31.222656842808707,
+          "zoom": 1,
+          "bearing": 0,
+          "pitch": 0
+        },
+        "original_field": {
+          "field_name": "viewport",
+          "description": "Parameters related to the view and perspective on the map",
+          "data_type": "object",
+          "sample_data": {
+            "longitude": 6.85236157047845,
+            "latitude": 31.222656842808707,
+            "zoom": 1,
+            "bearing": 0,
+            "pitch": 0
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": {
+            "longitude": 6.85236157047845,
+            "latitude": 31.222656842808707,
+            "zoom": 1,
+            "bearing": 0,
+            "pitch": 0
+          },
+          "notes": "运行时 `transformProps.ts` 会把当前图表的 `width`/`height` 合并进 viewport，但 root form_data 不需要自己提供宽高。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Map",
+        "field_name": "color_scheme_type",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Select the type of color scheme to use.",
+        "data_type": "string",
+        "sample_data": "linear_palette",
+        "original_field": {
+          "field_name": "color_scheme_type",
+          "description": "Select the type of color scheme to use.",
+          "data_type": "string",
+          "enum_values": [
+            "fixed_color",
+            "linear_palette"
+          ],
+          "sample_data": "linear_palette",
+          "required": false,
+          "embedding": "否",
+          "default_value": "linear_palette",
+          "notes": "当前图覆盖了共享 color scheme type choices，只保留 `fixed_color` 与 `linear_palette`。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Map",
+        "field_name": "color_picker",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Select the fixed color",
+        "data_type": "object",
+        "sample_data": {
+          "r": 0,
+          "g": 122,
+          "b": 135,
+          "a": 1
+        },
+        "original_field": {
+          "field_name": "color_picker",
+          "description": "Select the fixed color",
+          "data_type": "object",
+          "sample_data": {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          },
+          "notes": "仅当 `color_scheme_type='fixed_color'` 时可见。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Map",
+        "field_name": "linear_color_scheme",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Select a linear color scheme",
+        "data_type": "string",
+        "sample_data": "superset_seq_1",
+        "original_field": {
+          "field_name": "linear_color_scheme",
+          "description": "Select a linear color scheme",
+          "data_type": "string",
+          "enum_source": "sequentialSchemeRegistry.values()",
+          "sample_data": "superset_seq_1",
+          "required": false,
+          "embedding": "否",
+          "default_value": "sequentialSchemeRegistry.getDefaultKey()",
+          "notes": "仅当 `color_scheme_type='linear_palette'` 时可见。`Heatmap.tsx` 会用它创建 sequential linear scale。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Map",
+        "field_name": "autozoom",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "When checked, the map will zoom to your data after each query",
+        "data_type": "boolean",
+        "sample_data": true,
+        "original_field": {
+          "field_name": "autozoom",
+          "description": "When checked, the map will zoom to your data after each query",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Map",
+        "field_name": "aggregation",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "The function to use when aggregating points into groups",
+        "data_type": "string",
+        "sample_data": "sum",
+        "original_field": {
+          "field_name": "aggregation",
+          "description": "The function to use when aggregating points into groups",
+          "data_type": "string",
+          "enum_values": [
+            "sum",
+            "mean"
+          ],
+          "sample_data": "sum",
+          "required": false,
+          "embedding": "否",
+          "default_value": "sum",
+          "notes": "root form_data 应保留 controlPanel 中的小写值；运行时 `Heatmap.tsx` 会再转成大写。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Advanced",
+        "field_name": "js_columns",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "List of extra columns made available in JavaScript functions",
+        "data_type": "array[string | object]",
+        "sample_data": [
+          "city"
+        ],
+        "original_field": {
+          "field_name": "js_columns",
+          "description": "List of extra columns made available in JavaScript functions",
+          "data_type": "array[string | object]",
+          "enum_source": "datasource columns",
+          "sample_data": [
+            "city"
+          ],
+          "required": false,
+          "embedding": "否",
+          "default_value": [],
+          "notes": "`BaseDeckGLViz.query_obj()` 会把它们并入 query groupby，并在返回特征中以 `extraProps` 暴露给自定义 JS。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Advanced",
+        "field_name": "js_data_mutator",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Define a javascript function that receives the data array used in the visualization and is expected to return a modified version of that array.",
+        "data_type": "string",
+        "sample_data": "data => data",
+        "original_field": {
+          "field_name": "js_data_mutator",
+          "description": "Define a javascript function that receives the data array used in the visualization and is expected to return a modified version of that array.",
+          "data_type": "string",
+          "sample_data": "data => data",
+          "required": false,
+          "embedding": "否",
+          "default_value": "",
+          "notes": "如果功能开关 `EnableJavascriptControls` 关闭，该控件会变成只读并显示安全提示。`Heatmap.tsx` 会在绘图前对 `payload.data.features` 执行它。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Advanced",
+        "field_name": "js_tooltip",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Define a function that receives the input and outputs the content for a tooltip",
+        "data_type": "string",
+        "sample_data": "o => `<div>${o.coordinate[0]}, ${o.coordinate[1]}</div>`",
+        "original_field": {
+          "field_name": "js_tooltip",
+          "description": "Define a function that receives the input and outputs the content for a tooltip",
+          "data_type": "string",
+          "sample_data": "o => `<div>${o.coordinate[0]}, ${o.coordinate[1]}</div>`",
+          "required": false,
+          "embedding": "否",
+          "default_value": "",
+          "notes": "若未提供，Heatmap 默认 tooltip 只显示 centroid 坐标。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Advanced",
+        "field_name": "js_onclick_href",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Define a function that returns a URL to navigate to when user clicks",
+        "data_type": "string",
+        "sample_data": "o => `https://example.com/?lon=${o.coordinate[0]}&lat=${o.coordinate[1]}`",
+        "original_field": {
+          "field_name": "js_onclick_href",
+          "description": "Define a function that returns a URL to navigate to when user clicks",
+          "data_type": "string",
+          "sample_data": "o => `https://example.com/?lon=${o.coordinate[0]}&lat=${o.coordinate[1]}`",
+          "required": false,
+          "embedding": "否",
+          "default_value": "",
+          "notes": "若提供，`commonLayerProps()` 会在点击时打开该 URL。"
+        }
+      }
+    ],
+    "field_inventory": [
+      {
+        "field_name": "adhoc_filters",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "字段标签为 Filters。legacy `/superset/explore_json/` 路径会先把 legacy filters 归并进 `adhoc_filters`，再继续 merge `extra_form_data`。"
+        ],
+        "data_types": [
+          "array[object]"
+        ],
+        "sample_data_examples": [
+          [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "LAT",
+              "operator": "IS NOT NULL",
+              "comparator": ""
+            }
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "adhoc_filters",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "extra_form_data.append",
+            "description": "字段标签为 Filters。legacy `/superset/explore_json/` 路径会先把 legacy filters 归并进 `adhoc_filters`，再继续 merge `extra_form_data`。",
+            "data_type": "array[object]",
+            "sample_data": [
+              {
+                "expressionType": "SIMPLE",
+                "clause": "WHERE",
+                "subject": "LAT",
+                "operator": "IS NOT NULL",
+                "comparator": ""
+              }
+            ],
+            "original_field": {
+              "field_name": "adhoc_filters",
+              "description": "字段标签为 Filters。legacy `/superset/explore_json/` 路径会先把 legacy filters 归并进 `adhoc_filters`，再继续 merge `extra_form_data`。",
+              "data_type": "array[object]",
+              "enum_source": "datasource columns + saved metrics + 当前 size 指标",
+              "sample_data": [
+                {
+                  "expressionType": "SIMPLE",
+                  "clause": "WHERE",
+                  "subject": "LAT",
+                  "operator": "IS NOT NULL",
+                  "comparator": ""
+                }
+              ],
+              "required": false,
+              "embedding": "extra_form_data.append",
+              "default_value": [],
+              "notes": "即便 root 不显式提供，若 `filter_nulls=true`，后端也会在查询前自动把空间列的 `IS NOT NULL` 过滤补进来。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "aggregation",
+        "required": false,
+        "categories": [
+          "Map"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "The function to use when aggregating points into groups"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "sum"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Map",
+            "field_name": "aggregation",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "The function to use when aggregating points into groups",
+            "data_type": "string",
+            "sample_data": "sum",
+            "original_field": {
+              "field_name": "aggregation",
+              "description": "The function to use when aggregating points into groups",
+              "data_type": "string",
+              "enum_values": [
+                "sum",
+                "mean"
+              ],
+              "sample_data": "sum",
+              "required": false,
+              "embedding": "否",
+              "default_value": "sum",
+              "notes": "root form_data 应保留 controlPanel 中的小写值；运行时 `Heatmap.tsx` 会再转成大写。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "autozoom",
+        "required": false,
+        "categories": [
+          "Map"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "When checked, the map will zoom to your data after each query"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          true
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Map",
+            "field_name": "autozoom",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "When checked, the map will zoom to your data after each query",
+            "data_type": "boolean",
+            "sample_data": true,
+            "original_field": {
+              "field_name": "autozoom",
+              "description": "When checked, the map will zoom to your data after each query",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": true,
+              "required": false,
+              "embedding": "否",
+              "default_value": true
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "color_picker",
+        "required": false,
+        "categories": [
+          "Map"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select the fixed color"
+        ],
+        "data_types": [
+          "object"
+        ],
+        "sample_data_examples": [
+          {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Map",
+            "field_name": "color_picker",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Select the fixed color",
+            "data_type": "object",
+            "sample_data": {
+              "r": 0,
+              "g": 122,
+              "b": 135,
+              "a": 1
+            },
+            "original_field": {
+              "field_name": "color_picker",
+              "description": "Select the fixed color",
+              "data_type": "object",
+              "sample_data": {
+                "r": 0,
+                "g": 122,
+                "b": 135,
+                "a": 1
+              },
+              "required": false,
+              "embedding": "否",
+              "default_value": {
+                "r": 0,
+                "g": 122,
+                "b": 135,
+                "a": 1
+              },
+              "notes": "仅当 `color_scheme_type='fixed_color'` 时可见。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "color_scheme_type",
+        "required": false,
+        "categories": [
+          "Map"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select the type of color scheme to use."
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "linear_palette"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Map",
+            "field_name": "color_scheme_type",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Select the type of color scheme to use.",
+            "data_type": "string",
+            "sample_data": "linear_palette",
+            "original_field": {
+              "field_name": "color_scheme_type",
+              "description": "Select the type of color scheme to use.",
+              "data_type": "string",
+              "enum_values": [
+                "fixed_color",
+                "linear_palette"
+              ],
+              "sample_data": "linear_palette",
+              "required": false,
+              "embedding": "否",
+              "default_value": "linear_palette",
+              "notes": "当前图覆盖了共享 color scheme type choices，只保留 `fixed_color` 与 `linear_palette`。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "filter_nulls",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Whether to ignore locations that are null"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          true
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "filter_nulls",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Whether to ignore locations that are null",
+            "data_type": "boolean",
+            "sample_data": true,
+            "original_field": {
+              "field_name": "filter_nulls",
+              "description": "Whether to ignore locations that are null",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": true,
+              "required": false,
+              "embedding": "否",
+              "default_value": true,
+              "notes": "为 true 时，`BaseDeckGLViz.query_obj()` 会自动为 `spatial` 用到的列注入 `IS NOT NULL` 过滤条件。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "intensity",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Intensity is the value multiplied by the weight to obtain the final weight"
+        ],
+        "data_types": [
+          "number | string"
+        ],
+        "sample_data_examples": [
+          1
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "intensity",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Intensity is the value multiplied by the weight to obtain the final weight",
+            "data_type": "number | string",
+            "sample_data": 1,
+            "original_field": {
+              "field_name": "intensity",
+              "description": "Intensity is the value multiplied by the weight to obtain the final weight",
+              "data_type": "number | string",
+              "enum_values": [
+                0.1,
+                0.2,
+                0.3,
+                0.4,
+                0.5,
+                0.6,
+                0.7,
+                0.8,
+                0.9,
+                1
+              ],
+              "sample_data": 1,
+              "required": false,
+              "embedding": "否",
+              "default_value": 1,
+              "notes": "control 允许 free-form 数值输入，枚举列表只是默认 choices。运行时若 root 缺失，会回退到 1。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "js_columns",
+        "required": false,
+        "categories": [
+          "Advanced"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "List of extra columns made available in JavaScript functions"
+        ],
+        "data_types": [
+          "array[string | object]"
+        ],
+        "sample_data_examples": [
+          [
+            "city"
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Advanced",
+            "field_name": "js_columns",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "List of extra columns made available in JavaScript functions",
+            "data_type": "array[string | object]",
+            "sample_data": [
+              "city"
+            ],
+            "original_field": {
+              "field_name": "js_columns",
+              "description": "List of extra columns made available in JavaScript functions",
+              "data_type": "array[string | object]",
+              "enum_source": "datasource columns",
+              "sample_data": [
+                "city"
+              ],
+              "required": false,
+              "embedding": "否",
+              "default_value": [],
+              "notes": "`BaseDeckGLViz.query_obj()` 会把它们并入 query groupby，并在返回特征中以 `extraProps` 暴露给自定义 JS。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "js_data_mutator",
+        "required": false,
+        "categories": [
+          "Advanced"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Define a javascript function that receives the data array used in the visualization and is expected to return a modified version of that array."
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "data => data"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Advanced",
+            "field_name": "js_data_mutator",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Define a javascript function that receives the data array used in the visualization and is expected to return a modified version of that array.",
+            "data_type": "string",
+            "sample_data": "data => data",
+            "original_field": {
+              "field_name": "js_data_mutator",
+              "description": "Define a javascript function that receives the data array used in the visualization and is expected to return a modified version of that array.",
+              "data_type": "string",
+              "sample_data": "data => data",
+              "required": false,
+              "embedding": "否",
+              "default_value": "",
+              "notes": "如果功能开关 `EnableJavascriptControls` 关闭，该控件会变成只读并显示安全提示。`Heatmap.tsx` 会在绘图前对 `payload.data.features` 执行它。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "js_onclick_href",
+        "required": false,
+        "categories": [
+          "Advanced"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Define a function that returns a URL to navigate to when user clicks"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "o => `https://example.com/?lon=${o.coordinate[0]}&lat=${o.coordinate[1]}`"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Advanced",
+            "field_name": "js_onclick_href",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Define a function that returns a URL to navigate to when user clicks",
+            "data_type": "string",
+            "sample_data": "o => `https://example.com/?lon=${o.coordinate[0]}&lat=${o.coordinate[1]}`",
+            "original_field": {
+              "field_name": "js_onclick_href",
+              "description": "Define a function that returns a URL to navigate to when user clicks",
+              "data_type": "string",
+              "sample_data": "o => `https://example.com/?lon=${o.coordinate[0]}&lat=${o.coordinate[1]}`",
+              "required": false,
+              "embedding": "否",
+              "default_value": "",
+              "notes": "若提供，`commonLayerProps()` 会在点击时打开该 URL。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "js_tooltip",
+        "required": false,
+        "categories": [
+          "Advanced"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Define a function that receives the input and outputs the content for a tooltip"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "o => `<div>${o.coordinate[0]}, ${o.coordinate[1]}</div>`"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Advanced",
+            "field_name": "js_tooltip",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Define a function that receives the input and outputs the content for a tooltip",
+            "data_type": "string",
+            "sample_data": "o => `<div>${o.coordinate[0]}, ${o.coordinate[1]}</div>`",
+            "original_field": {
+              "field_name": "js_tooltip",
+              "description": "Define a function that receives the input and outputs the content for a tooltip",
+              "data_type": "string",
+              "sample_data": "o => `<div>${o.coordinate[0]}, ${o.coordinate[1]}</div>`",
+              "required": false,
+              "embedding": "否",
+              "default_value": "",
+              "notes": "若未提供，Heatmap 默认 tooltip 只显示 centroid 坐标。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "linear_color_scheme",
+        "required": false,
+        "categories": [
+          "Map"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select a linear color scheme"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "superset_seq_1"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Map",
+            "field_name": "linear_color_scheme",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Select a linear color scheme",
+            "data_type": "string",
+            "sample_data": "superset_seq_1",
+            "original_field": {
+              "field_name": "linear_color_scheme",
+              "description": "Select a linear color scheme",
+              "data_type": "string",
+              "enum_source": "sequentialSchemeRegistry.values()",
+              "sample_data": "superset_seq_1",
+              "required": false,
+              "embedding": "否",
+              "default_value": "sequentialSchemeRegistry.getDefaultKey()",
+              "notes": "仅当 `color_scheme_type='linear_palette'` 时可见。`Heatmap.tsx` 会用它创建 sequential linear scale。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "mapbox_style",
+        "required": false,
+        "categories": [
+          "Map"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/ or tile server URL."
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Map",
+            "field_name": "mapbox_style",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/ or tile server URL.",
+            "data_type": "string",
+            "sample_data": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+            "original_field": {
+              "field_name": "mapbox_style",
+              "description": "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/ or tile server URL.",
+              "data_type": "string",
+              "enum_source": "bootstrap common.deckgl_tiles or DEFAULT_DECKGL_TILES",
+              "sample_data": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+              "required": false,
+              "embedding": "否",
+              "default_value": "getDeckGLTiles()[0][0]"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "radius_pixels",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Intensity Radius is the radius at which the weight is distributed"
+        ],
+        "data_types": [
+          "integer | string"
+        ],
+        "sample_data_examples": [
+          30
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "radius_pixels",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Intensity Radius is the radius at which the weight is distributed",
+            "data_type": "integer | string",
+            "sample_data": 30,
+            "original_field": {
+              "field_name": "radius_pixels",
+              "description": "Intensity Radius is the radius at which the weight is distributed",
+              "data_type": "integer | string",
+              "enum_values": [
+                5,
+                10,
+                15,
+                20,
+                25,
+                30,
+                35,
+                40,
+                45,
+                50,
+                55,
+                60,
+                65,
+                70
+              ],
+              "sample_data": 30,
+              "required": false,
+              "embedding": "否",
+              "default_value": 30,
+              "notes": "control 允许 free-form 整数输入，枚举列表只是默认 choices。运行时若 root 缺失，会回退到 30。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "row_limit",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [
+          "rowLimit"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Limits the number of the rows that are computed in the query that is the source of the data used for this chart."
+        ],
+        "data_types": [
+          "integer"
+        ],
+        "sample_data_examples": [
+          10000
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "row_limit",
+            "runtime_alias": "rowLimit",
+            "required": false,
+            "embedding": "否",
+            "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+            "data_type": "integer",
+            "sample_data": 10000,
+            "original_field": {
+              "field_name": "row_limit",
+              "runtime_alias": "rowLimit",
+              "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+              "data_type": "integer",
+              "enum_values": [
+                10,
+                50,
+                100,
+                250,
+                500,
+                1000,
+                5000,
+                10000,
+                50000
+              ],
+              "sample_data": 10000,
+              "required": false,
+              "embedding": "否",
+              "default_value": 10000
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "size",
+        "required": true,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Metric used as a weight for the grid's coloring"
+        ],
+        "data_types": [
+          "string | object"
+        ],
+        "sample_data_examples": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "count"
+            },
+            "aggregate": "COUNT",
+            "label": "COUNT(*)"
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "size",
+            "runtime_alias": null,
+            "required": true,
+            "embedding": "否",
+            "description": "Metric used as a weight for the grid's coloring",
+            "data_type": "string | object",
+            "sample_data": {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "count"
+              },
+              "aggregate": "COUNT",
+              "label": "COUNT(*)"
+            },
+            "original_field": {
+              "field_name": "size",
+              "description": "Metric used as a weight for the grid's coloring",
+              "data_type": "string | object",
+              "enum_source": "saved metrics + adhoc metrics",
+              "sample_data": {
+                "expressionType": "SIMPLE",
+                "column": {
+                  "column_name": "count"
+                },
+                "aggregate": "COUNT",
+                "label": "COUNT(*)"
+              },
+              "required": true,
+              "embedding": "否",
+              "default_value": null,
+              "notes": "底层共享控件仍是 `dndSizeControl`，但当前图通过 `controlOverrides.size` 把它改名为 `Weight` 并加上 `validateNonEmpty`。后端把它当成唯一指标，并将对应指标标签映射成每个点的 `weight`。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "spatial",
+        "required": true,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Point to your spatial columns"
+        ],
+        "data_types": [
+          "object"
+        ],
+        "sample_data_examples": [
+          {
+            "type": "latlong",
+            "lonCol": "LON",
+            "latCol": "LAT"
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "spatial",
+            "runtime_alias": null,
+            "required": true,
+            "embedding": "否",
+            "description": "Point to your spatial columns",
+            "data_type": "object",
+            "sample_data": {
+              "type": "latlong",
+              "lonCol": "LON",
+              "latCol": "LAT"
+            },
+            "original_field": {
+              "field_name": "spatial",
+              "description": "Point to your spatial columns",
+              "data_type": "object",
+              "enum_values": [
+                "latlong",
+                "delimited",
+                "geohash"
+              ],
+              "sample_data": {
+                "type": "latlong",
+                "lonCol": "LON",
+                "latCol": "LAT"
+              },
+              "required": true,
+              "embedding": "否",
+              "default_value": {
+                "type": "latlong"
+              },
+              "notes": "控件是 `SpatialControl` + `validateNonEmpty`。源码支持三种对象形状：`{type:'latlong', lonCol, latCol}`、`{type:'delimited', lonlatCol, delimiter, reverseCheckbox}`、`{type:'geohash', geohashCol, reverseCheckbox}`。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "viewport",
+        "required": false,
+        "categories": [
+          "Map"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Parameters related to the view and perspective on the map"
+        ],
+        "data_types": [
+          "object"
+        ],
+        "sample_data_examples": [
+          {
+            "longitude": 6.85236157047845,
+            "latitude": 31.222656842808707,
+            "zoom": 1,
+            "bearing": 0,
+            "pitch": 0
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Map",
+            "field_name": "viewport",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Parameters related to the view and perspective on the map",
+            "data_type": "object",
+            "sample_data": {
+              "longitude": 6.85236157047845,
+              "latitude": 31.222656842808707,
+              "zoom": 1,
+              "bearing": 0,
+              "pitch": 0
+            },
+            "original_field": {
+              "field_name": "viewport",
+              "description": "Parameters related to the view and perspective on the map",
+              "data_type": "object",
+              "sample_data": {
+                "longitude": 6.85236157047845,
+                "latitude": 31.222656842808707,
+                "zoom": 1,
+                "bearing": 0,
+                "pitch": 0
+              },
+              "required": false,
+              "embedding": "否",
+              "default_value": {
+                "longitude": 6.85236157047845,
+                "latitude": 31.222656842808707,
+                "zoom": 1,
+                "bearing": 0,
+                "pitch": 0
+              },
+              "notes": "运行时 `transformProps.ts` 会把当前图表的 `width`/`height` 合并进 viewport，但 root form_data 不需要自己提供宽高。"
+            }
+          }
+        ]
+      }
+    ],
+    "required_field_names": [
+      "size",
+      "spatial"
+    ],
+    "embedding_enabled_field_names": [
+      "adhoc_filters"
+    ],
+    "runtime_alias_index": {
+      "row_limit": [
+        "rowLimit"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "deck_heatmap",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/deck_heatmap-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/deck_heatmap-form-data-schema.json",
+      "control-schema": "form-data-schema/deck_heatmap-schema.json"
+    }
+  },
+  "fallback_online_field_categories": {
+    "Query": [],
+    "Advanced analytics": [],
+    "Annotations & Layers": [],
+    "Predictive Analytics（Forecast）": [],
+    "Chart Options": [],
+    "Chart Title": [],
+    "图表专属": [],
+    "通用图表选项": []
+  },
+  "original_control_schema": {
+    "viz_type": "deck_heatmap",
+    "display_name": "deck.gl Heatmap",
+    "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Heatmap/controlPanel.ts",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Heatmap/controlPanel.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Heatmap/index.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Heatmap/Heatmap.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/factory.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/common.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/Shared_DeckGL.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/utils.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utils/crossFiltersDataMask.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+      "D:/vsx/sources/superset-6.0.0/superset/views/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/viz.py"
+    ],
+    "notes": [
+      "deck_heatmap 位于 `legacy-preset-chart-deckgl/src/layers/Heatmap`，metadata 明确声明 `useLegacyApi=true`，因此真实请求路径是 `/superset/explore_json/`。",
+      "前端展示名是 `deck.gl Heatmap`，后端类名是 `superset/viz.py::DeckHeatmap`。构造模板时应以 `viz_type='deck_heatmap'` 为准。",
+      "当前图的主查询输入是 `spatial` 对象和 `size` 指标。`BaseDeckGLViz.get_metrics()` 明确读取 `form_data.size`，`DeckHeatmap.get_properties()` 再把对应指标标签映射为每个点的 `weight`。",
+      "当前图对 `size` 做了 `controlOverrides`：标签改为 `Weight`、描述改为 `Metric used as a weight for the grid's coloring`、并追加 `validateNonEmpty`。因此规范创建模板应把 `size` 视为必填。",
+      "Query section 额外定义了 `intensity` 和 `radius_pixels`，它们分别控制权重强度倍率和热力半径；两者都支持 free-form 数值输入，并分别走 number / integer 校验。",
+      "Map section 的 `color_scheme_type` 复用了共享控件配置，但 choices 被当前图改成只允许 `fixed_color` 和 `linear_palette`，默认是 `linear_palette`。当前图没有 categorical palette 选项。",
+      "`linear_color_scheme` 是当前图正式 controlPanel 字段；`Heatmap.tsx` 会用它从 sequential scheme registry 创建线性色标。",
+      "`Heatmap.tsx` 运行时代码仍会把 `deafult_breakpoint_color` 与 `color_breakpoints` 传给 `getColorRange()`，`factory.tsx` 也仍会读取 `legend_position` 与 `legend_format`。但这些字段当前 `deck_heatmap` controlPanel.ts 没有正式暴露，因此不属于 canonical controlPanel 字段。",
+      "`aggregation` 的 root form_data 值在 controlPanel 里是小写枚举 `sum|mean`；运行时 `Heatmap.tsx` 会再把它转成大写传给 `HeatmapLayer`。"
+    ],
+    "control_overrides": {
+      "size": {
+        "label": "Weight",
+        "description": "Metric used as a weight for the grid's coloring",
+        "validators": [
+          "validateNonEmpty"
+        ]
+      }
+    },
+    "legacy_api_behavior": {
+      "useLegacyApi": true,
+      "frontend_request_endpoint": "/superset/explore_json/",
+      "frontend_request_payload": {
+        "form_data": "<raw form_data>"
+      },
+      "query_builder": "deck_heatmap 没有专属前端 buildQuery。ChartClient.ts 在 `useLegacyApi=true` 且未注册 buildQuery 时，会把原始 form_data 直接包装进 legacy payload。"
+    },
+    "query_compilation": {
+      "backend_class": "superset/viz.py::DeckHeatmap",
+      "base_query": "继承 `BaseDeckGLViz.query_obj()` -> `BaseViz.query_obj()`，因此会先执行 `convert_legacy_filters_into_adhoc(form_data)` 与 `merge_extra_filters(form_data)`。",
+      "null_filter_injection": "当 `filter_nulls=true`（默认值）时，`BaseDeckGLViz.add_null_filters()` 会为 `spatial` 引用到的经纬度列、delimited 列或 geohash 列自动追加 `IS NOT NULL` adhoc filter。",
+      "groupby": "`BaseDeckGLViz.query_obj()` 会把 `spatial` 展开的实际列追加到 `group_by`，再拼上可选 `js_columns`；当前图没有普通 dimension 控件，所以常规情况下 groupby 只由空间列和 js_columns 组成。",
+      "metrics": "规范保存态里 `size` 因 `validateNonEmpty` 应始终存在，因此 `query_obj['metrics']=[size]` 且 `query_obj['columns']=[]`。若手工绕过 UI 不传 `size`，后端仍会回退成无指标 columns 查询，随后 `weight` 回退为 1。",
+      "orderby": "当有 `size` 指标时，`query_obj['orderby']=[(size, not order_desc)]`。由于 root 没有正式 `order_desc` 控件，缺省行为等价于按指标降序。",
+      "returned_data": "`DeckHeatmap.get_data()` 会先把 `self.metric_label` 设为 `utils.get_metric_name(self.metric)`，再复用 `BaseDeckGLViz.get_data()` 返回 `{ features, mapboxApiKey, metricLabels }`。每个 feature 的形状是 `{ position, weight }`。",
+      "runtime_rendering": "`Heatmap.tsx` 会把 `payload.data.features` 直接交给 `HeatmapLayer`，并读取 root `intensity`、`radius_pixels`、`aggregation`、`color_scheme_type`、`linear_color_scheme` 与 `color_picker`。若 root 里没有这些字段，则分别回退到 1、30、SUM 与 deck.gl 默认配色行为。"
+    },
+    "field_categories": {
+      "Query": [
+        {
+          "field_name": "spatial",
+          "description": "Point to your spatial columns",
+          "data_type": "object",
+          "enum_values": [
+            "latlong",
+            "delimited",
+            "geohash"
+          ],
+          "sample_data": {
+            "type": "latlong",
+            "lonCol": "LON",
+            "latCol": "LAT"
+          },
+          "required": true,
+          "embedding": "否",
+          "default_value": {
+            "type": "latlong"
+          },
+          "notes": "控件是 `SpatialControl` + `validateNonEmpty`。源码支持三种对象形状：`{type:'latlong', lonCol, latCol}`、`{type:'delimited', lonlatCol, delimiter, reverseCheckbox}`、`{type:'geohash', geohashCol, reverseCheckbox}`。"
+        },
+        {
+          "field_name": "size",
+          "description": "Metric used as a weight for the grid's coloring",
+          "data_type": "string | object",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "count"
+            },
+            "aggregate": "COUNT",
+            "label": "COUNT(*)"
+          },
+          "required": true,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "底层共享控件仍是 `dndSizeControl`，但当前图通过 `controlOverrides.size` 把它改名为 `Weight` 并加上 `validateNonEmpty`。后端把它当成唯一指标，并将对应指标标签映射成每个点的 `weight`。"
+        },
+        {
+          "field_name": "row_limit",
+          "runtime_alias": "rowLimit",
+          "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+          "data_type": "integer",
+          "enum_values": [
+            10,
+            50,
+            100,
+            250,
+            500,
+            1000,
+            5000,
+            10000,
+            50000
+          ],
+          "sample_data": 10000,
+          "required": false,
+          "embedding": "否",
+          "default_value": 10000
+        },
+        {
+          "field_name": "filter_nulls",
+          "description": "Whether to ignore locations that are null",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true,
+          "notes": "为 true 时，`BaseDeckGLViz.query_obj()` 会自动为 `spatial` 用到的列注入 `IS NOT NULL` 过滤条件。"
+        },
+        {
+          "field_name": "adhoc_filters",
+          "description": "字段标签为 Filters。legacy `/superset/explore_json/` 路径会先把 legacy filters 归并进 `adhoc_filters`，再继续 merge `extra_form_data`。",
+          "data_type": "array[object]",
+          "enum_source": "datasource columns + saved metrics + 当前 size 指标",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "LAT",
+              "operator": "IS NOT NULL",
+              "comparator": ""
+            }
+          ],
+          "required": false,
+          "embedding": "extra_form_data.append",
+          "default_value": [],
+          "notes": "即便 root 不显式提供，若 `filter_nulls=true`，后端也会在查询前自动把空间列的 `IS NOT NULL` 过滤补进来。"
+        },
+        {
+          "field_name": "intensity",
+          "description": "Intensity is the value multiplied by the weight to obtain the final weight",
+          "data_type": "number | string",
+          "enum_values": [
+            0.1,
+            0.2,
+            0.3,
+            0.4,
+            0.5,
+            0.6,
+            0.7,
+            0.8,
+            0.9,
+            1
+          ],
+          "sample_data": 1,
+          "required": false,
+          "embedding": "否",
+          "default_value": 1,
+          "notes": "control 允许 free-form 数值输入，枚举列表只是默认 choices。运行时若 root 缺失，会回退到 1。"
+        },
+        {
+          "field_name": "radius_pixels",
+          "description": "Intensity Radius is the radius at which the weight is distributed",
+          "data_type": "integer | string",
+          "enum_values": [
+            5,
+            10,
+            15,
+            20,
+            25,
+            30,
+            35,
+            40,
+            45,
+            50,
+            55,
+            60,
+            65,
+            70
+          ],
+          "sample_data": 30,
+          "required": false,
+          "embedding": "否",
+          "default_value": 30,
+          "notes": "control 允许 free-form 整数输入，枚举列表只是默认 choices。运行时若 root 缺失，会回退到 30。"
+        }
+      ],
+      "Map": [
+        {
+          "field_name": "mapbox_style",
+          "description": "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/ or tile server URL.",
+          "data_type": "string",
+          "enum_source": "bootstrap common.deckgl_tiles or DEFAULT_DECKGL_TILES",
+          "sample_data": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+          "required": false,
+          "embedding": "否",
+          "default_value": "getDeckGLTiles()[0][0]"
+        },
+        {
+          "field_name": "viewport",
+          "description": "Parameters related to the view and perspective on the map",
+          "data_type": "object",
+          "sample_data": {
+            "longitude": 6.85236157047845,
+            "latitude": 31.222656842808707,
+            "zoom": 1,
+            "bearing": 0,
+            "pitch": 0
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": {
+            "longitude": 6.85236157047845,
+            "latitude": 31.222656842808707,
+            "zoom": 1,
+            "bearing": 0,
+            "pitch": 0
+          },
+          "notes": "运行时 `transformProps.ts` 会把当前图表的 `width`/`height` 合并进 viewport，但 root form_data 不需要自己提供宽高。"
+        },
+        {
+          "field_name": "color_scheme_type",
+          "description": "Select the type of color scheme to use.",
+          "data_type": "string",
+          "enum_values": [
+            "fixed_color",
+            "linear_palette"
+          ],
+          "sample_data": "linear_palette",
+          "required": false,
+          "embedding": "否",
+          "default_value": "linear_palette",
+          "notes": "当前图覆盖了共享 color scheme type choices，只保留 `fixed_color` 与 `linear_palette`。"
+        },
+        {
+          "field_name": "color_picker",
+          "description": "Select the fixed color",
+          "data_type": "object",
+          "sample_data": {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          },
+          "notes": "仅当 `color_scheme_type='fixed_color'` 时可见。"
+        },
+        {
+          "field_name": "linear_color_scheme",
+          "description": "Select a linear color scheme",
+          "data_type": "string",
+          "enum_source": "sequentialSchemeRegistry.values()",
+          "sample_data": "superset_seq_1",
+          "required": false,
+          "embedding": "否",
+          "default_value": "sequentialSchemeRegistry.getDefaultKey()",
+          "notes": "仅当 `color_scheme_type='linear_palette'` 时可见。`Heatmap.tsx` 会用它创建 sequential linear scale。"
+        },
+        {
+          "field_name": "autozoom",
+          "description": "When checked, the map will zoom to your data after each query",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true
+        },
+        {
+          "field_name": "aggregation",
+          "description": "The function to use when aggregating points into groups",
+          "data_type": "string",
+          "enum_values": [
+            "sum",
+            "mean"
+          ],
+          "sample_data": "sum",
+          "required": false,
+          "embedding": "否",
+          "default_value": "sum",
+          "notes": "root form_data 应保留 controlPanel 中的小写值；运行时 `Heatmap.tsx` 会再转成大写。"
+        }
+      ],
+      "Advanced": [
+        {
+          "field_name": "js_columns",
+          "description": "List of extra columns made available in JavaScript functions",
+          "data_type": "array[string | object]",
+          "enum_source": "datasource columns",
+          "sample_data": [
+            "city"
+          ],
+          "required": false,
+          "embedding": "否",
+          "default_value": [],
+          "notes": "`BaseDeckGLViz.query_obj()` 会把它们并入 query groupby，并在返回特征中以 `extraProps` 暴露给自定义 JS。"
+        },
+        {
+          "field_name": "js_data_mutator",
+          "description": "Define a javascript function that receives the data array used in the visualization and is expected to return a modified version of that array.",
+          "data_type": "string",
+          "sample_data": "data => data",
+          "required": false,
+          "embedding": "否",
+          "default_value": "",
+          "notes": "如果功能开关 `EnableJavascriptControls` 关闭，该控件会变成只读并显示安全提示。`Heatmap.tsx` 会在绘图前对 `payload.data.features` 执行它。"
+        },
+        {
+          "field_name": "js_tooltip",
+          "description": "Define a function that receives the input and outputs the content for a tooltip",
+          "data_type": "string",
+          "sample_data": "o => `<div>${o.coordinate[0]}, ${o.coordinate[1]}</div>`",
+          "required": false,
+          "embedding": "否",
+          "default_value": "",
+          "notes": "若未提供，Heatmap 默认 tooltip 只显示 centroid 坐标。"
+        },
+        {
+          "field_name": "js_onclick_href",
+          "description": "Define a function that returns a URL to navigate to when user clicks",
+          "data_type": "string",
+          "sample_data": "o => `https://example.com/?lon=${o.coordinate[0]}&lat=${o.coordinate[1]}`",
+          "required": false,
+          "embedding": "否",
+          "default_value": "",
+          "notes": "若提供，`commonLayerProps()` 会在点击时打开该 URL。"
+        }
+      ]
+    }
+  }
+}

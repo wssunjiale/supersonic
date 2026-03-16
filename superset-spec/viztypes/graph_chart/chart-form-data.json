@@ -1,0 +1,366 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "graph_chart",
+  "display_name": "Graph Chart",
+  "source_kind": "schema_file",
+  "normalized_chart_form_data": {
+    "required_root_fields": [
+      "datasource",
+      "metric",
+      "source",
+      "target",
+      "viz_type"
+    ],
+    "optional_root_fields": [
+      "adhoc_filters",
+      "cache_timeout",
+      "custom_params",
+      "row_limit",
+      "slice_id",
+      "source_category",
+      "target_category",
+      "url_params"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "metric",
+      "source",
+      "target",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "baseEdgeWidth",
+      "baseNodeSize",
+      "color_scheme",
+      "datasource",
+      "draggable",
+      "edgeLength",
+      "edgeSymbol",
+      "friction",
+      "gravity",
+      "layout",
+      "legendMargin",
+      "legendOrientation",
+      "legendType",
+      "metric",
+      "repulsion",
+      "roam",
+      "row_limit",
+      "selectedMode",
+      "showSymbolThreshold",
+      "show_legend",
+      "source",
+      "source_category",
+      "target",
+      "target_category",
+      "viz_type"
+    ],
+    "fallback_template_seed": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "graph_chart",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "source": "<source_column>",
+      "target": "<target_column>",
+      "adhoc_filters": [],
+      "time_range": "No filter"
+    }
+  },
+  "original_chart_form_data_schema": {
+    "viz_type": "graph_chart",
+    "display_name": "Graph Chart",
+    "purpose": "用于调用 API 创建或保存 Graph Chart 时填写的 form_data 模板",
+    "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/graph_chart-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Graph/index.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Graph/controlPanel.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Graph/buildQuery.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Graph/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Graph/types.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Graph/constants.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/controls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/standardizedFormData.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/models/ChartProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryContext.ts"
+    ],
+    "notes": [
+      "API form_data 的键名必须保留源码中的原始 control name。Graph Chart 的键名是 mixed-case：既有 snake_case，也有 camelCase。",
+      "Explore 导出 form_data 时走 getFormDataFromControls()，它只会按 controlName 原样取 value，不会统一改名。",
+      "transformProps 中看到的 camelCase formData 来自 ChartProps.convertKeysToCamelCase(formData)，是运行时形态，不是构造 API form_data 的主依据。",
+      "datasource 和 viz_type 来自通用的 datasourceAndVizType section，不是 Graph Chart 专属控件，但创建图表时必须提供。",
+      "Graph Chart 的 Query 区没有 groupby 概念，而是直接要求 `source`、`target` 和 `metric`。`buildQuery.ts` 会把 source/target/category 四个字段编译到 query.columns。",
+      "Graph Chart 的 root form_data 里本来就混用 snake_case 和 camelCase，例如 `source_category`、`show_legend` 与 `edgeSymbol`、`selectedMode`、`showSymbolThreshold` 并存。",
+      "`formDataOverrides.metric = getStandardizedControls().popAllMetrics()` 只在 standardized controls 切换图表时起作用，不是常规保存时必须主动传的字段。"
+    ],
+    "naming_and_pipeline": {
+      "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写成 form_data[name]",
+      "api_form_data_to_query_context": "Graph/buildQuery.ts 使用原始 form_data 构建 query context",
+      "api_form_data_to_runtime_form_data": "ChartProps.ts 会把 form_data 转成 camelCase 的 runtime formData，同时保留 rawFormData"
+    },
+    "global_required_fields": {
+      "datasource": {
+        "data_type": "string",
+        "required": true,
+        "sample_data": "<dataset_id>__table",
+        "source": "datasourceAndVizType section"
+      },
+      "viz_type": {
+        "data_type": "string",
+        "required": true,
+        "fixed_value": "graph_chart",
+        "source": "Graph/index.ts metadata"
+      },
+      "source": {
+        "data_type": "string | object",
+        "required": true,
+        "sample_data": "source_name",
+        "source": "Graph Query section"
+      },
+      "target": {
+        "data_type": "string | object",
+        "required": true,
+        "sample_data": "target_name",
+        "source": "Graph Query section"
+      },
+      "metric": {
+        "data_type": "string | object",
+        "required": true,
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "weight"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(weight)"
+        },
+        "source": "Graph Query section"
+      }
+    },
+    "global_optional_fields": {
+      "source_category": {
+        "data_type": "string | object | null",
+        "required": false,
+        "sample_data": "source_type",
+        "source": "Graph Query section"
+      },
+      "target_category": {
+        "data_type": "string | object | null",
+        "required": false,
+        "sample_data": "target_type",
+        "source": "Graph Query section"
+      },
+      "adhoc_filters": {
+        "data_type": "array[object]",
+        "required": false,
+        "sample_data": [],
+        "source": "Graph Query section"
+      },
+      "row_limit": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 10000,
+        "source": "Graph Query section"
+      },
+      "slice_id": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 0,
+        "source": "datasourceAndVizType hidden control",
+        "notes": "新建图表时通常省略；编辑已存在图表时由服务端或上层调用方提供。"
+      },
+      "cache_timeout": {
+        "data_type": "integer | null",
+        "required": false,
+        "sample_data": null,
+        "source": "datasourceAndVizType hidden control"
+      },
+      "url_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "datasourceAndVizType hidden control"
+      },
+      "custom_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "datasourceAndVizType hidden control"
+      }
+    },
+    "minimal_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "graph_chart",
+      "source": "<source_dimension>",
+      "target": "<target_dimension>",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "adhoc_filters": []
+    },
+    "recommended_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "graph_chart",
+      "source": "source_name",
+      "target": "target_name",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "weight"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(weight)"
+      },
+      "source_category": null,
+      "target_category": null,
+      "adhoc_filters": [],
+      "row_limit": 10000,
+      "color_scheme": "<categoricalSchemeRegistry.defaultKey>",
+      "show_legend": true,
+      "legendType": "scroll",
+      "legendOrientation": "top",
+      "legendMargin": null,
+      "layout": "force",
+      "edgeSymbol": "none,arrow",
+      "draggable": false,
+      "roam": true,
+      "selectedMode": "single",
+      "showSymbolThreshold": 0,
+      "baseNodeSize": 20,
+      "baseEdgeWidth": 3,
+      "edgeLength": 400,
+      "gravity": 0.3,
+      "repulsion": 1000,
+      "friction": 0.2
+    },
+    "conditional_blocks": {
+      "node_categories": {
+        "condition": "需要按节点类别着色并展示图例时",
+        "fields": {
+          "source_category": "<source_category_dimension>",
+          "target_category": "<target_category_dimension>",
+          "show_legend": true
+        }
+      },
+      "circular_layout": {
+        "condition": "需要把关系图改成圆形排布时",
+        "fields": {
+          "layout": "circular"
+        }
+      },
+      "force_layout_tuning": {
+        "condition": "使用 force 布局并需要调节拉力/斥力时",
+        "fields": {
+          "layout": "force",
+          "edgeLength": 400,
+          "gravity": 0.3,
+          "repulsion": 1000,
+          "friction": 0.2
+        }
+      },
+      "drag_and_roam": {
+        "condition": "需要开启节点拖拽与画布缩放/平移时",
+        "fields": {
+          "draggable": true,
+          "roam": true
+        }
+      },
+      "selection_mode": {
+        "condition": "需要控制节点选择模式时",
+        "fields": {
+          "selectedMode": "multiple"
+        }
+      },
+      "edge_symbols": {
+        "condition": "需要给边两端添加箭头或圆点时",
+        "fields": {
+          "edgeSymbol": "circle,arrow"
+        }
+      },
+      "label_threshold": {
+        "condition": "需要只显示高权重节点标签时",
+        "fields": {
+          "showSymbolThreshold": 10
+        }
+      }
+    },
+    "runtime_only_or_non_template_fields": {
+      "query_context_only": [
+        {
+          "field_name": "query_context.queries[*].columns",
+          "reason": "这是 Graph/buildQuery.ts 从 root form_data 的 source/target/category 字段编译出来的结果，不是额外 root form_data 字段。"
+        },
+        {
+          "field_name": "query_context.queries[*].metrics",
+          "reason": "这是标准 query builder 从 root form_data.metric 编译出来的结果，不是额外 root form_data 字段。"
+        }
+      ],
+      "runtime_aliases": [
+        {
+          "field_name": "sourceCategory / targetCategory / colorScheme / showLegend / rowLimit",
+          "reason": "这些是运行时 camelCase 别名，不是全部 API root form_data 的 canonical 键名。"
+        }
+      ],
+      "viz_switch_only": [
+        {
+          "field_name": "formDataOverrides(metric remap)",
+          "reason": "只在 standardized controls 切换图表时触发，不是常规创建 Graph Chart 时必须手工传入的 root 字段。"
+        }
+      ]
+    },
+    "api_usage_guidance": {
+      "high_confidence_required_fields": [
+        "datasource",
+        "viz_type",
+        "source",
+        "target",
+        "metric"
+      ],
+      "recommended_always_set": [
+        "adhoc_filters",
+        "row_limit",
+        "layout",
+        "edgeSymbol",
+        "roam"
+      ],
+      "mixed_case_examples": [
+        "source",
+        "target",
+        "source_category",
+        "target_category",
+        "color_scheme",
+        "show_legend",
+        "edgeSymbol",
+        "selectedMode",
+        "showSymbolThreshold",
+        "baseNodeSize"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "graph_chart",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/graph_chart-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/graph_chart-form-data-schema.json",
+      "control-schema": "form-data-schema/graph_chart-schema.json"
+    }
+  }
+}

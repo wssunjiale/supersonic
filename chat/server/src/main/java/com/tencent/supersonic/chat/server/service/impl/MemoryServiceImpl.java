@@ -6,6 +6,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.tencent.supersonic.chat.api.pojo.enums.MemoryReviewResult;
 import com.tencent.supersonic.chat.api.pojo.enums.MemoryStatus;
+import com.tencent.supersonic.chat.api.pojo.request.ChatMemoryDeleteReq;
 import com.tencent.supersonic.chat.api.pojo.request.ChatMemoryFilter;
 import com.tencent.supersonic.chat.api.pojo.request.ChatMemoryUpdateReq;
 import com.tencent.supersonic.chat.api.pojo.request.PageMemoryReq;
@@ -18,19 +19,23 @@ import com.tencent.supersonic.common.config.EmbeddingConfig;
 import com.tencent.supersonic.common.pojo.Text2SQLExemplar;
 import com.tencent.supersonic.common.pojo.User;
 import com.tencent.supersonic.common.service.ExemplarService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
-public class MemoryServiceImpl implements MemoryService {
+@Slf4j
+public class MemoryServiceImpl implements MemoryService, CommandLineRunner {
 
     @Autowired
     private ChatMemoryRepository chatMemoryRepository;
@@ -61,12 +66,17 @@ public class MemoryServiceImpl implements MemoryService {
         ChatMemoryDO chatMemoryDO = chatMemoryRepository.getMemory(chatMemoryUpdateReq.getId());
         boolean hadEnabled =
                 MemoryStatus.ENABLED.toString().equals(chatMemoryDO.getStatus().trim());
-        if (MemoryStatus.ENABLED.equals(chatMemoryUpdateReq.getStatus()) && !hadEnabled) {
+
+        if (MemoryStatus.ENABLED.equals(chatMemoryUpdateReq.getStatus())) {
+            // Update the latest SQL/Schema to vector DB once memory is enabled
+            chatMemoryDO.setS2sql(chatMemoryUpdateReq.getS2sql());
+            chatMemoryDO.setDbSchema(chatMemoryUpdateReq.getDbSchema());
             enableMemory(chatMemoryDO);
-        } else if (MemoryStatus.DISABLED.equals(chatMemoryUpdateReq.getStatus()) && hadEnabled) {
+        } else if ((MemoryStatus.DISABLED.equals(chatMemoryUpdateReq.getStatus())
+                || MemoryStatus.PENDING.equals(chatMemoryUpdateReq.getStatus())) && hadEnabled) {
+            // Remove from vector DB when transitioning: launched→disabled OR enabled→pending
             disableMemory(chatMemoryDO);
         }
-
         LambdaUpdateWrapper<ChatMemoryDO> updateWrapper = new LambdaUpdateWrapper<>();
         updateWrapper.eq(ChatMemoryDO::getId, chatMemoryDO.getId());
         if (Objects.nonNull(chatMemoryUpdateReq.getStatus())) {
@@ -87,6 +97,12 @@ public class MemoryServiceImpl implements MemoryService {
             updateWrapper.set(ChatMemoryDO::getHumanReviewCmt,
                     chatMemoryUpdateReq.getHumanReviewCmt());
         }
+        if (Objects.nonNull(chatMemoryUpdateReq.getDbSchema())) {
+            updateWrapper.set(ChatMemoryDO::getDbSchema, chatMemoryUpdateReq.getDbSchema());
+        }
+        if (Objects.nonNull(chatMemoryUpdateReq.getS2sql())) {
+            updateWrapper.set(ChatMemoryDO::getS2sql, chatMemoryUpdateReq.getS2sql());
+        }
         updateWrapper.set(ChatMemoryDO::getUpdatedAt, new Date());
         updateWrapper.set(ChatMemoryDO::getUpdatedBy, user.getName());
 
@@ -94,7 +110,22 @@ public class MemoryServiceImpl implements MemoryService {
     }
 
     @Override
-    public void batchDelete(List<Long> ids) {
+    public void batchDelete(ChatMemoryDeleteReq chatMemoryDeleteReq, User user) {
+        QueryWrapper<ChatMemoryDO> queryWrapper = new QueryWrapper<>();
+        if (!CollectionUtils.isEmpty(chatMemoryDeleteReq.getIds())) {
+            queryWrapper.lambda().in(ChatMemoryDO::getId, chatMemoryDeleteReq.getIds());
+        }
+        if (chatMemoryDeleteReq.getAgentId() != null) {
+            queryWrapper.lambda().eq(ChatMemoryDO::getAgentId, chatMemoryDeleteReq.getAgentId());
+        }
+        List<ChatMemoryDO> chatMemoryDOS = chatMemoryRepository.getMemories(queryWrapper);
+        List<Long> ids = new ArrayList<>();
+        chatMemoryDOS.forEach(chatMemoryDO -> {
+            if (MemoryStatus.ENABLED.toString().equals(chatMemoryDO.getStatus().trim())) {
+                disableMemory(chatMemoryDO);
+            }
+            ids.add(chatMemoryDO.getId());
+        });
         chatMemoryRepository.batchDelete(ids);
     }
 
@@ -187,4 +218,25 @@ public class MemoryServiceImpl implements MemoryService {
         return memory;
     }
 
+    @Override
+    public void run(String... args) { // 优化，启动时检查，向量数据，将记忆放到向量数据库
+        loadSysExemplars();
+    }
+
+    public void loadSysExemplars() {
+        try {
+            List<ChatMemory> memories = this
+                    .getMemories(ChatMemoryFilter.builder().status(MemoryStatus.ENABLED).build());
+            for (ChatMemory memory : memories) {
+                exemplarService.storeExemplar(
+                        embeddingConfig.getMemoryCollectionName(memory.getAgentId()),
+                        Text2SQLExemplar.builder().question(memory.getQuestion())
+                                .sideInfo(memory.getSideInfo()).dbSchema(memory.getDbSchema())
+                                .sql(memory.getS2sql()).build());
+            }
+
+        } catch (Exception e) {
+            log.error("Failed to load system exemplars", e);
+        }
+    }
 }

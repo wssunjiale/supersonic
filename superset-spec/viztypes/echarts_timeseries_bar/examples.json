@@ -1,0 +1,594 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "echarts_timeseries_bar",
+  "display_name": "Bar Chart",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      [
+        {
+          "clause": "WHERE",
+          "subject": "order_date",
+          "operator": "TEMPORAL_RANGE",
+          "comparator": "No filter",
+          "expressionType": "SIMPLE"
+        }
+      ]
+    ],
+    "annotation_layers": [
+      []
+    ],
+    "color_scheme": [
+      "supersetColors"
+    ],
+    "comparison_type": [
+      "values"
+    ],
+    "contributionMode": [
+      "column"
+    ],
+    "currency_format": [
+      {
+        "symbol": "$",
+        "symbolPosition": "prefix"
+      }
+    ],
+    "forecastEnabled": [
+      false
+    ],
+    "forecastInterval": [
+      0.8
+    ],
+    "forecastPeriods": [
+      10
+    ],
+    "forecastSeasonalityDaily": [
+      false
+    ],
+    "forecastSeasonalityWeekly": [
+      true
+    ],
+    "forecastSeasonalityYearly": [
+      true
+    ],
+    "group_others_when_limit_reached": [
+      false
+    ],
+    "groupby": [
+      [
+        "region"
+      ]
+    ],
+    "legendMargin": [
+      12
+    ],
+    "legendOrientation": [
+      "top"
+    ],
+    "legendType": [
+      "scroll"
+    ],
+    "limit": [
+      10
+    ],
+    "logAxis": [
+      false
+    ],
+    "metrics": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        }
+      ]
+    ],
+    "min_periods": [
+      7
+    ],
+    "minorSplitLine": [
+      false
+    ],
+    "minorTicks": [
+      false
+    ],
+    "only_total": [
+      true
+    ],
+    "order_desc": [
+      true
+    ],
+    "orientation": [
+      "vertical"
+    ],
+    "percentage_threshold": [
+      5
+    ],
+    "resample_method": [
+      "asfreq"
+    ],
+    "resample_rule": [
+      "1D"
+    ],
+    "rich_tooltip": [
+      true
+    ],
+    "rolling_periods": [
+      7
+    ],
+    "rolling_type": [
+      "mean"
+    ],
+    "row_limit": [
+      10000
+    ],
+    "showTooltipPercentage": [
+      false
+    ],
+    "showTooltipTotal": [
+      true
+    ],
+    "show_empty_columns": [
+      true
+    ],
+    "show_extra_controls": [
+      false
+    ],
+    "show_legend": [
+      true
+    ],
+    "show_value": [
+      false
+    ],
+    "sort_series_ascending": [
+      false
+    ],
+    "sort_series_type": [
+      "sum"
+    ],
+    "stack": [
+      "Stack"
+    ],
+    "stackDimension": [
+      "region"
+    ],
+    "time_compare": [
+      [
+        "1 year ago"
+      ]
+    ],
+    "time_grain_sqla": [
+      "P1D"
+    ],
+    "time_shift_color": [
+      true
+    ],
+    "timeseries_limit_metric": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "sales"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(sales)"
+      }
+    ],
+    "tooltipSortByMetric": [
+      false
+    ],
+    "tooltipTimeFormat": [
+      "smart_date"
+    ],
+    "truncateXAxis": [
+      true
+    ],
+    "truncateYAxis": [
+      false
+    ],
+    "truncate_metric": [
+      true
+    ],
+    "xAxisBounds": [
+      [
+        0,
+        100
+      ]
+    ],
+    "xAxisForceCategorical": [
+      false
+    ],
+    "xAxisLabelInterval": [
+      "auto"
+    ],
+    "xAxisLabelRotation": [
+      0
+    ],
+    "x_axis": [
+      "order_date"
+    ],
+    "x_axis_sort": [
+      "SUM(sales)"
+    ],
+    "x_axis_sort_asc": [
+      true
+    ],
+    "x_axis_time_format": [
+      "smart_date"
+    ],
+    "x_axis_title": [
+      "Order Date"
+    ],
+    "x_axis_title_margin": [
+      15
+    ],
+    "y_axis_bounds": [
+      [
+        null,
+        null
+      ]
+    ],
+    "y_axis_format": [
+      "SMART_NUMBER"
+    ],
+    "y_axis_title": [
+      "Sales"
+    ],
+    "y_axis_title_margin": [
+      30
+    ],
+    "y_axis_title_position": [
+      "Left"
+    ],
+    "zoomable": [
+      false
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "echarts_timeseries_bar",
+      "time_range": "No filter",
+      "x_axis": "<time_column_or_dimension>",
+      "metrics": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        }
+      ],
+      "groupby": [],
+      "adhoc_filters": [],
+      "row_limit": 10000,
+      "order_desc": true
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "echarts_timeseries_bar",
+      "time_range": "No filter",
+      "x_axis": "<time_column_or_dimension>",
+      "time_grain_sqla": "P1D",
+      "xAxisForceCategorical": false,
+      "x_axis_sort": null,
+      "x_axis_sort_asc": true,
+      "metrics": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        }
+      ],
+      "groupby": [],
+      "contributionMode": null,
+      "adhoc_filters": [],
+      "limit": null,
+      "group_others_when_limit_reached": false,
+      "timeseries_limit_metric": null,
+      "order_desc": true,
+      "row_limit": 10000,
+      "truncate_metric": true,
+      "show_empty_columns": true,
+      "rolling_type": null,
+      "rolling_periods": null,
+      "min_periods": null,
+      "time_compare": null,
+      "comparison_type": "values",
+      "resample_rule": null,
+      "resample_method": null,
+      "annotation_layers": [],
+      "forecastEnabled": false,
+      "forecastPeriods": 10,
+      "forecastInterval": 0.8,
+      "forecastSeasonalityYearly": null,
+      "forecastSeasonalityWeekly": null,
+      "forecastSeasonalityDaily": null,
+      "orientation": "vertical",
+      "x_axis_title": "",
+      "x_axis_title_margin": 15,
+      "y_axis_title": "",
+      "y_axis_title_margin": 30,
+      "y_axis_title_position": "Left",
+      "sort_series_type": "sum",
+      "sort_series_ascending": false,
+      "color_scheme": "<categoricalSchemeRegistry.defaultKey>",
+      "time_shift_color": true,
+      "show_value": false,
+      "stack": null,
+      "only_total": true,
+      "percentage_threshold": 0,
+      "stackDimension": null,
+      "show_extra_controls": false,
+      "minorTicks": false,
+      "zoomable": false,
+      "show_legend": true,
+      "legendType": "scroll",
+      "legendOrientation": "top",
+      "legendMargin": null,
+      "x_axis_time_format": "smart_date",
+      "xAxisLabelRotation": 0,
+      "xAxisLabelInterval": "auto",
+      "truncateXAxis": true,
+      "xAxisBounds": null,
+      "rich_tooltip": true,
+      "showTooltipTotal": true,
+      "showTooltipPercentage": false,
+      "tooltipSortByMetric": false,
+      "tooltipTimeFormat": "smart_date",
+      "y_axis_format": "SMART_NUMBER",
+      "currency_format": null,
+      "logAxis": false,
+      "minorSplitLine": false,
+      "truncateYAxis": false,
+      "y_axis_bounds": [
+        null,
+        null
+      ]
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "echarts_timeseries_bar",
+      "x_axis": "<copied_from_saved_chart>",
+      "metrics": "<copied_from_saved_chart>",
+      "groupby": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "timeseries_limit_metric": "<copied_from_saved_chart>",
+      "order_desc": "<copied_from_saved_chart>",
+      "row_limit": "<copied_from_saved_chart>",
+      "orientation": "<copied_from_saved_chart>",
+      "stack": "<copied_from_saved_chart>",
+      "stackDimension": "<copied_from_saved_chart>",
+      "show_value": "<copied_from_saved_chart>",
+      "show_legend": "<copied_from_saved_chart>",
+      "extra_form_data": {
+        "time_range": "Last 7 days",
+        "time_grain_sqla": "P1D",
+        "filters": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_bar": true,
+        "recommended": true,
+        "sample_data": "Last 7 days",
+        "effect": "覆盖保存态图表的时间范围。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_bar": true,
+        "recommended": true,
+        "sample_data": "P1D",
+        "effect": "覆盖时间粒度。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_bar": true,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "覆盖时间列；对时序柱图属于高影响字段，仅在你明确知道保存态图表就是同一时间列语义时使用。",
+        "source": "superset/constants.py + frontend QueryFormData.ts"
+      },
+      {
+        "field_name": "granularity",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_bar": false,
+        "recommended": false,
+        "sample_data": "__time",
+        "effect": "通用 SQL 时间列覆盖键；Bar Chart 常规场景通常不需要手动传。",
+        "source": "superset/constants.py"
+      },
+      {
+        "field_name": "time_column",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_bar": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "后端 QueryObject 允许的时间列覆盖键；Bar Chart 常规场景通常优先使用保存态 x_axis 与 granularity_sqla。",
+        "source": "superset/constants.py + frontend QueryFormData.ts"
+      },
+      {
+        "field_name": "time_grain",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_bar": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "底层 QueryObject 的时间粒度键，通常不必与 time_grain_sqla 同时手工传。",
+        "source": "superset/constants.py + frontend QueryFormData.ts"
+      },
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_bar": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters；后端会转成额外过滤条件。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_bar": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会标记为 isExtra 并并入查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_bar": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "可传非标准附加数据；Bar Chart 默认 buildQuery/transformProps 不直接消费它。",
+        "source": "superset/constants.py + frontend QueryFormData.ts"
+      },
+      {
+        "field_name": "relative_start",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_bar": true,
+        "recommended": false,
+        "sample_data": "now",
+        "effect": "进入 query.extras.relative_start。后端 schema 对取值做了约束，示例为 `today` / `now`。",
+        "source": "superset/charts/schemas.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "relative_end",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_bar": true,
+        "recommended": false,
+        "sample_data": "today",
+        "effect": "进入 query.extras.relative_end。后端 schema 对取值做了约束，示例为 `today` / `now`。",
+        "source": "superset/charts/schemas.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_bar": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用 ExtraFormData 字段。Bar Chart 的 Timeseries/buildQuery.ts 不直接消费它，通常没有实际效果。",
+        "source": "frontend QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_bar": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用交互字段；Bar Chart 默认不直接消费。",
+        "source": "frontend QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_bar": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用交互字段；Bar Chart 默认不直接消费。",
+        "source": "frontend QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "time_compare",
+        "data_type": "string | array[string]",
+        "behavior": "override",
+        "safe_for_bar": false,
+        "recommended": false,
+        "sample_data": [
+          "1 year ago"
+        ],
+        "effect": "frontend 类型声明存在，但 Superset 6.0.0 后端 constants.py 的 extra_form_data merge whitelist 未将其列为高置信 override。guest embedding 下容易出现前后端行为不一致。",
+        "source": "frontend QueryFormData.ts + query/constants.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "echarts_timeseries_bar",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/echarts_timeseries_bar-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/echarts_timeseries_bar-form-data-schema.json",
+      "control-schema": "form-data-schema/echarts_timeseries_bar-schema.json"
+    }
+  }
+}

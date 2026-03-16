@@ -1,0 +1,484 @@
+{
+  "viz_type": "big_number",
+  "display_name": "Big Number with Trendline",
+  "purpose": "用于调用 API 创建或保存 Big Number with Trendline 时填写的 form_data 模板",
+  "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/big_number-schema.json",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/BigNumberWithTrendline/controlPanel.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/BigNumberWithTrendline/index.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/BigNumberWithTrendline/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/BigNumberWithTrendline/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/BigNumberWithTrendline/buildQuery.test.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/BigNumberWithTrendline/transformProps.test.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/BigNumberViz.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/sharedControls.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/types.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/utils.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/mixins.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/customControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/getXAxis.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/models/ChartProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/store.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getControlState.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/reducers/exploreReducer.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/components/ExploreViewContainer/index.jsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/components/Chart/chartAction.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/standardizedFormData.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryObject.ts"
+  ],
+  "notes": [
+    "API form_data 的键名必须保留源码中的原始 control name。big_number 这组字段主要是 snake_case。",
+    "Explore 导出 form_data 时走 getFormDataFromControls()，它按 controlName 原样取值，不会把 x_axis、show_trend_line 之类的键名改写。",
+    "transformProps 中看到的 camelCase formData 来自 ChartProps.convertKeysToCamelCase(formData)，是运行时形态，不是构造 API form_data 的主依据。",
+    "big_number 的正式时间轴字段是 x_axis，不是 granularity_sqla。后者只在 getXAxisColumn() 的兼容分支和 BigNumberViz.tsx 的 drill-to-detail 运行时读取里出现，不应作为创建模板的主字段。",
+    "buildQuery.ts 只在 aggregation='raw' 时追加第 2 个 query；其它 aggregation 都只发 1 个 query，并在 transformProps.ts 中用 aggregationChoices 做客户端聚合。",
+    "compare_lag / compare_suffix 控制的是运行时比较摘要；当前控制面板没有持久化的 subheader 文本字段。subheader 只会作为 legacy 字段被 transformProps.ts 回退读取。",
+    "time filtering 在这个图表里通常通过 adhoc_filters 中的 TEMPORAL_RANGE 表达；time_range 只是 QueryFormData/仪表盘上下文中的通用字段，不是当前 controlPanel 暴露出的独立控件。"
+  ],
+  "naming_and_pipeline": {
+    "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写成 form_data[name]",
+    "api_form_data_to_query_context": "BigNumberWithTrendline/buildQuery.ts 基于 form_data 构造趋势线 query；只有 aggregation='raw' 时额外生成 1 个 big number 聚合 query",
+    "api_form_data_to_runtime_form_data": "ChartProps.ts 会把 form_data 转成 camelCase 的 runtime formData，同时保留 rawFormData"
+  },
+  "global_required_fields": {
+    "datasource": {
+      "data_type": "string",
+      "required": true,
+      "sample_data": "<dataset_id>__table",
+      "source": "datasourceAndVizType section"
+    },
+    "viz_type": {
+      "data_type": "string",
+      "required": true,
+      "fixed_value": "big_number",
+      "source": "datasourceAndVizType section"
+    },
+    "x_axis": {
+      "data_type": "string | object",
+      "required": true,
+      "sample_data": "<temporal_column>",
+      "source": "BigNumberWithTrendline Query section"
+    },
+    "metric": {
+      "data_type": "string | object",
+      "required": true,
+      "sample_data": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "source": "BigNumberWithTrendline Query section"
+    }
+  },
+  "global_optional_fields": {
+    "time_grain_sqla": {
+      "data_type": "string | null",
+      "required": false,
+      "sample_data": "P1D",
+      "source": "BigNumberWithTrendline Query section"
+    },
+    "aggregation": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "LAST_VALUE",
+      "source": "BigNumberWithTrendline Query section"
+    },
+    "adhoc_filters": {
+      "data_type": "array[object]",
+      "required": false,
+      "sample_data": [],
+      "source": "BigNumberWithTrendline Query section"
+    },
+    "compare_lag": {
+      "data_type": "integer | string | null",
+      "required": false,
+      "sample_data": 1,
+      "source": "BigNumberWithTrendline Options section"
+    },
+    "compare_suffix": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "WoW",
+      "source": "BigNumberWithTrendline Options section"
+    },
+    "show_timestamp": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": false,
+      "source": "BigNumberWithTrendline Options section"
+    },
+    "show_trend_line": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": true,
+      "source": "BigNumberWithTrendline Options section"
+    },
+    "start_y_axis_at_zero": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": true,
+      "source": "BigNumberWithTrendline Options section"
+    },
+    "time_range_fixed": {
+      "data_type": "boolean | null",
+      "required": false,
+      "sample_data": true,
+      "source": "BigNumberWithTrendline Options section",
+      "notes": "源码未声明显式 default；通常按需传。"
+    },
+    "color_picker": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      },
+      "source": "BigNumberWithTrendline Chart Options section"
+    },
+    "header_font_size": {
+      "data_type": "number",
+      "required": false,
+      "sample_data": 0.4,
+      "source": "BigNumberWithTrendline Chart Options section"
+    },
+    "subheader_font_size": {
+      "data_type": "number",
+      "required": false,
+      "sample_data": 0.15,
+      "source": "BigNumberWithTrendline Chart Options section"
+    },
+    "subtitle": {
+      "data_type": "string | null",
+      "required": false,
+      "sample_data": "Total Sales",
+      "source": "BigNumberWithTrendline Chart Options section"
+    },
+    "subtitle_font_size": {
+      "data_type": "number",
+      "required": false,
+      "sample_data": 0.15,
+      "source": "BigNumberWithTrendline Chart Options section"
+    },
+    "show_metric_name": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": false,
+      "source": "BigNumberWithTrendline Chart Options section"
+    },
+    "metric_name_font_size": {
+      "data_type": "number",
+      "required": false,
+      "sample_data": 0.15,
+      "source": "BigNumberWithTrendline Chart Options section"
+    },
+    "y_axis_format": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "SMART_NUMBER",
+      "source": "BigNumberWithTrendline Chart Options section"
+    },
+    "currency_format": {
+      "data_type": "string | object | null",
+      "required": false,
+      "sample_data": {
+        "symbol": "$",
+        "symbolPosition": "prefix"
+      },
+      "source": "BigNumberWithTrendline Chart Options section"
+    },
+    "time_format": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "smart_date",
+      "source": "BigNumberWithTrendline Chart Options section"
+    },
+    "force_timestamp_formatting": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": false,
+      "source": "BigNumberWithTrendline Chart Options section"
+    },
+    "rolling_type": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "None",
+      "source": "BigNumberWithTrendline Advanced Analytics section"
+    },
+    "rolling_periods": {
+      "data_type": "integer | string | null",
+      "required": false,
+      "sample_data": 7,
+      "source": "BigNumberWithTrendline Advanced Analytics section"
+    },
+    "min_periods": {
+      "data_type": "integer | string | null",
+      "required": false,
+      "sample_data": 7,
+      "source": "BigNumberWithTrendline Advanced Analytics section"
+    },
+    "resample_rule": {
+      "data_type": "string | null",
+      "required": false,
+      "sample_data": "1D",
+      "source": "BigNumberWithTrendline Advanced Analytics section"
+    },
+    "resample_method": {
+      "data_type": "string | null",
+      "required": false,
+      "sample_data": "ffill",
+      "source": "BigNumberWithTrendline Advanced Analytics section"
+    },
+    "slice_id": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 0,
+      "source": "datasourceAndVizType hidden control",
+      "notes": "新建图表时通常省略；编辑已存在图表时由服务端或上层调用方提供。"
+    },
+    "cache_timeout": {
+      "data_type": "integer | null",
+      "required": false,
+      "sample_data": null,
+      "source": "datasourceAndVizType hidden control"
+    },
+    "url_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "datasourceAndVizType hidden control"
+    },
+    "custom_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "datasourceAndVizType hidden control"
+    },
+    "time_range": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "No filter",
+      "source": "generic QueryFormData / dashboard context",
+      "notes": "当前图表没有独立 time_range 控件；通常优先在 adhoc_filters 或 extra_form_data 中表达时间筛选。只有当你需要 time_range_fixed 的 UI 行为或显式 dashboard context 时才会见到它。"
+    }
+  },
+  "minimal_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "big_number",
+    "x_axis": "<temporal_column>",
+    "metric": {
+      "expressionType": "SIMPLE",
+      "column": {
+        "column_name": "<metric_column>"
+      },
+      "aggregate": "SUM",
+      "label": "SUM(<metric_column>)"
+    },
+    "adhoc_filters": []
+  },
+  "recommended_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "big_number",
+    "x_axis": "<temporal_column>",
+    "time_grain_sqla": "P1D",
+    "aggregation": "LAST_VALUE",
+    "metric": {
+      "expressionType": "SIMPLE",
+      "column": {
+        "column_name": "<metric_column>"
+      },
+      "aggregate": "SUM",
+      "label": "SUM(<metric_column>)"
+    },
+    "adhoc_filters": [],
+    "color_picker": {
+      "r": 0,
+      "g": 122,
+      "b": 135,
+      "a": 1
+    },
+    "show_timestamp": false,
+    "show_trend_line": true,
+    "start_y_axis_at_zero": true,
+    "header_font_size": 0.4,
+    "subheader_font_size": 0.15,
+    "subtitle": null,
+    "subtitle_font_size": 0.15,
+    "show_metric_name": false,
+    "metric_name_font_size": 0.15,
+    "y_axis_format": "SMART_NUMBER",
+    "currency_format": null,
+    "time_format": "smart_date",
+    "force_timestamp_formatting": false,
+    "rolling_type": "None",
+    "rolling_periods": null,
+    "min_periods": null,
+    "resample_rule": null,
+    "resample_method": null
+  },
+  "conditional_blocks": {
+    "temporal_filter_in_adhoc_filters": {
+      "condition": "需要按时间范围过滤趋势线和大数字时",
+      "fields": {
+        "adhoc_filters": [
+          {
+            "clause": "WHERE",
+            "subject": "<temporal_column>",
+            "operator": "TEMPORAL_RANGE",
+            "comparator": "Last 30 days",
+            "expressionType": "SIMPLE"
+          }
+        ]
+      }
+    },
+    "overall_value_across_full_range": {
+      "condition": "需要展示整个筛选时间段上的总体值，而不是最后一个点时",
+      "fields": {
+        "aggregation": "raw"
+      }
+    },
+    "comparison_summary": {
+      "condition": "需要显示相对前一周期/前 N 周期的百分比摘要时",
+      "fields": {
+        "compare_lag": 1,
+        "compare_suffix": "WoW"
+      }
+    },
+    "show_timestamp": {
+      "condition": "需要在大数字上方显示当前值对应的时间戳时",
+      "fields": {
+        "show_timestamp": true
+      }
+    },
+    "fix_trendline_to_time_range": {
+      "condition": "需要把趋势线补齐到完整时间范围边界时",
+      "fields": {
+        "time_range": "Last 30 days",
+        "time_range_fixed": true
+      }
+    },
+    "show_metric_name": {
+      "condition": "需要在大数字上方显示指标名时",
+      "fields": {
+        "show_metric_name": true,
+        "metric_name_font_size": 0.15
+      }
+    },
+    "subtitle": {
+      "condition": "需要在大数字下方显示补充说明时",
+      "fields": {
+        "subtitle": "Total Sales",
+        "subtitle_font_size": 0.15
+      }
+    },
+    "format_as_date": {
+      "condition": "查询结果不是时间列类型，但仍希望按日期格式渲染时",
+      "fields": {
+        "time_format": "smart_date",
+        "force_timestamp_formatting": true
+      }
+    },
+    "rolling_window": {
+      "condition": "需要先对时间序列做滚动窗口再得出 big number 时",
+      "fields": {
+        "rolling_type": "mean",
+        "rolling_periods": 7,
+        "min_periods": 7
+      }
+    },
+    "resample": {
+      "condition": "需要先对时间序列按固定频率重采样时",
+      "fields": {
+        "resample_rule": "1D",
+        "resample_method": "ffill"
+      }
+    }
+  },
+  "runtime_only_or_non_template_fields": {
+    "legacy_accepted_by_transform_props": [
+      {
+        "field_name": "subheader",
+        "reason": "transformProps.ts 会在 compare_lag 没有生成比较摘要时回退读取 legacy 的 subheader，但当前 controlPanel 已不再暴露该字段。"
+      }
+    ],
+    "runtime_derived_fields": [
+      {
+        "field_name": "subheader",
+        "reason": "运行时优先由 compare_lag + compare_suffix 计算百分比摘要，不是当前推荐的 API 创建字段。"
+      },
+      {
+        "field_name": "bigNumber",
+        "reason": "运行时由查询结果计算得出，不是 form_data 字段。"
+      },
+      {
+        "field_name": "bigNumberFallback",
+        "reason": "运行时在当前值为空时回退到最近一个非空点，不是 form_data 字段。"
+      },
+      {
+        "field_name": "timestamp",
+        "reason": "运行时从排序后的时间序列里推导，不是 form_data 字段。"
+      },
+      {
+        "field_name": "trendLineData",
+        "reason": "运行时从 queriesData 组织出来的 ECharts 序列，不是 form_data 字段。"
+      },
+      {
+        "field_name": "echartOptions",
+        "reason": "运行时由 transformProps.ts 生成，不是 form_data 字段。"
+      },
+      {
+        "field_name": "metricName",
+        "reason": "运行时通过 getOriginalLabel(metric, datasource.metrics) 推导，用于显示友好指标名。"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "reason": "BigNumberViz.tsx 的右键钻取事件读取 runtime formData.granularitySqla，但当前 controlPanel 的正式查询字段是 x_axis；新建图表模板不应把 granularity_sqla 当作主字段。"
+      }
+    ],
+    "viz_switch_only": [
+      {
+        "field_name": "formDataOverrides(metric remap)",
+        "reason": "只在 standardizedFormData.transform() 切换 viz_type 时触发，不是常规导出 Big Number with Trendline form_data 的必经步骤。"
+      }
+    ]
+  },
+  "api_usage_guidance": {
+    "high_confidence_required_fields": [
+      "datasource",
+      "viz_type",
+      "x_axis",
+      "metric"
+    ],
+    "recommended_always_set": [
+      "time_grain_sqla",
+      "aggregation",
+      "adhoc_filters",
+      "show_trend_line",
+      "y_axis_format",
+      "time_format"
+    ],
+    "api_field_examples": [
+      "x_axis",
+      "metric",
+      "aggregation",
+      "compare_lag",
+      "show_trend_line",
+      "rolling_type",
+      "resample_rule"
+    ],
+    "avoid_confusion": [
+      "不要把 big_number 的 metric 写成 metrics 数组。",
+      "不要把 granularity_sqla 当作当前图表创建时的主时间轴字段；controlPanel 的正式字段是 x_axis。",
+      "不要优先传 runtime 生成的 subheader；如需比较摘要，应使用 compare_lag / compare_suffix。",
+      "time_range_fixed 只有在 show_trend_line 有意义且存在时间范围上下文时才真正生效。",
+      "如果你需要整个筛选区间的总体值，请把 aggregation 设为 raw，而不是假定 LAST_VALUE 会替你做整段聚合。"
+    ]
+  }
+}

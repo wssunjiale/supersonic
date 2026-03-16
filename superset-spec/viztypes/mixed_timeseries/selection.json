@@ -1,0 +1,730 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "mixed_timeseries",
+  "display_name": "Mixed Chart",
+  "selection_summary": {
+    "category": "timeseries",
+    "tags": [
+      "timeseries",
+      "mixed",
+      "multi_type",
+      "comparison"
+    ],
+    "description_zh": "Mixed Timeseries Chart combines multiple chart types (line, area, bar) in a single time-series visualization, ideal for multi-metric comparison with different display types.",
+    "visual_shape_zh": "混合时间序列（折线/面积/柱状）",
+    "use_cases_zh": [
+      "多指标混合类型展示（如折线+柱状、面积+折线）",
+      "不同量级指标对比（如绝对值+百分比）",
+      "复杂时间序列的分层展示"
+    ],
+    "required_slots": [
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "Query A",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+          "聚合指标列表（可多个），用于绘制多系列混合类型对比。"
+        ]
+      },
+      {
+        "field_name": "metrics_b",
+        "required": true,
+        "slot_kind": "secondary_metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<secondary_metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<secondary_metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "Query B"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+        ]
+      },
+      {
+        "field_name": "x_axis",
+        "required": true,
+        "slot_kind": "x_axis",
+        "accepted_dataset_roles": [
+          "time_dimension",
+          "dimension"
+        ],
+        "cardinality": "1",
+        "placeholder": "<x_axis_column>",
+        "source_categories": [
+          "Shared Query Fields"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Dimension to use on x-axis."
+        ]
+      }
+    ],
+    "optional_slots": [
+      {
+        "field_name": "adhoc_filters",
+        "required": false,
+        "slot_kind": "filter_list",
+        "accepted_dataset_roles": [
+          "filter_context"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [],
+        "source_categories": [
+          "Query A"
+        ],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "源码未提供额外描述；字段标签为 Filters。"
+        ]
+      },
+      {
+        "field_name": "adhoc_filters_b",
+        "required": false,
+        "slot_kind": "filter_list",
+        "accepted_dataset_roles": [
+          "filter_context"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [],
+        "source_categories": [
+          "Query B"
+        ],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "源码未提供额外描述；字段标签为 Filters。"
+        ]
+      },
+      {
+        "field_name": "groupby",
+        "required": false,
+        "slot_kind": "dimension_list",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [
+          "<dimension_column>"
+        ],
+        "source_categories": [
+          "Query A",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Dimensions contain qualitative values such as names, dates, or geographical data. Use dimensions to categorize, segment, and reveal the details in your data. Dimensions affect the level of detail in the view.",
+          "维度字段列表（通常为时间维度），用于分组/系列/分类轴。"
+        ]
+      },
+      {
+        "field_name": "groupby_b",
+        "required": false,
+        "slot_kind": "dimension",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "0..n",
+        "placeholder": "<dimension_column_or_list>",
+        "source_categories": [
+          "Query B"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Dimensions contain qualitative values such as names, dates, or geographical data. Use dimensions to categorize, segment, and reveal the details in your data. Dimensions affect the level of detail in the view."
+        ]
+      },
+      {
+        "field_name": "time_compare_b",
+        "required": false,
+        "slot_kind": "time_or_axis",
+        "accepted_dataset_roles": [
+          "time_dimension",
+          "dimension"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<time_or_axis_column>",
+        "source_categories": [
+          "Advanced analytics Query B"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Overlay one or more timeseries from a relative time period. Expects relative time deltas in natural language. Free text is supported."
+        ]
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "required": false,
+        "slot_kind": "time_grain",
+        "accepted_dataset_roles": [
+          "time_grain"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "P1D",
+        "source_categories": [
+          "Shared Query Fields"
+        ],
+        "embedding_modes": [
+          "extra_form_data.override"
+        ],
+        "descriptions": [
+          "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart."
+        ]
+      },
+      {
+        "field_name": "timeseries_limit_metric_b",
+        "required": false,
+        "slot_kind": "metric",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "0..n",
+        "placeholder": "<metric_or_metric_list>",
+        "source_categories": [
+          "Query B"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Orders the query result that generates the source data for this chart. If a series or row limit is reached, this determines what data are truncated. If undefined, defaults to the first metric (where appropriate)."
+        ]
+      },
+      {
+        "field_name": "yAxisIndex",
+        "required": false,
+        "slot_kind": "time_or_axis",
+        "accepted_dataset_roles": [
+          "time_dimension",
+          "dimension"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<time_or_axis_column>",
+        "source_categories": [
+          "Chart Options / Query A"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Primary or secondary y-axis"
+        ]
+      },
+      {
+        "field_name": "yAxisIndexB",
+        "required": false,
+        "slot_kind": "time_or_axis",
+        "accepted_dataset_roles": [
+          "time_dimension",
+          "dimension"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<time_or_axis_column>",
+        "source_categories": [
+          "Chart Options / Query B"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Primary or secondary y-axis"
+        ]
+      },
+      {
+        "field_name": "series_type",
+        "required": false,
+        "slot_kind": "dimension",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "0..n",
+        "placeholder": "<dimension_column_or_list>",
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "系列类型映射（如 {metric1: 'line', metric2: 'bar'}），用于指定每个指标的展示类型。"
+        ]
+      }
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "dimension",
+      "metric",
+      "saved_metric",
+      "time_dimension"
+    ],
+    "optional_dataset_roles": [
+      "adhoc_metric",
+      "category_dimension",
+      "dimension",
+      "filter_context",
+      "metric",
+      "saved_metric",
+      "time_dimension",
+      "time_grain"
+    ],
+    "dataset_role_inventory": {
+      "adhoc_metric": [
+        "metrics",
+        "metrics_b",
+        "timeseries_limit_metric_b"
+      ],
+      "category_dimension": [
+        "groupby",
+        "groupby_b",
+        "series_type"
+      ],
+      "dimension": [
+        "groupby",
+        "groupby_b",
+        "series_type",
+        "time_compare_b",
+        "x_axis",
+        "yAxisIndex",
+        "yAxisIndexB"
+      ],
+      "filter_context": [
+        "adhoc_filters",
+        "adhoc_filters_b"
+      ],
+      "metric": [
+        "metrics",
+        "metrics_b",
+        "timeseries_limit_metric_b"
+      ],
+      "saved_metric": [
+        "metrics",
+        "metrics_b",
+        "timeseries_limit_metric_b"
+      ],
+      "time_dimension": [
+        "time_compare_b",
+        "x_axis",
+        "yAxisIndex",
+        "yAxisIndexB"
+      ],
+      "time_grain": [
+        "time_grain_sqla"
+      ]
+    },
+    "non_binding_control_names": [
+      "annotation_layers",
+      "area",
+      "areaB",
+      "color_scheme",
+      "comparison_type",
+      "comparison_type_b",
+      "currency_format",
+      "currency_format_secondary",
+      "legendMargin",
+      "legendOrientation",
+      "legendType",
+      "limit",
+      "limit_b",
+      "logAxis",
+      "logAxisSecondary",
+      "markerEnabled",
+      "markerEnabledB",
+      "markerSize",
+      "markerSizeB",
+      "min_periods",
+      "min_periods_b",
+      "minorSplitLine",
+      "minorTicks",
+      "only_total",
+      "only_totalB",
+      "opacity",
+      "opacityB",
+      "order_desc",
+      "order_desc_b",
+      "resample_method",
+      "resample_method_b",
+      "resample_rule",
+      "resample_rule_b",
+      "rich_tooltip",
+      "rolling_periods",
+      "rolling_periods_b",
+      "rolling_type",
+      "rolling_type_b",
+      "row_limit",
+      "row_limit_b",
+      "seriesType",
+      "seriesTypeB",
+      "show_legend",
+      "show_query_identifiers",
+      "show_value",
+      "show_valueB",
+      "sort_series_ascending",
+      "sort_series_ascendingB",
+      "sort_series_type",
+      "sort_series_typeB",
+      "stack",
+      "stackB",
+      "time_compare",
+      "time_shift_color",
+      "timeseries_limit_metric",
+      "tooltipSortByMetric",
+      "tooltipTimeFormat",
+      "truncateXAxis",
+      "truncateYAxis",
+      "truncate_metric",
+      "truncate_metric_b",
+      "xAxisBounds",
+      "xAxisLabelInterval",
+      "xAxisLabelRotation",
+      "x_axis_time_format",
+      "x_axis_title",
+      "x_axis_title_margin",
+      "yAxisTitleSecondary",
+      "y_axis_bounds",
+      "y_axis_bounds_secondary",
+      "y_axis_format",
+      "y_axis_format_secondary",
+      "y_axis_title",
+      "y_axis_title_margin",
+      "y_axis_title_position",
+      "zoomable"
+    ],
+    "embedding_runtime_field_names": [
+      "adhoc_filters",
+      "adhoc_filters_b",
+      "custom_form_data",
+      "filters",
+      "granularity_sqla",
+      "interactive_drilldown",
+      "interactive_groupby",
+      "interactive_highlight",
+      "relative_end",
+      "relative_start",
+      "time_compare",
+      "time_grain_sqla",
+      "time_range"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "adhoc_filters_b",
+      "datasource",
+      "groupby",
+      "groupby_b",
+      "metrics",
+      "metrics_b",
+      "order_desc",
+      "order_desc_b",
+      "row_limit",
+      "row_limit_b",
+      "time_range",
+      "viz_type",
+      "x_axis"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "adhoc_filters_b",
+      "annotation_layers",
+      "area",
+      "areaB",
+      "color_scheme",
+      "comparison_type",
+      "comparison_type_b",
+      "currency_format",
+      "currency_format_secondary",
+      "datasource",
+      "groupby",
+      "groupby_b",
+      "legendMargin",
+      "legendOrientation",
+      "legendType",
+      "limit",
+      "limit_b",
+      "logAxis",
+      "logAxisSecondary",
+      "markerEnabled",
+      "markerEnabledB",
+      "markerSize",
+      "markerSizeB",
+      "metrics",
+      "metrics_b",
+      "min_periods",
+      "min_periods_b",
+      "minorSplitLine",
+      "minorTicks",
+      "only_total",
+      "only_totalB",
+      "opacity",
+      "opacityB",
+      "order_desc",
+      "order_desc_b",
+      "resample_method",
+      "resample_method_b",
+      "resample_rule",
+      "resample_rule_b",
+      "rich_tooltip",
+      "rolling_periods",
+      "rolling_periods_b",
+      "rolling_type",
+      "rolling_type_b",
+      "row_limit",
+      "row_limit_b",
+      "seriesType",
+      "seriesTypeB",
+      "show_legend",
+      "show_query_identifiers",
+      "show_value",
+      "show_valueB",
+      "sort_series_ascending",
+      "sort_series_ascendingB",
+      "sort_series_type",
+      "sort_series_typeB",
+      "stack",
+      "stackB",
+      "time_compare",
+      "time_compare_b",
+      "time_grain_sqla",
+      "time_range",
+      "time_shift_color",
+      "timeseries_limit_metric",
+      "timeseries_limit_metric_b",
+      "tooltipSortByMetric",
+      "tooltipTimeFormat",
+      "truncateXAxis",
+      "truncateYAxis",
+      "truncate_metric",
+      "truncate_metric_b",
+      "viz_type",
+      "xAxisBounds",
+      "xAxisLabelInterval",
+      "xAxisLabelRotation",
+      "x_axis",
+      "x_axis_time_format",
+      "x_axis_title",
+      "x_axis_title_margin",
+      "yAxisIndex",
+      "yAxisIndexB",
+      "yAxisTitleSecondary",
+      "y_axis_bounds",
+      "y_axis_bounds_secondary",
+      "y_axis_format",
+      "y_axis_format_secondary",
+      "y_axis_title",
+      "y_axis_title_margin",
+      "y_axis_title_position",
+      "zoomable"
+    ],
+    "structural_flags": {
+      "time_series": true,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": false,
+      "flow_like": false,
+      "distribution_like": false,
+      "supports_breakdown": true,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": true,
+      "needs_dimension": true
+    },
+    "selection_hints": [
+      "优先用于趋势、演化、时间对比类问题。",
+      "至少需要 1 个可聚合指标字段。",
+      "需要时间字段，通常还应结合时间粒度或时间范围。",
+      "需要至少 1 个维度字段用于分组、拆分或定位。",
+      "支持按维度拆分多序列或子组。",
+      "可结合时间粒度控制趋势聚合窗口。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：多指标混合类型展示（如折线+柱状、面积+折线）；不同量级指标对比（如绝对值+百分比）；复杂时间序列的分层展示"
+    ]
+  },
+  "selection_prompt_card": {
+    "viz_type": "mixed_timeseries",
+    "display_name": "Mixed Chart",
+    "category": "timeseries",
+    "description_zh": "Mixed Timeseries Chart combines multiple chart types (line, area, bar) in a single time-series visualization, ideal for multi-metric comparison with different display types.",
+    "visual_shape_zh": "混合时间序列（折线/面积/柱状）",
+    "best_for": [
+      "多指标混合类型展示（如折线+柱状、面积+折线）",
+      "不同量级指标对比（如绝对值+百分比）",
+      "复杂时间序列的分层展示"
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "dimension",
+      "metric",
+      "saved_metric",
+      "time_dimension"
+    ],
+    "optional_dataset_roles": [
+      "adhoc_metric",
+      "category_dimension",
+      "dimension",
+      "filter_context",
+      "metric",
+      "saved_metric",
+      "time_dimension",
+      "time_grain"
+    ],
+    "required_slots": [
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "Query A",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+          "聚合指标列表（可多个），用于绘制多系列混合类型对比。"
+        ]
+      },
+      {
+        "field_name": "metrics_b",
+        "required": true,
+        "slot_kind": "secondary_metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<secondary_metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<secondary_metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "Query B"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+        ]
+      },
+      {
+        "field_name": "x_axis",
+        "required": true,
+        "slot_kind": "x_axis",
+        "accepted_dataset_roles": [
+          "time_dimension",
+          "dimension"
+        ],
+        "cardinality": "1",
+        "placeholder": "<x_axis_column>",
+        "source_categories": [
+          "Shared Query Fields"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Dimension to use on x-axis."
+        ]
+      }
+    ],
+    "optional_slot_names": [
+      "adhoc_filters",
+      "adhoc_filters_b",
+      "groupby",
+      "groupby_b",
+      "time_compare_b",
+      "time_grain_sqla",
+      "timeseries_limit_metric_b",
+      "yAxisIndex",
+      "yAxisIndexB",
+      "series_type"
+    ],
+    "structural_flags": {
+      "time_series": true,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": false,
+      "flow_like": false,
+      "distribution_like": false,
+      "supports_breakdown": true,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": true,
+      "needs_dimension": true
+    },
+    "selection_hints": [
+      "优先用于趋势、演化、时间对比类问题。",
+      "至少需要 1 个可聚合指标字段。",
+      "需要时间字段，通常还应结合时间粒度或时间范围。",
+      "需要至少 1 个维度字段用于分组、拆分或定位。",
+      "支持按维度拆分多序列或子组。",
+      "可结合时间粒度控制趋势聚合窗口。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：多指标混合类型展示（如折线+柱状、面积+折线）；不同量级指标对比（如绝对值+百分比）；复杂时间序列的分层展示"
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "mixed_timeseries",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/mixed_timeseries-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/mixed_timeseries-form-data-schema.json",
+      "control-schema": "form-data-schema/mixed_timeseries-schema.json"
+    }
+  }
+}

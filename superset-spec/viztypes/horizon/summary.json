@@ -1,0 +1,131 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "horizon",
+  "display_name": "Horizon Chart",
+  "normalized_summary": {
+    "category": "timeseries",
+    "tags": [
+      "timeseries",
+      "horizon",
+      "compact",
+      "multiple_series"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "groupby",
+        "required": true,
+        "description": "维度字段列表（通常为时间维度），用于分组展示时间序列。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标列表，用于展示多时间序列的数值。"
+      },
+      {
+        "key": "time_grain_sqla",
+        "required": true,
+        "description": "时间粒度（如 day/week），用于时间聚合桶。"
+      },
+      {
+        "key": "band_count",
+        "required": false,
+        "description": "波段数量，用于控制正负值分离的波段数。"
+      }
+    ],
+    "description_zh": "Horizon Chart is a compact time-series chart that splits negative/positive values into bands, ideal for displaying multiple time-series in a small space.",
+    "visual_shape_zh": "水平地平线图（紧凑型时间序列）",
+    "use_cases_zh": [
+      "多时间序列紧凑型展示（如多指标趋势、多维度对比）",
+      "正负值分离的趋势分析",
+      "小空间内的高密度时间序列展示"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "horizon",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/horizon-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/horizon-form-data-schema.json",
+      "control-schema": "form-data-schema/horizon-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Horizon Chart",
+    "viztype": "horizon",
+    "详细描述": "Horizon Chart is a compact time-series chart that splits negative/positive values into bands, ideal for displaying multiple time-series in a small space.",
+    "表现形态": "水平地平线图（紧凑型时间序列）",
+    "适用场景": [
+      "多时间序列紧凑型展示（如多指标趋势、多维度对比）",
+      "正负值分离的趋势分析",
+      "小空间内的高密度时间序列展示"
+    ],
+    "vizKey": "Horizon",
+    "pluginCategory": "Evolution",
+    "pluginTags": [],
+    "category": "timeseries",
+    "tags": [
+      "timeseries",
+      "horizon",
+      "compact",
+      "multiple_series"
+    ],
+    "关键字段": [
+      {
+        "key": "groupby",
+        "required": true,
+        "description": "维度字段列表（通常为时间维度），用于分组展示时间序列。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标列表，用于展示多时间序列的数值。"
+      },
+      {
+        "key": "time_grain_sqla",
+        "required": true,
+        "description": "时间粒度（如 day/week），用于时间聚合桶。"
+      },
+      {
+        "key": "band_count",
+        "required": false,
+        "description": "波段数量，用于控制正负值分离的波段数。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

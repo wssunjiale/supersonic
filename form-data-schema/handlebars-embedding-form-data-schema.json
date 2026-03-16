@@ -1,0 +1,378 @@
+{
+  "viz_type": "handlebars",
+  "display_name": "Handlebars",
+  "purpose": "第三方 embedding / guest token 场景下安全传输的 Handlebars form_data 模板",
+  "base_form_data_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/handlebars-form-data-schema.json",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset/security/manager.py",
+    "D:/vsx/sources/superset-6.0.0/superset/constants.py",
+    "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+    "D:/vsx/sources/superset-6.0.0/superset/charts/data/api.py",
+    "D:/vsx/sources/superset-6.0.0/superset/commands/chart/data/get_data_command.py",
+    "D:/vsx/sources/superset-6.0.0/superset/charts/schemas.py",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/constants.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryContext.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryObject.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractExtras.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractQueryFields.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/normalizeOrderBy.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataWithDashboardContext.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/actions/hydrateExplore.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/plugin/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/plugin/controlPanel.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/Handlebars.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/components/Handlebars/HandlebarsViewer.tsx"
+  ],
+  "notes": [
+    "embedded guest 的核心限制仍在后端 `security/manager.py::query_context_modified()`，报错原文是 `Guest user cannot modify chart payload`。",
+    "Handlebars 走标准 `/api/v1/chart/data`，因此 guest 校验针对的是编译后的 `metrics`、`columns`、`orderby` 等 query context 结构，而不是只看 root form_data 字段名。",
+    "对 Handlebars 来说，`query_mode`、`groupby`、`all_columns`、`metrics`、`order_by_cols`、`timeseries_limit_metric`、`granularity_sqla`、`time_grain_sqla`、`time_range`、`row_limit` 都会直接或间接影响最终 query，应视为根层敏感字段。",
+    "`handlebarsTemplate` 和 `styleTemplate` 不属于 query_context_modified() 的硬编码对比核心字段，但它们会直接改变 guest 看到的模板与样式。安全做法仍然是从已保存图表完整复制。"
+  ],
+  "security_enforcement": {
+    "backend_check_function": "superset/security/manager.py::query_context_modified",
+    "checked_when": "ChartDataCommand.validate() -> QueryContext.raise_for_access()",
+    "error_message": "Guest user cannot modify chart payload",
+    "hard_block_fields": [
+      "slice_id",
+      "metrics",
+      "groupby",
+      "columns",
+      "orderby"
+    ],
+    "indirectly_sensitive_fields_for_handlebars": [
+      "query_mode",
+      "groupby",
+      "all_columns",
+      "metrics",
+      "order_by_cols",
+      "timeseries_limit_metric",
+      "order_desc",
+      "row_limit",
+      "granularity_sqla",
+      "time_grain_sqla",
+      "time_range",
+      "adhoc_filters"
+    ],
+    "presentation_only_fields_not_compared_directly": [
+      "handlebarsTemplate",
+      "styleTemplate",
+      "show_totals",
+      "percent_metrics",
+      "include_time"
+    ],
+    "recommended_strategy": "复制保存态 Handlebars 图表的完整 form_data 作为 base，仅通过 `extra_form_data` 追加过滤条件或时间 override。"
+  },
+  "safe_base_rule": {
+    "description": "第三方 embedding 请求中的根层 form_data，应当从已保存的 Handlebars 图表完整复制，不要重构。",
+    "must_be_copied_from_saved_chart": [
+      "slice_id",
+      "datasource",
+      "viz_type",
+      "query_mode",
+      "groupby",
+      "all_columns",
+      "metrics",
+      "percent_metrics",
+      "timeseries_limit_metric",
+      "order_by_cols",
+      "order_desc",
+      "row_limit",
+      "granularity_sqla",
+      "time_grain_sqla",
+      "time_range",
+      "include_time",
+      "adhoc_filters",
+      "handlebarsTemplate",
+      "styleTemplate",
+      "show_totals",
+      "all other chart-definition fields"
+    ],
+    "why": [
+      "`query_context_modified()` 最终比较的是编译出来的 query payload。",
+      "Handlebars 的 `query_mode` 会改变 `extractQueryFields()` 对 `groupby/all_columns/metrics` 的解释方式。",
+      "`groupby`、`all_columns`、`metrics`、`order_by_cols`、`timeseries_limit_metric`、`granularity_sqla` 都会影响最终的 `columns` / `metrics` / `orderby` / `granularity`。",
+      "`handlebarsTemplate` 和 `styleTemplate` 虽不一定触发 guest query payload 校验，但修改它们等于改图表定义本身。"
+    ]
+  },
+  "safe_embedding_form_data_template": {
+    "description": "这是 guest embedding 下的安全写法。根层以保存态 Handlebars 图表为 base，仅把动态筛选与时间覆盖放进 `extra_form_data`。",
+    "template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "handlebars",
+      "query_mode": "<copied_from_saved_chart>",
+      "groupby": "<copied_from_saved_chart>",
+      "all_columns": "<copied_from_saved_chart>",
+      "metrics": "<copied_from_saved_chart>",
+      "timeseries_limit_metric": "<copied_from_saved_chart>",
+      "order_by_cols": "<copied_from_saved_chart>",
+      "order_desc": "<copied_from_saved_chart>",
+      "row_limit": "<copied_from_saved_chart>",
+      "granularity_sqla": "<copied_from_saved_chart>",
+      "time_grain_sqla": "<copied_from_saved_chart>",
+      "time_range": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "handlebarsTemplate": "<copied_from_saved_chart>",
+      "styleTemplate": "<copied_from_saved_chart>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "state",
+            "op": "IN",
+            "val": [
+              "CA"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "state",
+            "operator": "IN",
+            "comparator": [
+              "CA"
+            ]
+          }
+        ],
+        "time_range": "Last 30 days",
+        "time_grain_sqla": "P1D",
+        "custom_form_data": {}
+      }
+    }
+  },
+  "preferred_dynamic_container": {
+    "field_name": "extra_form_data",
+    "description": "第三方 embedding 允许动态传入的上下文容器；后端会在 merge 阶段把它并入实际查询。",
+    "append_keys": [
+      "adhoc_filters",
+      "filters",
+      "interactive_groupby",
+      "interactive_highlight",
+      "interactive_drilldown",
+      "custom_form_data"
+    ],
+    "override_keys_backend_high_confidence": [
+      "granularity_sqla",
+      "granularity",
+      "time_column",
+      "time_grain",
+      "time_range",
+      "time_grain_sqla",
+      "relative_start",
+      "relative_end"
+    ],
+    "notes": "Handlebars chart 可以使用共享时间字段，因此时间 override 对它是有意义的；但依然建议根层 base form_data 复制保存态。"
+  },
+  "extra_form_data_field_schema": [
+    {
+      "field_name": "filters",
+      "data_type": "array[QueryObjectFilterClause]",
+      "behavior": "append",
+      "safe_for_handlebars": true,
+      "recommended": true,
+      "sample_data": [
+        {
+          "col": "state",
+          "op": "IN",
+          "val": [
+            "CA"
+          ]
+        }
+      ],
+      "effect": "追加 simple filters；后端会把它们并入额外过滤条件。",
+      "source": "superset/constants.py + superset/utils/core.py"
+    },
+    {
+      "field_name": "adhoc_filters",
+      "data_type": "array[AdhocFilter]",
+      "behavior": "append",
+      "safe_for_handlebars": true,
+      "recommended": true,
+      "sample_data": [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "state",
+          "operator": "IN",
+          "comparator": [
+            "CA"
+          ]
+        }
+      ],
+      "effect": "追加 adhoc filters；后端会标记为 isExtra 并并入查询。",
+      "source": "superset/constants.py + superset/utils/core.py"
+    },
+    {
+      "field_name": "time_range",
+      "data_type": "string",
+      "behavior": "override",
+      "safe_for_handlebars": true,
+      "recommended": true,
+      "sample_data": "Last 30 days",
+      "effect": "覆盖 query.time_range。",
+      "source": "superset/constants.py + superset-ui-core query/constants.ts"
+    },
+    {
+      "field_name": "time_grain_sqla",
+      "data_type": "string | null",
+      "behavior": "override",
+      "safe_for_handlebars": true,
+      "recommended": false,
+      "sample_data": "P1D",
+      "effect": "覆盖 query.extras.time_grain_sqla；仅在图表本身使用时间维度时才有意义。",
+      "source": "superset/constants.py + superset-ui-core query/constants.ts"
+    },
+    {
+      "field_name": "granularity_sqla",
+      "data_type": "string | null",
+      "behavior": "override",
+      "safe_for_handlebars": true,
+      "recommended": false,
+      "sample_data": "ds",
+      "effect": "覆盖 query.granularity。",
+      "source": "superset/constants.py + superset-ui-core query/constants.ts"
+    },
+    {
+      "field_name": "custom_form_data",
+      "data_type": "object",
+      "behavior": "append",
+      "safe_for_handlebars": true,
+      "recommended": false,
+      "sample_data": {},
+      "effect": "可传非标准附加数据；Handlebars 默认 buildQuery/transformProps 不直接消费它。",
+      "source": "superset/constants.py + frontend QueryFormData.ts"
+    },
+    {
+      "field_name": "interactive_groupby",
+      "data_type": "array[string]",
+      "behavior": "append",
+      "safe_for_handlebars": false,
+      "recommended": false,
+      "sample_data": [
+        "state"
+      ],
+      "effect": "通用 ExtraFormData 字段；当前 Handlebars buildQuery 没有像 Table plugin 那样专门读取它。",
+      "source": "frontend QueryFormData.ts + query/constants.ts"
+    }
+  ],
+  "minimal_extra_form_data_template": {
+    "filters": [
+      {
+        "col": "state",
+        "op": "IN",
+        "val": [
+          "CA"
+        ]
+      }
+    ]
+  },
+  "recommended_extra_form_data_template": {
+    "filters": [
+      {
+        "col": "state",
+        "op": "IN",
+        "val": [
+          "CA",
+          "TX"
+        ]
+      }
+    ],
+    "adhoc_filters": [
+      {
+        "expressionType": "SIMPLE",
+        "clause": "WHERE",
+        "subject": "state",
+        "operator": "IN",
+        "comparator": [
+          "CA",
+          "TX"
+        ]
+      }
+    ],
+    "time_range": "Last 30 days",
+    "custom_form_data": {}
+  },
+  "unsafe_root_form_data_changes": [
+    {
+      "field_name": "slice_id",
+      "reason": "会改变请求对应的图表实体。"
+    },
+    {
+      "field_name": "datasource",
+      "reason": "会直接改变 Handlebars 图表绑定的数据集。"
+    },
+    {
+      "field_name": "viz_type",
+      "reason": "Handlebars guest 请求仍应保持 `handlebars`。"
+    },
+    {
+      "field_name": "query_mode",
+      "reason": "会改变 `extractQueryFields()` 对 `groupby/all_columns/metrics` 的解释。"
+    },
+    {
+      "field_name": "groupby",
+      "reason": "aggregate 模式下会直接改变编译后的 `query.columns`。"
+    },
+    {
+      "field_name": "all_columns",
+      "reason": "raw 模式下会直接改变编译后的 `query.columns`。"
+    },
+    {
+      "field_name": "metrics",
+      "reason": "aggregate 模式下会直接改变编译后的 `query.metrics`。"
+    },
+    {
+      "field_name": "order_by_cols",
+      "reason": "raw 模式下会直接改变编译后的 `query.orderby`。"
+    },
+    {
+      "field_name": "timeseries_limit_metric",
+      "reason": "aggregate 模式下会通过 `normalizeOrderBy()` 改变最终排序字段。"
+    },
+    {
+      "field_name": "granularity_sqla",
+      "reason": "会直接改变 query.granularity。"
+    },
+    {
+      "field_name": "time_grain_sqla",
+      "reason": "会直接改变 query.extras.time_grain_sqla。"
+    },
+    {
+      "field_name": "time_range",
+      "reason": "会直接改变 query.time_range。"
+    },
+    {
+      "field_name": "adhoc_filters",
+      "reason": "动态筛选应优先放进 `extra_form_data.append`，不要覆盖保存态根字段。"
+    },
+    {
+      "field_name": "row_limit",
+      "reason": "会直接改变底层记录数。"
+    },
+    {
+      "field_name": "handlebarsTemplate",
+      "reason": "虽然不一定触发 query payload 校验，但会直接改变 guest 看到的模板内容。"
+    },
+    {
+      "field_name": "styleTemplate",
+      "reason": "虽然不一定触发 query payload 校验，但会直接改变 guest 看到的样式。"
+    }
+  ],
+  "practical_guidance": {
+    "best_practice": [
+      "先从保存态 Handlebars 图表读取完整 form_data。",
+      "根层字段保持不变，尤其保留 `query_mode`、`groupby`、`all_columns`、`metrics`、`order_by_cols`、`timeseries_limit_metric`、`granularity_sqla`、`time_range`、`handlebarsTemplate`。",
+      "只在 `extra_form_data` 中放动态 filters / adhoc_filters / time_range override。",
+      "如果 guest 只是做筛选联动，优先使用 `filters` 和 `adhoc_filters`。"
+    ],
+    "avoid": [
+      "不要在 guest 请求里在 aggregate/raw 之间切 `query_mode`。",
+      "不要把动态筛选直接覆盖到根层 `adhoc_filters`；优先用 `extra_form_data.append`。",
+      "不要把 Table plugin 的分页/搜索字段硬塞进 Handlebars guest 请求。",
+      "不要把 `handlebars_template` 这类非 canonical 旧键名写回根层。"
+    ]
+  }
+}

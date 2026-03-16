@@ -1,0 +1,406 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "world_map",
+  "display_name": "World Map",
+  "source_kind": "schema_file",
+  "normalized_chart_form_data": {
+    "required_root_fields": [
+      "datasource",
+      "entity",
+      "metric",
+      "viz_type"
+    ],
+    "optional_root_fields": [
+      "adhoc_filters",
+      "cache_timeout",
+      "color_by",
+      "color_picker",
+      "color_scheme",
+      "country_fieldtype",
+      "currency_format",
+      "custom_params",
+      "extra_form_data",
+      "linear_color_scheme",
+      "max_bubble_size",
+      "row_limit",
+      "secondary_metric",
+      "show_bubbles",
+      "slice_id",
+      "sort_by_metric",
+      "url_params",
+      "y_axis_format"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "country_fieldtype",
+      "datasource",
+      "entity",
+      "metric",
+      "row_limit",
+      "sort_by_metric",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "color_by",
+      "color_picker",
+      "color_scheme",
+      "country_fieldtype",
+      "currency_format",
+      "datasource",
+      "entity",
+      "linear_color_scheme",
+      "max_bubble_size",
+      "metric",
+      "row_limit",
+      "show_bubbles",
+      "sort_by_metric",
+      "viz_type",
+      "y_axis_format"
+    ],
+    "fallback_template_seed": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "world_map",
+      "entity": "<entity_column>",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "adhoc_filters": [],
+      "time_range": "No filter"
+    }
+  },
+  "original_chart_form_data_schema": {
+    "viz_type": "world_map",
+    "display_name": "World Map",
+    "purpose": "用于调用 API 创建或保存 World Map 时填写的 form_data 模板",
+    "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/world_map-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-world-map/src/index.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-world-map/src/controlPanel.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-world-map/src/transformProps.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-world-map/src/WorldMap.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-world-map/src/utils.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-world-map/src/ReactWorldMap.jsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/sections/sections.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/utils/getStandardizedControls.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+      "D:/vsx/sources/superset-6.0.0/superset/viz.py"
+    ],
+    "notes": [
+      "World Map 是 legacy 图。前端 metadata 明确声明 `useLegacyApi=true`，真实请求路径是 `/superset/explore_json/`。",
+      "`/superset/explore_json/` 会读取原始 `form_data`，然后在后端 `BaseViz.process_query_filters()` 中执行 `convert_legacy_filters_into_adhoc(form_data)` 与 `merge_extra_filters(form_data)`。",
+      "World Map 没有前端 buildQuery；真正的查询组装在后端 `WorldMapViz.query_obj()` 和 `BaseViz.query_obj()` 内完成。",
+      "`entity` 和 `metric` 是新建模板的核心必填字段。`secondary_metric` 是气泡大小的条件必需字段：只有在 `show_bubbles=true` 时才强烈建议提供。",
+      "`country_fieldtype` 决定实体列采用哪种国家编码标准；后端会把原始值映射成统一的 `cca3` 国家代码后再给前端地图渲染。",
+      "World Map 的前端 runtime 看到的是 camelCase 形态，如 `countryFieldtype`、`showBubbles`、`maxBubbleSize`、`colorBy`；API 入参仍应使用原始 snake_case 键。",
+      "`sort_by_metric` 只会按主 metric 排序，不会改成按 `secondary_metric` 排序。"
+    ],
+    "naming_and_pipeline": {
+      "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写成 form_data[name]。",
+      "frontend_request_mode": "legacy explore_json",
+      "api_form_data_to_backend_query": "前端把原始 form_data 发给 `/superset/explore_json/`；后端 BaseViz / WorldMapViz 直接读取这些 root 键。",
+      "api_form_data_to_runtime_form_data": "legacy 插件 transformProps 会把 snake_case form_data 转成 camelCase runtime props。",
+      "backend_metric_collection": "BaseViz.process_metrics() 会把 `metric` 与 `secondary_metric` 一并加入 metrics 列表。"
+    },
+    "global_required_fields": {
+      "datasource": {
+        "data_type": "string",
+        "required": true,
+        "sample_data": "<dataset_id>__table",
+        "source": "datasourceAndVizType section"
+      },
+      "viz_type": {
+        "data_type": "string",
+        "required": true,
+        "fixed_value": "world_map",
+        "source": "datasourceAndVizType section"
+      },
+      "entity": {
+        "data_type": "string | object",
+        "required": true,
+        "sample_data": "country_code",
+        "source": "World Map Query section + shared entity validator"
+      },
+      "metric": {
+        "data_type": "string | object",
+        "required": true,
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "value"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(value)"
+        },
+        "source": "World Map Query section + shared metric validator"
+      }
+    },
+    "global_optional_fields": {
+      "country_fieldtype": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "cca2",
+        "source": "World Map Query section"
+      },
+      "secondary_metric": {
+        "data_type": "string | object | null",
+        "required": false,
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "population"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(population)"
+        },
+        "source": "World Map Options section",
+        "notes": "这不是经验判断。`WorldMapViz.get_data()` 只有在它非空时才会生成 `m2`，而 `WorldMap.js` 的 bubble 半径直接依赖 `d.m2`。因此 `show_bubbles=true` 时应把它视为条件必需字段。"
+      },
+      "adhoc_filters": {
+        "data_type": "array[object]",
+        "required": false,
+        "sample_data": [],
+        "source": "World Map Query section"
+      },
+      "row_limit": {
+        "data_type": "integer | string",
+        "required": false,
+        "sample_data": 10000,
+        "source": "World Map Query section"
+      },
+      "sort_by_metric": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": false,
+        "source": "World Map Query section"
+      },
+      "show_bubbles": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": false,
+        "source": "World Map Options section"
+      },
+      "max_bubble_size": {
+        "data_type": "string | integer",
+        "required": false,
+        "sample_data": "25",
+        "source": "World Map Options section"
+      },
+      "color_picker": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {
+          "r": 0,
+          "g": 122,
+          "b": 135,
+          "a": 1
+        },
+        "source": "World Map Options section"
+      },
+      "color_by": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "metric",
+        "source": "World Map Options section"
+      },
+      "linear_color_scheme": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "<sequential_scheme_key>",
+        "source": "World Map Options section"
+      },
+      "color_scheme": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "bnbColors",
+        "source": "World Map Options section"
+      },
+      "y_axis_format": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "SMART_NUMBER",
+        "source": "World Map Chart Options section"
+      },
+      "currency_format": {
+        "data_type": "object | null",
+        "required": false,
+        "sample_data": {
+          "symbol": "$",
+          "symbolPosition": "prefix"
+        },
+        "source": "World Map Chart Options section"
+      },
+      "slice_id": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 0,
+        "source": "datasourceAndVizType hidden control"
+      },
+      "cache_timeout": {
+        "data_type": "integer | null",
+        "required": false,
+        "sample_data": null,
+        "source": "datasourceAndVizType hidden control"
+      },
+      "url_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "datasourceAndVizType hidden control"
+      },
+      "custom_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "datasourceAndVizType hidden control"
+      },
+      "extra_form_data": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "QueryFormData.extra_form_data"
+      }
+    },
+    "minimal_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "world_map",
+      "entity": "country_code",
+      "country_fieldtype": "cca2",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "value"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(value)"
+      },
+      "adhoc_filters": [],
+      "row_limit": 10000,
+      "sort_by_metric": false
+    },
+    "recommended_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "world_map",
+      "entity": "country_code",
+      "country_fieldtype": "cca2",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "value"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(value)"
+      },
+      "adhoc_filters": [],
+      "row_limit": 10000,
+      "sort_by_metric": false,
+      "show_bubbles": false,
+      "max_bubble_size": "25",
+      "color_picker": {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      },
+      "color_by": "metric",
+      "linear_color_scheme": "<sequential_scheme_key>",
+      "color_scheme": "bnbColors",
+      "y_axis_format": "SMART_NUMBER",
+      "currency_format": null
+    },
+    "conditional_blocks": {
+      "bubble_overlay_mode": {
+        "condition": "需要在国家底图上叠加 bubbles 时",
+        "fields": {
+          "show_bubbles": true,
+          "secondary_metric": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "population"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(population)"
+          },
+          "max_bubble_size": "25",
+          "color_picker": {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          }
+        },
+        "notes": "如果缺少 `secondary_metric`，后端不会生成 `m2`；而 `WorldMap.js` 会直接用 `d.m2` 计算 bubble radius。"
+      },
+      "same_metric_for_fill_and_bubble": {
+        "condition": "需要用同一个指标同时控制底图着色与 bubble 大小时",
+        "fields": {
+          "secondary_metric": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "value"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(value)"
+          }
+        },
+        "notes": "WorldMapViz.get_data() 会在 `metric == secondary_metric` 时把 `m2 = m1`。"
+      },
+      "country_palette_mode": {
+        "condition": "需要按国家分类色板着色，而不是按主指标渐变色着色时",
+        "fields": {
+          "color_by": "country",
+          "color_scheme": "bnbColors"
+        }
+      },
+      "metric_palette_mode": {
+        "condition": "需要按主指标连续色带着色时",
+        "fields": {
+          "color_by": "metric",
+          "linear_color_scheme": "<sequential_scheme_key>"
+        }
+      }
+    },
+    "runtime_only_or_non_template_fields": {
+      "runtime_aliases_only": [
+        {
+          "field_name": "countryFieldtype/showBubbles/maxBubbleSize/linearColorScheme/colorPicker/colorBy/colorScheme/sliceId/yAxisFormat/currencyFormat",
+          "reason": "这些是 legacy transformProps 产出的 runtime camelCase 形态；API 调用时应使用原始 snake_case 键。"
+        }
+      ],
+      "backend_generated_query_fields": [
+        {
+          "field_name": "groupby",
+          "reason": "WorldMapViz.query_obj() 会把它强制生成为 `[entity]`。"
+        },
+        {
+          "field_name": "orderby",
+          "reason": "只有 `sort_by_metric=true` 时，WorldMapViz.query_obj() 才会按主 metric 生成降序排序。"
+        }
+      ],
+      "source_inconsistencies": [
+        {
+          "field_name": "entity",
+          "reason": "controlOverride 的描述写的是 `3 letter code of the country`，但 `country_fieldtype` 实际支持 `name/cioc/cca2/cca3` 四种输入格式。"
+        }
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "world_map",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/world_map-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/world_map-form-data-schema.json",
+      "control-schema": "form-data-schema/world_map-schema.json"
+    }
+  }
+}

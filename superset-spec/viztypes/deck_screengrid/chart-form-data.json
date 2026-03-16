@@ -1,0 +1,540 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "deck_screengrid",
+  "display_name": "deck.gl Screen Grid",
+  "source_kind": "schema_file",
+  "normalized_chart_form_data": {
+    "required_root_fields": [
+      "datasource",
+      "size",
+      "spatial",
+      "viz_type"
+    ],
+    "optional_root_fields": [
+      "adhoc_filters",
+      "autozoom",
+      "cache_timeout",
+      "color_picker",
+      "color_scheme",
+      "color_scheme_type",
+      "filter_nulls",
+      "grid_size",
+      "js_columns",
+      "js_data_mutator",
+      "js_onclick_href",
+      "js_tooltip",
+      "mapbox_style",
+      "row_limit",
+      "slice_id",
+      "viewport"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "size",
+      "spatial",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "autozoom",
+      "color_picker",
+      "color_scheme",
+      "color_scheme_type",
+      "datasource",
+      "filter_nulls",
+      "grid_size",
+      "js_columns",
+      "js_data_mutator",
+      "js_onclick_href",
+      "js_tooltip",
+      "mapbox_style",
+      "row_limit",
+      "size",
+      "spatial",
+      "viewport",
+      "viz_type"
+    ],
+    "fallback_template_seed": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "deck_screengrid",
+      "size": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "spatial": "<spatial_column_or_expression>",
+      "adhoc_filters": [],
+      "time_range": "No filter"
+    }
+  },
+  "original_chart_form_data_schema": {
+    "viz_type": "deck_screengrid",
+    "display_name": "deck.gl Screen Grid",
+    "purpose": "用于调用 API 创建或保存 deck.gl Screen Grid 时填写的 form_data 模板",
+    "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/deck_screengrid-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Screengrid/controlPanel.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Screengrid/index.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Screengrid/Screengrid.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/factory.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/common.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/Shared_DeckGL.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/utils.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utils/crossFiltersDataMask.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-demo/storybook/stories/plugins/legacy-preset-chart-deckgl/Screengrid/Stories.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-demo/storybook/stories/plugins/legacy-preset-chart-deckgl/Screengrid/payload.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/QueryFormData.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+      "D:/vsx/sources/superset-6.0.0/superset/views/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/viz.py"
+    ],
+    "notes": [
+      "deck_screengrid 是 legacy 图，metadata 明确声明 `useLegacyApi=true`，真实请求路径仍是 `/superset/explore_json/`。",
+      "Explore 导出 form_data 时走 `getFormDataFromControls()`，它按 control name 原样写入 root form_data。API 根层必须使用 `spatial`、`size`、`filter_nulls`、`mapbox_style`、`grid_size`、`color_scheme_type` 等原始键名。",
+      "deck_screengrid 没有专属前端 buildQuery。ChartClient.ts 对它会退回 `() => formData`，也就是说，API 层真正应该构造的是原始 root `form_data`，然后由 legacy `/superset/explore_json/` 包装成 `{ form_data: ... }`。",
+      "这个图的正式 Weight 字段名就是 `size`，不是 `metrics`、也不是 `point_radius_fixed`。后端 `BaseDeckGLViz.get_metrics()` 与 `DeckScreengrid.get_properties()` 都直接依赖它。",
+      "`color_scheme_type='default'` 是当前图的正式默认行为，它会启用 `Screengrid.tsx` 内置的 6 段黄橙红色带；只有切到 `fixed_color` 或 `categorical_palette` 时才分别使用 `color_picker` 或 `color_scheme`。",
+      "当前图没有正式的 breakpoint 颜色控件、legend 控件或 `js_agg_function` 控件。虽然运行时代码还支持读取这些字段，但它们不属于当前 controlPanel 的 canonical 创建字段。",
+      "storybook `Screengrid/payload.js` 中还混入了 `groupby`、`point_radius`、`point_radius_fixed`、`point_unit`、`filters`、`where`、`having`、`granularity_sqla`、`time_grain_sqla`、`time_range` 等 generic/遗留字段。当前 controlPanel 与 `Screengrid.tsx` 不以它们为正式图表定义字段。"
+    ],
+    "naming_and_pipeline": {
+      "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写成 form_data[name]，不会自动把 snake_case 改成 camelCase。",
+      "api_form_data_to_backend_request": "ChartClient.ts 在 `useLegacyApi=true` 时，把 `buildQuery(formData)` 包成 `{ form_data }` POST 到 `/superset/explore_json/`；deck_screengrid 没有专属 buildQuery，因此等价于直接发送原始 form_data。",
+      "backend_form_data_normalization": "`explore_json()` 会先补 `datasource`，再执行 `convert_legacy_filters_into_adhoc(form_data)` 与 `merge_extra_filters(form_data)`。",
+      "backend_form_data_to_query_obj": "`DeckScreengrid.query_obj()` 会先根据 `time_grain_sqla` 计算 `is_timeseries`，然后由 `BaseDeckGLViz.query_obj()` 按 `filter_nulls` 给空间列补空值过滤，展开 `spatial` 真实列，拼上 `js_columns`，并用 `size` 构建 metrics 查询。",
+      "runtime_chart_props": "`transformProps.ts` 直接把 `rawFormData` 透传成 runtime `formData`，把 `queriesData[0]` 透传成 runtime `payload`，并把 `viewport` 与 `width`/`height` 合并。"
+    },
+    "global_required_fields": {
+      "datasource": {
+        "data_type": "string",
+        "required": true,
+        "sample_data": "<dataset_id>__table",
+        "source": "explore_json() + datasourceAndVizType hidden control"
+      },
+      "viz_type": {
+        "data_type": "string",
+        "required": true,
+        "fixed_value": "deck_screengrid",
+        "source": "Screengrid/index.ts"
+      },
+      "spatial": {
+        "data_type": "object",
+        "required": true,
+        "sample_data": {
+          "type": "latlong",
+          "lonCol": "LON",
+          "latCol": "LAT"
+        },
+        "source": "Query section + SpatialControl validator + BaseDeckGLViz.query_obj()",
+        "notes": "高置信必填。没有它，后端无法展开空间列并构造 `position`。"
+      },
+      "size": {
+        "data_type": "string | object",
+        "required": true,
+        "sample_data": "count",
+        "source": "controlOverrides.size + BaseDeckGLViz.get_metrics() + DeckScreengrid.get_data()",
+        "notes": "当前图在 UI 层明确设置了 `validateNonEmpty`。规范创建模板应始终提供它。"
+      }
+    },
+    "global_optional_fields": {
+      "row_limit": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 5000,
+        "source": "Query section"
+      },
+      "filter_nulls": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": true,
+        "source": "Query section"
+      },
+      "adhoc_filters": {
+        "data_type": "array[object]",
+        "required": false,
+        "sample_data": [],
+        "source": "Query section"
+      },
+      "mapbox_style": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "mapbox://styles/mapbox/dark-v9",
+        "source": "Map section"
+      },
+      "autozoom": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": true,
+        "source": "Map section"
+      },
+      "viewport": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {
+          "longitude": -122.41827069521386,
+          "latitude": 37.76024135844065,
+          "zoom": 14.161641703941438,
+          "bearing": -4.952916738791771,
+          "pitch": 4.750411100577438
+        },
+        "source": "Map section"
+      },
+      "grid_size": {
+        "data_type": "integer | string",
+        "required": false,
+        "sample_data": 20,
+        "source": "Grid section"
+      },
+      "color_scheme_type": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "default",
+        "source": "Grid section"
+      },
+      "color_picker": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {
+          "r": 14,
+          "g": 255,
+          "b": 0,
+          "a": 1
+        },
+        "source": "Grid section"
+      },
+      "color_scheme": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "SUPERSET_DEFAULT",
+        "source": "Grid section"
+      },
+      "js_columns": {
+        "data_type": "array[string | object]",
+        "required": false,
+        "sample_data": [],
+        "source": "Advanced section"
+      },
+      "js_data_mutator": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "data => data",
+        "source": "Advanced section"
+      },
+      "js_tooltip": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "o => `<div>${o.object?.value}</div>`",
+        "source": "Advanced section"
+      },
+      "js_onclick_href": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "o => `https://example.com/?lon=${o.coordinate[0]}&lat=${o.coordinate[1]}`",
+        "source": "Advanced section"
+      },
+      "slice_id": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 67,
+        "source": "datasourceAndVizType hidden control",
+        "notes": "新建图表时通常省略；编辑已存在图表时由服务端或上层调用方提供。"
+      },
+      "cache_timeout": {
+        "data_type": "integer | null",
+        "required": false,
+        "sample_data": null,
+        "source": "datasourceAndVizType hidden control"
+      }
+    },
+    "minimal_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "deck_screengrid",
+      "spatial": {
+        "type": "latlong",
+        "lonCol": "LON",
+        "latCol": "LAT"
+      },
+      "size": "count",
+      "adhoc_filters": []
+    },
+    "recommended_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "deck_screengrid",
+      "spatial": {
+        "type": "latlong",
+        "lonCol": "LON",
+        "latCol": "LAT"
+      },
+      "size": "count",
+      "row_limit": 5000,
+      "filter_nulls": true,
+      "adhoc_filters": [],
+      "mapbox_style": "mapbox://styles/mapbox/dark-v9",
+      "autozoom": true,
+      "viewport": {
+        "longitude": 6.85236157047845,
+        "latitude": 31.222656842808707,
+        "zoom": 1,
+        "bearing": 0,
+        "pitch": 0
+      },
+      "grid_size": 20,
+      "color_scheme_type": "default",
+      "color_picker": {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      },
+      "color_scheme": "SUPERSET_DEFAULT",
+      "js_columns": [],
+      "js_data_mutator": "",
+      "js_tooltip": "",
+      "js_onclick_href": ""
+    },
+    "conditional_blocks": {
+      "delimited_spatial_column": {
+        "condition": "空间字段存储在单列经纬度字符串中时",
+        "fields": {
+          "spatial": {
+            "type": "delimited",
+            "lonlatCol": "LONLAT",
+            "delimiter": ",",
+            "reverseCheckbox": false
+          }
+        }
+      },
+      "geohash_spatial_column": {
+        "condition": "空间字段存储为 geohash 时",
+        "fields": {
+          "spatial": {
+            "type": "geohash",
+            "geohashCol": "geohash",
+            "reverseCheckbox": false
+          }
+        }
+      },
+      "custom_weight_metric": {
+        "condition": "需要按业务指标而不是默认计数作为 cell 权重时",
+        "fields": {
+          "size": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          }
+        }
+      },
+      "fixed_color_mode": {
+        "condition": "需要所有 grid cell 使用同一固定色时",
+        "fields": {
+          "color_scheme_type": "fixed_color",
+          "color_picker": {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          }
+        }
+      },
+      "categorical_palette_mode": {
+        "condition": "需要使用调色板颜色范围时",
+        "fields": {
+          "color_scheme_type": "categorical_palette",
+          "color_scheme": "SUPERSET_DEFAULT"
+        },
+        "notes": "当前图没有独立 categorical dimension，因此这里实际只控制调色板 range。"
+      },
+      "hidden_timeseries_mode": {
+        "condition": "虽然当前 UI 没有正式暴露时间控件，但上层调用方明确沿用隐藏时间查询路径时",
+        "fields": {
+          "granularity_sqla": "dttm",
+          "time_grain_sqla": "P1D",
+          "time_range": "Last 30 days"
+        },
+        "notes": "这不是当前 controlPanel 正式字段；仅在你明确知道保存态图表本来就使用了隐藏时间路径时使用。"
+      }
+    },
+    "runtime_only_or_non_template_fields": {
+      "runtime_props_generated_by_transformProps": [
+        {
+          "field_name": "payload",
+          "reason": "这是运行时从 `queriesData[0]` 注入的对象，不是 API root form_data 字段。"
+        },
+        {
+          "field_name": "formData",
+          "reason": "这是 runtime 对 `rawFormData` 的整体透传容器，不是额外的 API root 字段。"
+        },
+        {
+          "field_name": "viewport.width",
+          "reason": "运行时由图表尺寸补入，不需要写到 root form_data。"
+        },
+        {
+          "field_name": "viewport.height",
+          "reason": "运行时由图表尺寸补入，不需要写到 root form_data。"
+        },
+        {
+          "field_name": "emitCrossFilters",
+          "reason": "这是 ChartProps/hook 层运行时能力，不是 API root 字段。"
+        },
+        {
+          "field_name": "filterState",
+          "reason": "这是 runtime 交互状态，不是 API root 字段。"
+        }
+      ],
+      "backend_response_only_fields": [
+        {
+          "field_name": "queriesData[0].data.features[*].position",
+          "reason": "这是后端 `DeckScreengrid.get_data()` 产出的空间点位，不是 root form_data 字段。"
+        },
+        {
+          "field_name": "queriesData[0].data.features[*].weight",
+          "reason": "这是后端 `DeckScreengrid.get_data()` 产出的点权重，不是 root form_data 字段。"
+        },
+        {
+          "field_name": "queriesData[0].data.features[*].__timestamp",
+          "reason": "这是后端 `DeckScreengrid.get_properties()` 产出的运行时时间戳字段，不是 root form_data 字段。"
+        },
+        {
+          "field_name": "queriesData[0].data.mapboxApiKey",
+          "reason": "这是后端 payload 附带的运行时地图密钥，不是 root form_data 字段。"
+        },
+        {
+          "field_name": "queriesData[0].data.metricLabels",
+          "reason": "这是后端返回的指标标签列表，不是 root form_data 字段。"
+        }
+      ],
+      "hidden_runtime_supported_fields": [
+        {
+          "field_name": "deafult_breakpoint_color",
+          "reason": "`Screengrid.tsx` 仍然会把它传给 `getColorRange()`，但当前 controlPanel 没有正式暴露该字段。"
+        },
+        {
+          "field_name": "color_breakpoints",
+          "reason": "`Screengrid.tsx` 仍然支持 `color_scheme_type='color_breakpoints'` 的运行时分支，但当前 controlPanel 没有正式暴露该模式。"
+        },
+        {
+          "field_name": "legend_position",
+          "reason": "`factory.tsx` 的通用 `Legend` 仍会读取它，但当前 screengrid controlPanel 没有正式 legend 控件。"
+        },
+        {
+          "field_name": "legend_format",
+          "reason": "`factory.tsx` 的通用 `Legend` 仍会读取它，但当前 screengrid controlPanel 没有正式 legend 控件。"
+        },
+        {
+          "field_name": "js_agg_function",
+          "reason": "当前 screengrid 运行时源码没有正式消费它；若保存态残留该字段，也不应把它当成当前 controlPanel 的正式创建字段。"
+        }
+      ],
+      "storybook_or_legacy_carry_over_fields": [
+        {
+          "field_name": "filters",
+          "reason": "这不是当前 controlPanel 正式字段。它可能在旧保存态或 storybook payload 中出现，但当前创建模板应优先使用 `adhoc_filters`。"
+        },
+        {
+          "field_name": "where",
+          "reason": "legacy 兼容字段，不是当前 deck_screengrid controlPanel 正式字段。"
+        },
+        {
+          "field_name": "having",
+          "reason": "legacy 兼容字段，不是当前 deck_screengrid controlPanel 正式字段。"
+        },
+        {
+          "field_name": "groupby",
+          "reason": "storybook payload 中会出现空数组，但当前 deck_screengrid 没有正式 groupby control；主 groupby 逻辑由 `spatial` 和可选 `js_columns` 决定。"
+        },
+        {
+          "field_name": "point_radius",
+          "reason": "这是其他 deck.gl 图层使用的字段，当前 `Screengrid.tsx` 不消费它。"
+        },
+        {
+          "field_name": "point_radius_fixed",
+          "reason": "这是其他 deck.gl 图层使用的字段，当前 `Screengrid.tsx` 不消费它。"
+        },
+        {
+          "field_name": "point_unit",
+          "reason": "这是其他 deck.gl 图层使用的字段，当前 `Screengrid.tsx` 不消费它。"
+        },
+        {
+          "field_name": "granularity_sqla",
+          "reason": "storybook/demo 保存态中可能带出该字段，但 screengrid 当前 controlPanel 没有正式暴露它。"
+        },
+        {
+          "field_name": "time_grain_sqla",
+          "reason": "虽然后端 timeseries 路径会读取它，但当前 screengrid controlPanel 没有正式暴露它。"
+        },
+        {
+          "field_name": "time_range",
+          "reason": "storybook/demo 保存态中可能带出该字段，但当前 screengrid controlPanel 没有正式暴露它。"
+        },
+        {
+          "field_name": "payload.form_data",
+          "reason": "这是 legacy `/superset/explore_json/` 请求的外层包裹字段，不是图表保存态内部的 root form_data 字段。"
+        }
+      ],
+      "viz_switch_only": [
+        {
+          "field_name": "formDataOverrides(size)",
+          "reason": "只在 standardized form data 切换 viz_type 时触发，不是常规 API 导出 deck_screengrid form_data 的必经步骤。"
+        }
+      ]
+    },
+    "api_usage_guidance": {
+      "high_confidence_required_fields": [
+        "datasource",
+        "viz_type",
+        "spatial",
+        "size"
+      ],
+      "recommended_always_set": [
+        "adhoc_filters",
+        "filter_nulls",
+        "row_limit",
+        "mapbox_style",
+        "autozoom",
+        "viewport",
+        "grid_size",
+        "color_scheme_type"
+      ],
+      "api_field_examples": [
+        "spatial",
+        "size",
+        "filter_nulls",
+        "mapbox_style",
+        "grid_size",
+        "color_scheme_type",
+        "color_picker",
+        "color_scheme",
+        "viewport"
+      ],
+      "avoid_confusion": [
+        "不要把 deck_screengrid 当成标准 chart data API 图表去套 `/api/v1/chart/data` 的 `query_context` 模板；当前图真实入口是 legacy `/superset/explore_json/`。",
+        "不要把 `size` 误写成 `metric`、`metrics` 或 `point_radius_fixed`；当前图的正式 Weight 字段名就是 `size`。",
+        "`color_scheme_type='default'` 才是当前图的正式默认模式。它使用 `Screengrid.tsx` 内置色带，不需要额外 `color_picker` 或 `color_scheme` 才能工作。",
+        "当前图没有正式 breakpoint 颜色控件，也没有正式 legend 控件。`deafult_breakpoint_color`、`color_breakpoints`、`legend_position`、`legend_format` 不应作为当前 controlPanel 的 canonical 创建字段去主动构造。",
+        "`spatial` 不是单个字符串列名，而是一个对象。根据你的空间数据编码方式，必须传 `latlong` / `delimited` / `geohash` 三种形状之一。",
+        "`viewport` 是正式保存态字段，但 `width`/`height` 由运行时补入，不要把这两个字段写回 root form_data。"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "deck_screengrid",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/deck_screengrid-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/deck_screengrid-form-data-schema.json",
+      "control-schema": "form-data-schema/deck_screengrid-schema.json"
+    }
+  }
+}

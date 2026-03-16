@@ -1,0 +1,358 @@
+{
+  "viz_type": "funnel",
+  "display_name": "Funnel Chart",
+  "purpose": "用于调用 API 创建或保存 Funnel Chart 时填写的 form_data 模板",
+  "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/funnel-schema.json",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Funnel/controlPanel.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Funnel/index.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Funnel/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Funnel/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Funnel/types.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/controls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/constants.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/utils/eventHandlers.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-demo/storybook/stories/plugins/plugin-chart-echarts/Funnel/Funnel.stories.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/test/Funnel/buildQuery.test.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/test/Funnel/transformProps.test.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryContext.ts"
+  ],
+  "notes": [
+    "funnel 走标准 `/api/v1/chart/data`，不是 legacy `/superset/explore_json/`。",
+    "API form_data 必须保留 controlPanel 原始键名；不要直接照抄 storybook 里的 runtime camelCase 字段名。",
+    "`groupby` 和 `metric` 虽然在 UI 层没有显式 `validateNonEmpty`，但 buildQuery、transformProps 和漏斗图语义都强依赖它们。规范创建模板应始终提供这两个字段。",
+    "`sort_by_metric` 只影响 query_context 中是否注入 `orderby=[[metric,false]]`；它不会改变 root form_data 中的 `metric` 或 `groupby` 结构。",
+    "当前 controlPanel 没有正式暴露 `sort`、`orient`、`gap`、`labelLine`、`legendType`。如果你是新建图表，canonical 模板不需要主动传这些字段；如果你是在复制已有保存态图表，应原样保留。"
+  ],
+  "naming_and_pipeline": {
+    "control_to_api_form_data": "getFormDataFromControls() 按 control name 原样输出 root form_data。",
+    "api_form_data_to_query_context": "`Funnel/buildQuery.ts` 使用 `buildQueryContext(formData, ...)` 构造 query_context，并在 `sort_by_metric=true` 时给单个 query 注入 `orderby`。",
+    "api_form_data_to_runtime_form_data": "运行时 `ChartProps` 会把 root form_data 转成 camelCase 别名，例如 `color_scheme -> colorScheme`、`label_type -> labelType`、`show_legend -> showLegend`。这些 camelCase 字段不是 API root form_data 的正式键名。"
+  },
+  "global_required_fields": {
+    "datasource": {
+      "data_type": "string",
+      "required": true,
+      "sample_data": "<dataset_id>__table",
+      "source": "datasourceAndVizType hidden control"
+    },
+    "viz_type": {
+      "data_type": "string",
+      "required": true,
+      "fixed_value": "funnel",
+      "source": "Funnel/index.ts"
+    },
+    "groupby": {
+      "data_type": "array[string | object]",
+      "required": true,
+      "sample_data": [
+        "stage"
+      ],
+      "source": "Funnel Query section + buildQuery.ts + transformProps.ts",
+      "notes": "高置信语义必填。没有它，漏斗阶段标签与 cross-filter 维度都不存在。"
+    },
+    "metric": {
+      "data_type": "string | object",
+      "required": true,
+      "sample_data": "value",
+      "source": "Funnel Query section + buildQuery.ts + transformProps.ts",
+      "notes": "高置信语义必填。没有它，漏斗每个 step 的数值无法生成。"
+    }
+  },
+  "global_optional_fields": {
+    "adhoc_filters": {
+      "data_type": "array[object]",
+      "required": false,
+      "sample_data": [],
+      "source": "Query section"
+    },
+    "row_limit": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 10,
+      "source": "Query section"
+    },
+    "sort_by_metric": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": true,
+      "source": "Query section"
+    },
+    "percent_calculation_type": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "first_step",
+      "source": "Query section"
+    },
+    "color_scheme": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "supersetColors",
+      "source": "Chart Options"
+    },
+    "show_legend": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": true,
+      "source": "Chart Options"
+    },
+    "legendOrientation": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "top",
+      "source": "Chart Options"
+    },
+    "legendMargin": {
+      "data_type": "integer | null",
+      "required": false,
+      "sample_data": null,
+      "source": "Chart Options"
+    },
+    "label_type": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 0,
+      "source": "Chart Options"
+    },
+    "tooltip_label_type": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 5,
+      "source": "Chart Options"
+    },
+    "number_format": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "SMART_NUMBER",
+      "source": "Chart Options"
+    },
+    "currency_format": {
+      "data_type": "string | object | null",
+      "required": false,
+      "sample_data": null,
+      "source": "Chart Options"
+    },
+    "show_labels": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": true,
+      "source": "Chart Options"
+    },
+    "show_tooltip_labels": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": true,
+      "source": "Chart Options"
+    },
+    "slice_id": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 0,
+      "source": "datasourceAndVizType hidden control"
+    },
+    "cache_timeout": {
+      "data_type": "integer | null",
+      "required": false,
+      "sample_data": null,
+      "source": "datasourceAndVizType hidden control"
+    },
+    "url_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "datasourceAndVizType hidden control"
+    },
+    "custom_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "datasourceAndVizType hidden control"
+    }
+  },
+  "minimal_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "funnel",
+    "groupby": [
+      "<stage_column>"
+    ],
+    "metric": {
+      "expressionType": "SIMPLE",
+      "column": {
+        "column_name": "<metric_column>"
+      },
+      "aggregate": "SUM",
+      "label": "SUM(<metric_column>)"
+    },
+    "adhoc_filters": [],
+    "row_limit": 10
+  },
+  "recommended_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "funnel",
+    "groupby": [
+      "<stage_column>"
+    ],
+    "metric": {
+      "expressionType": "SIMPLE",
+      "column": {
+        "column_name": "<metric_column>"
+      },
+      "aggregate": "SUM",
+      "label": "SUM(<metric_column>)"
+    },
+    "adhoc_filters": [],
+    "row_limit": 10,
+    "sort_by_metric": true,
+    "percent_calculation_type": "first_step",
+    "color_scheme": "supersetColors",
+    "show_legend": true,
+    "legendOrientation": "top",
+    "legendMargin": null,
+    "label_type": 0,
+    "tooltip_label_type": 5,
+    "number_format": "SMART_NUMBER",
+    "currency_format": null,
+    "show_labels": true,
+    "show_tooltip_labels": true
+  },
+  "conditional_blocks": {
+    "multi_dimension_funnel": {
+      "condition": "需要用多列组合成漏斗阶段标签时",
+      "fields": {
+        "groupby": [
+          "region",
+          "stage"
+        ]
+      },
+      "notes": "`transformProps.ts` 会用 `extractGroupbyLabel()` 把多列 groupby 拼成单个显示标签。"
+    },
+    "disable_metric_sort": {
+      "condition": "需要取消按指标降序注入 orderby 时",
+      "fields": {
+        "sort_by_metric": false
+      },
+      "notes": "此时 `buildQuery.ts` 不再写入 `orderby`，实际显示顺序会更多依赖底层查询结果或隐藏 runtime `sort`。"
+    },
+    "percent_display_modes": {
+      "condition": "需要调整标签/tooltip 百分比展示口径时",
+      "fields": {
+        "percent_calculation_type": "total",
+        "label_type": 5,
+        "tooltip_label_type": 5
+      }
+    },
+    "legend_display": {
+      "condition": "需要显示漏斗图例时",
+      "fields": {
+        "show_legend": true,
+        "legendOrientation": "top",
+        "legendMargin": null
+      }
+    },
+    "currency_display": {
+      "condition": "需要以货币格式显示数值时",
+      "fields": {
+        "number_format": "SMART_NUMBER",
+        "currency_format": "<currency_control_value>"
+      }
+    },
+    "hidden_runtime_layout": {
+      "condition": "如果你是在复制一个已有保存态图表，并且该图表本来就带有隐藏布局字段时",
+      "fields": {
+        "sort": "descending",
+        "orient": "vertical",
+        "gap": 0,
+        "labelLine": false,
+        "legendType": "scroll"
+      },
+      "notes": "这些字段来自 runtime 默认值，不是当前 controlPanel 的正式字段。新建图表时不建议主动构造。"
+    }
+  },
+  "runtime_only_or_non_template_fields": {
+    "runtime_camel_case_aliases": [
+      {
+        "field_name": "colorScheme",
+        "reason": "这是 `color_scheme` 的 runtime camelCase 别名，不是 API root 字段。"
+      },
+      {
+        "field_name": "labelType",
+        "reason": "这是 `label_type` 的 runtime camelCase 别名，不是 API root 字段。"
+      },
+      {
+        "field_name": "tooltipLabelType",
+        "reason": "这是 `tooltip_label_type` 的 runtime camelCase 别名，不是 API root 字段。"
+      },
+      {
+        "field_name": "numberFormat",
+        "reason": "这是 `number_format` 的 runtime camelCase 别名，不是 API root 字段。"
+      },
+      {
+        "field_name": "showLabels / showTooltipLabels / showLegend",
+        "reason": "这些是 `show_labels` / `show_tooltip_labels` / `show_legend` 的 runtime camelCase 别名。"
+      }
+    ],
+    "query_context_generated_fields": [
+      {
+        "field_name": "query_context.queries[*].metrics",
+        "reason": "由 root `metric` 经 `buildQuery.ts` 映射得到，不是额外的 root form_data 字段。"
+      },
+      {
+        "field_name": "query_context.queries[*].columns",
+        "reason": "由 root `groupby` 经 `buildQuery.ts` 映射得到，不是额外的 root form_data 字段。"
+      },
+      {
+        "field_name": "query_context.queries[*].orderby",
+        "reason": "只在 `sort_by_metric=true` 时由 `buildQuery.ts` 自动注入。"
+      }
+    ],
+    "hidden_runtime_supported_fields": [
+      {
+        "field_name": "sort / orient / gap / labelLine / legendType",
+        "reason": "这些字段来自 `types.ts::DEFAULT_FORM_DATA` 或 `DEFAULT_LEGEND_FORM_DATA`，当前 controlPanel 没有正式暴露。"
+      }
+    ],
+    "viz_switch_only": [
+      {
+        "field_name": "formDataOverrides(metric/groupby remap)",
+        "reason": "只在 standardizedFormData.transform() 切换 viz_type 时触发，不是常规导出 Funnel form_data 的必经步骤。"
+      }
+    ]
+  },
+  "api_usage_guidance": {
+    "high_confidence_required_fields": [
+      "datasource",
+      "viz_type",
+      "groupby",
+      "metric"
+    ],
+    "recommended_always_set": [
+      "adhoc_filters",
+      "row_limit",
+      "sort_by_metric",
+      "percent_calculation_type",
+      "color_scheme",
+      "show_legend",
+      "label_type",
+      "tooltip_label_type",
+      "number_format",
+      "show_labels",
+      "show_tooltip_labels"
+    ],
+    "mixed_case_examples": [
+      "color_scheme",
+      "label_type",
+      "tooltip_label_type",
+      "show_legend",
+      "legendOrientation",
+      "legendMargin"
+    ],
+    "avoid_confusion": [
+      "不要把 storybook 里的 `colorScheme`、`labelType`、`showLegend` 直接当成 API root 键名。",
+      "`sort_by_metric` 只是控制是否向 query_context 注入 `orderby`，不是 runtime `sort` 的替代字段。",
+      "当前 controlPanel 没有正式暴露 `sort`、`orient`、`gap`、`labelLine`、`legendType`；这些不是 canonical 创建模板字段。"
+    ]
+  }
+}

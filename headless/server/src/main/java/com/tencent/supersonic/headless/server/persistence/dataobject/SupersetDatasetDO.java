@@ -44,6 +44,41 @@ public class SupersetDatasetDO {
 
     private String metrics;
 
+    /**
+     * Dataset registry source type (e.g. chat SQL, semantic dataset mapping).
+     */
+    private String sourceType;
+
+    /**
+     * Sync state for superset dataset sync job.
+     */
+    private String syncState;
+
+    /**
+     * Last sync attempt time.
+     */
+    private Date syncAttemptAt;
+
+    /**
+     * Next retry time for retryable failures.
+     */
+    private Date nextRetryAt;
+
+    /**
+     * Retry count for consecutive failures.
+     */
+    private Integer retryCount;
+
+    /**
+     * Last sync error type (retryable/fatal).
+     */
+    private String syncErrorType;
+
+    /**
+     * Last sync error message.
+     */
+    private String syncErrorMsg;
+
     private Date createdAt;
 
     private String createdBy;

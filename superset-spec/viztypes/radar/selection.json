@@ -1,0 +1,295 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "radar",
+  "display_name": "Radar Chart",
+  "selection_summary": {
+    "category": "relationship",
+    "tags": [
+      "radar",
+      "multi_dimensional",
+      "polar",
+      "comparison"
+    ],
+    "description_zh": "Radar Chart displays multi-dimensional numerical data on a polar coordinate system, with each dimension as a spoke and data points as a polygon connecting values across spokes.",
+    "visual_shape_zh": "雷达图（多维对比型）",
+    "use_cases_zh": [
+      "多维度指标对比（如产品多维度评分、用户多特征分析）",
+      "多维特征的相似度分析",
+      "综合能力/性能评估"
+    ],
+    "required_slots": [
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "Query",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+          "多维数值指标列表，用于定义雷达图的维度（辐条）。"
+        ]
+      }
+    ],
+    "optional_slots": [
+      {
+        "field_name": "adhoc_filters",
+        "required": false,
+        "slot_kind": "filter_list",
+        "accepted_dataset_roles": [
+          "filter_context"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [],
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "Filters"
+        ]
+      },
+      {
+        "field_name": "groupby",
+        "required": false,
+        "slot_kind": "dimension_list",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [
+          "<dimension_column>"
+        ],
+        "source_categories": [
+          "Query",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Dimensions contain qualitative values such as names, dates, or geographical data. Use dimensions to categorize, segment, and reveal the details in your data. Dimensions affect the level of detail in the view.",
+          "分类维度字段，用于定义雷达图的系列（不同多边形）。"
+        ]
+      }
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "metric",
+      "saved_metric"
+    ],
+    "optional_dataset_roles": [
+      "category_dimension",
+      "dimension",
+      "filter_context"
+    ],
+    "dataset_role_inventory": {
+      "adhoc_metric": [
+        "metrics"
+      ],
+      "category_dimension": [
+        "groupby"
+      ],
+      "dimension": [
+        "groupby"
+      ],
+      "filter_context": [
+        "adhoc_filters"
+      ],
+      "metric": [
+        "metrics"
+      ],
+      "saved_metric": [
+        "metrics"
+      ]
+    },
+    "non_binding_control_names": [
+      "color_scheme",
+      "column_config",
+      "date_format",
+      "is_circle",
+      "label_position",
+      "label_type",
+      "legendMargin",
+      "legendOrientation",
+      "legendType",
+      "number_format",
+      "row_limit",
+      "show_labels",
+      "show_legend",
+      "timeseries_limit_metric"
+    ],
+    "embedding_runtime_field_names": [
+      "adhoc_filters",
+      "custom_form_data",
+      "filters",
+      "granularity_sqla",
+      "interactive_drilldown",
+      "interactive_groupby",
+      "interactive_highlight",
+      "relative_end",
+      "relative_start",
+      "time_column",
+      "time_grain",
+      "time_grain_sqla",
+      "time_range"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "groupby",
+      "metrics",
+      "row_limit",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "color_scheme",
+      "column_config",
+      "datasource",
+      "date_format",
+      "groupby",
+      "is_circle",
+      "label_position",
+      "label_type",
+      "legendMargin",
+      "legendOrientation",
+      "legendType",
+      "metrics",
+      "number_format",
+      "row_limit",
+      "show_labels",
+      "show_legend",
+      "timeseries_limit_metric",
+      "viz_type"
+    ],
+    "structural_flags": {
+      "time_series": false,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": false,
+      "flow_like": false,
+      "distribution_like": false,
+      "supports_breakdown": true,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": false,
+      "needs_dimension": false
+    },
+    "selection_hints": [
+      "至少需要 1 个可聚合指标字段。",
+      "支持按维度拆分多序列或子组。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：多维度指标对比（如产品多维度评分、用户多特征分析）；多维特征的相似度分析；综合能力/性能评估"
+    ]
+  },
+  "selection_prompt_card": {
+    "viz_type": "radar",
+    "display_name": "Radar Chart",
+    "category": "relationship",
+    "description_zh": "Radar Chart displays multi-dimensional numerical data on a polar coordinate system, with each dimension as a spoke and data points as a polygon connecting values across spokes.",
+    "visual_shape_zh": "雷达图（多维对比型）",
+    "best_for": [
+      "多维度指标对比（如产品多维度评分、用户多特征分析）",
+      "多维特征的相似度分析",
+      "综合能力/性能评估"
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "metric",
+      "saved_metric"
+    ],
+    "optional_dataset_roles": [
+      "category_dimension",
+      "dimension",
+      "filter_context"
+    ],
+    "required_slots": [
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "Query",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+          "多维数值指标列表，用于定义雷达图的维度（辐条）。"
+        ]
+      }
+    ],
+    "optional_slot_names": [
+      "adhoc_filters",
+      "groupby"
+    ],
+    "structural_flags": {
+      "time_series": false,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": false,
+      "flow_like": false,
+      "distribution_like": false,
+      "supports_breakdown": true,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": false,
+      "needs_dimension": false
+    },
+    "selection_hints": [
+      "至少需要 1 个可聚合指标字段。",
+      "支持按维度拆分多序列或子组。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：多维度指标对比（如产品多维度评分、用户多特征分析）；多维特征的相似度分析；综合能力/性能评估"
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "radar",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/radar-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/radar-form-data-schema.json",
+      "control-schema": "form-data-schema/radar-schema.json"
+    }
+  }
+}

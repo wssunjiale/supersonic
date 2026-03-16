@@ -1,0 +1,376 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "time_pivot",
+  "display_name": "Time-series Period Pivot",
+  "generation_mode": "heuristic_seed",
+  "slot_candidates": [
+    {
+      "field_name": "adhoc_filters",
+      "required": false,
+      "slot_kind": "filter_list",
+      "accepted_dataset_roles": [
+        "filter_context"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [],
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [
+        "extra_form_data.append"
+      ],
+      "descriptions": [
+        "字段标签为 Filters。"
+      ]
+    },
+    {
+      "field_name": "granularity_sqla",
+      "required": false,
+      "slot_kind": "time_column",
+      "accepted_dataset_roles": [
+        "time_dimension"
+      ],
+      "cardinality": "0..1",
+      "placeholder": "<time_column>",
+      "source_categories": [
+        "Time"
+      ],
+      "embedding_modes": [
+        "extra_form_data.override"
+      ],
+      "descriptions": [
+        "The time column for the visualization. Note that you can define arbitrary expression that return a DATETIME column in the table. Also note that the filter below is applied against this column or expression"
+      ]
+    },
+    {
+      "field_name": "metric",
+      "required": true,
+      "slot_kind": "metric",
+      "accepted_dataset_roles": [
+        "metric",
+        "saved_metric",
+        "adhoc_metric"
+      ],
+      "cardinality": "1",
+      "placeholder": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+      ]
+    },
+    {
+      "field_name": "time_grain_sqla",
+      "required": false,
+      "slot_kind": "time_grain",
+      "accepted_dataset_roles": [
+        "time_grain"
+      ],
+      "cardinality": "0..1",
+      "placeholder": "P1D",
+      "source_categories": [
+        "Time"
+      ],
+      "embedding_modes": [
+        "extra_form_data.override"
+      ],
+      "descriptions": [
+        "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart."
+      ]
+    }
+  ],
+  "non_binding_form_controls": [
+    {
+      "field_name": "bottom_margin",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "X Axis"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Bottom margin, in pixels, allowing for more room for axis labels"
+      ]
+    },
+    {
+      "field_name": "color_picker",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Use this to define a static color for all circles"
+      ]
+    },
+    {
+      "field_name": "freq",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The periodicity over which to pivot time. Users can provide Pandas offset alias."
+      ]
+    },
+    {
+      "field_name": "granularity",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Time"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The time granularity for the visualization. Note that you can type and use simple natural language as in `10 seconds`, `1 day` or `56 weeks`."
+      ]
+    },
+    {
+      "field_name": "left_margin",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Y Axis"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Left margin, in pixels, allowing for more room for axis labels"
+      ]
+    },
+    {
+      "field_name": "line_interpolation",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Line interpolation as defined by d3.js"
+      ]
+    },
+    {
+      "field_name": "show_legend",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to display the legend (toggles)"
+      ]
+    },
+    {
+      "field_name": "time_range",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Time"
+      ],
+      "embedding_modes": [
+        "extra_form_data.override"
+      ],
+      "descriptions": [
+        "This control filters the whole chart based on the selected time range. All relative times, e.g. \"Last month\", \"Last 7 days\", \"now\", etc. are evaluated on the server using the server's local time (sans timezone)."
+      ]
+    },
+    {
+      "field_name": "x_axis_format",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "X Axis"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "D3 format syntax: https://github.com/d3/d3-format"
+      ]
+    },
+    {
+      "field_name": "x_axis_label",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "X Axis"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "源码未提供额外描述；字段标签为 X Axis Label。"
+      ]
+    },
+    {
+      "field_name": "x_axis_showminmax",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "X Axis"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to display the min and max values of the X-axis"
+      ]
+    },
+    {
+      "field_name": "y_axis_bounds",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Y Axis"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Bounds for the Y-axis. When left empty, the bounds are dynamically defined based on the min/max of the data. Note that this feature will only expand the axis range. It won't narrow the data's extent."
+      ]
+    },
+    {
+      "field_name": "y_axis_format",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Y Axis"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "D3 format syntax: https://github.com/d3/d3-format"
+      ]
+    },
+    {
+      "field_name": "y_axis_label",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Y Axis"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "源码未提供额外描述；字段标签为 Y Axis Label。"
+      ]
+    },
+    {
+      "field_name": "y_axis_showminmax",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Y Axis"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to display the min and max values of the Y-axis"
+      ]
+    },
+    {
+      "field_name": "y_log_scale",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Y Axis"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Use a log scale for the Y-axis"
+      ]
+    }
+  ],
+  "dataset_role_inventory": {
+    "adhoc_metric": [
+      "metric"
+    ],
+    "filter_context": [
+      "adhoc_filters"
+    ],
+    "metric": [
+      "metric"
+    ],
+    "saved_metric": [
+      "metric"
+    ],
+    "time_dimension": [
+      "granularity_sqla"
+    ],
+    "time_grain": [
+      "time_grain_sqla"
+    ]
+  },
+  "binding_seed_example": {
+    "metric": {
+      "expressionType": "SIMPLE",
+      "column": {
+        "column_name": "<metric_column>"
+      },
+      "aggregate": "SUM",
+      "label": "SUM(<metric_column>)"
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "time_pivot",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/time_pivot-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/time_pivot-form-data-schema.json",
+      "control-schema": "form-data-schema/time_pivot-schema.json"
+    }
+  }
+}

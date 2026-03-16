@@ -1,0 +1,102 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "deck_multi",
+  "display_name": "deck.gl Multiple Layers",
+  "generation_mode": "heuristic_seed",
+  "slot_candidates": [
+    {
+      "field_name": "adhoc_filters",
+      "required": false,
+      "slot_kind": "filter_list",
+      "accepted_dataset_roles": [
+        "filter_context"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [],
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [
+        "extra_form_data.append"
+      ],
+      "descriptions": [
+        "根层 Filters。对 deck_multi 而言，它不是作用于自身 SQL，而是被转发到各个子图层。若存在 layer scope，则会按图层索引筛选后再分发。"
+      ]
+    },
+    {
+      "field_name": "deck_slices",
+      "required": true,
+      "slot_kind": "chart_reference_list",
+      "accepted_dataset_roles": [
+        "chart_reference"
+      ],
+      "cardinality": "1..n",
+      "placeholder": [
+        "<saved_chart_reference_json>"
+      ],
+      "source_categories": [
+        "Map"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Pick a set of deck.gl charts to layer on top of one another"
+      ]
+    }
+  ],
+  "non_binding_form_controls": [
+    {
+      "field_name": "mapbox_style",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Map"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/ or tile server URL."
+      ]
+    },
+    {
+      "field_name": "viewport",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Map"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Parameters related to the view and perspective on the map"
+      ]
+    }
+  ],
+  "dataset_role_inventory": {
+    "chart_reference": [
+      "deck_slices"
+    ],
+    "filter_context": [
+      "adhoc_filters"
+    ]
+  },
+  "binding_seed_example": {
+    "deck_slices": [
+      "<saved_chart_reference_json>"
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "deck_multi",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/deck_multi-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/deck_multi-form-data-schema.json",
+      "control-schema": "form-data-schema/deck_multi-schema.json"
+    }
+  }
+}

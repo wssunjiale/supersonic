@@ -1,0 +1,504 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "gauge_chart",
+  "display_name": "Gauge Chart",
+  "source_kind": "schema_file",
+  "normalized_chart_form_data": {
+    "required_root_fields": [
+      "datasource",
+      "metric",
+      "viz_type"
+    ],
+    "optional_root_fields": [
+      "adhoc_filters",
+      "animation",
+      "cache_timeout",
+      "color_scheme",
+      "currency_format",
+      "custom_params",
+      "end_angle",
+      "font_size",
+      "groupby",
+      "interval_color_indices",
+      "intervals",
+      "max_val",
+      "min_val",
+      "number_format",
+      "overlap",
+      "round_cap",
+      "row_limit",
+      "show_axis_tick",
+      "show_pointer",
+      "show_progress",
+      "show_split_line",
+      "slice_id",
+      "sort_by_metric",
+      "split_number",
+      "start_angle",
+      "url_params",
+      "value_formatter"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "groupby",
+      "metric",
+      "row_limit",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "animation",
+      "color_scheme",
+      "currency_format",
+      "datasource",
+      "end_angle",
+      "font_size",
+      "groupby",
+      "interval_color_indices",
+      "intervals",
+      "max_val",
+      "metric",
+      "min_val",
+      "number_format",
+      "overlap",
+      "round_cap",
+      "row_limit",
+      "show_axis_tick",
+      "show_pointer",
+      "show_progress",
+      "show_split_line",
+      "sort_by_metric",
+      "split_number",
+      "start_angle",
+      "value_formatter",
+      "viz_type"
+    ],
+    "fallback_template_seed": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "gauge_chart",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "adhoc_filters": [],
+      "time_range": "No filter"
+    }
+  },
+  "original_chart_form_data_schema": {
+    "viz_type": "gauge_chart",
+    "display_name": "Gauge Chart",
+    "purpose": "用于调用 API 创建或保存 Gauge Chart 时填写的 form_data 模板",
+    "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/gauge_chart-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Gauge/controlPanel.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Gauge/index.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Gauge/buildQuery.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Gauge/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Gauge/EchartsGauge.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Gauge/types.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Gauge/constants.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/utils/eventHandlers.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/utils/controls.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/test/Gauge/buildQuery.test.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/test/Gauge/transformProps.test.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-demo/storybook/stories/plugins/plugin-chart-echarts/Gauge/Gauge.stories.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryContext.ts"
+    ],
+    "notes": [
+      "gauge_chart 走标准 `/api/v1/chart/data`，不是 legacy `/superset/explore_json/`。",
+      "API root form_data 必须使用 controlPanel 原始 snake_case 键名，不要直接照抄 `transformProps.test.ts` 和 runtime 里的 camelCase 字段。",
+      "`metric` 是 Gauge 的源码级必填字段；`groupby` 则是可选字段。没有 `groupby` 时 Gauge 仍会渲染单个刻度盘。",
+      "`sort_by_metric` 不改变 root `metric`/`groupby` 结构，只决定 `buildQuery.ts` 是否向 query_context 注入 `orderby=[[metric,false]]`。",
+      "`intervals` 与 `interval_color_indices` 都是文本字段，不是数组；运行时会在 `transformProps.ts` 中做解析。",
+      "当前 Gauge 虽然在 `types.ts::DEFAULT_FORM_DATA` 里带入了 legend 默认值，但 controlPanel 与 transformProps 都没有正式使用 legend 配置，因此 canonical 创建模板不需要主动传 legend 字段。"
+    ],
+    "naming_and_pipeline": {
+      "control_to_api_form_data": "Explore control state 会按 control name 原样输出 root form_data。",
+      "api_form_data_to_query_context": "`Gauge/buildQuery.ts` 让标准 query builder 先处理 `metric`/`groupby`，再按需补 `orderby`。",
+      "api_form_data_to_runtime_form_data": "运行时会把大多数 Gauge root 字段映射为 camelCase，例如 `row_limit -> rowLimit`、`min_val -> minVal`、`interval_color_indices -> intervalColorIndices`。这些 camelCase 字段不是 API root 键名。"
+    },
+    "global_required_fields": {
+      "datasource": {
+        "data_type": "string",
+        "required": true,
+        "sample_data": "<dataset_id>__table",
+        "source": "datasourceAndVizType hidden control"
+      },
+      "viz_type": {
+        "data_type": "string",
+        "required": true,
+        "fixed_value": "gauge_chart",
+        "source": "Gauge/index.ts"
+      },
+      "metric": {
+        "data_type": "string | object",
+        "required": true,
+        "sample_data": "value",
+        "source": "Gauge Query section + sharedControls.metric + buildQuery.ts"
+      }
+    },
+    "global_optional_fields": {
+      "groupby": {
+        "data_type": "array[string | object]",
+        "required": false,
+        "sample_data": [
+          "name"
+        ],
+        "source": "Query section"
+      },
+      "adhoc_filters": {
+        "data_type": "array[object]",
+        "required": false,
+        "sample_data": [],
+        "source": "Query section"
+      },
+      "row_limit": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 10,
+        "source": "Query section"
+      },
+      "sort_by_metric": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": false,
+        "source": "Query section"
+      },
+      "min_val": {
+        "data_type": "integer | null",
+        "required": false,
+        "sample_data": 0,
+        "source": "Chart Options"
+      },
+      "max_val": {
+        "data_type": "integer | null",
+        "required": false,
+        "sample_data": 100,
+        "source": "Chart Options"
+      },
+      "start_angle": {
+        "data_type": "number | string",
+        "required": false,
+        "sample_data": 225,
+        "source": "Chart Options"
+      },
+      "end_angle": {
+        "data_type": "number | string",
+        "required": false,
+        "sample_data": -45,
+        "source": "Chart Options"
+      },
+      "color_scheme": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "supersetColors",
+        "source": "通用图表选项"
+      },
+      "font_size": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 15,
+        "source": "通用图表选项"
+      },
+      "number_format": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "SMART_NUMBER",
+        "source": "通用图表选项"
+      },
+      "currency_format": {
+        "data_type": "string | object | null",
+        "required": false,
+        "sample_data": {
+          "symbol": "$",
+          "symbolPosition": "prefix"
+        },
+        "source": "通用图表选项"
+      },
+      "value_formatter": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "{value}%",
+        "source": "通用图表选项"
+      },
+      "show_pointer": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": true,
+        "source": "Chart Options"
+      },
+      "animation": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": true,
+        "source": "通用图表选项"
+      },
+      "show_axis_tick": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": false,
+        "source": "Chart Options"
+      },
+      "show_split_line": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": false,
+        "source": "Chart Options"
+      },
+      "split_number": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 10,
+        "source": "Chart Options"
+      },
+      "show_progress": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": true,
+        "source": "Chart Options"
+      },
+      "overlap": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": true,
+        "source": "Chart Options"
+      },
+      "round_cap": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": false,
+        "source": "Chart Options"
+      },
+      "intervals": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "60,100",
+        "source": "图表专属"
+      },
+      "interval_color_indices": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "1,2",
+        "source": "图表专属"
+      },
+      "slice_id": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 0,
+        "source": "datasourceAndVizType hidden control"
+      },
+      "cache_timeout": {
+        "data_type": "integer | null",
+        "required": false,
+        "sample_data": null,
+        "source": "datasourceAndVizType hidden control"
+      },
+      "url_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "datasourceAndVizType hidden control"
+      },
+      "custom_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "datasourceAndVizType hidden control"
+      }
+    },
+    "minimal_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "gauge_chart",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "groupby": [],
+      "adhoc_filters": [],
+      "row_limit": 10
+    },
+    "recommended_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "gauge_chart",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "groupby": [
+        "<dimension_column>"
+      ],
+      "adhoc_filters": [],
+      "row_limit": 10,
+      "sort_by_metric": false,
+      "min_val": 0,
+      "max_val": 100,
+      "start_angle": 225,
+      "end_angle": -45,
+      "color_scheme": "supersetColors",
+      "font_size": 15,
+      "number_format": "SMART_NUMBER",
+      "currency_format": null,
+      "value_formatter": "{value}",
+      "show_pointer": true,
+      "animation": true,
+      "show_axis_tick": false,
+      "show_split_line": false,
+      "split_number": 10,
+      "show_progress": true,
+      "overlap": true,
+      "round_cap": false,
+      "intervals": "",
+      "interval_color_indices": ""
+    },
+    "conditional_blocks": {
+      "multiple_gauges": {
+        "condition": "需要按维度输出多个 gauge 项时",
+        "fields": {
+          "groupby": [
+            "name"
+          ],
+          "row_limit": 10
+        },
+        "notes": "`groupby` 有值时，`transformProps.ts` 会为每条结果生成一个 GaugeDataItem，并通过 `allEventHandlers` 支持点击筛选。"
+      },
+      "metric_sorting": {
+        "condition": "需要让多个 gauge 按指标值降序排列时",
+        "fields": {
+          "sort_by_metric": true
+        },
+        "notes": "这会让 `buildQuery.ts` 额外写入 `orderby=[[metric,false]]`。"
+      },
+      "fixed_axis_range": {
+        "condition": "需要固定 gauge 量程时",
+        "fields": {
+          "min_val": 0,
+          "max_val": 100
+        },
+        "notes": "若不显式提供，运行时会按数据自动推导两倍范围。"
+      },
+      "interval_coloring": {
+        "condition": "需要按区间着色 gauge 轴线时",
+        "fields": {
+          "intervals": "60,100",
+          "interval_color_indices": "1,2"
+        },
+        "notes": "`intervals` 和 `interval_color_indices` 都必须是逗号分隔的数字文本。"
+      },
+      "separate_multiple_rings": {
+        "condition": "需要让多个 gauge 进度环分离显示时",
+        "fields": {
+          "overlap": false,
+          "show_progress": true
+        },
+        "notes": "`overlap=false` 会让轴线宽度按 `data.length * fontSize` 扩大，形成分离多环。"
+      },
+      "append_unit_text": {
+        "condition": "需要为数值追加单位时",
+        "fields": {
+          "value_formatter": "{value}%"
+        },
+        "notes": "运行时通过字符串替换 `{value}` 拼接格式化后的数值。"
+      }
+    },
+    "runtime_only_or_non_template_fields": {
+      "runtime_camel_case_aliases": [
+        {
+          "field_name": "rowLimit / minVal / maxVal / startAngle / endAngle / colorScheme / fontSize / numberFormat / currencyFormat / valueFormatter / showPointer / showAxisTick / showSplitLine / splitNumber / showProgress / roundCap / intervalColorIndices",
+          "reason": "这些是运行时 camelCase 别名，不是 API root form_data 的 canonical 键名。"
+        }
+      ],
+      "query_context_generated_fields": [
+        {
+          "field_name": "query_context.queries[*].metrics",
+          "reason": "由 root `metric` 经标准 query builder 生成。"
+        },
+        {
+          "field_name": "query_context.queries[*].columns",
+          "reason": "由 root `groupby` 经标准 query builder 生成。"
+        },
+        {
+          "field_name": "query_context.queries[*].orderby",
+          "reason": "只在 `sort_by_metric=true` 时由 `Gauge/buildQuery.ts` 注入。"
+        }
+      ],
+      "hidden_runtime_defaults_not_template_fields": [
+        {
+          "field_name": "showLegend / legendType / legendOrientation / legendMargin",
+          "reason": "它们出现在 `Gauge/types.ts::DEFAULT_FORM_DATA`，但当前 Gauge controlPanel 与 transformProps 都没有正式使用。"
+        }
+      ],
+      "viz_switch_only": [
+        {
+          "field_name": "formDataOverrides(metric/groupby remap)",
+          "reason": "只在 standardizedFormData.transform() 切换图表时触发，不是常规 Gauge API 创建模板字段。"
+        }
+      ]
+    },
+    "api_usage_guidance": {
+      "high_confidence_required_fields": [
+        "datasource",
+        "viz_type",
+        "metric"
+      ],
+      "recommended_always_set": [
+        "groupby",
+        "adhoc_filters",
+        "row_limit",
+        "min_val",
+        "max_val",
+        "color_scheme",
+        "font_size",
+        "number_format",
+        "value_formatter",
+        "show_progress"
+      ],
+      "mixed_case_examples": [
+        "row_limit",
+        "min_val",
+        "max_val",
+        "start_angle",
+        "end_angle",
+        "font_size",
+        "show_axis_tick",
+        "show_split_line",
+        "split_number",
+        "show_progress",
+        "round_cap",
+        "interval_color_indices"
+      ],
+      "avoid_confusion": [
+        "不要把 `rowLimit`、`minVal`、`startAngle`、`intervalColorIndices` 当成 API root 键名。",
+        "`intervals` 和 `interval_color_indices` 都是文本输入，不是数组。",
+        "`sort_by_metric` 只是决定是否注入 `orderby`，不是独立排序字段集合。",
+        "Gauge 当前没有正式 legend 配置；不要把 `show_legend` 一类字段主动塞进 canonical 创建模板。"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "gauge_chart",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/gauge_chart-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/gauge_chart-form-data-schema.json",
+      "control-schema": "form-data-schema/gauge_chart-schema.json"
+    }
+  }
+}

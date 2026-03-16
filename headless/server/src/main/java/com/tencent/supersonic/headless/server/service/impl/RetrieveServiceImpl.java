@@ -60,6 +60,10 @@ public class RetrieveServiceImpl implements RetrieveService {
 
     @Override
     public List<SearchResult> retrieve(QueryNLReq queryNLReq) {
+        if (CollectionUtils.isEmpty(queryNLReq.getDataSetIds())) {
+            return Collections.emptyList();
+        }
+
         String queryText = queryNLReq.getQueryText();
 
         // 1. Get meta info
@@ -75,7 +79,7 @@ public class RetrieveServiceImpl implements RetrieveService {
         Set<Long> dataSetIds = queryNLReq.getDataSetIds();
 
         ChatQueryContext chatQueryContext = new ChatQueryContext(queryNLReq);
-        chatQueryContext.setModelIdToDataSetIds(dataSetService.getModelIdToDataSetIds());
+        chatQueryContext.setModelIdToDataSetIds(modelIdToDataSetIds);
 
         Map<MatchText, List<HanlpMapResult>> regTextMap =
                 searchMatchStrategy.match(chatQueryContext, originals, dataSetIds);

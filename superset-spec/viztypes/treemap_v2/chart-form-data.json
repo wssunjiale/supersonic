@@ -1,0 +1,375 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "treemap_v2",
+  "display_name": "Treemap",
+  "source_kind": "schema_file",
+  "normalized_chart_form_data": {
+    "required_root_fields": [
+      "datasource",
+      "groupby",
+      "metric",
+      "viz_type"
+    ],
+    "optional_root_fields": [
+      "adhoc_filters",
+      "cache_timeout",
+      "color_scheme",
+      "currency_format",
+      "custom_params",
+      "date_format",
+      "extra_form_data",
+      "label_type",
+      "number_format",
+      "row_limit",
+      "show_labels",
+      "show_upper_labels",
+      "slice_id",
+      "sort_by_metric",
+      "url_params"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "groupby",
+      "metric",
+      "row_limit",
+      "sort_by_metric",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "color_scheme",
+      "currency_format",
+      "datasource",
+      "date_format",
+      "groupby",
+      "label_type",
+      "metric",
+      "number_format",
+      "row_limit",
+      "show_labels",
+      "show_upper_labels",
+      "sort_by_metric",
+      "viz_type"
+    ],
+    "fallback_template_seed": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "treemap_v2",
+      "groupby": [
+        "<dimension_column>"
+      ],
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "adhoc_filters": [],
+      "time_range": "No filter"
+    }
+  },
+  "original_chart_form_data_schema": {
+    "viz_type": "treemap_v2",
+    "display_name": "Treemap",
+    "purpose": "用于调用 API 创建或保存 Treemap 时填写的 form_data 模板",
+    "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/treemap_v2-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Treemap/controlPanel.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Treemap/index.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Treemap/buildQuery.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Treemap/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Treemap/types.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Treemap/constants.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/utils/treeBuilder.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/test/Treemap/buildQuery.test.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/test/Treemap/transformProps.test.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/models/ChartProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryContext.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryObject.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractQueryFields.ts"
+    ],
+    "notes": [
+      "API form_data 的键名必须保留源码中的原始 control name。Treemap 的根层字段既有 snake_case，也有 shared control 的通用命名。",
+      "Explore 导出 form_data 时走 getFormDataFromControls()，它只会按 controlName 原样取 value，不会统一改名。",
+      "transformProps 里看到的 camelCase formData 来自 ChartProps.convertKeysToCamelCase(formData)，是运行时形态，不是构造 API form_data 时唯一可信来源。",
+      "datasource 和 viz_type 来自通用 datasourceAndVizType section，不是 Treemap 专属控件，但创建图表时必须提供。",
+      "Treemap 当前源码没有直接暴露 `label_position` 控件；runtime 会使用 DEFAULT_FORM_DATA.labelPosition=insideTopLeft。",
+      "Treemap 的 hierarchy 完全依赖 `groupby`，面积值完全依赖 `metric`。二者是最核心的 form_data 字段。",
+      "sort_by_metric=true 时，buildQuery.ts 会把 query_context 的 orderby 写成 [[metric,false]]。"
+    ],
+    "naming_and_pipeline": {
+      "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写成 form_data[name]。",
+      "api_form_data_to_query_context": "Treemap/buildQuery.ts 使用原始 form_data 构建 query context。",
+      "api_form_data_to_runtime_form_data": "ChartProps.ts 会把 form_data 转成 camelCase 的 runtime formData，同时保留 rawFormData。",
+      "core_aliasing": "buildQueryObject/extractQueryFields 会把 `groupby` 归并到 query.columns，把 `metric` 归并到 query.metrics。"
+    },
+    "global_required_fields": {
+      "datasource": {
+        "data_type": "string",
+        "required": true,
+        "sample_data": "<dataset_id>__table",
+        "source": "datasourceAndVizType section"
+      },
+      "viz_type": {
+        "data_type": "string",
+        "required": true,
+        "fixed_value": "treemap_v2",
+        "source": "datasourceAndVizType section"
+      },
+      "groupby": {
+        "data_type": "array[string | object]",
+        "required": true,
+        "sample_data": [
+          "<level1_column>",
+          "<level2_column>"
+        ],
+        "source": "Treemap Query section + treeBuilder() runtime dependency",
+        "notes": "这不是纯推断。`transformProps()` 会把 groupby labels 直接传给 `treeBuilder()`，而 `treeBuilder()` 对非空层级列存在直接运行时依赖。"
+      },
+      "metric": {
+        "data_type": "string | object",
+        "required": true,
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        },
+        "source": "Treemap Query section + sharedControls.metric"
+      }
+    },
+    "global_optional_fields": {
+      "row_limit": {
+        "data_type": "integer | string",
+        "required": false,
+        "sample_data": 10000,
+        "source": "Treemap Query section"
+      },
+      "sort_by_metric": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": false,
+        "source": "Treemap Query section",
+        "notes": "开启后会改写 orderby。"
+      },
+      "adhoc_filters": {
+        "data_type": "array[object]",
+        "required": false,
+        "sample_data": [],
+        "source": "Treemap Query section"
+      },
+      "color_scheme": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "bnbColors",
+        "source": "Chart Options section"
+      },
+      "show_labels": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": true,
+        "source": "Chart Options section"
+      },
+      "show_upper_labels": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": true,
+        "source": "Chart Options section"
+      },
+      "label_type": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "key_value",
+        "source": "Chart Options section"
+      },
+      "number_format": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "SMART_NUMBER",
+        "source": "Chart Options section"
+      },
+      "currency_format": {
+        "data_type": "object | null",
+        "required": false,
+        "sample_data": {
+          "symbol": "$",
+          "symbolPosition": "prefix"
+        },
+        "source": "Chart Options section"
+      },
+      "date_format": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "smart_date",
+        "source": "Chart Options section"
+      },
+      "slice_id": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 0,
+        "source": "datasourceAndVizType hidden control"
+      },
+      "cache_timeout": {
+        "data_type": "integer | null",
+        "required": false,
+        "sample_data": null,
+        "source": "datasourceAndVizType hidden control"
+      },
+      "url_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "datasourceAndVizType hidden control"
+      },
+      "custom_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "datasourceAndVizType hidden control"
+      },
+      "extra_form_data": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "QueryFormData.extra_form_data"
+      }
+    },
+    "minimal_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "treemap_v2",
+      "groupby": [
+        "<hierarchy_column>"
+      ],
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "adhoc_filters": [],
+      "row_limit": 10000,
+      "sort_by_metric": false
+    },
+    "recommended_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "treemap_v2",
+      "groupby": [
+        "<level1_column>",
+        "<level2_column>"
+      ],
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "adhoc_filters": [],
+      "row_limit": 10000,
+      "sort_by_metric": false,
+      "color_scheme": "<categorical_scheme_key>",
+      "show_labels": true,
+      "show_upper_labels": true,
+      "label_type": "key_value",
+      "number_format": "SMART_NUMBER",
+      "currency_format": null,
+      "date_format": "smart_date"
+    },
+    "conditional_blocks": {
+      "multi_level_hierarchy": {
+        "condition": "需要展示多层 Treemap 时",
+        "fields": {
+          "groupby": [
+            "<level1_column>",
+            "<level2_column>",
+            "<level3_column>"
+          ]
+        }
+      },
+      "sort_by_primary_metric": {
+        "condition": "需要按主指标降序排序查询结果时",
+        "fields": {
+          "sort_by_metric": true
+        }
+      },
+      "label_formatting": {
+        "condition": "需要定制标签和 tooltip 数值格式时",
+        "fields": {
+          "show_labels": true,
+          "show_upper_labels": true,
+          "label_type": "key_value",
+          "number_format": ",.2f",
+          "currency_format": {
+            "symbol": "$",
+            "symbolPosition": "prefix"
+          },
+          "date_format": "smart_date"
+        }
+      }
+    },
+    "runtime_only_or_non_template_fields": {
+      "standardized_or_viz_switch_only": [
+        {
+          "field_name": "formDataOverrides(metric/groupby remap)",
+          "reason": "只在 standardizedFormData.transform() 切换 viz_type 时触发，不是常规导出 Treemap form_data 的必经步骤。"
+        }
+      ],
+      "runtime_aliases_only": [
+        {
+          "field_name": "colorScheme/showLabels/showUpperLabels/labelType/numberFormat/currencyFormat/dateFormat",
+          "reason": "这些是运行时 camelCase 形态；API 调用时应使用原始 control name。"
+        },
+        {
+          "field_name": "labelPosition",
+          "reason": "当前只存在于 runtime DEFAULT_FORM_DATA，不是当前 controlPanel 直接输出的 root form_data 字段。"
+        }
+      ]
+    },
+    "api_usage_guidance": {
+      "high_confidence_required_fields": [
+        "datasource",
+        "viz_type",
+        "groupby",
+        "metric"
+      ],
+      "recommended_always_set": [
+        "adhoc_filters",
+        "row_limit",
+        "sort_by_metric",
+        "color_scheme",
+        "show_labels",
+        "label_type",
+        "number_format"
+      ],
+      "do_not_send_as_root_form_data": [
+        "colorScheme",
+        "showLabels",
+        "showUpperLabels",
+        "labelType",
+        "numberFormat",
+        "currencyFormat",
+        "dateFormat",
+        "labelPosition"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "treemap_v2",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/treemap_v2-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/treemap_v2-form-data-schema.json",
+      "control-schema": "form-data-schema/treemap_v2-schema.json"
+    }
+  }
+}

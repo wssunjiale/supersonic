@@ -1,0 +1,285 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "word_cloud",
+  "display_name": "Word Cloud",
+  "source_kind": "schema_file",
+  "normalized_embedding_policy": {
+    "immutable_root_keys": [
+      "slice_id",
+      "datasource",
+      "viz_type",
+      "all_saved_chart_definition_fields"
+    ],
+    "allowed_runtime_fields": [
+      {
+        "field_name": "adhoc_filters",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "custom_form_data",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "filters",
+        "behavior": "append",
+        "source": "embedding-schema"
+      }
+    ],
+    "safe_embedding_form_data_seed": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "word_cloud",
+      "extra_form_data": {
+        "filters": [],
+        "adhoc_filters": []
+      }
+    }
+  },
+  "original_embedding_form_data_schema": {
+    "viz_type": "word_cloud",
+    "display_name": "Word Cloud",
+    "purpose": "第三方 embedding / guest token 场景下安全传输的 Word Cloud form_data 模板",
+    "base_form_data_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/word_cloud-form-data-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset/security/manager.py",
+      "D:/vsx/sources/superset-6.0.0/superset/constants.py",
+      "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/charts/data/api.py",
+      "D:/vsx/sources/superset-6.0.0/superset/commands/chart/data/get_data_command.py",
+      "D:/vsx/sources/superset-6.0.0/superset/charts/schemas.py",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/constants.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/QueryFormData.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/processExtraFormData.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/dashboard/components/nativeFilters/utils.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataWithDashboardContext.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-word-cloud/src/plugin/controlPanel.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-word-cloud/src/plugin/buildQuery.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-word-cloud/src/plugin/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-word-cloud/src/chart/WordCloud.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractQueryFields.ts"
+    ],
+    "notes": [
+      "word_cloud 是现代 chart data API 图。embedded guest 的限制核心在后端 `security/manager.py::query_context_modified()`。",
+      "安全做法不是在 guest 请求里重新拼装一份新的 Word Cloud form_data，而是以已保存图表的 form_data 原样复制为 base，只把动态条件放进 `extra_form_data`。",
+      "Word Cloud 的 query 关键字段是 `series`、可选 `metric`、`adhoc_filters`、`row_limit`、`sort_by_metric`。其中 `series` 会进入 query.columns，`metric` 会进入 query.metrics，`sort_by_metric` 在 truthy 时会改写 orderby。",
+      "`size_from`、`size_to`、`rotation`、`color_scheme` 虽然不改 query，但属于词云定义字段；guest 请求里不应临时改写。",
+      "如果保存态图表没有 `metric`，guest 请求也不应该临时补一个 metric；这会改变 query.metrics 与字体大小映射语义。"
+    ],
+    "security_enforcement": {
+      "backend_check_function": "superset/security/manager.py::query_context_modified",
+      "checked_when": "ChartDataCommand.validate() -> QueryContext.raise_for_access()",
+      "error_message": "Guest user cannot modify chart payload",
+      "hard_block_fields": [
+        "slice_id",
+        "metrics",
+        "columns",
+        "groupby",
+        "orderby"
+      ],
+      "indirectly_sensitive_fields_for_word_cloud": [
+        "series",
+        "metric",
+        "adhoc_filters",
+        "row_limit",
+        "sort_by_metric",
+        "size_from",
+        "size_to",
+        "rotation",
+        "color_scheme"
+      ],
+      "recommended_strategy": "复制保存态 chart form_data 作为 base，仅通过 extra_form_data 追加 filters / adhoc_filters；不要在 guest 请求里重构 Word Cloud 的 root 查询字段或展示字段。"
+    },
+    "safe_base_rule": {
+      "description": "第三方 embedding 请求中的根层 form_data，应当从已保存图表的 form_data 直接复制，不要重构。",
+      "must_be_copied_from_saved_chart": [
+        "slice_id",
+        "datasource",
+        "viz_type",
+        "series",
+        "metric",
+        "adhoc_filters",
+        "row_limit",
+        "sort_by_metric",
+        "size_from",
+        "size_to",
+        "rotation",
+        "color_scheme",
+        "all other chart-definition fields"
+      ],
+      "why": [
+        "query_context_modified() 会把请求 query_context 与保存态图表对比。",
+        "Word Cloud 的 `series` 会通过 core alias 进入 query.columns。",
+        "`metric` 会进入 query.metrics；`sort_by_metric` 在 truthy 时会显式改写 orderby。",
+        "`adhoc_filters` 与 `row_limit` 会直接改变查询结果。",
+        "字号范围、旋转方式、配色虽然不改 query，但会改变词云定义；保守 guest 模式也应直接复制保存态。"
+      ]
+    },
+    "safe_embedding_form_data_template": {
+      "description": "这是 guest embedding 下的安全写法。根层以保存态图表为 base，仅改 extra_form_data。",
+      "template": {
+        "slice_id": "<saved_chart_id>",
+        "dashboardId": "<dashboard_id>",
+        "datasource": "<copied_from_saved_chart>",
+        "viz_type": "word_cloud",
+        "series": "<copied_from_saved_chart>",
+        "metric": "<copied_from_saved_chart>",
+        "adhoc_filters": "<copied_from_saved_chart>",
+        "row_limit": "<copied_from_saved_chart>",
+        "sort_by_metric": "<copied_from_saved_chart>",
+        "size_from": "<copied_from_saved_chart>",
+        "size_to": "<copied_from_saved_chart>",
+        "rotation": "<copied_from_saved_chart>",
+        "color_scheme": "<copied_from_saved_chart>",
+        "extra_form_data": {
+          "filters": [
+            {
+              "col": "lang",
+              "op": "IN",
+              "val": [
+                "zh"
+              ]
+            }
+          ],
+          "adhoc_filters": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "lang",
+              "operator": "IN",
+              "comparator": [
+                "zh"
+              ]
+            }
+          ],
+          "custom_form_data": {}
+        }
+      }
+    },
+    "preferred_dynamic_container": {
+      "field_name": "extra_form_data",
+      "description": "chart data API 与 dashboard filter context 都会把动态过滤条件并入这里。",
+      "append_keys": [
+        "adhoc_filters",
+        "filters",
+        "custom_form_data"
+      ],
+      "override_keys_backend_high_confidence": [],
+      "notes": "Word Cloud 的常规 guest 动态入口应聚焦 `filters` / `adhoc_filters`。"
+    },
+    "extra_form_data_field_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_word_cloud": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "lang",
+            "op": "IN",
+            "val": [
+              "zh"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_word_cloud": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "lang",
+            "operator": "IN",
+            "comparator": [
+              "zh"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_word_cloud": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；Word Cloud 默认不直接消费它。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      }
+    ],
+    "unsafe_root_form_data_changes": [
+      {
+        "field_name": "slice_id",
+        "reason": "与保存态图表 id 不一致会被后端立即判定为请求了另一张图。"
+      },
+      {
+        "field_name": "series",
+        "reason": "会改变 query.columns 与词项来源。"
+      },
+      {
+        "field_name": "metric",
+        "reason": "会改变 query.metrics 与词云字号缩放逻辑。"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "reason": "会直接改变查询结果；guest 动态过滤应走 extra_form_data。"
+      },
+      {
+        "field_name": "row_limit",
+        "reason": "会改变 query 取数规模与最终词数量。"
+      },
+      {
+        "field_name": "sort_by_metric",
+        "reason": "会在 truthy 时改写 query.orderby。"
+      },
+      {
+        "field_name": "size_from",
+        "reason": "属于图表定义字段；会改变字号映射下界。"
+      },
+      {
+        "field_name": "size_to",
+        "reason": "属于图表定义字段；会改变字号映射上界。"
+      },
+      {
+        "field_name": "rotation",
+        "reason": "属于图表定义字段；会改变词的旋转布局。"
+      },
+      {
+        "field_name": "color_scheme",
+        "reason": "属于图表定义字段；会改变词的配色。"
+      }
+    ],
+    "practical_guidance": {
+      "best_practice": [
+        "先从保存态图表读取完整 form_data。",
+        "根层字段保持不变。",
+        "Word Cloud 优先只在 extra_form_data 中放 filters / adhoc_filters / custom_form_data。",
+        "如果页面需要 guest 联动筛选，优先使用 filters 或 adhoc_filters，而不是改 `series`、`metric`、`sort_by_metric` 或字号/旋转/颜色字段。"
+      ],
+      "do_not_rebuild_root_form_data": true
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "word_cloud",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/word_cloud-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/word_cloud-form-data-schema.json",
+      "control-schema": "form-data-schema/word_cloud-schema.json"
+    }
+  }
+}

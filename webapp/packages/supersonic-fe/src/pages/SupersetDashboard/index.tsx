@@ -11,6 +11,27 @@ import {
   SupersetDashboardManageResp,
 } from './service';
 
+type ApiEnvelope<T> = {
+  code?: number | string;
+  msg?: string;
+  data?: T;
+};
+
+function unwrapApiEnvelope<T>(payload: ApiEnvelope<T> | T | undefined): T | undefined {
+  if (payload == null) {
+    return undefined;
+  }
+  if (typeof payload === 'object' && 'code' in (payload as Record<string, unknown>)) {
+    const envelope = payload as ApiEnvelope<T>;
+    const code = Number(envelope.code);
+    if (Number.isFinite(code) && code !== 200 && code !== 0) {
+      throw new Error(envelope.msg || '请求失败');
+    }
+    return envelope.data;
+  }
+  return payload as T;
+}
+
 const SupersetDashboardPage: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const [pluginId, setPluginId] = useState<number | undefined>();
@@ -19,13 +40,16 @@ const SupersetDashboardPage: React.FC = () => {
   const [creating, setCreating] = useState(false);
   const [title, setTitle] = useState('');
 
-  const resolveManageResponse = (resp: SupersetDashboardManageResp | undefined) => {
-    const dashboards = resp?.dashboards || [];
-    if (resp?.pluginId && resp.pluginId !== pluginId) {
-      setPluginId(resp.pluginId);
+  const resolveManageResponse = (
+    resp: ApiEnvelope<SupersetDashboardManageResp> | SupersetDashboardManageResp | undefined
+  ) => {
+    const resolved = unwrapApiEnvelope<SupersetDashboardManageResp>(resp);
+    const dashboards = resolved?.dashboards || [];
+    if (resolved?.pluginId && resolved.pluginId !== pluginId) {
+      setPluginId(resolved.pluginId);
     }
-    if (resp?.supersetDomain && resp.supersetDomain !== supersetDomain) {
-      setSupersetDomain(resp.supersetDomain);
+    if (resolved?.supersetDomain && resolved.supersetDomain !== supersetDomain) {
+      setSupersetDomain(resolved.supersetDomain);
     }
     return dashboards;
   };
@@ -44,10 +68,13 @@ const SupersetDashboardPage: React.FC = () => {
     }
     setCreating(true);
     try {
-      await createSupersetDashboard({
+      const created = unwrapApiEnvelope<SupersetDashboardItem>(await createSupersetDashboard({
         pluginId,
         title: title.trim(),
-      });
+      }));
+      if (!created?.id) {
+        throw new Error('创建失败');
+      }
       message.success('已创建');
       setCreateOpen(false);
       setTitle('');
@@ -62,7 +89,10 @@ const SupersetDashboardPage: React.FC = () => {
 
   const handleDelete = async (dashboardId: number) => {
     try {
-      await deleteSupersetDashboard({ pluginId, dashboardId });
+      const deleted = unwrapApiEnvelope<boolean>(await deleteSupersetDashboard({ pluginId, dashboardId }));
+      if (deleted !== true) {
+        throw new Error('删除失败');
+      }
       message.success('已删除');
       actionRef.current?.reload();
     } catch (error: any) {
@@ -87,7 +117,7 @@ const SupersetDashboardPage: React.FC = () => {
     if (record.title) {
       query.set('title', record.title);
     }
-    window.open(`/supersetDashboard/embed?${query.toString()}`, '_blank');
+    window.open(`/webapp/supersetDashboard/embed?${query.toString()}`, '_blank');
   };
 
   const handleEdit = (record: SupersetDashboardItem) => {

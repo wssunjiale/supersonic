@@ -1,0 +1,222 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "funnel",
+  "display_name": "Funnel Chart",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      []
+    ],
+    "color_scheme": [
+      "supersetColors"
+    ],
+    "currency_format": [],
+    "groupby": [
+      [
+        "stage"
+      ]
+    ],
+    "label_type": [
+      0
+    ],
+    "legendMargin": [],
+    "legendOrientation": [
+      "top"
+    ],
+    "metric": [
+      "value"
+    ],
+    "number_format": [
+      "SMART_NUMBER"
+    ],
+    "percent_calculation_type": [
+      "first_step"
+    ],
+    "row_limit": [
+      10
+    ],
+    "show_labels": [
+      true
+    ],
+    "show_legend": [
+      true
+    ],
+    "show_tooltip_labels": [
+      true
+    ],
+    "sort_by_metric": [
+      true
+    ],
+    "tooltip_label_type": [
+      5
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "funnel",
+      "groupby": [
+        "<stage_column>"
+      ],
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "adhoc_filters": [],
+      "row_limit": 10
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "funnel",
+      "groupby": [
+        "<stage_column>"
+      ],
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "adhoc_filters": [],
+      "row_limit": 10,
+      "sort_by_metric": true,
+      "percent_calculation_type": "first_step",
+      "color_scheme": "supersetColors",
+      "show_legend": true,
+      "legendOrientation": "top",
+      "legendMargin": null,
+      "label_type": 0,
+      "tooltip_label_type": 5,
+      "number_format": "SMART_NUMBER",
+      "currency_format": null,
+      "show_labels": true,
+      "show_tooltip_labels": true
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "funnel",
+      "metric": "<copied_from_saved_chart>",
+      "groupby": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "row_limit": "<copied_from_saved_chart>",
+      "sort_by_metric": "<copied_from_saved_chart>",
+      "percent_calculation_type": "<copied_from_saved_chart_if_present>",
+      "color_scheme": "<copied_from_saved_chart_if_present>",
+      "show_legend": "<copied_from_saved_chart_if_present>",
+      "legendOrientation": "<copied_from_saved_chart_if_present>",
+      "legendMargin": "<copied_from_saved_chart_if_present>",
+      "label_type": "<copied_from_saved_chart_if_present>",
+      "tooltip_label_type": "<copied_from_saved_chart_if_present>",
+      "number_format": "<copied_from_saved_chart_if_present>",
+      "currency_format": "<copied_from_saved_chart_if_present>",
+      "show_labels": "<copied_from_saved_chart_if_present>",
+      "show_tooltip_labels": "<copied_from_saved_chart_if_present>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "stage",
+            "op": "IN",
+            "val": [
+              "Lead",
+              "Qualified"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_funnel": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "stage",
+            "op": "IN",
+            "val": [
+              "Lead",
+              "Qualified"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters；后端会转成额外过滤条件。对 Funnel 来说，这也是 `utils/eventHandlers.ts` 交互筛选明确产出的容器。",
+        "source": "superset/constants.py + superset/utils/core.py + plugin-chart-echarts/utils/eventHandlers.ts"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_funnel": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会标记为 `isExtra` 并并入查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_funnel": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "可传非标准附加数据；Funnel 默认 buildQuery / transformProps 不直接消费它。",
+        "source": "superset/constants.py + frontend QueryFormData.ts"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_funnel": false,
+        "recommended": false,
+        "sample_data": "Last 30 days",
+        "effect": "这是通用 extra_form_data override 字段，但 Funnel 当前 controlPanel 不以时间字段为主，通常没有必要在 guest embedding 中依赖它。",
+        "source": "superset/constants.py + frontend QueryFormData.ts",
+        "status": "低相关，不建议在 guest embedding 中依赖"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "funnel",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/funnel-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/funnel-form-data-schema.json",
+      "control-schema": "form-data-schema/funnel-schema.json"
+    }
+  }
+}

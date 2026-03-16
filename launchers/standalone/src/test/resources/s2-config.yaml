@@ -36,8 +36,6 @@ s2:
     enabled: ${S2_SUPERSET_ENABLED:true}
     base-url: ${S2_SUPERSET_BASE_URL:http://10.0.12.244:8088}
     auth-enabled: ${S2_SUPERSET_AUTH_ENABLED:false}
-    auth-strategy: ${S2_SUPERSET_AUTH_STRATEGY:JWT_FIRST}
-    api-key: ${S2_SUPERSET_API_KEY:}
     jwt-username: ${S2_SUPERSET_JWT_USERNAME:}
     jwt-password: ${S2_SUPERSET_JWT_PASSWORD:}
     jwt-provider: ${S2_SUPERSET_JWT_PROVIDER:db}
@@ -52,6 +50,8 @@ s2:
     guest-token-user-last-name: ${S2_SUPERSET_GUEST_USER_LAST_NAME:Guest}
     sync:
       enabled: ${S2_SUPERSET_SYNC_ENABLED:true}
+      auto-migrate-registry-schema: ${S2_SUPERSET_SYNC_AUTO_MIGRATE_REGISTRY_SCHEMA:true}
       interval-ms: ${S2_SUPERSET_SYNC_INTERVAL_MS:3600000}
+      dataset-interval-ms: ${S2_SUPERSET_SYNC_DATASET_INTERVAL_MS:60000}
       retry-interval-ms: ${S2_SUPERSET_SYNC_RETRY_INTERVAL_MS:60000}
       max-retries: ${S2_SUPERSET_SYNC_MAX_RETRIES:3}

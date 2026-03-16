@@ -1,0 +1,495 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "cal_heatmap",
+  "display_name": "Calendar Heatmap",
+  "source_kind": "schema_file",
+  "normalized_chart_form_data": {
+    "required_root_fields": [
+      "datasource",
+      "domain_granularity",
+      "granularity_sqla",
+      "metrics",
+      "subdomain_granularity",
+      "time_range",
+      "viz_type"
+    ],
+    "optional_root_fields": [
+      "adhoc_filters",
+      "cache_timeout",
+      "cell_padding",
+      "cell_radius",
+      "cell_size",
+      "custom_params",
+      "extra_form_data",
+      "linear_color_scheme",
+      "row_limit",
+      "show_legend",
+      "show_metric_name",
+      "show_values",
+      "since",
+      "slice_id",
+      "steps",
+      "until",
+      "url_params",
+      "x_axis_time_format",
+      "y_axis_format"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "domain_granularity",
+      "granularity_sqla",
+      "metrics",
+      "subdomain_granularity",
+      "time_range",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "cell_padding",
+      "cell_radius",
+      "cell_size",
+      "datasource",
+      "domain_granularity",
+      "granularity_sqla",
+      "linear_color_scheme",
+      "metrics",
+      "show_legend",
+      "show_metric_name",
+      "show_values",
+      "steps",
+      "subdomain_granularity",
+      "time_range",
+      "viz_type",
+      "x_axis_time_format",
+      "y_axis_format"
+    ],
+    "fallback_template_seed": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "cal_heatmap",
+      "domain_granularity": "<time_or_axis_column>",
+      "granularity_sqla": "<time_column>",
+      "metrics": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        }
+      ],
+      "subdomain_granularity": "<time_or_axis_column>",
+      "time_range": null,
+      "adhoc_filters": []
+    }
+  },
+  "original_chart_form_data_schema": {
+    "viz_type": "cal_heatmap",
+    "display_name": "Calendar Heatmap",
+    "purpose": "用于调用 API 创建或保存 Calendar Heatmap 时填写的 form_data 模板",
+    "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/cal_heatmap-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-calendar/src/controlPanel.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-calendar/src/index.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-calendar/src/transformProps.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-calendar/src/Calendar.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-calendar/src/utils.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+      "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+      "D:/vsx/sources/superset-6.0.0/superset/views/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/examples/random_time_series.py",
+      "D:/vsx/sources/superset-6.0.0/superset/examples/multiformat_time_series.py",
+      "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py",
+      "D:/vsx/sources/superset-6.0.0/superset/migrations/versions/2018-04-10_11-19_bf706ae5eb46_cal_heatmap_metric_to_metrics.py"
+    ],
+    "notes": [
+      "Calendar Heatmap 是 legacy 图，真实请求路径是 `/superset/explore_json/`，不是 `/api/v1/chart/data`。",
+      "Explore 导出 form_data 时走 `getFormDataFromControls()`，它按 control name 原样写入 root form_data，因此保存态字段保持 snake_case，例如 `domain_granularity`、`subdomain_granularity`、`linear_color_scheme`。",
+      "前端运行时看到的 `domainGranularity`、`subdomainGranularity`、`linearColorScheme`、`cellSize`、`showLegend` 等 camelCase 名称来自运行时 formData 映射，不是 API root 键名。",
+      "CalHeatmapViz.query_obj() 会把 `subdomain_granularity` 映射成 `extras.time_grain_sqla`，因此当前图真正驱动查询粒度的是 `subdomain_granularity`。",
+      "CalHeatmapViz.get_data() 会再次解析 `time_range / since / until`。如果无法解析出完整时间边界，会抛出 `Please provide both time bounds (Since and Until)`。",
+      "2018 年迁移脚本把旧的 `metric` 键迁移成 `metrics` 数组。Superset 6.0.0 的正式模板应使用 `metrics`。"
+    ],
+    "naming_and_pipeline": {
+      "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写成 form_data[name]。",
+      "api_form_data_to_backend_request": "ChartClient.ts 在 `useLegacyApi=true` 时，把原始 form_data 包装成 `{ form_data }` POST 到 `/superset/explore_json/`。",
+      "backend_form_data_normalization": "`explore_json()` 会先补 `datasource`，再执行 `convert_legacy_filters_into_adhoc(form_data)` 与 `merge_extra_filters(form_data)`。",
+      "backend_form_data_to_query_obj": "`CalHeatmapViz.query_obj()` 会把 `form_data.metrics` 直接写入 `query_obj.metrics`，并用 `subdomain_granularity` 覆盖 `query_obj.extras.time_grain_sqla`。"
+    },
+    "global_required_fields": {
+      "datasource": {
+        "data_type": "string",
+        "required": true,
+        "sample_data": "<dataset_id>__table",
+        "source": "explore_json() + datasourceAndVizType hidden control"
+      },
+      "viz_type": {
+        "data_type": "string",
+        "required": true,
+        "fixed_value": "cal_heatmap",
+        "source": "CalHeatmapViz.viz_type + Calendar/index.js"
+      },
+      "granularity_sqla": {
+        "data_type": "string | object",
+        "required": true,
+        "sample_data": "ds",
+        "source": "Time section + CalHeatmapViz/BaseViz query path"
+      },
+      "time_range": {
+        "data_type": "string",
+        "required": true,
+        "sample_data": "2008-01-01 : 2008-02-01",
+        "source": "Time section + CalHeatmapViz.get_data()",
+        "notes": "若不用 time_range，则至少要提供 legacy `since` + `until`。"
+      },
+      "domain_granularity": {
+        "data_type": "string",
+        "required": true,
+        "sample_data": "month",
+        "source": "Query section"
+      },
+      "subdomain_granularity": {
+        "data_type": "string",
+        "required": true,
+        "sample_data": "day",
+        "source": "Query section + CalHeatmapViz.query_obj()"
+      },
+      "metrics": {
+        "data_type": "array[string | object]",
+        "required": true,
+        "sample_data": [
+          "count"
+        ],
+        "source": "Query section"
+      }
+    },
+    "global_optional_fields": {
+      "adhoc_filters": {
+        "data_type": "array[object]",
+        "required": false,
+        "sample_data": [],
+        "source": "Query section"
+      },
+      "since": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "2019-01-01",
+        "source": "legacy examples + CalHeatmapViz.get_data()",
+        "notes": "legacy accepted time bounds start。通常与 `until` 成对出现，可替代 `time_range`。"
+      },
+      "until": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "2019-02-01",
+        "source": "legacy examples + CalHeatmapViz.get_data()",
+        "notes": "legacy accepted time bounds end。通常与 `since` 成对出现，可替代 `time_range`。"
+      },
+      "row_limit": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 10000,
+        "source": "BaseViz.query_obj() + examples",
+        "notes": "当前 controlPanel 未显式暴露，但 legacy 示例里会保存这个字段。"
+      },
+      "linear_color_scheme": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "superset_seq_1",
+        "source": "Chart Options section"
+      },
+      "cell_size": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 10,
+        "source": "Chart Options section"
+      },
+      "cell_padding": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 2,
+        "source": "Chart Options section"
+      },
+      "cell_radius": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 0,
+        "source": "Chart Options section"
+      },
+      "steps": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 10,
+        "source": "Chart Options section"
+      },
+      "y_axis_format": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "SMART_NUMBER",
+        "source": "Chart Options section"
+      },
+      "x_axis_time_format": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "smart_date",
+        "source": "Chart Options section"
+      },
+      "show_legend": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": true,
+        "source": "Chart Options section"
+      },
+      "show_values": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": false,
+        "source": "Chart Options section"
+      },
+      "show_metric_name": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": true,
+        "source": "Chart Options section"
+      },
+      "slice_id": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 0,
+        "source": "datasourceAndVizType hidden control",
+        "notes": "新建图表时通常省略；编辑已存在图表时由服务端或上层调用方提供。"
+      },
+      "cache_timeout": {
+        "data_type": "integer | null",
+        "required": false,
+        "sample_data": null,
+        "source": "datasourceAndVizType hidden control"
+      },
+      "url_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "QueryFormData"
+      },
+      "custom_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "QueryFormData"
+      },
+      "extra_form_data": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "utils.merge_extra_form_data()",
+        "notes": "虽然不属于 controlPanel 字段，但 legacy explore_json 路径会消费它。"
+      }
+    },
+    "minimal_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "cal_heatmap",
+      "granularity_sqla": "<temporal_column>",
+      "time_range": "2025-01-01 : 2025-01-31",
+      "domain_granularity": "month",
+      "subdomain_granularity": "day",
+      "metrics": [
+        "count"
+      ],
+      "adhoc_filters": []
+    },
+    "recommended_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "cal_heatmap",
+      "granularity_sqla": "ds",
+      "time_range": "2025-01-01 : 2025-01-31",
+      "domain_granularity": "month",
+      "subdomain_granularity": "day",
+      "metrics": [
+        "count"
+      ],
+      "adhoc_filters": [],
+      "linear_color_scheme": "superset_seq_1",
+      "cell_size": 10,
+      "cell_padding": 2,
+      "cell_radius": 0,
+      "steps": 10,
+      "y_axis_format": "SMART_NUMBER",
+      "x_axis_time_format": "smart_date",
+      "show_legend": true,
+      "show_values": false,
+      "show_metric_name": true
+    },
+    "conditional_blocks": {
+      "multiple_metrics": {
+        "condition": "需要按多个指标分别渲染多个日历块时",
+        "fields": {
+          "metrics": [
+            "count",
+            {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "sales"
+              },
+              "aggregate": "SUM",
+              "label": "SUM(sales)"
+            }
+          ],
+          "show_metric_name": true
+        }
+      },
+      "legacy_since_until_pair": {
+        "condition": "如果调用方仍沿用 legacy since/until 形式，而不是 time_range",
+        "fields": {
+          "since": "2019-01-01",
+          "until": "2019-02-01"
+        }
+      },
+      "filters": {
+        "condition": "需要筛选参与聚合的底层数据时",
+        "fields": {
+          "adhoc_filters": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "region",
+              "operator": "IN",
+              "comparator": [
+                "East"
+              ]
+            }
+          ]
+        }
+      },
+      "hourly_calendar": {
+        "condition": "需要按天域展示小时级热力块时",
+        "fields": {
+          "domain_granularity": "day",
+          "subdomain_granularity": "hour"
+        }
+      },
+      "weekly_calendar": {
+        "condition": "需要按月域展示周级热力块时",
+        "fields": {
+          "domain_granularity": "month",
+          "subdomain_granularity": "week"
+        }
+      },
+      "show_cell_values": {
+        "condition": "需要在单元格内部直接显示数值时",
+        "fields": {
+          "show_values": true,
+          "y_axis_format": "SMART_NUMBER"
+        }
+      },
+      "layout_and_colors": {
+        "condition": "需要调整单元格大小、间距、圆角和颜色步长时",
+        "fields": {
+          "linear_color_scheme": "superset_seq_1",
+          "cell_size": 12,
+          "cell_padding": 2,
+          "cell_radius": 1,
+          "steps": 10
+        }
+      }
+    },
+    "runtime_only_or_non_template_fields": {
+      "legacy_or_confusing_keys": [
+        {
+          "field_name": "metric",
+          "reason": "旧切片曾使用单值 `metric`。2018 年迁移脚本已把它迁移成 `metrics` 数组，Superset 6.0.0 的正式模板应使用 `metrics`。"
+        },
+        {
+          "field_name": "time_grain_sqla",
+          "reason": "当前图的查询粒度由 `subdomain_granularity` 在后端映射生成。即使 root 里存在 `time_grain_sqla`，CalHeatmapViz.query_obj() 也会覆盖它。"
+        }
+      ],
+      "runtime_aliases_generated_by_transformProps": [
+        {
+          "field_name": "domainGranularity",
+          "reason": "由 raw form_data.domain_granularity 派生的运行时别名，不是 API root 键。"
+        },
+        {
+          "field_name": "subdomainGranularity",
+          "reason": "由 raw form_data.subdomain_granularity 派生的运行时别名，不是 API root 键。"
+        },
+        {
+          "field_name": "linearColorScheme",
+          "reason": "由 raw form_data.linear_color_scheme 派生的运行时别名，不是 API root 键。"
+        },
+        {
+          "field_name": "cellSize",
+          "reason": "由 raw form_data.cell_size 派生的运行时别名，不是 API root 键。"
+        },
+        {
+          "field_name": "showLegend",
+          "reason": "由 raw form_data.show_legend 派生的运行时别名，不是 API root 键。"
+        }
+      ],
+      "backend_response_only_fields": [
+        {
+          "field_name": "queriesData[0].data.start",
+          "reason": "这是后端 CalHeatmapViz.get_data() 计算出的起始时间戳，不是 root form_data 字段。"
+        },
+        {
+          "field_name": "queriesData[0].data.range",
+          "reason": "这是后端根据 domain_granularity 与时间跨度计算出的 domain 数量，不是 root form_data 字段。"
+        },
+        {
+          "field_name": "queriesData[0].data.data",
+          "reason": "这是按 metric label 分组、按秒级时间戳编码的查询结果字典，不是 root form_data 字段。"
+        }
+      ],
+      "viz_switch_only": [
+        {
+          "field_name": "formDataOverrides(metrics)",
+          "reason": "只在 standardized form data 切换 viz_type 时把 standardized metrics 列表迁移到当前图的 `metrics` 字段，不是常规 API 导出 form_data 的必经步骤。"
+        }
+      ]
+    },
+    "api_usage_guidance": {
+      "high_confidence_required_fields": [
+        "datasource",
+        "viz_type",
+        "granularity_sqla",
+        "time_range",
+        "domain_granularity",
+        "subdomain_granularity",
+        "metrics"
+      ],
+      "recommended_always_set": [
+        "adhoc_filters",
+        "linear_color_scheme",
+        "cell_size",
+        "cell_padding",
+        "cell_radius",
+        "steps",
+        "y_axis_format",
+        "x_axis_time_format",
+        "show_legend",
+        "show_values",
+        "show_metric_name"
+      ],
+      "avoid_confusion": [
+        "不要把当前正式指标字段写成旧的 `metric`；Superset 6.0.0 正式字段是 `metrics`。",
+        "不要尝试用 root `time_grain_sqla` 来控制格子粒度；当前图后端会用 `subdomain_granularity` 覆盖它。",
+        "不要把运行时别名 `domainGranularity`、`subdomainGranularity`、`linearColorScheme`、`cellSize` 写回 root form_data。",
+        "如果不提供可解析的时间边界，CalHeatmapViz.get_data() 会直接报错；最稳妥的写法是显式传 `time_range`。"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "cal_heatmap",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/cal_heatmap-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/cal_heatmap-form-data-schema.json",
+      "control-schema": "form-data-schema/cal_heatmap-schema.json"
+    }
+  }
+}

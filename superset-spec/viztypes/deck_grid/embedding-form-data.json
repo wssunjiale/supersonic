@@ -1,0 +1,491 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "deck_grid",
+  "display_name": "deck.gl Grid",
+  "source_kind": "schema_file",
+  "normalized_embedding_policy": {
+    "immutable_root_keys": [
+      "slice_id",
+      "datasource",
+      "viz_type",
+      "all_saved_chart_definition_fields"
+    ],
+    "allowed_runtime_fields": [
+      {
+        "field_name": "adhoc_filters",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "custom_form_data",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "filters",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_range",
+        "behavior": "override",
+        "source": "embedding-schema"
+      }
+    ],
+    "safe_embedding_form_data_seed": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "deck_grid",
+      "extra_form_data": {
+        "filters": [],
+        "adhoc_filters": []
+      }
+    }
+  },
+  "original_embedding_form_data_schema": {
+    "viz_type": "deck_grid",
+    "display_name": "deck.gl Grid",
+    "purpose": "第三方 embedding / guest token 场景下安全传输的 deck.gl Grid form_data 模板",
+    "base_form_data_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/deck_grid-form-data-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Grid/controlPanel.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Grid/Grid.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/factory.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/common.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/Shared_DeckGL.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utils/crossFiltersDataMask.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+      "D:/vsx/sources/superset-6.0.0/superset/views/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/constants.py",
+      "D:/vsx/sources/superset-6.0.0/superset/charts/schemas.py",
+      "D:/vsx/sources/superset-6.0.0/superset/security/manager.py",
+      "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/QueryFormData.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/constants.ts"
+    ],
+    "notes": [
+      "deck_grid 仍然是 legacy 图，metadata 明确声明 `useLegacyApi=true`，真实请求路径是 `/superset/explore_json/`。",
+      "`/superset/explore_json/` 路径会读取原始 `form_data`，补 `datasource`，然后执行 `convert_legacy_filters_into_adhoc(form_data)` 与 `merge_extra_filters(form_data)`。",
+      "当前源码里 `Guest user cannot modify chart payload` 只在 `security/manager.py::raise_for_access(query_context=...)` 分支触发，核心比较器是 `query_context_modified()`；legacy `/superset/explore_json/` 则会走 `views/utils.py::check_datasource_perms()` -> `get_viz()` -> `viz.raise_for_access()` -> `security/manager.py::raise_for_access(viz=self)`。当前 `viz` 分支会校验 `dashboardId` / `slice_id` / datasource 绑定，但没有等价的 columns / metrics / orderby 子集比较器。",
+      "即便如此，deck_grid 的空间字段、高度指标、地图样式、viewport、颜色模式、legend、grid 大小和自定义 JS 都直接来自 root form_data。最稳妥的 embedding 策略仍然是根层复制保存态图表，只把动态筛选放进 `extra_form_data`。",
+      "`crossFiltersDataMask.ts` 对带 `spatial` 的 deck_grid，会在拾取到 cell 中多个点时生成经纬度 `IN` 过滤；在没有 points 但有拾取坐标和 viewport 时，会生成经纬度范围过滤。因此对 deck_grid 来说，`extra_form_data.filters` 是高置信、源码证实的动态筛选容器。",
+      "`legend_position` 是正式保存态字段；`js_agg_function`、`legend_format` 虽是隐藏运行时字段，但如果已存在于保存态，也应在 embedding 根层原样复制，不要在第三方请求里自行重建。"
+    ],
+    "security_enforcement": {
+      "frontend_request_mode": "legacy explore_json",
+      "frontend_request_endpoint": "/superset/explore_json/",
+      "frontend_request_payload": {
+        "form_data": "<raw form_data>"
+      },
+      "backend_normalization_steps": [
+        "convert_legacy_filters_into_adhoc(form_data)",
+        "merge_extra_filters(form_data)"
+      ],
+      "verified_guest_payload_guard": {
+        "chart_data_api": "security/manager.py::query_context_modified",
+        "chart_data_api_error": "Guest user cannot modify chart payload",
+        "legacy_explore_json_api": "`check_datasource_perms()` 会构造 viz 并调用 `raise_for_access(viz=self)`；该分支校验 datasource / dashboard / slice 绑定，但没有 `query_context_modified()` 那种 query subset guard",
+        "confidence": "high"
+      },
+      "guest_access_binding_fields": [
+        "dashboardId",
+        "slice_id"
+      ],
+      "query_critical_root_fields": [
+        "slice_id",
+        "datasource",
+        "viz_type",
+        "spatial",
+        "size",
+        "row_limit",
+        "filter_nulls",
+        "adhoc_filters",
+        "mapbox_style",
+        "viewport",
+        "color_scheme_type",
+        "color_picker",
+        "color_scheme",
+        "deafult_breakpoint_color",
+        "color_breakpoints",
+        "legend_position",
+        "autozoom",
+        "grid_size",
+        "extruded",
+        "js_columns",
+        "js_data_mutator",
+        "js_tooltip",
+        "js_onclick_href",
+        "js_agg_function",
+        "legend_format"
+      ],
+      "recommended_strategy": "复制保存态 chart form_data 作为 base，仅通过 extra_form_data 追加动态过滤条件；不要在 embedding 请求里重构 deck_grid 的 root 查询字段和图表定义字段。"
+    },
+    "safe_base_rule": {
+      "description": "第三方 embedding 请求中的根层 form_data，应当从已保存的 deck_grid 图表直接复制，不要自行重构。",
+      "must_be_copied_from_saved_chart": [
+        "slice_id",
+        "dashboardId",
+        "datasource",
+        "viz_type",
+        "spatial",
+        "size",
+        "row_limit",
+        "filter_nulls",
+        "adhoc_filters",
+        "mapbox_style",
+        "viewport",
+        "color_scheme_type",
+        "color_picker",
+        "color_scheme",
+        "deafult_breakpoint_color",
+        "color_breakpoints",
+        "legend_position",
+        "autozoom",
+        "grid_size",
+        "extruded",
+        "js_columns",
+        "js_data_mutator",
+        "js_tooltip",
+        "js_onclick_href",
+        "js_agg_function",
+        "legend_format",
+        "all other saved chart-definition fields"
+      ],
+      "why": [
+        "deck_grid 没有专属前端 buildQuery，前端会把 root form_data 直接发给 `/superset/explore_json/`。",
+        "`BaseDeckGLViz.query_obj()` / `DeckGrid.get_data()` 会直接消费 root `spatial`、`size`、`filter_nulls`、`adhoc_filters` 和可选 `js_columns`。",
+        "`Grid.tsx` / `factory.tsx` / `common.tsx` 会直接消费 root `mapbox_style`、`viewport`、`color_scheme_type`、`legend_position`、`grid_size`、`extruded` 和自定义 JS 字段。",
+        "`merge_extra_filters()` 会在后端把 `extra_form_data` 并入 legacy 请求，因此动态筛选不需要通过覆盖根层保存态字段来实现。",
+        "虽然当前没有在 legacy 路径定位到 `query_context_modified()` 等价校验，但复制保存态仍然是最稳妥、最接近官方前端行为的策略。"
+      ]
+    },
+    "safe_embedding_form_data_template": {
+      "description": "这是 deck_grid embedding 下的保守安全写法。根层以保存态图表为 base，仅改 extra_form_data。",
+      "template": {
+        "slice_id": "<saved_chart_id>",
+        "dashboardId": "<dashboard_id>",
+        "datasource": "<copied_from_saved_chart>",
+        "viz_type": "deck_grid",
+        "spatial": "<copied_from_saved_chart>",
+        "size": "<copied_from_saved_chart>",
+        "row_limit": "<copied_from_saved_chart_if_present>",
+        "filter_nulls": "<copied_from_saved_chart_if_present>",
+        "adhoc_filters": "<copied_from_saved_chart>",
+        "mapbox_style": "<copied_from_saved_chart_if_present>",
+        "viewport": "<copied_from_saved_chart_if_present>",
+        "color_scheme_type": "<copied_from_saved_chart_if_present>",
+        "color_picker": "<copied_from_saved_chart_if_present>",
+        "color_scheme": "<copied_from_saved_chart_if_present>",
+        "deafult_breakpoint_color": "<copied_from_saved_chart_if_present>",
+        "color_breakpoints": "<copied_from_saved_chart_if_present>",
+        "legend_position": "<copied_from_saved_chart_if_present>",
+        "autozoom": "<copied_from_saved_chart_if_present>",
+        "grid_size": "<copied_from_saved_chart_if_present>",
+        "extruded": "<copied_from_saved_chart_if_present>",
+        "js_columns": "<copied_from_saved_chart_if_present>",
+        "js_data_mutator": "<copied_from_saved_chart_if_present>",
+        "js_tooltip": "<copied_from_saved_chart_if_present>",
+        "js_onclick_href": "<copied_from_saved_chart_if_present>",
+        "js_agg_function": "<copied_from_saved_chart_if_present>",
+        "legend_format": "<copied_from_saved_chart_if_present>",
+        "extra_form_data": {
+          "filters": [
+            {
+              "col": "LON",
+              "op": "IN",
+              "val": [
+                -122.4221936,
+                -122.4101989
+              ]
+            },
+            {
+              "col": "LAT",
+              "op": "IN",
+              "val": [
+                37.7786083,
+                37.7878771
+              ]
+            }
+          ],
+          "adhoc_filters": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "city",
+              "operator": "IN",
+              "comparator": [
+                "San Francisco"
+              ]
+            }
+          ],
+          "custom_form_data": {}
+        }
+      }
+    },
+    "preferred_dynamic_container": {
+      "field_name": "extra_form_data",
+      "description": "legacy `/superset/explore_json/` 路径同样会在 `merge_extra_filters()` -> `merge_extra_form_data()` 中消费它。",
+      "append_keys": [
+        "adhoc_filters",
+        "filters",
+        "interactive_groupby",
+        "interactive_highlight",
+        "interactive_drilldown",
+        "custom_form_data"
+      ],
+      "override_keys_backend_supported": [
+        "granularity_sqla",
+        "time_column",
+        "time_grain",
+        "time_range",
+        "time_grain_sqla",
+        "relative_start",
+        "relative_end"
+      ],
+      "override_keys_effective_for_deck_grid_high_confidence": [],
+      "legacy_also_accepted_root_container": "extra_filters",
+      "notes": "deck_grid 不是时序图。当前没有高置信源码证据表明应通过 `extra_form_data.override` 去动态改 `spatial`、`size`、颜色模式、legend、grid 大小或 JS 字段。"
+    },
+    "extra_form_data_field_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_deck_grid_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "LON",
+            "op": "IN",
+            "val": [
+              -122.4221936,
+              -122.4101989
+            ]
+          }
+        ],
+        "effect": "追加 simple filters；后端会把它们并入额外过滤条件。对 deck_grid 来说，这也是 `crossFiltersDataMask.ts` 交互筛选明确产出的容器。latlong 场景下，点击包含多点的 grid cell 会生成经纬度 `IN` 过滤；按拾取坐标生成包围盒时，会生成 `>=` / `<=` 范围过滤。",
+        "source": "superset/constants.py + superset/utils/core.py + crossFiltersDataMask.ts"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_deck_grid_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "city",
+            "operator": "IN",
+            "comparator": [
+              "San Francisco"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会标记为 `isExtra` 并并入查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_deck_grid_legacy": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；deck_grid 默认不直接消费它。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_deck_grid_legacy": false,
+        "recommended": false,
+        "sample_data": "Last 30 days",
+        "effect": "这是通用 extra_form_data override 字段，但当前图不是时序图，deck_grid 控制面板与后端查询路径都没有高置信业务依赖。",
+        "source": "QueryFormData.ts + superset/constants.py + superset/utils/core.py + superset/viz.py",
+        "status": "低相关，不建议在 guest embedding 中依赖"
+      }
+    ],
+    "minimal_extra_form_data_template": {
+      "filters": [
+        {
+          "col": "city",
+          "op": "IN",
+          "val": [
+            "San Francisco"
+          ]
+        }
+      ]
+    },
+    "recommended_extra_form_data_template": {
+      "filters": [
+        {
+          "col": "LON",
+          "op": "IN",
+          "val": [
+            -122.4221936,
+            -122.4101989
+          ]
+        },
+        {
+          "col": "LAT",
+          "op": "IN",
+          "val": [
+            37.7786083,
+            37.7878771
+          ]
+        }
+      ],
+      "adhoc_filters": [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "city",
+          "operator": "IN",
+          "comparator": [
+            "San Francisco"
+          ]
+        }
+      ],
+      "custom_form_data": {}
+    },
+    "unsafe_root_form_data_changes": [
+      {
+        "field_name": "slice_id",
+        "reason": "会改变请求对应的图表实体，最不应该在 embedding 请求里改。"
+      },
+      {
+        "field_name": "dashboardId",
+        "reason": "guest 用户的数据访问上下文通常依赖 dashboard 绑定关系，保守写法应直接复制保存态。"
+      },
+      {
+        "field_name": "datasource",
+        "reason": "legacy deck_grid 的 root form_data 会直接驱动后端查询，embedding 不应改图表绑定数据集。"
+      },
+      {
+        "field_name": "viz_type",
+        "reason": "deck_grid 仍应保持 `deck_grid`；不应在请求里改成其他 viz。"
+      },
+      {
+        "field_name": "spatial",
+        "reason": "它决定后端如何展开空间列，也决定交互筛选最终生成哪些列过滤条件。"
+      },
+      {
+        "field_name": "size",
+        "reason": "它决定每个点的原始高度权重指标。"
+      },
+      {
+        "field_name": "row_limit",
+        "reason": "它直接影响参与 grid 聚合的原始点数量。"
+      },
+      {
+        "field_name": "filter_nulls",
+        "reason": "它决定后端是否自动注入空间列的空值过滤。"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "reason": "动态筛选应优先放进 `extra_form_data.append`，不要覆盖保存态根字段。"
+      },
+      {
+        "field_name": "mapbox_style",
+        "reason": "它直接改变底图样式。"
+      },
+      {
+        "field_name": "viewport",
+        "reason": "虽然主要影响前端视角，但它仍是图表保存态的一部分，guest 场景应保持与保存态一致。"
+      },
+      {
+        "field_name": "color_scheme_type",
+        "reason": "它直接改变 grid cell 的颜色生成逻辑。"
+      },
+      {
+        "field_name": "color_picker",
+        "reason": "会直接改变 fixed color 模式下的颜色。"
+      },
+      {
+        "field_name": "color_scheme",
+        "reason": "会直接改变 categorical palette 模式下的颜色范围。"
+      },
+      {
+        "field_name": "deafult_breakpoint_color",
+        "reason": "会直接改变 breakpoint 模式下的默认颜色。"
+      },
+      {
+        "field_name": "color_breakpoints",
+        "reason": "会直接改变 breakpoint 模式下的颜色分段规则。"
+      },
+      {
+        "field_name": "legend_position",
+        "reason": "会直接改变 legend 的展示位置。"
+      },
+      {
+        "field_name": "autozoom",
+        "reason": "会直接改变每次查询后地图视角行为。"
+      },
+      {
+        "field_name": "grid_size",
+        "reason": "会直接改变 grid cell 尺寸与视觉聚合粒度。"
+      },
+      {
+        "field_name": "extruded",
+        "reason": "会直接改变是否渲染 3D。"
+      },
+      {
+        "field_name": "js_columns",
+        "reason": "会直接改变查询的附加 groupby 列和返回给 JS 的 extraProps。"
+      },
+      {
+        "field_name": "js_data_mutator",
+        "reason": "会直接改变前端绘图前的数据数组。"
+      },
+      {
+        "field_name": "js_tooltip",
+        "reason": "会直接改变 tooltip 行为。"
+      },
+      {
+        "field_name": "js_onclick_href",
+        "reason": "会直接改变点击行为。"
+      },
+      {
+        "field_name": "js_agg_function",
+        "reason": "虽然不是当前 controlPanel 正式字段，但如果保存态中存在，它会直接改变 grid cell 的高度和颜色聚合函数。"
+      },
+      {
+        "field_name": "legend_format",
+        "reason": "虽然不是当前 controlPanel 正式字段，但如果保存态中存在，它会直接改变 legend 数值格式。"
+      }
+    ],
+    "practical_guidance": {
+      "best_practice": [
+        "先从保存态 deck_grid 图表读取完整 form_data。",
+        "根层字段保持不变，尤其保留 `spatial`、`size`、`mapbox_style`、`viewport`、`color_scheme_type`、`legend_position`、`grid_size`、`extruded`。",
+        "如果保存态里已经带有 `js_agg_function` 或 `legend_format`，embedding 根层也应原样复制，而不是重新生成。",
+        "只在 `extra_form_data` 中放动态 `filters` / `adhoc_filters`。",
+        "如果你的接入代码自己发请求，deck_grid 仍应按 `/superset/explore_json/` 的 `{ form_data: ... }` 形状发送。",
+        "如果你希望和 Superset 前端交互筛选保持一致，优先使用 `extra_form_data.filters`，因为 deck_grid 的 cross filter 代码就是这么生成的。"
+      ],
+      "avoid": [
+        "不要把 `deck_grid` 当成标准 chart data API 图表去套 `/api/v1/chart/data` 的 `query_context` 模板。",
+        "不要依赖 `extra_form_data.override` 去动态修改 `spatial`、`size`、颜色模式、legend、grid 大小或 JS 字段。",
+        "不要把运行时字段 `payload`、`formData`、`filterState`、`emitCrossFilters` 或 `viewport.width/height` 写回 root form_data。",
+        "不要把 `deafult_breakpoint_color` 改成自定义拼写，否则前端不会识别。"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "deck_grid",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/deck_grid-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/deck_grid-form-data-schema.json",
+      "control-schema": "form-data-schema/deck_grid-schema.json"
+    }
+  }
+}

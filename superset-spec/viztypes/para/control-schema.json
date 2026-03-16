@@ -1,0 +1,1234 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "para",
+  "display_name": "Parallel Coordinates",
+  "source_kind": "schema_file",
+  "normalized_control_schema": {
+    "field_category_order": [
+      "Query",
+      "Options"
+    ],
+    "field_occurrences": [
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "series",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Defines the grouping of entities. Each series is represented by a specific color in the chart.",
+        "data_type": "string | object | null",
+        "sample_data": "experiment_group",
+        "original_field": {
+          "field_name": "series",
+          "description": "Defines the grouping of entities. Each series is represented by a specific color in the chart.",
+          "data_type": "string | object | null",
+          "enum_source": "datasource columns",
+          "sample_data": "experiment_group",
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "controlPanel 没有给它加 validator；但后端会直接把它写入 `query_obj.groupby = [form_data.series]`。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "metrics",
+        "runtime_alias": null,
+        "required": true,
+        "embedding": "否",
+        "description": "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+        "data_type": "array[string | object]",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          }
+        ],
+        "original_field": {
+          "field_name": "metrics",
+          "description": "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+          "data_type": "array[string | object]",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "sales"
+              },
+              "aggregate": "SUM",
+              "label": "SUM(sales)"
+            }
+          ],
+          "required": true,
+          "embedding": "否",
+          "default_value": []
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "secondary_metric",
+        "runtime_alias": "secondaryMetric",
+        "required": false,
+        "embedding": "否",
+        "description": "A metric to use for color",
+        "data_type": "string | object | null",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "profit"
+          },
+          "aggregate": "AVG",
+          "label": "AVG(profit)"
+        },
+        "original_field": {
+          "field_name": "secondary_metric",
+          "runtime_alias": "secondaryMetric",
+          "description": "A metric to use for color",
+          "data_type": "string | object | null",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "profit"
+            },
+            "aggregate": "AVG",
+            "label": "AVG(profit)"
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "BaseViz.process_metrics() 会把它并入 `self.all_metrics`，因此它既是颜色指标，也是实际查询字段。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "adhoc_filters",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "description": "字段标签为 Filters。legacy explore_json 路径会先把 legacy filters 转成 adhoc_filters，再继续处理 extra filters / extra_form_data。",
+        "data_type": "array[object]",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "experiment_group",
+            "operator": "IN",
+            "comparator": [
+              "A",
+              "B"
+            ]
+          }
+        ],
+        "original_field": {
+          "field_name": "adhoc_filters",
+          "description": "字段标签为 Filters。legacy explore_json 路径会先把 legacy filters 转成 adhoc_filters，再继续处理 extra filters / extra_form_data。",
+          "data_type": "array[object]",
+          "enum_source": "datasource columns + saved metrics + 当前 metrics",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "experiment_group",
+              "operator": "IN",
+              "comparator": [
+                "A",
+                "B"
+              ]
+            }
+          ],
+          "required": false,
+          "embedding": "extra_form_data.append",
+          "default_value": []
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "limit",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Limits the number of series that get displayed. A joined subquery (or an extra phase where subqueries are not supported) is applied to limit the number of series that get fetched and rendered. This feature is useful when grouping by high cardinality column(s) though does increase the query complexity and cost.",
+        "data_type": "integer | null",
+        "sample_data": 10,
+        "original_field": {
+          "field_name": "limit",
+          "description": "Limits the number of series that get displayed. A joined subquery (or an extra phase where subqueries are not supported) is applied to limit the number of series that get fetched and rendered. This feature is useful when grouping by high cardinality column(s) though does increase the query complexity and cost.",
+          "data_type": "integer | null",
+          "enum_values": [
+            5,
+            10,
+            25,
+            50,
+            100,
+            500
+          ],
+          "sample_data": 10,
+          "required": false,
+          "embedding": "否",
+          "default_value": null
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "row_limit",
+        "runtime_alias": "rowLimit",
+        "required": false,
+        "embedding": "否",
+        "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+        "data_type": "integer",
+        "sample_data": 10000,
+        "original_field": {
+          "field_name": "row_limit",
+          "runtime_alias": "rowLimit",
+          "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+          "data_type": "integer",
+          "enum_values": [
+            10,
+            50,
+            100,
+            250,
+            500,
+            1000,
+            5000,
+            10000,
+            50000
+          ],
+          "sample_data": 10000,
+          "required": false,
+          "embedding": "否",
+          "default_value": 10000
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "timeseries_limit_metric",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Orders the query result that generates the source data for this chart. If a series or row limit is reached, this determines what data are truncated. If undefined, defaults to the first metric (where appropriate).",
+        "data_type": "string | object | null",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        },
+        "original_field": {
+          "field_name": "timeseries_limit_metric",
+          "description": "Orders the query result that generates the source data for this chart. If a series or row limit is reached, this determines what data are truncated. If undefined, defaults to the first metric (where appropriate).",
+          "data_type": "string | object | null",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": null
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "order_desc",
+        "runtime_alias": "orderDesc",
+        "required": false,
+        "embedding": "否",
+        "description": "If enabled, this control sorts the results/values descending, otherwise it sorts the results ascending.",
+        "data_type": "boolean",
+        "sample_data": true,
+        "original_field": {
+          "field_name": "order_desc",
+          "runtime_alias": "orderDesc",
+          "description": "If enabled, this control sorts the results/values descending, otherwise it sorts the results ascending.",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true,
+          "notes": "只有在 `timeseries_limit_metric` 存在时，后端才可能根据它写入 orderby。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Options",
+        "field_name": "show_datatable",
+        "runtime_alias": "showDatatable",
+        "required": false,
+        "embedding": "否",
+        "description": "Whether to display the interactive data table",
+        "data_type": "boolean",
+        "sample_data": false,
+        "original_field": {
+          "field_name": "show_datatable",
+          "runtime_alias": "showDatatable",
+          "description": "Whether to display the interactive data table",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Options",
+        "field_name": "include_series",
+        "runtime_alias": "includeSeries",
+        "required": false,
+        "embedding": "否",
+        "description": "Include series name as an axis",
+        "data_type": "boolean",
+        "sample_data": false,
+        "original_field": {
+          "field_name": "include_series",
+          "runtime_alias": "includeSeries",
+          "description": "Include series name as an axis",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false,
+          "notes": "ParallelCoordinates.js 会在 `includeSeries=true` 时把 `series` 放到第一条轴。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Options",
+        "field_name": "linear_color_scheme",
+        "runtime_alias": "linearColorScheme",
+        "required": false,
+        "embedding": "否",
+        "description": "字段标签为 Linear Color Scheme。运行时用于根据 `secondary_metric` 创建 sequential linear scale。",
+        "data_type": "string",
+        "sample_data": "superset_seq_1",
+        "original_field": {
+          "field_name": "linear_color_scheme",
+          "runtime_alias": "linearColorScheme",
+          "description": "字段标签为 Linear Color Scheme。运行时用于根据 `secondary_metric` 创建 sequential linear scale。",
+          "data_type": "string",
+          "enum_source": "sequentialSchemeRegistry.values()",
+          "sample_data": "superset_seq_1",
+          "required": false,
+          "embedding": "否",
+          "default_value": "sequentialSchemeRegistry.getDefaultKey()",
+          "notes": "只有 `secondary_metric` 存在时才会实际参与 colorScale；否则颜色回退为 `grey`。"
+        }
+      }
+    ],
+    "field_inventory": [
+      {
+        "field_name": "adhoc_filters",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "字段标签为 Filters。legacy explore_json 路径会先把 legacy filters 转成 adhoc_filters，再继续处理 extra filters / extra_form_data。"
+        ],
+        "data_types": [
+          "array[object]"
+        ],
+        "sample_data_examples": [
+          [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "experiment_group",
+              "operator": "IN",
+              "comparator": [
+                "A",
+                "B"
+              ]
+            }
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "adhoc_filters",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "extra_form_data.append",
+            "description": "字段标签为 Filters。legacy explore_json 路径会先把 legacy filters 转成 adhoc_filters，再继续处理 extra filters / extra_form_data。",
+            "data_type": "array[object]",
+            "sample_data": [
+              {
+                "expressionType": "SIMPLE",
+                "clause": "WHERE",
+                "subject": "experiment_group",
+                "operator": "IN",
+                "comparator": [
+                  "A",
+                  "B"
+                ]
+              }
+            ],
+            "original_field": {
+              "field_name": "adhoc_filters",
+              "description": "字段标签为 Filters。legacy explore_json 路径会先把 legacy filters 转成 adhoc_filters，再继续处理 extra filters / extra_form_data。",
+              "data_type": "array[object]",
+              "enum_source": "datasource columns + saved metrics + 当前 metrics",
+              "sample_data": [
+                {
+                  "expressionType": "SIMPLE",
+                  "clause": "WHERE",
+                  "subject": "experiment_group",
+                  "operator": "IN",
+                  "comparator": [
+                    "A",
+                    "B"
+                  ]
+                }
+              ],
+              "required": false,
+              "embedding": "extra_form_data.append",
+              "default_value": []
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "include_series",
+        "required": false,
+        "categories": [
+          "Options"
+        ],
+        "runtime_aliases": [
+          "includeSeries"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Include series name as an axis"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          false
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Options",
+            "field_name": "include_series",
+            "runtime_alias": "includeSeries",
+            "required": false,
+            "embedding": "否",
+            "description": "Include series name as an axis",
+            "data_type": "boolean",
+            "sample_data": false,
+            "original_field": {
+              "field_name": "include_series",
+              "runtime_alias": "includeSeries",
+              "description": "Include series name as an axis",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": false,
+              "required": false,
+              "embedding": "否",
+              "default_value": false,
+              "notes": "ParallelCoordinates.js 会在 `includeSeries=true` 时把 `series` 放到第一条轴。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "limit",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Limits the number of series that get displayed. A joined subquery (or an extra phase where subqueries are not supported) is applied to limit the number of series that get fetched and rendered. This feature is useful when grouping by high cardinality column(s) though does increase the query complexity and cost."
+        ],
+        "data_types": [
+          "integer | null"
+        ],
+        "sample_data_examples": [
+          10
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "limit",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Limits the number of series that get displayed. A joined subquery (or an extra phase where subqueries are not supported) is applied to limit the number of series that get fetched and rendered. This feature is useful when grouping by high cardinality column(s) though does increase the query complexity and cost.",
+            "data_type": "integer | null",
+            "sample_data": 10,
+            "original_field": {
+              "field_name": "limit",
+              "description": "Limits the number of series that get displayed. A joined subquery (or an extra phase where subqueries are not supported) is applied to limit the number of series that get fetched and rendered. This feature is useful when grouping by high cardinality column(s) though does increase the query complexity and cost.",
+              "data_type": "integer | null",
+              "enum_values": [
+                5,
+                10,
+                25,
+                50,
+                100,
+                500
+              ],
+              "sample_data": 10,
+              "required": false,
+              "embedding": "否",
+              "default_value": null
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "linear_color_scheme",
+        "required": false,
+        "categories": [
+          "Options"
+        ],
+        "runtime_aliases": [
+          "linearColorScheme"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "字段标签为 Linear Color Scheme。运行时用于根据 `secondary_metric` 创建 sequential linear scale。"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "superset_seq_1"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Options",
+            "field_name": "linear_color_scheme",
+            "runtime_alias": "linearColorScheme",
+            "required": false,
+            "embedding": "否",
+            "description": "字段标签为 Linear Color Scheme。运行时用于根据 `secondary_metric` 创建 sequential linear scale。",
+            "data_type": "string",
+            "sample_data": "superset_seq_1",
+            "original_field": {
+              "field_name": "linear_color_scheme",
+              "runtime_alias": "linearColorScheme",
+              "description": "字段标签为 Linear Color Scheme。运行时用于根据 `secondary_metric` 创建 sequential linear scale。",
+              "data_type": "string",
+              "enum_source": "sequentialSchemeRegistry.values()",
+              "sample_data": "superset_seq_1",
+              "required": false,
+              "embedding": "否",
+              "default_value": "sequentialSchemeRegistry.getDefaultKey()",
+              "notes": "只有 `secondary_metric` 存在时才会实际参与 colorScale；否则颜色回退为 `grey`。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "metrics",
+        "required": true,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+        ],
+        "data_types": [
+          "array[string | object]"
+        ],
+        "sample_data_examples": [
+          [
+            {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "sales"
+              },
+              "aggregate": "SUM",
+              "label": "SUM(sales)"
+            }
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "metrics",
+            "runtime_alias": null,
+            "required": true,
+            "embedding": "否",
+            "description": "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+            "data_type": "array[string | object]",
+            "sample_data": [
+              {
+                "expressionType": "SIMPLE",
+                "column": {
+                  "column_name": "sales"
+                },
+                "aggregate": "SUM",
+                "label": "SUM(sales)"
+              }
+            ],
+            "original_field": {
+              "field_name": "metrics",
+              "description": "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+              "data_type": "array[string | object]",
+              "enum_source": "saved metrics + adhoc metrics",
+              "sample_data": [
+                {
+                  "expressionType": "SIMPLE",
+                  "column": {
+                    "column_name": "sales"
+                  },
+                  "aggregate": "SUM",
+                  "label": "SUM(sales)"
+                }
+              ],
+              "required": true,
+              "embedding": "否",
+              "default_value": []
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "order_desc",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [
+          "orderDesc"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "If enabled, this control sorts the results/values descending, otherwise it sorts the results ascending."
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          true
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "order_desc",
+            "runtime_alias": "orderDesc",
+            "required": false,
+            "embedding": "否",
+            "description": "If enabled, this control sorts the results/values descending, otherwise it sorts the results ascending.",
+            "data_type": "boolean",
+            "sample_data": true,
+            "original_field": {
+              "field_name": "order_desc",
+              "runtime_alias": "orderDesc",
+              "description": "If enabled, this control sorts the results/values descending, otherwise it sorts the results ascending.",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": true,
+              "required": false,
+              "embedding": "否",
+              "default_value": true,
+              "notes": "只有在 `timeseries_limit_metric` 存在时，后端才可能根据它写入 orderby。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "row_limit",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [
+          "rowLimit"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Limits the number of the rows that are computed in the query that is the source of the data used for this chart."
+        ],
+        "data_types": [
+          "integer"
+        ],
+        "sample_data_examples": [
+          10000
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "row_limit",
+            "runtime_alias": "rowLimit",
+            "required": false,
+            "embedding": "否",
+            "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+            "data_type": "integer",
+            "sample_data": 10000,
+            "original_field": {
+              "field_name": "row_limit",
+              "runtime_alias": "rowLimit",
+              "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+              "data_type": "integer",
+              "enum_values": [
+                10,
+                50,
+                100,
+                250,
+                500,
+                1000,
+                5000,
+                10000,
+                50000
+              ],
+              "sample_data": 10000,
+              "required": false,
+              "embedding": "否",
+              "default_value": 10000
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "secondary_metric",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [
+          "secondaryMetric"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "A metric to use for color"
+        ],
+        "data_types": [
+          "string | object | null"
+        ],
+        "sample_data_examples": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "profit"
+            },
+            "aggregate": "AVG",
+            "label": "AVG(profit)"
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "secondary_metric",
+            "runtime_alias": "secondaryMetric",
+            "required": false,
+            "embedding": "否",
+            "description": "A metric to use for color",
+            "data_type": "string | object | null",
+            "sample_data": {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "profit"
+              },
+              "aggregate": "AVG",
+              "label": "AVG(profit)"
+            },
+            "original_field": {
+              "field_name": "secondary_metric",
+              "runtime_alias": "secondaryMetric",
+              "description": "A metric to use for color",
+              "data_type": "string | object | null",
+              "enum_source": "saved metrics + adhoc metrics",
+              "sample_data": {
+                "expressionType": "SIMPLE",
+                "column": {
+                  "column_name": "profit"
+                },
+                "aggregate": "AVG",
+                "label": "AVG(profit)"
+              },
+              "required": false,
+              "embedding": "否",
+              "default_value": null,
+              "notes": "BaseViz.process_metrics() 会把它并入 `self.all_metrics`，因此它既是颜色指标，也是实际查询字段。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "series",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Defines the grouping of entities. Each series is represented by a specific color in the chart."
+        ],
+        "data_types": [
+          "string | object | null"
+        ],
+        "sample_data_examples": [
+          "experiment_group"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "series",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Defines the grouping of entities. Each series is represented by a specific color in the chart.",
+            "data_type": "string | object | null",
+            "sample_data": "experiment_group",
+            "original_field": {
+              "field_name": "series",
+              "description": "Defines the grouping of entities. Each series is represented by a specific color in the chart.",
+              "data_type": "string | object | null",
+              "enum_source": "datasource columns",
+              "sample_data": "experiment_group",
+              "required": false,
+              "embedding": "否",
+              "default_value": null,
+              "notes": "controlPanel 没有给它加 validator；但后端会直接把它写入 `query_obj.groupby = [form_data.series]`。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "show_datatable",
+        "required": false,
+        "categories": [
+          "Options"
+        ],
+        "runtime_aliases": [
+          "showDatatable"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Whether to display the interactive data table"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          false
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Options",
+            "field_name": "show_datatable",
+            "runtime_alias": "showDatatable",
+            "required": false,
+            "embedding": "否",
+            "description": "Whether to display the interactive data table",
+            "data_type": "boolean",
+            "sample_data": false,
+            "original_field": {
+              "field_name": "show_datatable",
+              "runtime_alias": "showDatatable",
+              "description": "Whether to display the interactive data table",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": false,
+              "required": false,
+              "embedding": "否",
+              "default_value": false
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "timeseries_limit_metric",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Orders the query result that generates the source data for this chart. If a series or row limit is reached, this determines what data are truncated. If undefined, defaults to the first metric (where appropriate)."
+        ],
+        "data_types": [
+          "string | object | null"
+        ],
+        "sample_data_examples": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "timeseries_limit_metric",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Orders the query result that generates the source data for this chart. If a series or row limit is reached, this determines what data are truncated. If undefined, defaults to the first metric (where appropriate).",
+            "data_type": "string | object | null",
+            "sample_data": {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "sales"
+              },
+              "aggregate": "SUM",
+              "label": "SUM(sales)"
+            },
+            "original_field": {
+              "field_name": "timeseries_limit_metric",
+              "description": "Orders the query result that generates the source data for this chart. If a series or row limit is reached, this determines what data are truncated. If undefined, defaults to the first metric (where appropriate).",
+              "data_type": "string | object | null",
+              "enum_source": "saved metrics + adhoc metrics",
+              "sample_data": {
+                "expressionType": "SIMPLE",
+                "column": {
+                  "column_name": "sales"
+                },
+                "aggregate": "SUM",
+                "label": "SUM(sales)"
+              },
+              "required": false,
+              "embedding": "否",
+              "default_value": null
+            }
+          }
+        ]
+      }
+    ],
+    "required_field_names": [
+      "metrics"
+    ],
+    "embedding_enabled_field_names": [
+      "adhoc_filters"
+    ],
+    "runtime_alias_index": {
+      "include_series": [
+        "includeSeries"
+      ],
+      "linear_color_scheme": [
+        "linearColorScheme"
+      ],
+      "order_desc": [
+        "orderDesc"
+      ],
+      "row_limit": [
+        "rowLimit"
+      ],
+      "secondary_metric": [
+        "secondaryMetric"
+      ],
+      "show_datatable": [
+        "showDatatable"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "para",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/para-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/para-form-data-schema.json",
+      "control-schema": "form-data-schema/para-schema.json"
+    }
+  },
+  "fallback_online_field_categories": {
+    "Query": [],
+    "Advanced analytics": [],
+    "Annotations & Layers": [],
+    "Predictive Analytics（Forecast）": [],
+    "Chart Options": [],
+    "Chart Title": [],
+    "图表专属": [],
+    "通用图表选项": []
+  },
+  "original_control_schema": {
+    "viz_type": "para",
+    "display_name": "Parallel Coordinates",
+    "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-parallel-coordinates/src/controlPanel.ts",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-parallel-coordinates/src/controlPanel.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-parallel-coordinates/src/index.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-parallel-coordinates/src/transformProps.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-parallel-coordinates/src/ParallelCoordinates.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-parallel-coordinates/src/ReactParallelCoordinates.jsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+      "D:/vsx/sources/superset-6.0.0/superset/viz.py"
+    ],
+    "notes": [
+      "para 是 legacy 图，metadata 明确声明 useLegacyApi=true，因此前端请求路径是 `/superset/explore_json/`。",
+      "controlPanel 只有 `Query` 与 `Options` 两段，没有时间、注释或预测分析 section。",
+      "`BaseViz.process_metrics()` 会扫描 `METRIC_KEYS`，其中包含 `metrics` 与 `secondary_metric`。因此 `secondary_metric` 不只是展示层选项，它也会进入 `self.all_metrics` 并被真正查询。",
+      "`ParallelCoordinatesViz.query_obj()` 在 `super().query_obj()` 之后，把 `query_obj.groupby` 重写为 `[form_data.series]`，而不是使用 root `groupby`。",
+      "只有当 `timeseries_limit_metric` 存在且 `order_desc=true` 时，后端才会显式写入 `orderby`；单独的 `order_desc` 不会触发排序字段。",
+      "`ParallelCoordinates.js` 用 `include_series` 决定是否把 `series` 作为第一条轴，用 `show_datatable` 决定是否在图下方追加交互表格；`linear_color_scheme` 只有在 `secondary_metric` 存在时才实际参与着色，否则颜色回退为 `grey`。"
+    ],
+    "legacy_api_behavior": {
+      "useLegacyApi": true,
+      "frontend_request_endpoint": "/superset/explore_json/",
+      "frontend_request_payload": {
+        "form_data": "<raw form_data>"
+      },
+      "frontend_build_query": "Parallel Coordinates 没有专属前端 buildQuery。ChartClient.ts 在 useLegacyApi=true 且未注册 buildQuery 时，会直接把原始 form_data 包装进 legacy payload。"
+    },
+    "query_compilation": {
+      "backend_class": "superset/viz.py::ParallelCoordinatesViz",
+      "query_obj_chain": [
+        "BaseViz.query_obj()",
+        "ParallelCoordinatesViz.query_obj()"
+      ],
+      "metric_collection": "BaseViz.process_metrics() 会扫描 METRIC_KEYS；对 para 来说，`metrics` 与可选的 `secondary_metric` 都会进入 `self.all_metrics`。",
+      "groupby_behavior": "ParallelCoordinatesViz.query_obj() 把 query_obj.groupby 重写为 `[form_data.series]`。",
+      "orderby_behavior": "只有当 `timeseries_limit_metric` 存在且 `order_desc` 为真时，才写入 orderby。",
+      "response_shape": "ParallelCoordinatesViz.get_data() 直接返回 `df.to_dict(orient=\"records\")`。",
+      "frontend_post_processing": "transformProps.js 把 `secondary_metric` 映射成 runtime `colorMetric`，把 `metrics` 映射成 label 字符串数组，并透传 `include_series`、`show_datatable`、`linear_color_scheme`。"
+    },
+    "field_categories": {
+      "Query": [
+        {
+          "field_name": "series",
+          "description": "Defines the grouping of entities. Each series is represented by a specific color in the chart.",
+          "data_type": "string | object | null",
+          "enum_source": "datasource columns",
+          "sample_data": "experiment_group",
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "controlPanel 没有给它加 validator；但后端会直接把它写入 `query_obj.groupby = [form_data.series]`。"
+        },
+        {
+          "field_name": "metrics",
+          "description": "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+          "data_type": "array[string | object]",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "sales"
+              },
+              "aggregate": "SUM",
+              "label": "SUM(sales)"
+            }
+          ],
+          "required": true,
+          "embedding": "否",
+          "default_value": []
+        },
+        {
+          "field_name": "secondary_metric",
+          "runtime_alias": "secondaryMetric",
+          "description": "A metric to use for color",
+          "data_type": "string | object | null",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "profit"
+            },
+            "aggregate": "AVG",
+            "label": "AVG(profit)"
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "BaseViz.process_metrics() 会把它并入 `self.all_metrics`，因此它既是颜色指标，也是实际查询字段。"
+        },
+        {
+          "field_name": "adhoc_filters",
+          "description": "字段标签为 Filters。legacy explore_json 路径会先把 legacy filters 转成 adhoc_filters，再继续处理 extra filters / extra_form_data。",
+          "data_type": "array[object]",
+          "enum_source": "datasource columns + saved metrics + 当前 metrics",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "experiment_group",
+              "operator": "IN",
+              "comparator": [
+                "A",
+                "B"
+              ]
+            }
+          ],
+          "required": false,
+          "embedding": "extra_form_data.append",
+          "default_value": []
+        },
+        {
+          "field_name": "limit",
+          "description": "Limits the number of series that get displayed. A joined subquery (or an extra phase where subqueries are not supported) is applied to limit the number of series that get fetched and rendered. This feature is useful when grouping by high cardinality column(s) though does increase the query complexity and cost.",
+          "data_type": "integer | null",
+          "enum_values": [
+            5,
+            10,
+            25,
+            50,
+            100,
+            500
+          ],
+          "sample_data": 10,
+          "required": false,
+          "embedding": "否",
+          "default_value": null
+        },
+        {
+          "field_name": "row_limit",
+          "runtime_alias": "rowLimit",
+          "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+          "data_type": "integer",
+          "enum_values": [
+            10,
+            50,
+            100,
+            250,
+            500,
+            1000,
+            5000,
+            10000,
+            50000
+          ],
+          "sample_data": 10000,
+          "required": false,
+          "embedding": "否",
+          "default_value": 10000
+        },
+        {
+          "field_name": "timeseries_limit_metric",
+          "description": "Orders the query result that generates the source data for this chart. If a series or row limit is reached, this determines what data are truncated. If undefined, defaults to the first metric (where appropriate).",
+          "data_type": "string | object | null",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": null
+        },
+        {
+          "field_name": "order_desc",
+          "runtime_alias": "orderDesc",
+          "description": "If enabled, this control sorts the results/values descending, otherwise it sorts the results ascending.",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true,
+          "notes": "只有在 `timeseries_limit_metric` 存在时，后端才可能根据它写入 orderby。"
+        }
+      ],
+      "Options": [
+        {
+          "field_name": "show_datatable",
+          "runtime_alias": "showDatatable",
+          "description": "Whether to display the interactive data table",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false
+        },
+        {
+          "field_name": "include_series",
+          "runtime_alias": "includeSeries",
+          "description": "Include series name as an axis",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false,
+          "notes": "ParallelCoordinates.js 会在 `includeSeries=true` 时把 `series` 放到第一条轴。"
+        },
+        {
+          "field_name": "linear_color_scheme",
+          "runtime_alias": "linearColorScheme",
+          "description": "字段标签为 Linear Color Scheme。运行时用于根据 `secondary_metric` 创建 sequential linear scale。",
+          "data_type": "string",
+          "enum_source": "sequentialSchemeRegistry.values()",
+          "sample_data": "superset_seq_1",
+          "required": false,
+          "embedding": "否",
+          "default_value": "sequentialSchemeRegistry.getDefaultKey()",
+          "notes": "只有 `secondary_metric` 存在时才会实际参与 colorScale；否则颜色回退为 `grey`。"
+        }
+      ]
+    }
+  }
+}

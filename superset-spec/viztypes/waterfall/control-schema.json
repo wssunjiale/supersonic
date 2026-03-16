@@ -1,0 +1,1704 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "waterfall",
+  "display_name": "Waterfall Chart",
+  "source_kind": "schema_file",
+  "normalized_control_schema": {
+    "field_category_order": [
+      "Query",
+      "Chart Options"
+    ],
+    "field_occurrences": [
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "x_axis",
+        "runtime_alias": null,
+        "required": true,
+        "embedding": "否",
+        "description": "Dimension to use on x-axis.",
+        "data_type": "string | object",
+        "sample_data": "order_date",
+        "original_field": {
+          "field_name": "x_axis",
+          "description": "Dimension to use on x-axis.",
+          "data_type": "string | object",
+          "enum_source": "datasource groupby columns + adhoc column",
+          "sample_data": "order_date",
+          "required": true,
+          "embedding": "否",
+          "default_value": null,
+          "required_reason": "xAxisMixin 内置 `validators: [validateNonEmpty]`。",
+          "notes": "在 UI 路径下它有直接 validator；若旧保存态只有 `granularity_sqla`，control 初始化会把该值回填到 `x_axis`。只有 raw API 绕过 UI 时，才需要依赖 buildQuery 的 `granularity_sqla` fallback。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "time_grain_sqla",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart.",
+        "data_type": "string",
+        "sample_data": "P1D",
+        "original_field": {
+          "field_name": "time_grain_sqla",
+          "description": "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart.",
+          "data_type": "string",
+          "enum_source": "datasource.time_grain_sqla",
+          "sample_data": "P1D",
+          "required": false,
+          "embedding": "否",
+          "default_value": "P1D",
+          "notes": "sharedControls.time_grain_sqla 对新建未保存图默认给 `P1D`；只有时序 X 轴场景才真正有意义。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "groupby",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Breaks down the series by the category specified in this control. This can help viewers understand how each category affects the overall value.",
+        "data_type": "string | object | array[string | object]",
+        "sample_data": "region",
+        "original_field": {
+          "field_name": "groupby",
+          "description": "Breaks down the series by the category specified in this control. This can help viewers understand how each category affects the overall value.",
+          "data_type": "string | object | array[string | object]",
+          "enum_source": "datasource groupby columns",
+          "sample_data": "region",
+          "required": false,
+          "embedding": "否",
+          "default_value": [],
+          "notes": "UI 通过 `multi=false` 限制只选一个 breakdown，但运行时用 `ensureIsArray(groupby)` 同时兼容字符串、对象、数组。transformProps 只消费第一个 breakdown。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "metric",
+        "runtime_alias": null,
+        "required": true,
+        "embedding": "否",
+        "description": "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+        "data_type": "string | object",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        },
+        "original_field": {
+          "field_name": "metric",
+          "description": "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+          "data_type": "string | object",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          },
+          "required": true,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "sharedControls.metric 复用 dndAdhocMetricControl，自带 `validateNonEmpty`。buildQuery 测试验证：metric 会进入 query.metrics。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "adhoc_filters",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "description": "Filters",
+        "data_type": "array[object]",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "APAC"
+            ]
+          }
+        ],
+        "original_field": {
+          "field_name": "adhoc_filters",
+          "description": "Filters",
+          "data_type": "array[object]",
+          "enum_source": "datasource filterable columns + saved metrics + current metric",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "region",
+              "operator": "IN",
+              "comparator": [
+                "APAC"
+              ]
+            }
+          ],
+          "required": false,
+          "embedding": "extra_form_data.append",
+          "default_value": []
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "row_limit",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+        "data_type": "integer | string",
+        "sample_data": 10000,
+        "original_field": {
+          "field_name": "row_limit",
+          "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+          "data_type": "integer | string",
+          "sample_data": 10000,
+          "required": false,
+          "embedding": "否",
+          "default_value": 10000,
+          "notes": "sharedControls.row_limit 校验整数且不能超过 SQL_MAX_ROW。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "show_value",
+        "runtime_alias": "showValue",
+        "required": false,
+        "embedding": "否",
+        "description": "Show series values on the chart",
+        "data_type": "boolean",
+        "sample_data": false,
+        "original_field": {
+          "field_name": "show_value",
+          "runtime_alias": "showValue",
+          "description": "Show series values on the chart",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "show_legend",
+        "runtime_alias": "showLegend",
+        "required": false,
+        "embedding": "否",
+        "description": "Whether to display a legend for the chart",
+        "data_type": "boolean",
+        "sample_data": false,
+        "original_field": {
+          "field_name": "show_legend",
+          "runtime_alias": "showLegend",
+          "description": "Whether to display a legend for the chart",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false,
+          "notes": "controlPanel 默认值是 `false`；但 types.ts 的 runtime DEFAULT_FORM_DATA 给的是 `showLegend=true`。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "increase_color",
+        "runtime_alias": "increaseColor",
+        "required": false,
+        "embedding": "否",
+        "description": "Bar color used for positive changes.",
+        "data_type": "object",
+        "sample_data": {
+          "r": 90,
+          "g": 193,
+          "b": 137,
+          "a": 1
+        },
+        "original_field": {
+          "field_name": "increase_color",
+          "runtime_alias": "increaseColor",
+          "description": "Bar color used for positive changes.",
+          "data_type": "object",
+          "sample_data": {
+            "r": 90,
+            "g": 193,
+            "b": 137,
+            "a": 1
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": {
+            "r": 90,
+            "g": 193,
+            "b": 137,
+            "a": 1
+          }
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "decrease_color",
+        "runtime_alias": "decreaseColor",
+        "required": false,
+        "embedding": "否",
+        "description": "Bar color used for negative changes.",
+        "data_type": "object",
+        "sample_data": {
+          "r": 224,
+          "g": 67,
+          "b": 85,
+          "a": 1
+        },
+        "original_field": {
+          "field_name": "decrease_color",
+          "runtime_alias": "decreaseColor",
+          "description": "Bar color used for negative changes.",
+          "data_type": "object",
+          "sample_data": {
+            "r": 224,
+            "g": 67,
+            "b": 85,
+            "a": 1
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": {
+            "r": 224,
+            "g": 67,
+            "b": 85,
+            "a": 1
+          }
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "total_color",
+        "runtime_alias": "totalColor",
+        "required": false,
+        "embedding": "否",
+        "description": "Bar color used for period totals and the final TOTAL bar.",
+        "data_type": "object",
+        "sample_data": {
+          "r": 102,
+          "g": 102,
+          "b": 102,
+          "a": 1
+        },
+        "original_field": {
+          "field_name": "total_color",
+          "runtime_alias": "totalColor",
+          "description": "Bar color used for period totals and the final TOTAL bar.",
+          "data_type": "object",
+          "sample_data": {
+            "r": 102,
+            "g": 102,
+            "b": 102,
+            "a": 1
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": {
+            "r": 102,
+            "g": 102,
+            "b": 102,
+            "a": 1
+          }
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "x_axis_label",
+        "runtime_alias": "xAxisLabel",
+        "required": false,
+        "embedding": "否",
+        "description": "Custom label shown under the X axis.",
+        "data_type": "string",
+        "sample_data": "Month",
+        "original_field": {
+          "field_name": "x_axis_label",
+          "runtime_alias": "xAxisLabel",
+          "description": "Custom label shown under the X axis.",
+          "data_type": "string",
+          "sample_data": "Month",
+          "required": false,
+          "embedding": "否",
+          "default_value": ""
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "x_axis_time_format",
+        "runtime_alias": "xAxisTimeFormat",
+        "required": false,
+        "embedding": "否",
+        "description": "D3 time format string used when the X axis column is temporal.",
+        "data_type": "string",
+        "sample_data": "smart_date",
+        "original_field": {
+          "field_name": "x_axis_time_format",
+          "runtime_alias": "xAxisTimeFormat",
+          "description": "D3 time format string used when the X axis column is temporal.",
+          "data_type": "string",
+          "sample_data": "smart_date",
+          "required": false,
+          "embedding": "否",
+          "default_value": "smart_date",
+          "notes": "controlPanel 用 sharedControls.x_axis_time_format，并覆盖描述为 D3_TIME_FORMAT_DOCS。仅在 temporal X 轴时生效。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "x_ticks_layout",
+        "runtime_alias": "xTicksLayout",
+        "required": false,
+        "embedding": "否",
+        "description": "The way the ticks are laid out on the X-axis",
+        "data_type": "string",
+        "sample_data": "auto",
+        "original_field": {
+          "field_name": "x_ticks_layout",
+          "runtime_alias": "xTicksLayout",
+          "description": "The way the ticks are laid out on the X-axis",
+          "data_type": "string",
+          "enum_values": [
+            "auto",
+            "flat",
+            "45°",
+            "90°",
+            "staggered"
+          ],
+          "sample_data": "auto",
+          "required": false,
+          "embedding": "否",
+          "default_value": "auto"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "y_axis_label",
+        "runtime_alias": "yAxisLabel",
+        "required": false,
+        "embedding": "否",
+        "description": "Custom label shown beside the Y axis.",
+        "data_type": "string",
+        "sample_data": "Revenue",
+        "original_field": {
+          "field_name": "y_axis_label",
+          "runtime_alias": "yAxisLabel",
+          "description": "Custom label shown beside the Y axis.",
+          "data_type": "string",
+          "sample_data": "Revenue",
+          "required": false,
+          "embedding": "否",
+          "default_value": ""
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "y_axis_format",
+        "runtime_alias": "yAxisFormat",
+        "required": false,
+        "embedding": "否",
+        "description": "D3 number format string.",
+        "data_type": "string",
+        "sample_data": "SMART_NUMBER",
+        "original_field": {
+          "field_name": "y_axis_format",
+          "runtime_alias": "yAxisFormat",
+          "description": "D3 number format string.",
+          "data_type": "string",
+          "sample_data": "SMART_NUMBER",
+          "required": false,
+          "embedding": "否",
+          "default_value": "SMART_NUMBER"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "currency_format",
+        "runtime_alias": "currencyFormat",
+        "required": false,
+        "embedding": "否",
+        "description": "Currency format",
+        "data_type": "object | null",
+        "sample_data": {
+          "symbol": "$",
+          "symbolPosition": "prefix"
+        },
+        "original_field": {
+          "field_name": "currency_format",
+          "runtime_alias": "currencyFormat",
+          "description": "Currency format",
+          "data_type": "object | null",
+          "sample_data": {
+            "symbol": "$",
+            "symbolPosition": "prefix"
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "只有设置了 currency symbol 时，transformProps 才会使用 CurrencyFormatter；否则回退到普通 number formatter。"
+        }
+      }
+    ],
+    "field_inventory": [
+      {
+        "field_name": "adhoc_filters",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "Filters"
+        ],
+        "data_types": [
+          "array[object]"
+        ],
+        "sample_data_examples": [
+          [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "region",
+              "operator": "IN",
+              "comparator": [
+                "APAC"
+              ]
+            }
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "adhoc_filters",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "extra_form_data.append",
+            "description": "Filters",
+            "data_type": "array[object]",
+            "sample_data": [
+              {
+                "expressionType": "SIMPLE",
+                "clause": "WHERE",
+                "subject": "region",
+                "operator": "IN",
+                "comparator": [
+                  "APAC"
+                ]
+              }
+            ],
+            "original_field": {
+              "field_name": "adhoc_filters",
+              "description": "Filters",
+              "data_type": "array[object]",
+              "enum_source": "datasource filterable columns + saved metrics + current metric",
+              "sample_data": [
+                {
+                  "expressionType": "SIMPLE",
+                  "clause": "WHERE",
+                  "subject": "region",
+                  "operator": "IN",
+                  "comparator": [
+                    "APAC"
+                  ]
+                }
+              ],
+              "required": false,
+              "embedding": "extra_form_data.append",
+              "default_value": []
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "currency_format",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [
+          "currencyFormat"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Currency format"
+        ],
+        "data_types": [
+          "object | null"
+        ],
+        "sample_data_examples": [
+          {
+            "symbol": "$",
+            "symbolPosition": "prefix"
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "currency_format",
+            "runtime_alias": "currencyFormat",
+            "required": false,
+            "embedding": "否",
+            "description": "Currency format",
+            "data_type": "object | null",
+            "sample_data": {
+              "symbol": "$",
+              "symbolPosition": "prefix"
+            },
+            "original_field": {
+              "field_name": "currency_format",
+              "runtime_alias": "currencyFormat",
+              "description": "Currency format",
+              "data_type": "object | null",
+              "sample_data": {
+                "symbol": "$",
+                "symbolPosition": "prefix"
+              },
+              "required": false,
+              "embedding": "否",
+              "default_value": null,
+              "notes": "只有设置了 currency symbol 时，transformProps 才会使用 CurrencyFormatter；否则回退到普通 number formatter。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "decrease_color",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [
+          "decreaseColor"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Bar color used for negative changes."
+        ],
+        "data_types": [
+          "object"
+        ],
+        "sample_data_examples": [
+          {
+            "r": 224,
+            "g": 67,
+            "b": 85,
+            "a": 1
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "decrease_color",
+            "runtime_alias": "decreaseColor",
+            "required": false,
+            "embedding": "否",
+            "description": "Bar color used for negative changes.",
+            "data_type": "object",
+            "sample_data": {
+              "r": 224,
+              "g": 67,
+              "b": 85,
+              "a": 1
+            },
+            "original_field": {
+              "field_name": "decrease_color",
+              "runtime_alias": "decreaseColor",
+              "description": "Bar color used for negative changes.",
+              "data_type": "object",
+              "sample_data": {
+                "r": 224,
+                "g": 67,
+                "b": 85,
+                "a": 1
+              },
+              "required": false,
+              "embedding": "否",
+              "default_value": {
+                "r": 224,
+                "g": 67,
+                "b": 85,
+                "a": 1
+              }
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "groupby",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Breaks down the series by the category specified in this control. This can help viewers understand how each category affects the overall value."
+        ],
+        "data_types": [
+          "string | object | array[string | object]"
+        ],
+        "sample_data_examples": [
+          "region"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "groupby",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Breaks down the series by the category specified in this control. This can help viewers understand how each category affects the overall value.",
+            "data_type": "string | object | array[string | object]",
+            "sample_data": "region",
+            "original_field": {
+              "field_name": "groupby",
+              "description": "Breaks down the series by the category specified in this control. This can help viewers understand how each category affects the overall value.",
+              "data_type": "string | object | array[string | object]",
+              "enum_source": "datasource groupby columns",
+              "sample_data": "region",
+              "required": false,
+              "embedding": "否",
+              "default_value": [],
+              "notes": "UI 通过 `multi=false` 限制只选一个 breakdown，但运行时用 `ensureIsArray(groupby)` 同时兼容字符串、对象、数组。transformProps 只消费第一个 breakdown。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "increase_color",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [
+          "increaseColor"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Bar color used for positive changes."
+        ],
+        "data_types": [
+          "object"
+        ],
+        "sample_data_examples": [
+          {
+            "r": 90,
+            "g": 193,
+            "b": 137,
+            "a": 1
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "increase_color",
+            "runtime_alias": "increaseColor",
+            "required": false,
+            "embedding": "否",
+            "description": "Bar color used for positive changes.",
+            "data_type": "object",
+            "sample_data": {
+              "r": 90,
+              "g": 193,
+              "b": 137,
+              "a": 1
+            },
+            "original_field": {
+              "field_name": "increase_color",
+              "runtime_alias": "increaseColor",
+              "description": "Bar color used for positive changes.",
+              "data_type": "object",
+              "sample_data": {
+                "r": 90,
+                "g": 193,
+                "b": 137,
+                "a": 1
+              },
+              "required": false,
+              "embedding": "否",
+              "default_value": {
+                "r": 90,
+                "g": 193,
+                "b": 137,
+                "a": 1
+              }
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "metric",
+        "required": true,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+        ],
+        "data_types": [
+          "string | object"
+        ],
+        "sample_data_examples": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "metric",
+            "runtime_alias": null,
+            "required": true,
+            "embedding": "否",
+            "description": "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+            "data_type": "string | object",
+            "sample_data": {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "sales"
+              },
+              "aggregate": "SUM",
+              "label": "SUM(sales)"
+            },
+            "original_field": {
+              "field_name": "metric",
+              "description": "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+              "data_type": "string | object",
+              "enum_source": "saved metrics + adhoc metrics",
+              "sample_data": {
+                "expressionType": "SIMPLE",
+                "column": {
+                  "column_name": "sales"
+                },
+                "aggregate": "SUM",
+                "label": "SUM(sales)"
+              },
+              "required": true,
+              "embedding": "否",
+              "default_value": null,
+              "notes": "sharedControls.metric 复用 dndAdhocMetricControl，自带 `validateNonEmpty`。buildQuery 测试验证：metric 会进入 query.metrics。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "row_limit",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Limits the number of the rows that are computed in the query that is the source of the data used for this chart."
+        ],
+        "data_types": [
+          "integer | string"
+        ],
+        "sample_data_examples": [
+          10000
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "row_limit",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+            "data_type": "integer | string",
+            "sample_data": 10000,
+            "original_field": {
+              "field_name": "row_limit",
+              "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+              "data_type": "integer | string",
+              "sample_data": 10000,
+              "required": false,
+              "embedding": "否",
+              "default_value": 10000,
+              "notes": "sharedControls.row_limit 校验整数且不能超过 SQL_MAX_ROW。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "show_legend",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [
+          "showLegend"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Whether to display a legend for the chart"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          false
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "show_legend",
+            "runtime_alias": "showLegend",
+            "required": false,
+            "embedding": "否",
+            "description": "Whether to display a legend for the chart",
+            "data_type": "boolean",
+            "sample_data": false,
+            "original_field": {
+              "field_name": "show_legend",
+              "runtime_alias": "showLegend",
+              "description": "Whether to display a legend for the chart",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": false,
+              "required": false,
+              "embedding": "否",
+              "default_value": false,
+              "notes": "controlPanel 默认值是 `false`；但 types.ts 的 runtime DEFAULT_FORM_DATA 给的是 `showLegend=true`。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "show_value",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [
+          "showValue"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Show series values on the chart"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          false
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "show_value",
+            "runtime_alias": "showValue",
+            "required": false,
+            "embedding": "否",
+            "description": "Show series values on the chart",
+            "data_type": "boolean",
+            "sample_data": false,
+            "original_field": {
+              "field_name": "show_value",
+              "runtime_alias": "showValue",
+              "description": "Show series values on the chart",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": false,
+              "required": false,
+              "embedding": "否",
+              "default_value": false
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart."
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "P1D"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "time_grain_sqla",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart.",
+            "data_type": "string",
+            "sample_data": "P1D",
+            "original_field": {
+              "field_name": "time_grain_sqla",
+              "description": "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart.",
+              "data_type": "string",
+              "enum_source": "datasource.time_grain_sqla",
+              "sample_data": "P1D",
+              "required": false,
+              "embedding": "否",
+              "default_value": "P1D",
+              "notes": "sharedControls.time_grain_sqla 对新建未保存图默认给 `P1D`；只有时序 X 轴场景才真正有意义。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "total_color",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [
+          "totalColor"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Bar color used for period totals and the final TOTAL bar."
+        ],
+        "data_types": [
+          "object"
+        ],
+        "sample_data_examples": [
+          {
+            "r": 102,
+            "g": 102,
+            "b": 102,
+            "a": 1
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "total_color",
+            "runtime_alias": "totalColor",
+            "required": false,
+            "embedding": "否",
+            "description": "Bar color used for period totals and the final TOTAL bar.",
+            "data_type": "object",
+            "sample_data": {
+              "r": 102,
+              "g": 102,
+              "b": 102,
+              "a": 1
+            },
+            "original_field": {
+              "field_name": "total_color",
+              "runtime_alias": "totalColor",
+              "description": "Bar color used for period totals and the final TOTAL bar.",
+              "data_type": "object",
+              "sample_data": {
+                "r": 102,
+                "g": 102,
+                "b": 102,
+                "a": 1
+              },
+              "required": false,
+              "embedding": "否",
+              "default_value": {
+                "r": 102,
+                "g": 102,
+                "b": 102,
+                "a": 1
+              }
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "x_axis",
+        "required": true,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Dimension to use on x-axis."
+        ],
+        "data_types": [
+          "string | object"
+        ],
+        "sample_data_examples": [
+          "order_date"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "x_axis",
+            "runtime_alias": null,
+            "required": true,
+            "embedding": "否",
+            "description": "Dimension to use on x-axis.",
+            "data_type": "string | object",
+            "sample_data": "order_date",
+            "original_field": {
+              "field_name": "x_axis",
+              "description": "Dimension to use on x-axis.",
+              "data_type": "string | object",
+              "enum_source": "datasource groupby columns + adhoc column",
+              "sample_data": "order_date",
+              "required": true,
+              "embedding": "否",
+              "default_value": null,
+              "required_reason": "xAxisMixin 内置 `validators: [validateNonEmpty]`。",
+              "notes": "在 UI 路径下它有直接 validator；若旧保存态只有 `granularity_sqla`，control 初始化会把该值回填到 `x_axis`。只有 raw API 绕过 UI 时，才需要依赖 buildQuery 的 `granularity_sqla` fallback。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "x_axis_label",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [
+          "xAxisLabel"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Custom label shown under the X axis."
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "Month"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "x_axis_label",
+            "runtime_alias": "xAxisLabel",
+            "required": false,
+            "embedding": "否",
+            "description": "Custom label shown under the X axis.",
+            "data_type": "string",
+            "sample_data": "Month",
+            "original_field": {
+              "field_name": "x_axis_label",
+              "runtime_alias": "xAxisLabel",
+              "description": "Custom label shown under the X axis.",
+              "data_type": "string",
+              "sample_data": "Month",
+              "required": false,
+              "embedding": "否",
+              "default_value": ""
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "x_axis_time_format",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [
+          "xAxisTimeFormat"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "D3 time format string used when the X axis column is temporal."
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "smart_date"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "x_axis_time_format",
+            "runtime_alias": "xAxisTimeFormat",
+            "required": false,
+            "embedding": "否",
+            "description": "D3 time format string used when the X axis column is temporal.",
+            "data_type": "string",
+            "sample_data": "smart_date",
+            "original_field": {
+              "field_name": "x_axis_time_format",
+              "runtime_alias": "xAxisTimeFormat",
+              "description": "D3 time format string used when the X axis column is temporal.",
+              "data_type": "string",
+              "sample_data": "smart_date",
+              "required": false,
+              "embedding": "否",
+              "default_value": "smart_date",
+              "notes": "controlPanel 用 sharedControls.x_axis_time_format，并覆盖描述为 D3_TIME_FORMAT_DOCS。仅在 temporal X 轴时生效。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "x_ticks_layout",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [
+          "xTicksLayout"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "The way the ticks are laid out on the X-axis"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "auto"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "x_ticks_layout",
+            "runtime_alias": "xTicksLayout",
+            "required": false,
+            "embedding": "否",
+            "description": "The way the ticks are laid out on the X-axis",
+            "data_type": "string",
+            "sample_data": "auto",
+            "original_field": {
+              "field_name": "x_ticks_layout",
+              "runtime_alias": "xTicksLayout",
+              "description": "The way the ticks are laid out on the X-axis",
+              "data_type": "string",
+              "enum_values": [
+                "auto",
+                "flat",
+                "45°",
+                "90°",
+                "staggered"
+              ],
+              "sample_data": "auto",
+              "required": false,
+              "embedding": "否",
+              "default_value": "auto"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "y_axis_format",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [
+          "yAxisFormat"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "D3 number format string."
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "SMART_NUMBER"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "y_axis_format",
+            "runtime_alias": "yAxisFormat",
+            "required": false,
+            "embedding": "否",
+            "description": "D3 number format string.",
+            "data_type": "string",
+            "sample_data": "SMART_NUMBER",
+            "original_field": {
+              "field_name": "y_axis_format",
+              "runtime_alias": "yAxisFormat",
+              "description": "D3 number format string.",
+              "data_type": "string",
+              "sample_data": "SMART_NUMBER",
+              "required": false,
+              "embedding": "否",
+              "default_value": "SMART_NUMBER"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "y_axis_label",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [
+          "yAxisLabel"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Custom label shown beside the Y axis."
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "Revenue"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "y_axis_label",
+            "runtime_alias": "yAxisLabel",
+            "required": false,
+            "embedding": "否",
+            "description": "Custom label shown beside the Y axis.",
+            "data_type": "string",
+            "sample_data": "Revenue",
+            "original_field": {
+              "field_name": "y_axis_label",
+              "runtime_alias": "yAxisLabel",
+              "description": "Custom label shown beside the Y axis.",
+              "data_type": "string",
+              "sample_data": "Revenue",
+              "required": false,
+              "embedding": "否",
+              "default_value": ""
+            }
+          }
+        ]
+      }
+    ],
+    "required_field_names": [
+      "metric",
+      "x_axis"
+    ],
+    "embedding_enabled_field_names": [
+      "adhoc_filters"
+    ],
+    "runtime_alias_index": {
+      "currency_format": [
+        "currencyFormat"
+      ],
+      "decrease_color": [
+        "decreaseColor"
+      ],
+      "increase_color": [
+        "increaseColor"
+      ],
+      "show_legend": [
+        "showLegend"
+      ],
+      "show_value": [
+        "showValue"
+      ],
+      "total_color": [
+        "totalColor"
+      ],
+      "x_axis_label": [
+        "xAxisLabel"
+      ],
+      "x_axis_time_format": [
+        "xAxisTimeFormat"
+      ],
+      "x_ticks_layout": [
+        "xTicksLayout"
+      ],
+      "y_axis_format": [
+        "yAxisFormat"
+      ],
+      "y_axis_label": [
+        "yAxisLabel"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "waterfall",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/waterfall-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/waterfall-form-data-schema.json",
+      "control-schema": "form-data-schema/waterfall-schema.json"
+    }
+  },
+  "fallback_online_field_categories": {
+    "Query": [],
+    "Advanced analytics": [],
+    "Annotations & Layers": [],
+    "Predictive Analytics（Forecast）": [],
+    "Chart Options": [],
+    "Chart Title": [],
+    "图表专属": [],
+    "通用图表选项": []
+  },
+  "original_control_schema": {
+    "viz_type": "waterfall",
+    "display_name": "Waterfall Chart",
+    "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Waterfall/controlPanel.tsx",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Waterfall/index.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Waterfall/controlPanel.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Waterfall/buildQuery.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Waterfall/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Waterfall/types.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/controls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/test/Waterfall/buildQuery.test.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/test/Waterfall/transformProps.test.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/mixins.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getControlState.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractQueryFields.ts"
+    ],
+    "notes": [
+      "waterfall 是现代 ECharts 插件，走标准 chart data API，不是 legacy 图。",
+      "插件 metadata.name 是 `Waterfall Chart`，category 是 `Evolution`。",
+      "controlPanel 只有 2 个 section：`Query` 和 `Chart Options`。",
+      "`x_axis` 复用 dndXAxisControl，底层来自 dndGroupByControl + xAxisMixin；xAxisMixin 自带 `validateNonEmpty`，因此这不是经验推断，而是 UI 控件层面的直接必填约束。",
+      "`x_axis` 与 `granularity_sqla` 的兼容关系也能在源码里闭环：xAxisMixin 会在旧 form_data 只有 `granularity_sqla` 时，把它作为 `x_axis` 的 initialValue；`getControlState.ts` 会先应用 initialValue，再做校验；`getFormDataFromControls()` 最终会把这个 control.value 写回 root `x_axis`。因此 UI 初始化后的保存态 form_data 通常仍会显式带上 `x_axis`。另一方面，buildQuery.ts 也保留了 raw API 仅传 `granularity_sqla` 的兼容 fallback。",
+      "`groupby` 被 controlOverride 改名为 `Breakdowns`，并强制 `multi=false`；但源码同时兼容字符串、对象、数组三种形态，因为 buildQuery/transformProps 都会调用 `ensureIsArray(groupby)`。",
+      "buildQuery.ts 会把 query.columns 强制设置成 `[x_axis 或 granularity_sqla, ...groupby]`，并把 `orderby` 强制设置成这些 columns 的升序排序。",
+      "transformProps.ts 只会消费第一个 breakdown 列；如果有 breakdown，则每个 period 先按 breakdown 展示，再补一条 period total；如果没有 breakdown，则每个 period 聚合后，最后追加一条 `TOTAL`。",
+      "`x_axis_time_format` 只在 X 轴列的 coltype 为 temporal 时才会实际生效。",
+      "`show_value`、`show_legend`、`increase_color`、`decrease_color`、`total_color`、`x_axis_label`、`x_ticks_layout`、`y_axis_label`、`y_axis_format`、`currency_format` 都是前端展示字段，不参与 query.columns/query.metrics 编译。",
+      "`show_legend` 存在源码默认值不一致：controlPanel.tsx 里 `show_legend.default=false`，但 types.ts 里 runtime `DEFAULT_FORM_DATA.showLegend=true`。这里按 controlPanel 导出的 root form_data 形态记录默认值，并把不一致点单独注明。"
+    ],
+    "chart_data_api_behavior": {
+      "useLegacyApi": false,
+      "frontend_request_endpoint": "/api/v1/chart/data",
+      "build_query": "Waterfall/buildQuery.ts 调用 buildQueryContext(formData, baseQueryObject => [{ ...baseQueryObject, columns, orderby }])；其中 `columns = [...ensureIsArray(x_axis || granularity_sqla), ...ensureIsArray(groupby)]`，`orderby = columns.map(column => [column, true])`。",
+      "core_aliasing": "core `extractQueryFields()` 会把 root `metric` 归并到 query.metrics；`groupby` 在 core 层会归并到 columns，但 waterfall 自己的 buildQuery 已显式覆盖 query.columns。"
+    },
+    "query_compilation": {
+      "query_columns": "`x_axis` 或兼容字段 `granularity_sqla` 一定会排在 query.columns 首位；若存在 `groupby`，则作为后续 breakdown 列追加。",
+      "query_metrics": "`metric` 通过 core `extractQueryFields()` 的 alias `metric -> metrics` 进入 query.metrics。",
+      "query_filters": "`adhoc_filters` 由标准 buildQueryObject/processFilters 路径编译进 query。",
+      "query_limits": "`row_limit` 由标准 query object 路径写入 query.row_limit。",
+      "query_sorting": "`orderby` 不由共享控件决定，而是由 Waterfall/buildQuery.ts 强制按 columns 升序生成。"
+    },
+    "field_categories": {
+      "Query": [
+        {
+          "field_name": "x_axis",
+          "description": "Dimension to use on x-axis.",
+          "data_type": "string | object",
+          "enum_source": "datasource groupby columns + adhoc column",
+          "sample_data": "order_date",
+          "required": true,
+          "embedding": "否",
+          "default_value": null,
+          "required_reason": "xAxisMixin 内置 `validators: [validateNonEmpty]`。",
+          "notes": "在 UI 路径下它有直接 validator；若旧保存态只有 `granularity_sqla`，control 初始化会把该值回填到 `x_axis`。只有 raw API 绕过 UI 时，才需要依赖 buildQuery 的 `granularity_sqla` fallback。"
+        },
+        {
+          "field_name": "time_grain_sqla",
+          "description": "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart.",
+          "data_type": "string",
+          "enum_source": "datasource.time_grain_sqla",
+          "sample_data": "P1D",
+          "required": false,
+          "embedding": "否",
+          "default_value": "P1D",
+          "notes": "sharedControls.time_grain_sqla 对新建未保存图默认给 `P1D`；只有时序 X 轴场景才真正有意义。"
+        },
+        {
+          "field_name": "groupby",
+          "description": "Breaks down the series by the category specified in this control. This can help viewers understand how each category affects the overall value.",
+          "data_type": "string | object | array[string | object]",
+          "enum_source": "datasource groupby columns",
+          "sample_data": "region",
+          "required": false,
+          "embedding": "否",
+          "default_value": [],
+          "notes": "UI 通过 `multi=false` 限制只选一个 breakdown，但运行时用 `ensureIsArray(groupby)` 同时兼容字符串、对象、数组。transformProps 只消费第一个 breakdown。"
+        },
+        {
+          "field_name": "metric",
+          "description": "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+          "data_type": "string | object",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          },
+          "required": true,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "sharedControls.metric 复用 dndAdhocMetricControl，自带 `validateNonEmpty`。buildQuery 测试验证：metric 会进入 query.metrics。"
+        },
+        {
+          "field_name": "adhoc_filters",
+          "description": "Filters",
+          "data_type": "array[object]",
+          "enum_source": "datasource filterable columns + saved metrics + current metric",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "region",
+              "operator": "IN",
+              "comparator": [
+                "APAC"
+              ]
+            }
+          ],
+          "required": false,
+          "embedding": "extra_form_data.append",
+          "default_value": []
+        },
+        {
+          "field_name": "row_limit",
+          "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+          "data_type": "integer | string",
+          "sample_data": 10000,
+          "required": false,
+          "embedding": "否",
+          "default_value": 10000,
+          "notes": "sharedControls.row_limit 校验整数且不能超过 SQL_MAX_ROW。"
+        }
+      ],
+      "Chart Options": [
+        {
+          "field_name": "show_value",
+          "runtime_alias": "showValue",
+          "description": "Show series values on the chart",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false
+        },
+        {
+          "field_name": "show_legend",
+          "runtime_alias": "showLegend",
+          "description": "Whether to display a legend for the chart",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false,
+          "notes": "controlPanel 默认值是 `false`；但 types.ts 的 runtime DEFAULT_FORM_DATA 给的是 `showLegend=true`。"
+        },
+        {
+          "field_name": "increase_color",
+          "runtime_alias": "increaseColor",
+          "description": "Bar color used for positive changes.",
+          "data_type": "object",
+          "sample_data": {
+            "r": 90,
+            "g": 193,
+            "b": 137,
+            "a": 1
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": {
+            "r": 90,
+            "g": 193,
+            "b": 137,
+            "a": 1
+          }
+        },
+        {
+          "field_name": "decrease_color",
+          "runtime_alias": "decreaseColor",
+          "description": "Bar color used for negative changes.",
+          "data_type": "object",
+          "sample_data": {
+            "r": 224,
+            "g": 67,
+            "b": 85,
+            "a": 1
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": {
+            "r": 224,
+            "g": 67,
+            "b": 85,
+            "a": 1
+          }
+        },
+        {
+          "field_name": "total_color",
+          "runtime_alias": "totalColor",
+          "description": "Bar color used for period totals and the final TOTAL bar.",
+          "data_type": "object",
+          "sample_data": {
+            "r": 102,
+            "g": 102,
+            "b": 102,
+            "a": 1
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": {
+            "r": 102,
+            "g": 102,
+            "b": 102,
+            "a": 1
+          }
+        },
+        {
+          "field_name": "x_axis_label",
+          "runtime_alias": "xAxisLabel",
+          "description": "Custom label shown under the X axis.",
+          "data_type": "string",
+          "sample_data": "Month",
+          "required": false,
+          "embedding": "否",
+          "default_value": ""
+        },
+        {
+          "field_name": "x_axis_time_format",
+          "runtime_alias": "xAxisTimeFormat",
+          "description": "D3 time format string used when the X axis column is temporal.",
+          "data_type": "string",
+          "sample_data": "smart_date",
+          "required": false,
+          "embedding": "否",
+          "default_value": "smart_date",
+          "notes": "controlPanel 用 sharedControls.x_axis_time_format，并覆盖描述为 D3_TIME_FORMAT_DOCS。仅在 temporal X 轴时生效。"
+        },
+        {
+          "field_name": "x_ticks_layout",
+          "runtime_alias": "xTicksLayout",
+          "description": "The way the ticks are laid out on the X-axis",
+          "data_type": "string",
+          "enum_values": [
+            "auto",
+            "flat",
+            "45°",
+            "90°",
+            "staggered"
+          ],
+          "sample_data": "auto",
+          "required": false,
+          "embedding": "否",
+          "default_value": "auto"
+        },
+        {
+          "field_name": "y_axis_label",
+          "runtime_alias": "yAxisLabel",
+          "description": "Custom label shown beside the Y axis.",
+          "data_type": "string",
+          "sample_data": "Revenue",
+          "required": false,
+          "embedding": "否",
+          "default_value": ""
+        },
+        {
+          "field_name": "y_axis_format",
+          "runtime_alias": "yAxisFormat",
+          "description": "D3 number format string.",
+          "data_type": "string",
+          "sample_data": "SMART_NUMBER",
+          "required": false,
+          "embedding": "否",
+          "default_value": "SMART_NUMBER"
+        },
+        {
+          "field_name": "currency_format",
+          "runtime_alias": "currencyFormat",
+          "description": "Currency format",
+          "data_type": "object | null",
+          "sample_data": {
+            "symbol": "$",
+            "symbolPosition": "prefix"
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "只有设置了 currency symbol 时，transformProps 才会使用 CurrencyFormatter；否则回退到普通 number formatter。"
+        }
+      ]
+    }
+  }
+}

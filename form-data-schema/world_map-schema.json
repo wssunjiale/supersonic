@@ -1,0 +1,278 @@
+{
+  "viz_type": "world_map",
+  "display_name": "World Map",
+  "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-world-map/src/controlPanel.ts",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-world-map/src/index.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-world-map/src/controlPanel.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-world-map/src/transformProps.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-world-map/src/WorldMap.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-world-map/src/ReactWorldMap.jsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-world-map/src/utils.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/utils/getStandardizedControls.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+    "D:/vsx/sources/superset-6.0.0/superset/viz.py"
+  ],
+  "notes": [
+    "world_map 是 legacy 图。插件 metadata 明确声明 `useLegacyApi=true`，不是标准 chart data API 图。",
+    "插件 metadata.name 是 `World Map`，category 是 `Map`。",
+    "controlPanel 有 3 个 section：`Query`、`Options`、`Chart Options`。",
+    "`entity` 基于 shared `entity`，底层来自 dndEntityControl，自带 `validateNonEmpty`，因此它是高置信必填。后端 WorldMapViz.query_obj() 会把 `groupby` 强制改为 `[entity]`。",
+    "`metric` 也是高置信必填；BaseViz.process_metrics() 会把 root `metric` 以及可选的 `secondary_metric` 一并收集到 query metrics。",
+    "`secondary_metric` 在 `WorldMapViz.get_data()` 中被映射为 `m2`，而 `WorldMap.js` 会直接基于 `d.m2` 计算 `extRadius`、`radiusScale` 和每个 bubble 的 `radius`。因此在 `show_bubbles=true` 的路径下，`secondary_metric` 不是经验推断，而是 bubble 半径链路的直接数据来源。",
+    "如果 `metric == secondary_metric`，WorldMapViz.get_data() 会把 `m2` 复制为 `m1`；这意味着可以用同一个指标同时驱动国家底图着色和气泡大小。",
+    "`sort_by_metric=true` 时，WorldMapViz.query_obj() 会把 `orderby` 改成主 metric 的降序。即便同时存在 `secondary_metric`，排序仍然只看主 metric。",
+    "`country_fieldtype` 允许 `name`、`cioc`、`cca2`、`cca3` 4 种输入标准；后端会把原始值映射到标准国家信息，并把最终 `row.country` 统一写成 `cca3`。",
+    "`color_by=metric` 时国家底图按 `metric` 的顺序色板渲染；`color_by=country` 时改用国家名驱动分类色板。`color_picker` 只控制 bubbles 的固定颜色，不控制底图填色。",
+    "源码存在 1 处明显不一致：controlOverride 给 `entity` 的描述是 `3 letter code of the country`，但 `country_fieldtype` 实际支持 full name、cioc、cca2、cca3 四种格式。"
+  ],
+  "form_data_overrides": {
+    "entity": "getStandardizedControls().shiftColumn()",
+    "metric": "getStandardizedControls().shiftMetric()",
+    "notes": "这里只是 standardized controls 在切换图表时迁移 column / metric 的逻辑，不是常规新建 / 保存 world_map form_data 的主路径。"
+  },
+  "chart_data_api_behavior": {
+    "useLegacyApi": true,
+    "frontend_request_endpoint": "/superset/explore_json/",
+    "legacy_backend_viz": "superset.viz.WorldMapViz",
+    "legacy_query_builder": "WorldMapViz.query_obj() 在 BaseViz.query_obj() 结果上强制 `groupby=[entity]`，并在 `sort_by_metric=true` 时追加 `orderby=[(metrics[0], False)]`。"
+  },
+  "query_compilation": {
+    "query_groupby": "`entity` 直接决定后端 query_obj()['groupby']。",
+    "query_metrics": "`metric` 必进 query metrics；`secondary_metric` 非空时也会通过 BaseViz.process_metrics() 进入 metrics。",
+    "query_filters": "`adhoc_filters` 通过 legacy BaseViz.process_query_filters() 被编译进查询。",
+    "query_limits": "`row_limit` 由 BaseViz.query_obj() 读入并写进查询。",
+    "query_sorting": "`sort_by_metric=true` 时，WorldMapViz.query_obj() 只按主 metric 降序排序。"
+  },
+  "field_categories": {
+    "Query": [
+      {
+        "field_name": "entity",
+        "description": "3 letter code of the country",
+        "data_type": "string | object",
+        "enum_source": "datasource groupby columns",
+        "sample_data": "country_code",
+        "required": true,
+        "embedding": "否",
+        "default_value": null,
+        "required_reason": "shared `entity` 底层 dndEntityControl 自带 `validateNonEmpty`。",
+        "notes": "后端会把它作为 `groupby=[entity]`。这里的描述与 `country_fieldtype` 的多格式支持存在源码不一致。"
+      },
+      {
+        "field_name": "country_fieldtype",
+        "description": "The country code standard that Superset should expect to find in the [country] column",
+        "data_type": "string",
+        "enum_values": [
+          "name",
+          "cioc",
+          "cca2",
+          "cca3"
+        ],
+        "sample_data": "cca2",
+        "required": false,
+        "embedding": "否",
+        "default_value": "cca2",
+        "notes": "后端会按这个标准去查国家映射表，然后统一回写 `row.country = cca3`。"
+      },
+      {
+        "field_name": "metric",
+        "description": "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+        "data_type": "string | object",
+        "enum_source": "saved metrics + adhoc metrics",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "value"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(value)"
+        },
+        "required": true,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "adhoc_filters",
+        "description": "Filters",
+        "data_type": "array[object]",
+        "enum_source": "datasource filterable columns + saved metrics + current metric",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "year",
+            "operator": "==",
+            "comparator": 2024
+          }
+        ],
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "default_value": []
+      },
+      {
+        "field_name": "row_limit",
+        "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+        "data_type": "integer | string",
+        "sample_data": 10000,
+        "required": false,
+        "embedding": "否",
+        "default_value": 10000
+      },
+      {
+        "field_name": "sort_by_metric",
+        "description": "Whether to sort results by the selected metric in descending order.",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false,
+        "notes": "源码没有显式 default；但在 legacy backend 中未传时的有效行为等同 false。"
+      }
+    ],
+    "Options": [
+      {
+        "field_name": "show_bubbles",
+        "runtime_alias": "showBubbles",
+        "description": "Whether to display bubbles on top of countries",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      },
+      {
+        "field_name": "secondary_metric",
+        "description": "Metric that defines the size of the bubble",
+        "data_type": "string | object | null",
+        "enum_source": "saved metrics + adhoc metrics",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "population"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(population)"
+        },
+        "required": false,
+        "embedding": "否",
+        "default_value": null,
+        "required_when": "show_bubbles = true",
+        "required_reason": "当 `show_bubbles=true` 时，前端 bubble 半径直接读取 `d.m2`；而后端只有在 `secondary_metric` 非空时才会生成 `m2`。",
+        "notes": "如果 `metric == secondary_metric`，后端会把 `m2` 复制为 `m1`。"
+      },
+      {
+        "field_name": "max_bubble_size",
+        "runtime_alias": "maxBubbleSize",
+        "description": "Maximum pixel size of bubble radius after runtime parseInt.",
+        "data_type": "string | integer",
+        "enum_values": [
+          "5",
+          "10",
+          "15",
+          "25",
+          "50",
+          "75",
+          "100"
+        ],
+        "sample_data": "25",
+        "required": false,
+        "embedding": "否",
+        "default_value": "25",
+        "notes": "control 是 freeForm string；transformProps 会在运行时执行 `parseInt(maxBubbleSize, 10)`。"
+      },
+      {
+        "field_name": "color_picker",
+        "runtime_alias": "colorPicker",
+        "description": "Use this to define a static color for all circles",
+        "data_type": "object",
+        "sample_data": {
+          "r": 0,
+          "g": 122,
+          "b": 135,
+          "a": 1
+        },
+        "required": false,
+        "embedding": "否",
+        "default_value": {
+          "r": 0,
+          "g": 122,
+          "b": 135,
+          "a": 1
+        },
+        "notes": "controlOverride 只改了 label 为 `Bubble Color`，没有改 shared control 的描述与默认值。"
+      },
+      {
+        "field_name": "color_by",
+        "runtime_alias": "colorBy",
+        "description": "Choose whether a country should be shaded by the metric, or assigned a color based on a categorical color palette",
+        "data_type": "string",
+        "enum_values": [
+          "metric",
+          "country"
+        ],
+        "sample_data": "metric",
+        "required": false,
+        "embedding": "否",
+        "default_value": "metric"
+      },
+      {
+        "field_name": "linear_color_scheme",
+        "runtime_alias": "linearColorScheme",
+        "description": "",
+        "data_type": "string",
+        "sample_data": "<sequential_scheme_key>",
+        "required": false,
+        "embedding": "否",
+        "default_value": "sequentialSchemeRegistry.getDefaultKey()",
+        "visibility": "仅当 `color_by=metric` 时显示"
+      },
+      {
+        "field_name": "color_scheme",
+        "runtime_alias": "colorScheme",
+        "description": "The color scheme for rendering chart",
+        "data_type": "string",
+        "sample_data": "bnbColors",
+        "required": false,
+        "embedding": "否",
+        "default_value": "categoricalSchemeRegistry.getDefaultKey()",
+        "visibility": "仅当 `color_by=country` 时显示"
+      }
+    ],
+    "Chart Options": [
+      {
+        "field_name": "y_axis_format",
+        "runtime_alias": "yAxisFormat",
+        "description": "D3 number format string.",
+        "data_type": "string",
+        "sample_data": "SMART_NUMBER",
+        "required": false,
+        "embedding": "否",
+        "default_value": "SMART_NUMBER"
+      },
+      {
+        "field_name": "currency_format",
+        "runtime_alias": "currencyFormat",
+        "description": "Currency format",
+        "data_type": "object | null",
+        "sample_data": {
+          "symbol": "$",
+          "symbolPosition": "prefix"
+        },
+        "required": false,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "transformProps 会把它与 `y_axis_format` 一起传给 `getValueFormatter(metric, ...)`。"
+      }
+    ]
+  }
+}

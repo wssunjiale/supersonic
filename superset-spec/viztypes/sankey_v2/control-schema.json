@@ -1,0 +1,775 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "sankey_v2",
+  "display_name": "Sankey Chart",
+  "source_kind": "schema_file",
+  "normalized_control_schema": {
+    "field_category_order": [
+      "Query",
+      "Chart Options"
+    ],
+    "field_occurrences": [
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "source",
+        "runtime_alias": null,
+        "required": true,
+        "embedding": "否",
+        "description": "The column to be used as the source of the edge.",
+        "data_type": "string | object",
+        "sample_data": "source_stage",
+        "original_field": {
+          "field_name": "source",
+          "description": "The column to be used as the source of the edge.",
+          "data_type": "string | object",
+          "enum_source": "datasource columns",
+          "sample_data": "source_stage",
+          "required": true,
+          "embedding": "否",
+          "default_value": null
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "target",
+        "runtime_alias": null,
+        "required": true,
+        "embedding": "否",
+        "description": "The column to be used as the target of the edge.",
+        "data_type": "string | object",
+        "sample_data": "target_stage",
+        "original_field": {
+          "field_name": "target",
+          "description": "The column to be used as the target of the edge.",
+          "data_type": "string | object",
+          "enum_source": "datasource columns",
+          "sample_data": "target_stage",
+          "required": true,
+          "embedding": "否",
+          "default_value": null
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "metric",
+        "runtime_alias": null,
+        "required": true,
+        "embedding": "否",
+        "description": "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+        "data_type": "string | object",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "weight"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(weight)"
+        },
+        "original_field": {
+          "field_name": "metric",
+          "description": "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+          "data_type": "string | object",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "weight"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(weight)"
+          },
+          "required": true,
+          "embedding": "否",
+          "default_value": null
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "adhoc_filters",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "description": "Filters",
+        "data_type": "array[object]",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "country",
+            "operator": "IN",
+            "comparator": [
+              "CN",
+              "US"
+            ]
+          }
+        ],
+        "original_field": {
+          "field_name": "adhoc_filters",
+          "description": "Filters",
+          "data_type": "array[object]",
+          "enum_source": "dataset filterable columns + saved metrics + current metric",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "country",
+              "operator": "IN",
+              "comparator": [
+                "CN",
+                "US"
+              ]
+            }
+          ],
+          "required": false,
+          "embedding": "extra_form_data.append",
+          "default_value": []
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "row_limit",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+        "data_type": "integer",
+        "sample_data": 10000,
+        "original_field": {
+          "field_name": "row_limit",
+          "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+          "data_type": "integer",
+          "enum_values": [
+            10,
+            50,
+            100,
+            250,
+            500,
+            1000,
+            5000,
+            10000,
+            50000
+          ],
+          "sample_data": 10000,
+          "required": false,
+          "embedding": "否",
+          "default_value": 10000
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "sort_by_metric",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Whether to sort results by the selected metric in descending order.",
+        "data_type": "boolean",
+        "sample_data": false,
+        "original_field": {
+          "field_name": "sort_by_metric",
+          "description": "Whether to sort results by the selected metric in descending order.",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "ui_default_state": "unchecked",
+          "notes": "shared control 没有显式 `default`；`getControlState.ts` 只有在 `state.default` 为 truthy 时才会把默认值写入 control.value，因此 untouched root form_data 的缺省态通常是未设置。与此同时，`CheckboxControl.jsx` 的 `defaultProps.value=false` 且 `checked={!!value}`，所以 UI 会以未勾选状态展示。只有为 true 时，`buildQuery.ts` 才会追加 `orderby=[[metric, false]]`。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "color_scheme",
+        "runtime_alias": "colorScheme",
+        "required": false,
+        "embedding": "否",
+        "description": "The color scheme for rendering chart",
+        "data_type": "string",
+        "sample_data": "supersetColors",
+        "original_field": {
+          "field_name": "color_scheme",
+          "runtime_alias": "colorScheme",
+          "description": "The color scheme for rendering chart",
+          "data_type": "string",
+          "enum_source": "categoricalSchemeRegistry.keys()",
+          "sample_data": "supersetColors",
+          "required": false,
+          "embedding": "否",
+          "default_value": "categoricalSchemeRegistry.getDefaultKey()"
+        }
+      }
+    ],
+    "field_inventory": [
+      {
+        "field_name": "adhoc_filters",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "Filters"
+        ],
+        "data_types": [
+          "array[object]"
+        ],
+        "sample_data_examples": [
+          [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "country",
+              "operator": "IN",
+              "comparator": [
+                "CN",
+                "US"
+              ]
+            }
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "adhoc_filters",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "extra_form_data.append",
+            "description": "Filters",
+            "data_type": "array[object]",
+            "sample_data": [
+              {
+                "expressionType": "SIMPLE",
+                "clause": "WHERE",
+                "subject": "country",
+                "operator": "IN",
+                "comparator": [
+                  "CN",
+                  "US"
+                ]
+              }
+            ],
+            "original_field": {
+              "field_name": "adhoc_filters",
+              "description": "Filters",
+              "data_type": "array[object]",
+              "enum_source": "dataset filterable columns + saved metrics + current metric",
+              "sample_data": [
+                {
+                  "expressionType": "SIMPLE",
+                  "clause": "WHERE",
+                  "subject": "country",
+                  "operator": "IN",
+                  "comparator": [
+                    "CN",
+                    "US"
+                  ]
+                }
+              ],
+              "required": false,
+              "embedding": "extra_form_data.append",
+              "default_value": []
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "color_scheme",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [
+          "colorScheme"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "The color scheme for rendering chart"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "supersetColors"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "color_scheme",
+            "runtime_alias": "colorScheme",
+            "required": false,
+            "embedding": "否",
+            "description": "The color scheme for rendering chart",
+            "data_type": "string",
+            "sample_data": "supersetColors",
+            "original_field": {
+              "field_name": "color_scheme",
+              "runtime_alias": "colorScheme",
+              "description": "The color scheme for rendering chart",
+              "data_type": "string",
+              "enum_source": "categoricalSchemeRegistry.keys()",
+              "sample_data": "supersetColors",
+              "required": false,
+              "embedding": "否",
+              "default_value": "categoricalSchemeRegistry.getDefaultKey()"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "metric",
+        "required": true,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+        ],
+        "data_types": [
+          "string | object"
+        ],
+        "sample_data_examples": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "weight"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(weight)"
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "metric",
+            "runtime_alias": null,
+            "required": true,
+            "embedding": "否",
+            "description": "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+            "data_type": "string | object",
+            "sample_data": {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "weight"
+              },
+              "aggregate": "SUM",
+              "label": "SUM(weight)"
+            },
+            "original_field": {
+              "field_name": "metric",
+              "description": "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+              "data_type": "string | object",
+              "enum_source": "saved metrics + adhoc metrics",
+              "sample_data": {
+                "expressionType": "SIMPLE",
+                "column": {
+                  "column_name": "weight"
+                },
+                "aggregate": "SUM",
+                "label": "SUM(weight)"
+              },
+              "required": true,
+              "embedding": "否",
+              "default_value": null
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "row_limit",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Limits the number of the rows that are computed in the query that is the source of the data used for this chart."
+        ],
+        "data_types": [
+          "integer"
+        ],
+        "sample_data_examples": [
+          10000
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "row_limit",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+            "data_type": "integer",
+            "sample_data": 10000,
+            "original_field": {
+              "field_name": "row_limit",
+              "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+              "data_type": "integer",
+              "enum_values": [
+                10,
+                50,
+                100,
+                250,
+                500,
+                1000,
+                5000,
+                10000,
+                50000
+              ],
+              "sample_data": 10000,
+              "required": false,
+              "embedding": "否",
+              "default_value": 10000
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "sort_by_metric",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Whether to sort results by the selected metric in descending order."
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          false
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "sort_by_metric",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Whether to sort results by the selected metric in descending order.",
+            "data_type": "boolean",
+            "sample_data": false,
+            "original_field": {
+              "field_name": "sort_by_metric",
+              "description": "Whether to sort results by the selected metric in descending order.",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": false,
+              "required": false,
+              "embedding": "否",
+              "default_value": null,
+              "ui_default_state": "unchecked",
+              "notes": "shared control 没有显式 `default`；`getControlState.ts` 只有在 `state.default` 为 truthy 时才会把默认值写入 control.value，因此 untouched root form_data 的缺省态通常是未设置。与此同时，`CheckboxControl.jsx` 的 `defaultProps.value=false` 且 `checked={!!value}`，所以 UI 会以未勾选状态展示。只有为 true 时，`buildQuery.ts` 才会追加 `orderby=[[metric, false]]`。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "source",
+        "required": true,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "The column to be used as the source of the edge."
+        ],
+        "data_types": [
+          "string | object"
+        ],
+        "sample_data_examples": [
+          "source_stage"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "source",
+            "runtime_alias": null,
+            "required": true,
+            "embedding": "否",
+            "description": "The column to be used as the source of the edge.",
+            "data_type": "string | object",
+            "sample_data": "source_stage",
+            "original_field": {
+              "field_name": "source",
+              "description": "The column to be used as the source of the edge.",
+              "data_type": "string | object",
+              "enum_source": "datasource columns",
+              "sample_data": "source_stage",
+              "required": true,
+              "embedding": "否",
+              "default_value": null
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "target",
+        "required": true,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "The column to be used as the target of the edge."
+        ],
+        "data_types": [
+          "string | object"
+        ],
+        "sample_data_examples": [
+          "target_stage"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "target",
+            "runtime_alias": null,
+            "required": true,
+            "embedding": "否",
+            "description": "The column to be used as the target of the edge.",
+            "data_type": "string | object",
+            "sample_data": "target_stage",
+            "original_field": {
+              "field_name": "target",
+              "description": "The column to be used as the target of the edge.",
+              "data_type": "string | object",
+              "enum_source": "datasource columns",
+              "sample_data": "target_stage",
+              "required": true,
+              "embedding": "否",
+              "default_value": null
+            }
+          }
+        ]
+      }
+    ],
+    "required_field_names": [
+      "metric",
+      "source",
+      "target"
+    ],
+    "embedding_enabled_field_names": [
+      "adhoc_filters"
+    ],
+    "runtime_alias_index": {
+      "color_scheme": [
+        "colorScheme"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "sankey_v2",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/sankey_v2-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/sankey_v2-form-data-schema.json",
+      "control-schema": "form-data-schema/sankey_v2-schema.json"
+    }
+  },
+  "fallback_online_field_categories": {
+    "Query": [],
+    "Advanced analytics": [],
+    "Annotations & Layers": [],
+    "Predictive Analytics（Forecast）": [],
+    "Chart Options": [],
+    "Chart Title": [],
+    "图表专属": [],
+    "通用图表选项": []
+  },
+  "original_control_schema": {
+    "viz_type": "sankey_v2",
+    "display_name": "Sankey Chart",
+    "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Sankey/controlPanel.tsx",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Sankey/controlPanel.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Sankey/buildQuery.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Sankey/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Sankey/index.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Sankey/types.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/controls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryContext.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryObject.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractQueryFields.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts"
+    ],
+    "notes": [
+      "Sankey Chart 是 ECharts 图，走 chart data API / `buildQueryContext()`，不是 legacy `/superset/explore_json/`。",
+      "当前图的核心查询字段不是 `groupby` 控件，而是两个单选维度控件 `source` 和 `target`。`Sankey/buildQuery.ts` 会把它们组装成 query `groupby=[source, target]`。",
+      "`source` 与 `target` 都基于 `dndGroupByControl` 改成 `multi: false`，并额外加了 `validateNonEmpty`，因此它们都是高置信必填字段。",
+      "`metric` 走共享 `metric` 控件，是单值指标字段；`extractQueryFields()` 会把 root `metric` 别名映射到 query `metrics`。",
+      "`sort_by_metric=true` 时，`buildQuery.ts` 会显式写入 `orderby=[[metric, false]]`；否则当前图不主动写 `orderby`。",
+      "插件 metadata 注释里直接写了 `TODO: Implement cross filtering`。当前 Sankey 没有 click/cross-filter 实现，因此不能像 radar 那样从图上点击节点来发出 `extraFormData.filters`。"
+    ],
+    "metadata_summary": {
+      "description": "The Sankey chart visually tracks the movement and transformation of values across system stages. Nodes represent stages, connected by links depicting value flow.",
+      "category": "Flow",
+      "tags": [
+        "Directional",
+        "ECharts",
+        "Distribution",
+        "Flow"
+      ]
+    },
+    "query_compilation": {
+      "frontend_builder": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Sankey/buildQuery.ts",
+      "query_context_builder": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryContext.ts",
+      "query_field_aliases": {
+        "metric": "metrics"
+      },
+      "base_query_effect": "`buildQueryObject()` 会从 raw form_data 提取 `metric`、`adhoc_filters`、`row_limit` 等字段，生成 query `metrics` / filters。",
+      "sankey_build_query_effect": "`Sankey/buildQuery.ts` 会把 `source` 与 `target` 组装成 query `groupby=[source, target]`。若 `sort_by_metric=true`，会追加 `orderby=[[metric, false]]`。",
+      "frontend_post_processing": "`transformProps.ts` 会把查询结果按 `source -> target -> value` 转成 ECharts sankey `links` 和 `data`，并基于 `metric` 计算节点总流量与 tooltip 百分比。",
+      "query_sensitive_fields": [
+        "source",
+        "target",
+        "metric",
+        "adhoc_filters",
+        "row_limit",
+        "sort_by_metric"
+      ]
+    },
+    "field_categories": {
+      "Query": [
+        {
+          "field_name": "source",
+          "description": "The column to be used as the source of the edge.",
+          "data_type": "string | object",
+          "enum_source": "datasource columns",
+          "sample_data": "source_stage",
+          "required": true,
+          "embedding": "否",
+          "default_value": null
+        },
+        {
+          "field_name": "target",
+          "description": "The column to be used as the target of the edge.",
+          "data_type": "string | object",
+          "enum_source": "datasource columns",
+          "sample_data": "target_stage",
+          "required": true,
+          "embedding": "否",
+          "default_value": null
+        },
+        {
+          "field_name": "metric",
+          "description": "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+          "data_type": "string | object",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "weight"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(weight)"
+          },
+          "required": true,
+          "embedding": "否",
+          "default_value": null
+        },
+        {
+          "field_name": "adhoc_filters",
+          "description": "Filters",
+          "data_type": "array[object]",
+          "enum_source": "dataset filterable columns + saved metrics + current metric",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "country",
+              "operator": "IN",
+              "comparator": [
+                "CN",
+                "US"
+              ]
+            }
+          ],
+          "required": false,
+          "embedding": "extra_form_data.append",
+          "default_value": []
+        },
+        {
+          "field_name": "row_limit",
+          "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+          "data_type": "integer",
+          "enum_values": [
+            10,
+            50,
+            100,
+            250,
+            500,
+            1000,
+            5000,
+            10000,
+            50000
+          ],
+          "sample_data": 10000,
+          "required": false,
+          "embedding": "否",
+          "default_value": 10000
+        },
+        {
+          "field_name": "sort_by_metric",
+          "description": "Whether to sort results by the selected metric in descending order.",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "ui_default_state": "unchecked",
+          "notes": "shared control 没有显式 `default`；`getControlState.ts` 只有在 `state.default` 为 truthy 时才会把默认值写入 control.value，因此 untouched root form_data 的缺省态通常是未设置。与此同时，`CheckboxControl.jsx` 的 `defaultProps.value=false` 且 `checked={!!value}`，所以 UI 会以未勾选状态展示。只有为 true 时，`buildQuery.ts` 才会追加 `orderby=[[metric, false]]`。"
+        }
+      ],
+      "Chart Options": [
+        {
+          "field_name": "color_scheme",
+          "runtime_alias": "colorScheme",
+          "description": "The color scheme for rendering chart",
+          "data_type": "string",
+          "enum_source": "categoricalSchemeRegistry.keys()",
+          "sample_data": "supersetColors",
+          "required": false,
+          "embedding": "否",
+          "default_value": "categoricalSchemeRegistry.getDefaultKey()"
+        }
+      ]
+    }
+  }
+}

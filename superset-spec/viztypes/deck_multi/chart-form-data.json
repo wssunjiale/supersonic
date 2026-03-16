@@ -1,0 +1,442 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "deck_multi",
+  "display_name": "deck.gl Multiple Layers",
+  "source_kind": "schema_file",
+  "normalized_chart_form_data": {
+    "required_root_fields": [
+      "datasource",
+      "deck_slices",
+      "viz_type"
+    ],
+    "optional_root_fields": [
+      "adhoc_filters",
+      "cache_timeout",
+      "custom_params",
+      "extra_filters",
+      "extra_form_data",
+      "filter_data_mapping",
+      "layer_filter_scope",
+      "mapbox_style",
+      "slice_id",
+      "url_params",
+      "viewport"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "deck_slices",
+      "mapbox_style",
+      "viewport",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "deck_slices",
+      "extra_filters",
+      "extra_form_data",
+      "mapbox_style",
+      "viewport",
+      "viz_type"
+    ],
+    "fallback_template_seed": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "deck_multi",
+      "deck_slices": [
+        "<saved_chart_reference_json>"
+      ],
+      "adhoc_filters": [],
+      "time_range": "No filter"
+    }
+  },
+  "original_chart_form_data_schema": {
+    "viz_type": "deck_multi",
+    "display_name": "deck.gl Multiple Layers",
+    "purpose": "用于调用 API 创建或保存 deck.gl Multiple Layers 时填写的 form_data 模板",
+    "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/deck_multi-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/Multi/controlPanel.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/Multi/index.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/Multi/Multi.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utils/explore.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/index.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/Shared_DeckGL.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/dashboard/util/charts/getFormDataWithExtraFilters.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataWithDashboardContext.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/QueryFormData.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+      "D:/vsx/sources/superset-6.0.0/superset/views/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+      "D:/vsx/sources/superset-6.0.0/tests/integration_tests/viz_tests.py"
+    ],
+    "notes": [
+      "deck_multi 是 legacy 图，真实请求路径是 `/superset/explore_json/`，不是 `/api/v1/chart/data`。",
+      "Explore 导出 form_data 时走 `getFormDataFromControls()`，它按 control name 原样写入 root form_data。API 根层正式字段只有 `mapbox_style`、`viewport`、`deck_slices`、`adhoc_filters`，外加全局隐藏字段如 `datasource`、`viz_type`。",
+      "与普通图不同，deck_multi 根图不直接产出自己的 SQL 查询；它根据 `deck_slices` 找出已保存的子图，再分别调用各子图的 payload 流程。",
+      "`datasource` 仍然是创建图表时的隐藏必备字段，但 deck_multi 根图后端 `query_obj()` 返回 `{}`，因此根 datasource 不承担常规 root query 语义。",
+      "`deck_slices` 必须是 slice id 数组，不是完整 slice 对象，也不是名称数组。后端 `Slice.id.in_(slice_ids)` 和前端 `getLayerIndex()` 都按整数 id 工作。",
+      "虽然 `deck_slices` 的异步选择接口会返回所有 `viz_type` 前缀为 `deck` 的图表，但前端 `layerGenerators` 只支持 10 种具体子图层类型，因此推荐模板里的 `deck_slices` 应只包含这些支持的单层 deck 图。",
+      "根层 `adhoc_filters`、`extra_filters`、`extra_form_data` 对 deck_multi 的意义是“分发到子图层”，而不是作用于根图自己的 SQL。",
+      "`layer_filter_scope` 与 `filter_data_mapping` 是 dashboard/explore context 注入的高级字段，不是当前 controlPanel 正式字段；但若你需要分层筛选，它们是源码确认存在且生效的关键根字段。"
+    ],
+    "naming_and_pipeline": {
+      "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写成 form_data[name]。",
+      "api_form_data_to_backend_request": "ChartClient.ts 在 `useLegacyApi=true` 时，把原始 form_data 包装成 `{ form_data }` POST 到 `/superset/explore_json/`。",
+      "backend_form_data_normalization": "`explore_json()` 会先补 `datasource`，再执行 `convert_legacy_filters_into_adhoc(form_data)` 与 `merge_extra_filters(form_data)`。",
+      "backend_form_data_to_payload": "`DeckGLMultiLayer.get_data()` 读取 `deck_slices`，对每个子 slice 应用 layer filtering，再调用对应子图的 `get_payload()`，最后返回根层聚合 payload。",
+      "frontend_second_hop_loading": "`Multi.tsx` 还会遍历 `payload.data.slices[*].form_data`，给每个子图再生成一次 `/superset/explore_json/` URL，请求真正的子层 payload。"
+    },
+    "global_required_fields": {
+      "datasource": {
+        "data_type": "string",
+        "required": true,
+        "sample_data": "<dataset_id>__table",
+        "source": "explore_json() + datasourceAndVizType hidden control",
+        "notes": "deck_multi 根图虽不直接使用 root query_obj，但创建/保存图表时仍需要隐藏 datasource。"
+      },
+      "viz_type": {
+        "data_type": "string",
+        "required": true,
+        "fixed_value": "deck_multi",
+        "source": "DeckGLMultiLayer.viz_type + Multi/index.ts"
+      },
+      "deck_slices": {
+        "data_type": "array[integer]",
+        "required": true,
+        "sample_data": [
+          101,
+          102
+        ],
+        "source": "Multi controlPanel + DeckGLMultiLayer.get_data()",
+        "notes": "高置信必填。没有它，根图无法知道要加载哪些子图层。"
+      }
+    },
+    "global_optional_fields": {
+      "mapbox_style": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+        "source": "Map section"
+      },
+      "viewport": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {
+          "longitude": 6.85236157047845,
+          "latitude": 31.222656842808707,
+          "zoom": 1,
+          "bearing": 0,
+          "pitch": 0
+        },
+        "source": "Map section"
+      },
+      "adhoc_filters": {
+        "data_type": "array[object]",
+        "required": false,
+        "sample_data": [],
+        "source": "Query section",
+        "notes": "对 deck_multi 而言，这些过滤器会被转发到子图层，而不是作用于根图自己的 SQL。"
+      },
+      "extra_filters": {
+        "data_type": "array[object]",
+        "required": false,
+        "sample_data": [
+          {
+            "col": "country",
+            "op": "IN",
+            "val": [
+              "US"
+            ]
+          }
+        ],
+        "source": "dashboard getFormDataWithExtraFilters + DeckGLMultiLayer._apply_layer_filtering",
+        "notes": "legacy filterbox / dashboard context 根字段，不是 controlPanel 正式字段。根图会把它转发到子图层。"
+      },
+      "extra_form_data": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {
+          "filters": [
+            {
+              "col": "country",
+              "op": "IN",
+              "val": [
+                "US"
+              ]
+            }
+          ]
+        },
+        "source": "dashboard getFormDataWithExtraFilters + DeckGLMultiLayer._apply_layer_filtering",
+        "notes": "dashboard/native filter 根字段，不是 controlPanel 正式字段。根图会把它转发到子图层；若存在 `layer_filter_scope`，后端会结合 `filter_data_mapping` 重写其中的 `filters`。"
+      },
+      "layer_filter_scope": {
+        "data_type": "object<string, array[integer]>",
+        "required": false,
+        "sample_data": {
+          "native_filter_1": [
+            0
+          ],
+          "native_filter_2": [
+            1,
+            2
+          ]
+        },
+        "source": "dashboard getFormDataWithExtraFilters + getFormDataWithDashboardContext + DeckGLMultiLayer._apply_layer_filtering",
+        "notes": "key 是 filterId，value 是图层索引数组，不是 slice id 数组。"
+      },
+      "filter_data_mapping": {
+        "data_type": "object<string, array[object]>",
+        "required": false,
+        "sample_data": {
+          "native_filter_1": [
+            {
+              "column": "country",
+              "op": "==",
+              "val": "US"
+            }
+          ]
+        },
+        "source": "dashboard getFormDataWithExtraFilters + DeckGLMultiLayer._process_extra_form_data_filters",
+        "notes": "key 是 filterId，value 是该 filter 实际展开后的 simple filter 数组，用于按 layer scope 重写 `extra_form_data.filters`。"
+      },
+      "slice_id": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 0,
+        "source": "datasourceAndVizType hidden control",
+        "notes": "新建图表时通常省略；编辑已存在图表时由服务端或上层调用方提供。"
+      },
+      "cache_timeout": {
+        "data_type": "integer | null",
+        "required": false,
+        "sample_data": null,
+        "source": "datasourceAndVizType hidden control"
+      },
+      "url_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "QueryFormData"
+      },
+      "custom_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "QueryFormData"
+      }
+    },
+    "minimal_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "deck_multi",
+      "mapbox_style": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+      "viewport": {
+        "longitude": 6.85236157047845,
+        "latitude": 31.222656842808707,
+        "zoom": 1,
+        "bearing": 0,
+        "pitch": 0
+      },
+      "deck_slices": [
+        101,
+        102
+      ],
+      "adhoc_filters": []
+    },
+    "recommended_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "deck_multi",
+      "mapbox_style": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+      "viewport": {
+        "longitude": 6.85236157047845,
+        "latitude": 31.222656842808707,
+        "zoom": 1,
+        "bearing": 0,
+        "pitch": 0
+      },
+      "deck_slices": [
+        101,
+        102
+      ],
+      "adhoc_filters": [],
+      "extra_form_data": {},
+      "extra_filters": []
+    },
+    "conditional_blocks": {
+      "supported_sublayers_only": {
+        "condition": "需要叠加多个已保存的 deck.gl 子图层时",
+        "fields": {
+          "deck_slices": [
+            101,
+            102,
+            103
+          ]
+        },
+        "notes": "推荐只引用 `deck_arc`、`deck_contour`、`deck_geojson`、`deck_grid`、`deck_heatmap`、`deck_hex`、`deck_path`、`deck_polygon`、`deck_scatter`、`deck_screengrid` 这 10 种子图层。"
+      },
+      "global_filters_for_all_layers": {
+        "condition": "需要把同一组过滤条件广播给所有子图层时",
+        "fields": {
+          "adhoc_filters": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "country",
+              "operator": "IN",
+              "comparator": [
+                "US"
+              ]
+            }
+          ],
+          "extra_form_data": {
+            "filters": [
+              {
+                "col": "country",
+                "op": "IN",
+                "val": [
+                  "US"
+                ]
+              }
+            ]
+          }
+        },
+        "notes": "根字段会在 deck_multi 运行时被转发到各个子图层。"
+      },
+      "layer_scoped_filters": {
+        "condition": "需要把不同过滤器定向作用到不同子图层时",
+        "fields": {
+          "layer_filter_scope": {
+            "native_filter_1": [
+              0
+            ],
+            "native_filter_2": [
+              1,
+              2
+            ]
+          },
+          "filter_data_mapping": {
+            "native_filter_1": [
+              {
+                "column": "country",
+                "op": "==",
+                "val": "US"
+              }
+            ],
+            "native_filter_2": [
+              {
+                "column": "region",
+                "op": "!=",
+                "val": "West"
+              }
+            ]
+          },
+          "extra_form_data": {
+            "filters": []
+          }
+        },
+        "notes": "key 必须用同一个 filterId 对齐。`layer_filter_scope` 的 value 是图层索引，不是 slice id。"
+      },
+      "dashboard_context_passthrough": {
+        "condition": "需要保留 dashboard/native filters 注入进来的 legacy 过滤器时",
+        "fields": {
+          "extra_filters": [
+            {
+              "col": "country",
+              "op": "IN",
+              "val": [
+                "US"
+              ]
+            }
+          ]
+        },
+        "notes": "这不是当前 controlPanel 正式字段，只在 dashboard/explore context 里作为隐藏根字段出现。"
+      }
+    },
+    "runtime_only_or_non_template_fields": {
+      "backend_response_only_fields": [
+        {
+          "field_name": "queriesData[0].data.features",
+          "reason": "这是根图 payload 里按子 viz_type 聚合后的 feature 映射，不是 root form_data 字段。"
+        },
+        {
+          "field_name": "queriesData[0].data.mapboxApiKey",
+          "reason": "这是后端 payload 附带的运行时地图密钥，不是 root form_data 字段。"
+        },
+        {
+          "field_name": "queriesData[0].data.slices",
+          "reason": "这是后端从数据库拉回来的子 slice 数据对象数组，不是 root form_data 字段。"
+        }
+      ],
+      "frontend_runtime_state": [
+        {
+          "field_name": "subSlicesLayers",
+          "reason": "这是 `Multi.tsx` 内部维护的运行时 layer 缓存，不是 API root 字段。"
+        },
+        {
+          "field_name": "payload.data.slices[*].form_data",
+          "reason": "这是子图保存态，被前端拿来生成第二跳 `/superset/explore_json/` 请求，不是根图 root form_data 字段。"
+        }
+      ],
+      "dashboard_context_only_fields": [
+        {
+          "field_name": "layer_filter_scope",
+          "reason": "虽然不是 controlPanel 字段，但在 dashboard/explore context 中会被注入，而且 deck_multi 后端/前端都会消费它。"
+        },
+        {
+          "field_name": "filter_data_mapping",
+          "reason": "虽然不是 controlPanel 字段，但在 dashboard/explore context 中会被注入，用来把 scoped filter 具体展开成 simple filters。"
+        },
+        {
+          "field_name": "extra_filters",
+          "reason": "虽然不是 controlPanel 字段，但在 dashboard/filterbox context 中会被注入，并被 deck_multi 分发到子图层。"
+        }
+      ],
+      "legacy_or_confusing_keys": [
+        {
+          "field_name": "payload.form_data",
+          "reason": "这是 legacy `/superset/explore_json/` 请求的外层包裹字段，不是图表保存态内部的 root form_data 字段。"
+        }
+      ]
+    },
+    "api_usage_guidance": {
+      "high_confidence_required_fields": [
+        "datasource",
+        "viz_type",
+        "deck_slices"
+      ],
+      "recommended_always_set": [
+        "mapbox_style",
+        "viewport",
+        "adhoc_filters"
+      ],
+      "advanced_optional_fields": [
+        "extra_form_data",
+        "extra_filters",
+        "layer_filter_scope",
+        "filter_data_mapping"
+      ],
+      "avoid_confusion": [
+        "不要把 `deck_slices` 写成完整 slice 对象、slice name 或图层索引；当前源码需要的是 slice id 数组。",
+        "不要把 `layer_filter_scope` 的值写成 slice id；当前源码明确按 `deck_slices` 数组位置解释它，也就是图层索引。",
+        "不要把 `deck_multi` 当成普通单图查询型 deck chart；根图自己的 `query_obj()` 返回 `{}`，真正的数据来自子图 payload。",
+        "不要把 `adhoc_filters` 理解为只作用于根图本身；对 deck_multi 来说，它们会被分发到子图层。",
+        "不要在 `deck_slices` 里嵌套 `deck_multi` 或前端 `layerGenerators` 不支持的 deck 图，否则前端无法生成对应 layer。",
+        "不要把 dashboard 注入字段 `layer_filter_scope`、`filter_data_mapping` 误认为当前 controlPanel 正式字段；它们属于高级上下文字段，只在需要 scoped filtering 时使用。"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "deck_multi",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/deck_multi-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/deck_multi-form-data-schema.json",
+      "control-schema": "form-data-schema/deck_multi-schema.json"
+    }
+  }
+}

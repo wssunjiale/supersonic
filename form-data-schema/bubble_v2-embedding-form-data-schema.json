@@ -1,0 +1,494 @@
+{
+  "viz_type": "bubble_v2",
+  "display_name": "Bubble Chart",
+  "purpose": "第三方 embedding / guest token 场景下安全传输的 Bubble Chart form_data 模板",
+  "base_form_data_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/bubble_v2-form-data-schema.json",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset/security/manager.py",
+    "D:/vsx/sources/superset-6.0.0/superset/constants.py",
+    "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+    "D:/vsx/sources/superset-6.0.0/superset/charts/schemas.py",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/QueryFormData.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/constants.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/processExtraFormData.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryContext.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryObject.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractQueryFields.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Bubble/controlPanel.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Bubble/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Bubble/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset/examples/configs/charts/Featured Charts/Bubble.yaml"
+  ],
+  "notes": [
+    "embedded guest 的核心限制仍然在后端 security/manager.py 的 query_context_modified()。报错原文是 Guest user cannot modify chart payload。",
+    "manager.py 显式比较的是 form_data / query_context 中的 metrics、columns、groupby、orderby，但 Bubble Chart 的关键 root 字段并不直接叫这些名字。Bubble/buildQuery.ts 与 extractQueryFields.ts 会把 entity / series 编译到 query.columns，把 x / y / size 编译到 query.metrics，所以这些字段在 guest 场景同样属于高敏感字段。",
+    "Bubble/order_desc 不在 manager.py 的显式字段名单里，但它会通过 Bubble/buildQuery.ts 改写最终 query.orderby 的方向，因此 guest embedding 下也不能把它当成可随意动态覆盖的展示字段。",
+    "Bubble 的视觉类字段如 color_scheme、show_legend、max_bubble_size、opacity、xAxisFormat 等没有被 manager.py 直接比较，但它们仍属于图表定义。最稳妥的做法仍然是根层 form_data 完整复制保存态图表，不在 guest 请求里临时重构。",
+    "frontend 的 query/constants.ts 把 time_compare 视作可 override 的 extra_form_data 字段，但 Superset 6.0.0 后端 constants.py 的 merge whitelist 并没有把它列为高置信 override。guest embedding 下应视为低置信字段。",
+    "Bubble 本身没有 time_grain / time_range 控件。embedding 时如果要追加时间条件，优先使用 extra_form_data.adhoc_filters 或 filters；time_range 是否生效取决于该图是否实际绑定了时间列。"
+  ],
+  "security_enforcement": {
+    "backend_check_function": "superset/security/manager.py::query_context_modified",
+    "checked_when": "ChartDataCommand.validate() -> QueryContext.raise_for_access()",
+    "error_message": "Guest user cannot modify chart payload",
+    "hard_block_fields": [
+      "slice_id",
+      "metrics",
+      "columns",
+      "groupby",
+      "orderby"
+    ],
+    "bubble_query_critical_root_fields": [
+      "entity",
+      "series",
+      "x",
+      "y",
+      "size",
+      "orderby",
+      "order_desc",
+      "adhoc_filters",
+      "row_limit"
+    ],
+    "presentation_fields_not_compared_directly": [
+      "color_scheme",
+      "show_legend",
+      "legendType",
+      "legendOrientation",
+      "legendMargin",
+      "max_bubble_size",
+      "tooltipSizeFormat",
+      "opacity",
+      "x_axis_label",
+      "xAxisLabelRotation",
+      "xAxisLabelInterval",
+      "x_axis_title_margin",
+      "xAxisFormat",
+      "logXAxis",
+      "y_axis_label",
+      "yAxisLabelRotation",
+      "y_axis_title_margin",
+      "y_axis_format",
+      "logYAxis",
+      "truncateXAxis",
+      "xAxisBounds",
+      "truncateYAxis",
+      "y_axis_bounds"
+    ],
+    "recommended_strategy": "复制保存态 chart form_data 作为 base，仅通过 extra_form_data 追加过滤和必要的时间上下文。"
+  },
+  "safe_base_rule": {
+    "description": "第三方 embedding 请求中的根层 form_data，应当从已保存的 bubble_v2 图表直接复制，不要自行重新拼装。",
+    "must_be_copied_from_saved_chart": [
+      "slice_id",
+      "datasource",
+      "viz_type",
+      "series",
+      "entity",
+      "x",
+      "y",
+      "adhoc_filters",
+      "size",
+      "orderby",
+      "order_desc",
+      "row_limit",
+      "color_scheme",
+      "show_legend",
+      "legendType",
+      "legendOrientation",
+      "legendMargin",
+      "max_bubble_size",
+      "tooltipSizeFormat",
+      "opacity",
+      "x_axis_label",
+      "xAxisLabelRotation",
+      "xAxisLabelInterval",
+      "x_axis_title_margin",
+      "xAxisFormat",
+      "logXAxis",
+      "y_axis_label",
+      "yAxisLabelRotation",
+      "y_axis_title_margin",
+      "y_axis_format",
+      "logYAxis",
+      "truncateXAxis",
+      "xAxisBounds",
+      "truncateYAxis",
+      "y_axis_bounds",
+      "all other saved chart-definition fields"
+    ],
+    "why": [
+      "manager.py 会比较请求 query_context 中的 metrics / columns / orderby 是否仍是存量图表的子集。",
+      "Bubble/buildQuery.ts 会把 entity / series 编译成 query.columns，把 orderby + order_desc 编译成最终 query.orderby。",
+      "extractQueryFields.ts 会把 x / y / size 编译成 query.metrics。",
+      "即使 color_scheme、max_bubble_size 这类展示字段不被 manager.py 直接比较，它们也属于图表定义；最稳妥的 guest 策略仍是根层不改。"
+    ]
+  },
+  "safe_embedding_form_data_template": {
+    "description": "这是 Bubble guest embedding 下的安全写法。根层以保存态图表为 base，仅改 extra_form_data。",
+    "template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "bubble_v2",
+      "series": "<copied_from_saved_chart_if_present>",
+      "entity": "<copied_from_saved_chart>",
+      "x": "<copied_from_saved_chart>",
+      "y": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "size": "<copied_from_saved_chart>",
+      "orderby": "<copied_from_saved_chart_if_present>",
+      "order_desc": "<copied_from_saved_chart_if_present>",
+      "row_limit": "<copied_from_saved_chart>",
+      "color_scheme": "<copied_from_saved_chart_if_present>",
+      "show_legend": "<copied_from_saved_chart_if_present>",
+      "legendType": "<copied_from_saved_chart_if_present>",
+      "legendOrientation": "<copied_from_saved_chart_if_present>",
+      "legendMargin": "<copied_from_saved_chart_if_present>",
+      "max_bubble_size": "<copied_from_saved_chart_if_present>",
+      "tooltipSizeFormat": "<copied_from_saved_chart_if_present>",
+      "opacity": "<copied_from_saved_chart_if_present>",
+      "x_axis_label": "<copied_from_saved_chart_if_present>",
+      "xAxisLabelRotation": "<copied_from_saved_chart_if_present>",
+      "xAxisLabelInterval": "<copied_from_saved_chart_if_present>",
+      "x_axis_title_margin": "<copied_from_saved_chart_if_present>",
+      "xAxisFormat": "<copied_from_saved_chart_if_present>",
+      "logXAxis": "<copied_from_saved_chart_if_present>",
+      "y_axis_label": "<copied_from_saved_chart_if_present>",
+      "yAxisLabelRotation": "<copied_from_saved_chart_if_present>",
+      "y_axis_title_margin": "<copied_from_saved_chart_if_present>",
+      "y_axis_format": "<copied_from_saved_chart_if_present>",
+      "logYAxis": "<copied_from_saved_chart_if_present>",
+      "truncateXAxis": "<copied_from_saved_chart_if_present>",
+      "xAxisBounds": "<copied_from_saved_chart_if_present>",
+      "truncateYAxis": "<copied_from_saved_chart_if_present>",
+      "y_axis_bounds": "<copied_from_saved_chart_if_present>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "product_line",
+            "op": "IN",
+            "val": [
+              "Classic Cars"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "product_line",
+            "operator": "IN",
+            "comparator": [
+              "Classic Cars"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    }
+  },
+  "preferred_dynamic_container": {
+    "field_name": "extra_form_data",
+    "description": "第三方 embedding 允许动态传入的上下文容器；后端会在 merge_extra_form_data() 中把它并入实际查询。",
+    "append_keys": [
+      "adhoc_filters",
+      "filters",
+      "interactive_groupby",
+      "interactive_highlight",
+      "interactive_drilldown",
+      "custom_form_data"
+    ],
+    "override_keys_backend_high_confidence": [
+      "granularity_sqla",
+      "granularity",
+      "time_column",
+      "time_grain",
+      "time_range",
+      "time_grain_sqla",
+      "relative_start",
+      "relative_end"
+    ],
+    "frontend_declared_but_backend_not_high_confidence": [
+      "time_compare"
+    ]
+  },
+  "extra_form_data_field_schema": [
+    {
+      "field_name": "filters",
+      "data_type": "array[QueryObjectFilterClause]",
+      "behavior": "append",
+      "safe_for_bubble_v2": true,
+      "recommended": true,
+      "sample_data": [
+        {
+          "col": "product_line",
+          "op": "IN",
+          "val": [
+            "Classic Cars"
+          ]
+        }
+      ],
+      "effect": "追加 simple filters；后端会把它们转换成额外过滤条件。",
+      "source": "superset/constants.py + superset/utils/core.py"
+    },
+    {
+      "field_name": "adhoc_filters",
+      "data_type": "array[AdhocFilter]",
+      "behavior": "append",
+      "safe_for_bubble_v2": true,
+      "recommended": true,
+      "sample_data": [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "product_line",
+          "operator": "IN",
+          "comparator": [
+            "Classic Cars"
+          ]
+        }
+      ],
+      "effect": "追加 adhoc filters；后端会标记为 isExtra 并并入查询。",
+      "source": "superset/constants.py + superset/utils/core.py"
+    },
+    {
+      "field_name": "custom_form_data",
+      "data_type": "object",
+      "behavior": "append",
+      "safe_for_bubble_v2": true,
+      "recommended": false,
+      "sample_data": {},
+      "effect": "传递非标准附加数据；Bubble/buildQuery.ts 和 transformProps.ts 默认不直接消费它。",
+      "source": "QueryFormData.ts + superset/constants.py"
+    },
+    {
+      "field_name": "time_range",
+      "data_type": "string",
+      "behavior": "override",
+      "safe_for_bubble_v2": true,
+      "recommended": false,
+      "sample_data": "Last 30 days",
+      "effect": "覆盖时间范围。Bubble 本身没有时间控件，是否生效取决于该图的底层查询是否实际绑定了时间列。",
+      "source": "QueryFormData.ts + query/constants.ts + superset/constants.py"
+    },
+    {
+      "field_name": "time_grain_sqla",
+      "data_type": "string | null",
+      "behavior": "override",
+      "safe_for_bubble_v2": false,
+      "recommended": false,
+      "sample_data": "P1D",
+      "effect": "前后端都支持该 override，但 Bubble controlPanel 没有时间粒度控件，通常不应在 guest embedding 中临时改写。",
+      "source": "QueryFormData.ts + query/constants.ts + superset/constants.py"
+    },
+    {
+      "field_name": "granularity_sqla",
+      "data_type": "string | null",
+      "behavior": "override",
+      "safe_for_bubble_v2": false,
+      "recommended": false,
+      "sample_data": "order_date",
+      "effect": "后端支持 override，但 Bubble controlPanel 没有这个正式字段；guest embedding 中不建议依赖它重构时间列。",
+      "source": "QueryFormData.ts + superset/constants.py"
+    },
+    {
+      "field_name": "granularity",
+      "data_type": "string | null",
+      "behavior": "override",
+      "safe_for_bubble_v2": false,
+      "recommended": false,
+      "sample_data": "__time",
+      "effect": "底层 QueryObject 时间列 override，Bubble 常规场景不应在 guest 请求里临时改它。",
+      "source": "QueryFormData.ts + superset/constants.py"
+    },
+    {
+      "field_name": "time_column",
+      "data_type": "string | null",
+      "behavior": "override",
+      "safe_for_bubble_v2": false,
+      "recommended": false,
+      "sample_data": "order_date",
+      "effect": "底层 QueryObject 时间列 override；Bubble 默认并不暴露这类根字段。",
+      "source": "QueryFormData.ts + superset/constants.py"
+    },
+    {
+      "field_name": "time_grain",
+      "data_type": "string | null",
+      "behavior": "override",
+      "safe_for_bubble_v2": false,
+      "recommended": false,
+      "sample_data": "P1D",
+      "effect": "底层 QueryObject 的时间粒度 override；Bubble 常规场景通常不需要手动传。",
+      "source": "QueryFormData.ts + superset/constants.py"
+    },
+    {
+      "field_name": "relative_start",
+      "data_type": "string",
+      "behavior": "override",
+      "safe_for_bubble_v2": true,
+      "recommended": false,
+      "sample_data": "now",
+      "effect": "写入 query.extras.relative_start。后端 schema 对取值做了 today / now 校验。",
+      "source": "superset/constants.py + superset/charts/schemas.py"
+    },
+    {
+      "field_name": "relative_end",
+      "data_type": "string",
+      "behavior": "override",
+      "safe_for_bubble_v2": true,
+      "recommended": false,
+      "sample_data": "today",
+      "effect": "写入 query.extras.relative_end。后端 schema 对取值做了 today / now 校验。",
+      "source": "superset/constants.py + superset/charts/schemas.py"
+    },
+    {
+      "field_name": "interactive_groupby",
+      "data_type": "array[string]",
+      "behavior": "append",
+      "safe_for_bubble_v2": false,
+      "recommended": false,
+      "sample_data": [
+        "product_line"
+      ],
+      "effect": "通用 ExtraFormData 字段。Bubble/buildQuery.ts 不直接消费它，通常没有实际效果。",
+      "source": "QueryFormData.ts + query/constants.ts"
+    },
+    {
+      "field_name": "interactive_highlight",
+      "data_type": "array[string]",
+      "behavior": "append",
+      "safe_for_bubble_v2": false,
+      "recommended": false,
+      "sample_data": [
+        "product_line"
+      ],
+      "effect": "通用交互字段；Bubble 默认不直接消费。",
+      "source": "QueryFormData.ts + query/constants.ts"
+    },
+    {
+      "field_name": "interactive_drilldown",
+      "data_type": "array[string]",
+      "behavior": "append",
+      "safe_for_bubble_v2": false,
+      "recommended": false,
+      "sample_data": [
+        "product_line"
+      ],
+      "effect": "通用交互字段；Bubble 默认不直接消费。",
+      "source": "QueryFormData.ts + query/constants.ts"
+    },
+    {
+      "field_name": "time_compare",
+      "data_type": "string | array[string]",
+      "behavior": "override",
+      "safe_for_bubble_v2": false,
+      "recommended": false,
+      "sample_data": [
+        "1 year ago"
+      ],
+      "effect": "frontend 类型和 query/constants.ts 里都声明了它，但 Superset 6.0.0 后端 constants.py merge whitelist 没把它列为高置信 override，guest embedding 下不建议依赖。",
+      "source": "QueryFormData.ts + query/constants.ts + superset/constants.py",
+      "status": "低置信，不建议在 guest embedding 中依赖"
+    }
+  ],
+  "minimal_extra_form_data_template": {
+    "filters": [
+      {
+        "col": "product_line",
+        "op": "IN",
+        "val": [
+          "Classic Cars"
+        ]
+      }
+    ]
+  },
+  "recommended_extra_form_data_template": {
+    "filters": [
+      {
+        "col": "product_line",
+        "op": "IN",
+        "val": [
+          "Classic Cars",
+          "Motorcycles"
+        ]
+      }
+    ],
+    "adhoc_filters": [
+      {
+        "expressionType": "SIMPLE",
+        "clause": "WHERE",
+        "subject": "product_line",
+        "operator": "IN",
+        "comparator": [
+          "Classic Cars",
+          "Motorcycles"
+        ]
+      }
+    ],
+    "custom_form_data": {}
+  },
+  "unsafe_root_form_data_changes": [
+    {
+      "field_name": "slice_id",
+      "reason": "与保存态图表 id 不一致会被后端立即判定为请求了另一张图。"
+    },
+    {
+      "field_name": "datasource",
+      "reason": "embedded guest 不应改图表绑定数据集。"
+    },
+    {
+      "field_name": "viz_type",
+      "reason": "embedded guest 不应把已分享图表改成另一种图。"
+    },
+    {
+      "field_name": "entity",
+      "reason": "Bubble/buildQuery.ts 会把它编译到 query.columns，manager.py 会比较 query_context 中的 columns。"
+    },
+    {
+      "field_name": "series",
+      "reason": "Bubble/buildQuery.ts 会把它编译到 query.columns，manager.py 会比较 query_context 中的 columns。"
+    },
+    {
+      "field_name": "x",
+      "reason": "extractQueryFields.ts 会把它编译到 query.metrics，manager.py 会比较 query_context 中的 metrics。"
+    },
+    {
+      "field_name": "y",
+      "reason": "extractQueryFields.ts 会把它编译到 query.metrics，manager.py 会比较 query_context 中的 metrics。"
+    },
+    {
+      "field_name": "size",
+      "reason": "extractQueryFields.ts 会把它编译到 query.metrics，manager.py 会比较 query_context 中的 metrics。"
+    },
+    {
+      "field_name": "orderby",
+      "reason": "manager.py 直接比较 orderby；Bubble/buildQuery.ts 还会把它重写到 query.orderby。"
+    },
+    {
+      "field_name": "order_desc",
+      "reason": "虽然 manager.py 不直接比较它，但 Bubble/buildQuery.ts 会用它反转最终 query.orderby 的方向。"
+    },
+    {
+      "field_name": "adhoc_filters",
+      "reason": "动态筛选条件应放进 extra_form_data.append；不建议直接改根层保存态字段。"
+    },
+    {
+      "field_name": "row_limit",
+      "reason": "manager.py 不直接比较它，但它会改变查询返回规模；guest 请求里最好保持与保存态一致。"
+    }
+  ],
+  "practical_guidance": {
+    "best_practice": [
+      "先从保存态 bubble_v2 图表读取完整 form_data。",
+      "根层字段保持不变。",
+      "只在 extra_form_data 中放附加筛选条件；时间条件只在确认该图实际使用时间列时再追加。",
+      "如果只是要做第三方筛选联动，优先使用 filters / adhoc_filters。"
+    ],
+    "avoid": [
+      "不要在 guest embedding 请求里手工重写 entity、series、x、y、size、orderby、order_desc。",
+      "不要把正式 viz_type 写成旧测试值 echarts_bubble。",
+      "不要把 showLegend / maxBubbleSize / yAxisBounds 这类运行时别名写回 root form_data。",
+      "不要依赖前端声明存在但后端 whitelist 不稳定的 extra_form_data.time_compare。"
+    ]
+  }
+}

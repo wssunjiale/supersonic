@@ -1,0 +1,344 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "horizon",
+  "display_name": "Horizon Chart",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "region",
+          "operator": "IN",
+          "comparator": [
+            "APAC"
+          ]
+        }
+      ]
+    ],
+    "contribution": [
+      false
+    ],
+    "granularity_sqla": [
+      "ds"
+    ],
+    "groupby": [
+      [
+        "region"
+      ]
+    ],
+    "horizon_color_scale": [
+      "series"
+    ],
+    "limit": [
+      50
+    ],
+    "metrics": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "value"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(value)"
+        }
+      ]
+    ],
+    "order_desc": [
+      true
+    ],
+    "row_limit": [
+      10000
+    ],
+    "series_height": [
+      "25"
+    ],
+    "time_range": [
+      "Last 30 days"
+    ],
+    "timeseries_limit_metric": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "value"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(value)"
+      }
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "horizon",
+      "granularity_sqla": "<temporal_column>",
+      "metrics": [
+        "<metric_or_adhoc_metric>"
+      ],
+      "adhoc_filters": []
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "horizon",
+      "granularity_sqla": "ds",
+      "time_range": "Last 30 days",
+      "metrics": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "value"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(value)"
+        }
+      ],
+      "adhoc_filters": [],
+      "groupby": [
+        "region"
+      ],
+      "limit": 50,
+      "timeseries_limit_metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "value"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(value)"
+      },
+      "order_desc": true,
+      "contribution": false,
+      "row_limit": 10000,
+      "series_height": "25",
+      "horizon_color_scale": "series"
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "horizon",
+      "granularity_sqla": "<copied_from_saved_chart>",
+      "time_range": "<copied_from_saved_chart>",
+      "metrics": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "groupby": "<copied_from_saved_chart_if_present>",
+      "limit": "<copied_from_saved_chart_if_present>",
+      "timeseries_limit_metric": "<copied_from_saved_chart_if_present>",
+      "order_desc": "<copied_from_saved_chart_if_present>",
+      "contribution": "<copied_from_saved_chart_if_present>",
+      "row_limit": "<copied_from_saved_chart_if_present>",
+      "series_height": "<copied_from_saved_chart_if_present>",
+      "horizon_color_scale": "<copied_from_saved_chart_if_present>",
+      "extra_form_data": {
+        "time_range": "Last 30 days",
+        "filters": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "APAC"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "APAC"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_horizon_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "APAC"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters；后端会把它们并入额外过滤条件。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_horizon_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "APAC"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会标记这些 filter 为 `isExtra=true` 后并入查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_horizon_legacy": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "这是 `EXTRA_FORM_DATA_APPEND_KEYS` 白名单中的通用透传字段。Horizon 自己没有直接消费它的源码证据，但 legacy merge 白名单允许它存在。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_horizon_legacy": true,
+        "recommended": true,
+        "sample_data": "Last 30 days",
+        "effect": "`merge_extra_form_data()` 会把它写回 root `time_range`，而 `BaseViz.query_obj()` 直接读取 `time_range`。",
+        "source": "superset/constants.py + superset/utils/core.py + superset/viz.py"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_horizon_legacy": false,
+        "recommended": false,
+        "sample_data": "ds",
+        "effect": "通用时间列 override 键；但 `merge_extra_form_data()` 会把它写到 `form_data.granularity`，而 `BaseViz.query_obj()` 读取的是 `granularity_sqla`。",
+        "source": "superset/constants.py + superset/utils/core.py + superset/viz.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_horizon_legacy": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "虽然 override 映射存在，`BaseViz.query_obj()` 也会把 root `time_grain_sqla` 写进 `extras`，但 Horizon 的 controlPanel 没有正式暴露这个字段，guest embedding 下不宜把它当成稳定入口。",
+        "source": "superset/constants.py + superset/utils/core.py + superset/viz.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "granularity",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_horizon_legacy": false,
+        "recommended": false,
+        "sample_data": "__time",
+        "effect": "这是 extra_form_data 映射后的 QueryObject 层时间列键；Horizon 真实编译链读取的是 root `granularity_sqla`。",
+        "source": "superset/constants.py + superset/utils/core.py + superset/viz.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_column",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_horizon_legacy": false,
+        "recommended": false,
+        "sample_data": "ds",
+        "effect": "通用 QueryObject 时间列 override；当前 Horizon controlPanel 没有对应正式字段。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_grain",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_horizon_legacy": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "底层 QueryObject 时间粒度 override；当前 Horizon controlPanel 没有对应正式字段。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "relative_start",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_horizon_legacy": false,
+        "recommended": false,
+        "sample_data": "now-30d",
+        "effect": "写入 `extras` 的相对开始时间。Horizon 的正式时间控件链路还是 `time_range`。",
+        "source": "superset/charts/schemas.py + superset/utils/core.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "relative_end",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_horizon_legacy": false,
+        "recommended": false,
+        "sample_data": "now",
+        "effect": "写入 `extras` 的相对结束时间。Horizon 的正式时间控件链路还是 `time_range`。",
+        "source": "superset/charts/schemas.py + superset/utils/core.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_horizon_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用 ExtraFormData 字段。Horizon 默认不直接消费它。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_horizon_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用交互字段；Horizon 默认不直接消费。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_horizon_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用交互字段；Horizon 默认不直接消费。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "horizon",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/horizon-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/horizon-form-data-schema.json",
+      "control-schema": "form-data-schema/horizon-schema.json"
+    }
+  }
+}

@@ -1,0 +1,226 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "treemap_v2",
+  "display_name": "Treemap",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "region",
+          "operator": "IN",
+          "comparator": [
+            "APAC"
+          ]
+        }
+      ]
+    ],
+    "color_scheme": [
+      "bnbColors"
+    ],
+    "currency_format": [
+      {
+        "symbol": "$",
+        "symbolPosition": "prefix"
+      }
+    ],
+    "date_format": [
+      "smart_date"
+    ],
+    "groupby": [
+      [
+        "continent",
+        "country"
+      ]
+    ],
+    "label_type": [
+      "key_value"
+    ],
+    "metric": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "sales"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(sales)"
+      }
+    ],
+    "number_format": [
+      "SMART_NUMBER"
+    ],
+    "row_limit": [
+      10000
+    ],
+    "show_labels": [
+      true
+    ],
+    "show_upper_labels": [
+      true
+    ],
+    "sort_by_metric": [
+      false
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "treemap_v2",
+      "groupby": [
+        "<hierarchy_column>"
+      ],
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "adhoc_filters": [],
+      "row_limit": 10000,
+      "sort_by_metric": false
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "treemap_v2",
+      "groupby": [
+        "<level1_column>",
+        "<level2_column>"
+      ],
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "adhoc_filters": [],
+      "row_limit": 10000,
+      "sort_by_metric": false,
+      "color_scheme": "<categorical_scheme_key>",
+      "show_labels": true,
+      "show_upper_labels": true,
+      "label_type": "key_value",
+      "number_format": "SMART_NUMBER",
+      "currency_format": null,
+      "date_format": "smart_date"
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "treemap_v2",
+      "groupby": "<copied_from_saved_chart>",
+      "metric": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "row_limit": "<copied_from_saved_chart>",
+      "sort_by_metric": "<copied_from_saved_chart>",
+      "color_scheme": "<copied_from_saved_chart>",
+      "show_labels": "<copied_from_saved_chart>",
+      "show_upper_labels": "<copied_from_saved_chart>",
+      "label_type": "<copied_from_saved_chart>",
+      "number_format": "<copied_from_saved_chart>",
+      "currency_format": "<copied_from_saved_chart>",
+      "date_format": "<copied_from_saved_chart>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "APAC"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "APAC"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_treemap": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "APAC"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_treemap": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "APAC"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_treemap": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；Treemap 默认不直接消费它。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_treemap": false,
+        "recommended": false,
+        "sample_data": "Last 90 days",
+        "effect": "Treemap controlPanel 本身没有时间控件；guest 场景下不建议把它当成常规动态入口。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "treemap_v2",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/treemap_v2-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/treemap_v2-form-data-schema.json",
+      "control-schema": "form-data-schema/treemap_v2-schema.json"
+    }
+  }
+}

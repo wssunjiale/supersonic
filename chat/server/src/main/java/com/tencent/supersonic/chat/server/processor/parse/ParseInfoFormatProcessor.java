@@ -133,16 +133,18 @@ public class ParseInfoFormatProcessor implements ParseResultProcessor {
 
     private Set<SchemaElement> matchSchemaElements(List<String> allFields,
             Set<SchemaElement> elements) {
+        Set<String> normalizedFields = allFields.stream().filter(StringUtils::isNotBlank)
+                .map(ParseInfoFormatProcessor::normalizeFieldName).collect(Collectors.toSet());
         return elements.stream().filter(schemaElement -> {
-            if (CollectionUtils.isEmpty(schemaElement.getAlias())) {
-                return allFields.contains(schemaElement.getName());
+            Set<String> candidateNames = new HashSet<>();
+            candidateNames.add(schemaElement.getName());
+            candidateNames.add(schemaElement.getBizName());
+            if (!CollectionUtils.isEmpty(schemaElement.getAlias())) {
+                candidateNames.addAll(schemaElement.getAlias());
             }
-            Set<String> allFieldsSet = new HashSet<>(allFields);
-            Set<String> aliasSet = new HashSet<>(schemaElement.getAlias());
-            List<String> intersection =
-                    allFieldsSet.stream().filter(aliasSet::contains).collect(Collectors.toList());
-            return allFields.contains(schemaElement.getName())
-                    || !CollectionUtils.isEmpty(intersection);
+            return candidateNames.stream().filter(StringUtils::isNotBlank)
+                    .map(ParseInfoFormatProcessor::normalizeFieldName)
+                    .anyMatch(normalizedFields::contains);
         }).collect(Collectors.toSet());
     }
 
@@ -159,7 +161,8 @@ public class ParseInfoFormatProcessor implements ParseResultProcessor {
         for (FieldExpression expression : fieldExpressions) {
             QueryFilter dimensionFilter = new QueryFilter();
             dimensionFilter.setValue(expression.getFieldValue());
-            SchemaElement schemaElement = fieldNameToElement.get(expression.getFieldName());
+            SchemaElement schemaElement =
+                    fieldNameToElement.get(normalizeFieldName(expression.getFieldName()));
             if (Objects.isNull(schemaElement)
                     || isPartitionDimension(dsSchema, schemaElement.getName())) {
                 continue;
@@ -217,10 +220,15 @@ public class ParseInfoFormatProcessor implements ParseResultProcessor {
 
     private static boolean isPartitionDimension(DataSetSchema dataSetSchema, String sqlFieldName) {
         if (Objects.isNull(dataSetSchema) || Objects.isNull(dataSetSchema.getPartitionDimension())
-                || Objects.isNull(dataSetSchema.getPartitionDimension().getName())) {
+                || (Objects.isNull(dataSetSchema.getPartitionDimension().getName())
+                        && Objects.isNull(dataSetSchema.getPartitionDimension().getBizName()))) {
             return false;
         }
-        return sqlFieldName.equalsIgnoreCase(dataSetSchema.getPartitionDimension().getName());
+        SchemaElement partitionDimension = dataSetSchema.getPartitionDimension();
+        String normalizedSqlFieldName = normalizeFieldName(sqlFieldName);
+        return normalizedSqlFieldName.equals(normalizeFieldName(partitionDimension.getName()))
+                || normalizedSqlFieldName
+                        .equals(normalizeFieldName(partitionDimension.getBizName()));
     }
 
     private boolean containOperators(FieldExpression expression, FilterOperatorEnum firstOperator,
@@ -244,11 +252,14 @@ public class ParseInfoFormatProcessor implements ParseResultProcessor {
         // support alias
         return allElements.stream().flatMap(schemaElement -> {
             Set<Pair<String, SchemaElement>> result = new HashSet<>();
-            result.add(Pair.of(schemaElement.getName(), schemaElement));
+            result.add(Pair.of(normalizeFieldName(schemaElement.getName()), schemaElement));
+            if (StringUtils.isNotBlank(schemaElement.getBizName())) {
+                result.add(Pair.of(normalizeFieldName(schemaElement.getBizName()), schemaElement));
+            }
             List<String> aliasList = schemaElement.getAlias();
             if (!org.springframework.util.CollectionUtils.isEmpty(aliasList)) {
                 for (String alias : aliasList) {
-                    result.add(Pair.of(alias, schemaElement));
+                    result.add(Pair.of(normalizeFieldName(alias), schemaElement));
                 }
             }
             return result.stream();
@@ -267,6 +278,13 @@ public class ParseInfoFormatProcessor implements ParseResultProcessor {
                 && SqlSelectFunctionHelper.hasAggregateFunction(sqlInfo.getCorrectedS2SQL())) {
             parseInfo.setQueryType(QueryType.AGGREGATE);
         }
+    }
+
+    private static String normalizeFieldName(String fieldName) {
+        if (StringUtils.isBlank(fieldName)) {
+            return "";
+        }
+        return fieldName.replace("`", "").trim().toLowerCase(Locale.ROOT);
     }
 
 }

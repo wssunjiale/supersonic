@@ -1,0 +1,470 @@
+{
+  "viz_type": "cartodiagram",
+  "display_name": "Cartodiagram",
+  "purpose": "用于调用 API 创建或保存 Cartodiagram 时填写的 form_data 模板",
+  "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/cartodiagram-schema.json",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-cartodiagram/src/plugin/controlPanel.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-cartodiagram/src/plugin/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-cartodiagram/src/plugin/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-cartodiagram/src/util/transformPropsUtil.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-cartodiagram/src/types.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-cartodiagram/test/plugin/buildQuery.test.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/components/controls/MapViewControl/types.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/components/controls/LayerConfigsControl/types.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/components/controls/LayerConfigsControl/serviceUtil.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/components/controls/ZoomConfigControl/types.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/components/controls/ZoomConfigControl/zoomUtil.ts",
+    "D:/vsx/sources/superset-6.0.0/superset/charts/schemas.py"
+  ],
+  "notes": [
+    "Cartodiagram 的 root form_data 只定义地图层、范围、图表样式，以及“引用哪张已保存图表”；真正的 query object 由 `selected_chart.params` 内的被引用图表 form_data 生成。",
+    "Explore 导出 form_data 时走 `getFormDataFromControls()`，它按 control name 原样写入 root form_data，因此 API 根层应使用 `selected_chart`、`geom_column`、`map_view`、`layer_configs`、`chart_size` 这类 snake_case 键。",
+    "运行时看到的 `selectedChart`、`geomColumn`、`mapView`、`layerConfigs`、`chartSize`、`chartBackgroundColor` 等 camelCase 名称来自前端 formData 运行时转换，不是 root API 键名。",
+    "`selected_chart` 必须是 JSON 字符串；字符串内部的 `params` 也必须是 JSON 字符串，而不是对象。",
+    "UI 在选择 `selected_chart` 时会用当前 root datasource 的 `datasource_id` 过滤 `/api/v1/chart` 返回列表，因此稳定模板应保证 root `datasource` 与 `selected_chart.params.datasource` 指向同一 dataset。",
+    "`extra_form_data` 不是 controlPanel 字段，但 Cartodiagram 的 `buildQuery.ts` 会把它透传给被引用图表，因此它是 dashboard/native filter 场景下的重要动态入口。"
+  ],
+  "naming_and_pipeline": {
+    "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写成 form_data[name]。",
+    "api_form_data_to_query_context": "Cartodiagram buildQuery 先解析 `selected_chart`，再解析其中 `params`，把 root `extra_form_data` 合并进引用图表 form_data，并把 `geom_column` 插到 `groupby` 首位，最后调用被引用图表自己的 buildQuery。",
+    "selected_chart_shape": "root `selected_chart` 是一段 JSON 字符串，内容通常来自 `/api/v1/chart` 的单条记录：`{ id, slice_name, viz_type, params }`。",
+    "backend_request_endpoint": "/api/v1/chart/data",
+    "rendering_pipeline": "transformProps 会解析 `selected_chart.params`，按位置拆分返回数据、剥离几何列，再调用被引用图表自己的 transformProps。"
+  },
+  "global_required_fields": {
+    "datasource": {
+      "data_type": "string",
+      "required": true,
+      "sample_data": "12__table",
+      "source": "datasourceAndVizType hidden control",
+      "notes": "root datasource 用来决定地图几何列和可选 `selected_chart` 列表。稳定写法应与 `selected_chart.params.datasource` 保持一致。"
+    },
+    "viz_type": {
+      "data_type": "string",
+      "required": true,
+      "fixed_value": "cartodiagram",
+      "source": "VizType.ts + CartodiagramPlugin metadata"
+    },
+    "selected_chart": {
+      "data_type": "string (JSON-serialized chart object)",
+      "required": true,
+      "sample_data": "{\"id\":321,\"slice_name\":\"Pie Chart\",\"viz_type\":\"pie\",\"params\":\"{\\\"datasource\\\":\\\"12__table\\\",\\\"viz_type\\\":\\\"pie\\\",\\\"groupby\\\":[\\\"category\\\"],\\\"metric\\\":\\\"count\\\"}\"}",
+      "source": "Configuration section + buildQuery.ts",
+      "notes": "buildQuery 实际要求它至少能解析出 `viz_type` 和 `params`；但保存态通常保留 `id` 与 `slice_name`。"
+    },
+    "geom_column": {
+      "data_type": "string",
+      "required": true,
+      "sample_data": "geom",
+      "source": "Configuration section + buildQuery.ts"
+    }
+  },
+  "global_optional_fields": {
+    "map_view": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {
+        "mode": "FIT_DATA"
+      },
+      "source": "Map Options section"
+    },
+    "layer_configs": {
+      "data_type": "array[LayerConf]",
+      "required": false,
+      "sample_data": [],
+      "source": "Map Options section"
+    },
+    "chart_background_color": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 0.2
+      },
+      "source": "Chart Options section"
+    },
+    "chart_background_border_radius": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 10,
+      "source": "Chart Options section"
+    },
+    "chart_size": {
+      "data_type": "ZoomConfigsFixed | ZoomConfigsLinear | ZoomConfigsExp",
+      "required": false,
+      "sample_data": {
+        "type": "FIXED",
+        "configs": {
+          "zoom": 6,
+          "width": 100,
+          "height": 100
+        },
+        "values": {
+          "0": {
+            "width": 100,
+            "height": 100
+          },
+          "6": {
+            "width": 100,
+            "height": 100
+          },
+          "28": {
+            "width": 100,
+            "height": 100
+          }
+        }
+      },
+      "source": "Chart Options section"
+    },
+    "extra_form_data": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "buildQuery.ts",
+      "notes": "Cartodiagram 自己不消费它，但会把它透传给被引用图表 form_data.extra_form_data。"
+    },
+    "slice_id": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 0,
+      "source": "datasourceAndVizType hidden control"
+    },
+    "cache_timeout": {
+      "data_type": "integer | null",
+      "required": false,
+      "sample_data": null,
+      "source": "datasourceAndVizType hidden control"
+    },
+    "url_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "QueryFormData"
+    },
+    "custom_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "QueryFormData"
+    }
+  },
+  "minimal_form_data_template": {
+    "datasource": "12__table",
+    "viz_type": "cartodiagram",
+    "selected_chart": "{\"id\":321,\"slice_name\":\"Pie Chart\",\"viz_type\":\"pie\",\"params\":\"{\\\"datasource\\\":\\\"12__table\\\",\\\"viz_type\\\":\\\"pie\\\",\\\"groupby\\\":[\\\"category\\\"],\\\"metric\\\":\\\"count\\\"}\"}",
+    "geom_column": "geom",
+    "map_view": {
+      "mode": "FIT_DATA"
+    },
+    "layer_configs": [],
+    "chart_background_color": {
+      "r": 255,
+      "g": 255,
+      "b": 255,
+      "a": 0.2
+    },
+    "chart_background_border_radius": 10,
+    "chart_size": {
+      "type": "FIXED",
+      "configs": {
+        "zoom": 6,
+        "width": 100,
+        "height": 100,
+        "slope": 30,
+        "exponent": 2
+      },
+      "values": {
+        "0": { "width": 100, "height": 100 },
+        "1": { "width": 100, "height": 100 },
+        "2": { "width": 100, "height": 100 },
+        "3": { "width": 100, "height": 100 },
+        "4": { "width": 100, "height": 100 },
+        "5": { "width": 100, "height": 100 },
+        "6": { "width": 100, "height": 100 },
+        "7": { "width": 100, "height": 100 },
+        "8": { "width": 100, "height": 100 },
+        "9": { "width": 100, "height": 100 },
+        "10": { "width": 100, "height": 100 },
+        "11": { "width": 100, "height": 100 },
+        "12": { "width": 100, "height": 100 },
+        "13": { "width": 100, "height": 100 },
+        "14": { "width": 100, "height": 100 },
+        "15": { "width": 100, "height": 100 },
+        "16": { "width": 100, "height": 100 },
+        "17": { "width": 100, "height": 100 },
+        "18": { "width": 100, "height": 100 },
+        "19": { "width": 100, "height": 100 },
+        "20": { "width": 100, "height": 100 },
+        "21": { "width": 100, "height": 100 },
+        "22": { "width": 100, "height": 100 },
+        "23": { "width": 100, "height": 100 },
+        "24": { "width": 100, "height": 100 },
+        "25": { "width": 100, "height": 100 },
+        "26": { "width": 100, "height": 100 },
+        "27": { "width": 100, "height": 100 },
+        "28": { "width": 100, "height": 100 }
+      }
+    }
+  },
+  "recommended_form_data_template": {
+    "datasource": "12__table",
+    "viz_type": "cartodiagram",
+    "selected_chart": "{\"id\":321,\"slice_name\":\"Pie Chart\",\"viz_type\":\"pie\",\"params\":\"{\\\"datasource\\\":\\\"12__table\\\",\\\"viz_type\\\":\\\"pie\\\",\\\"groupby\\\":[\\\"category\\\"],\\\"metric\\\":\\\"count\\\",\\\"adhoc_filters\\\":[]}\"}",
+    "geom_column": "geom",
+    "map_view": {
+      "mode": "FIT_DATA"
+    },
+    "layer_configs": [],
+    "chart_background_color": {
+      "r": 255,
+      "g": 255,
+      "b": 255,
+      "a": 0.2
+    },
+    "chart_background_border_radius": 10,
+    "chart_size": {
+      "type": "FIXED",
+      "configs": {
+        "zoom": 6,
+        "width": 100,
+        "height": 100,
+        "slope": 30,
+        "exponent": 2
+      },
+      "values": {
+        "0": { "width": 100, "height": 100 },
+        "1": { "width": 100, "height": 100 },
+        "2": { "width": 100, "height": 100 },
+        "3": { "width": 100, "height": 100 },
+        "4": { "width": 100, "height": 100 },
+        "5": { "width": 100, "height": 100 },
+        "6": { "width": 100, "height": 100 },
+        "7": { "width": 100, "height": 100 },
+        "8": { "width": 100, "height": 100 },
+        "9": { "width": 100, "height": 100 },
+        "10": { "width": 100, "height": 100 },
+        "11": { "width": 100, "height": 100 },
+        "12": { "width": 100, "height": 100 },
+        "13": { "width": 100, "height": 100 },
+        "14": { "width": 100, "height": 100 },
+        "15": { "width": 100, "height": 100 },
+        "16": { "width": 100, "height": 100 },
+        "17": { "width": 100, "height": 100 },
+        "18": { "width": 100, "height": 100 },
+        "19": { "width": 100, "height": 100 },
+        "20": { "width": 100, "height": 100 },
+        "21": { "width": 100, "height": 100 },
+        "22": { "width": 100, "height": 100 },
+        "23": { "width": 100, "height": 100 },
+        "24": { "width": 100, "height": 100 },
+        "25": { "width": 100, "height": 100 },
+        "26": { "width": 100, "height": 100 },
+        "27": { "width": 100, "height": 100 },
+        "28": { "width": 100, "height": 100 }
+      }
+    },
+    "extra_form_data": {}
+  },
+  "conditional_blocks": {
+    "custom_map_extent": {
+      "condition": "需要固定地图初始范围，而不是自动 fit data 时",
+      "fields": {
+        "map_view": {
+          "mode": "CUSTOM",
+          "zoom": 6,
+          "latitude": 47.3769,
+          "longitude": 8.5417,
+          "fixedZoom": 6,
+          "fixedLatitude": 47.3769,
+          "fixedLongitude": 8.5417
+        }
+      }
+    },
+    "wms_layer": {
+      "condition": "需要叠加 WMS 图层时",
+      "fields": {
+        "layer_configs": [
+          {
+            "type": "WMS",
+            "version": "1.3.0",
+            "title": "Administrative Boundaries",
+            "url": "https://example.com/geoserver/wms",
+            "layersParam": "workspace:admin_boundaries",
+            "attribution": "© Example"
+          }
+        ]
+      }
+    },
+    "wfs_layer": {
+      "condition": "需要叠加可样式化的 WFS 图层时",
+      "fields": {
+        "layer_configs": [
+          {
+            "type": "WFS",
+            "version": "2.0.2",
+            "title": "Road Network",
+            "url": "https://example.com/geoserver/wfs",
+            "typeName": "workspace:roads",
+            "maxFeatures": 10000,
+            "style": {
+              "name": "Default Style",
+              "rules": [
+                {
+                  "name": "Default Rule",
+                  "symbolizers": [
+                    {
+                      "kind": "Line",
+                      "color": "#000000",
+                      "width": 2
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "xyz_layer": {
+      "condition": "需要叠加 XYZ 瓦片底图时",
+      "fields": {
+        "layer_configs": [
+          {
+            "type": "XYZ",
+            "title": "OpenStreetMap",
+            "url": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+            "attribution": "© OpenStreetMap contributors"
+          }
+        ]
+      }
+    },
+    "linear_chart_size": {
+      "condition": "需要按 zoom 线性放大小图时",
+      "fields": {
+        "chart_size": {
+          "type": "LINEAR",
+          "configs": {
+            "zoom": 6,
+            "width": 100,
+            "height": 100,
+            "slope": 30
+          },
+          "values": "<由 zoomUtil.computeConfigValues() 生成 0..28 的 width/height 映射>"
+        }
+      }
+    },
+    "exp_chart_size": {
+      "condition": "需要按 zoom 指数放大小图时",
+      "fields": {
+        "chart_size": {
+          "type": "EXP",
+          "configs": {
+            "zoom": 6,
+            "width": 100,
+            "height": 100,
+            "exponent": 2
+          },
+          "values": "<由 zoomUtil.computeConfigValues() 生成 0..28 的 width/height 映射>"
+        }
+      }
+    },
+    "dashboard_filter_passthrough": {
+      "condition": "需要把 dashboard/native filters 透传给被引用图表时",
+      "fields": {
+        "extra_form_data": {
+          "filters": [
+            {
+              "col": "region",
+              "op": "IN",
+              "val": [
+                "East"
+              ]
+            }
+          ]
+        }
+      }
+    }
+  },
+  "runtime_only_or_non_template_fields": {
+    "runtime_aliases_generated_by_frontend": [
+      {
+        "field_name": "selectedChart",
+        "reason": "由 root `selected_chart` 运行时转换得到，不是 API root 键。"
+      },
+      {
+        "field_name": "geomColumn",
+        "reason": "由 root `geom_column` 运行时转换得到，不是 API root 键。"
+      },
+      {
+        "field_name": "mapView",
+        "reason": "由 root `map_view` 运行时转换得到，不是 API root 键。"
+      },
+      {
+        "field_name": "layerConfigs",
+        "reason": "由 root `layer_configs` 运行时转换得到，不是 API root 键。"
+      },
+      {
+        "field_name": "chartSize",
+        "reason": "由 root `chart_size` 运行时转换得到，不是 API root 键。"
+      },
+      {
+        "field_name": "chartBackgroundColor",
+        "reason": "由 root `chart_background_color` 运行时转换得到，不是 API root 键。"
+      },
+      {
+        "field_name": "chartBackgroundBorderRadius",
+        "reason": "由 root `chart_background_border_radius` 运行时转换得到，不是 API root 键。"
+      }
+    ],
+    "parsed_or_derived_runtime_objects": [
+      {
+        "field_name": "selectedChart.params (object)",
+        "reason": "root `selected_chart` 内部的 `params` 保存态是字符串；运行时 `parseSelectedChart()` 会把它解析成对象。"
+      },
+      {
+        "field_name": "chartConfigs",
+        "reason": "这是 transformProps 根据查询结果和被引用图表 transformProps 计算出的 GeoJSON FeatureCollection，不是 root form_data 字段。"
+      },
+      {
+        "field_name": "chartVizType",
+        "reason": "这是从 `selected_chart.viz_type` 派生出的运行时字段，不是 root form_data 字段。"
+      }
+    ],
+    "query_result_only_fields": [
+      {
+        "field_name": "queriesData[0].data",
+        "reason": "这是 chart data API 返回的底层结果集；Cartodiagram 会再按几何位置拆分它。"
+      },
+      {
+        "field_name": "queriesData[0].label_map",
+        "reason": "仅在被引用图表包含 `x_axis` 等时序语义时，运行时会用它拆出 GeoJSON 列和其余 series label。"
+      }
+    ]
+  },
+  "api_usage_guidance": {
+    "high_confidence_required_fields": [
+      "datasource",
+      "viz_type",
+      "selected_chart",
+      "geom_column"
+    ],
+    "recommended_always_set": [
+      "map_view",
+      "layer_configs",
+      "chart_background_color",
+      "chart_background_border_radius",
+      "chart_size"
+    ],
+    "avoid_confusion": [
+      "不要把 `selected_chart` 写成对象；源码要求它是 JSON 字符串。",
+      "不要把 `selected_chart.params` 写成对象；源码要求它仍然是字符串。",
+      "不要把 runtime camelCase 字段名写回 root form_data。",
+      "不要忘记让 root `datasource` 与 `selected_chart.params.datasource` 保持同一个 dataset，否则 UI 约束和运行时语义会不一致。",
+      "Cartodiagram 自己不定义 metrics/groupby 语义；真正的查询字段来自被引用图表。"
+    ]
+  }
+}

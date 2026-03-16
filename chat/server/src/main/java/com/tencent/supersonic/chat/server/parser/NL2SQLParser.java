@@ -22,6 +22,7 @@ import com.tencent.supersonic.headless.api.pojo.request.QueryNLReq;
 import com.tencent.supersonic.headless.api.pojo.response.MapResp;
 import com.tencent.supersonic.headless.api.pojo.response.ParseResp;
 import com.tencent.supersonic.headless.api.pojo.response.QueryState;
+import com.tencent.supersonic.headless.chat.query.llm.s2sql.LLMSqlQuery;
 import com.tencent.supersonic.headless.chat.parser.ParserConfig;
 import com.tencent.supersonic.headless.server.facade.service.ChatLayerService;
 import com.tencent.supersonic.headless.server.utils.ModelConfigHelper;
@@ -32,6 +33,7 @@ import dev.langchain4j.model.input.PromptTemplate;
 import dev.langchain4j.model.output.Response;
 import dev.langchain4j.provider.ModelProvider;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +45,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.regex.Pattern;
 
 import static com.tencent.supersonic.headless.chat.parser.ParserConfig.PARSER_EXEMPLAR_RECALL_NUMBER;
 import static com.tencent.supersonic.headless.chat.parser.ParserConfig.PARSER_SHOW_COUNT;
@@ -51,6 +54,10 @@ import static com.tencent.supersonic.headless.chat.parser.ParserConfig.PARSER_SH
 public class NL2SQLParser implements ChatQueryParser {
 
     private static final Logger keyPipelineLog = LoggerFactory.getLogger("keyPipeline");
+    private static final Pattern UNSAFE_WINDOW_AGG_PATTERN =
+            Pattern.compile("(?is)\\b(row_number|rank|dense_rank|percent_rank)\\s*\\(\\s*\\)"
+                    + "\\s*over\\s*\\([^)]*\\border\\s+by\\s+[^)]*\\b(sum|avg|max|min|count)"
+                    + "\\s*\\(");
 
     public static final String APP_KEY_MULTI_TURN = "REWRITE_MULTI_TURN";
     private static final String REWRITE_MULTI_TURN_INSTRUCTION = ""
@@ -73,12 +80,12 @@ public class NL2SQLParser implements ChatQueryParser {
                         .build());
     }
 
+    public boolean accept(ParseContext parseContext) {
+        return parseContext.enableNL2SQL();
+    }
+
     @Override
     public void parse(ParseContext parseContext) {
-        if (!parseContext.enableNL2SQL()) {
-            return;
-        }
-
         // first go with rule-based parsers unless the user has already selected one parse.
         if (Objects.isNull(parseContext.getRequest().getSelectedParse())) {
             QueryNLReq queryNLReq = QueryReqConverter.buildQueryNLReq(parseContext);
@@ -133,6 +140,8 @@ public class NL2SQLParser implements ChatQueryParser {
                     && parseContext.getResponse().getSelectedParses().isEmpty()) {
                 return;
             }
+            List<SemanticParseInfo> ruleSelectedParses =
+                    new ArrayList<>(parseContext.getResponse().getSelectedParses());
 
             QueryNLReq queryNLReq = QueryReqConverter.buildQueryNLReq(parseContext);
             queryNLReq.setText2SQLType(Text2SQLType.LLM_OR_RULE);
@@ -151,7 +160,43 @@ public class NL2SQLParser implements ChatQueryParser {
                 queryNLReq.setMapModeEnum(MapModeEnum.ALL);
                 doParse(queryNLReq, parseContext.getResponse());
             }
+
+            fallbackToRuleParses(parseContext, ruleSelectedParses);
         }
+    }
+
+    private void fallbackToRuleParses(ParseContext parseContext,
+            List<SemanticParseInfo> ruleSelectedParses) {
+        if (parseContext == null || ruleSelectedParses == null || ruleSelectedParses.isEmpty()) {
+            return;
+        }
+        ChatParseResp llmResp = parseContext.getResponse();
+        boolean llmFailed = llmResp == null
+                || llmResp.getState() == ParseResp.ParseState.FAILED
+                || llmResp.getSelectedParses() == null
+                || llmResp.getSelectedParses().isEmpty();
+        boolean unsafeSql = !llmFailed && llmResp.getSelectedParses().stream()
+                .anyMatch(NL2SQLParser::containsTranslatorUnsafeWindowAgg);
+        if (!llmFailed && !unsafeSql) {
+            return;
+        }
+        log.warn("fallback to rule parse, queryId={}, llmFailed={}, unsafeSql={}",
+                parseContext.getRequest() == null ? null : parseContext.getRequest().getQueryId(),
+                llmFailed, unsafeSql);
+        llmResp.setSelectedParses(new ArrayList<>(ruleSelectedParses));
+        llmResp.setState(ParseResp.ParseState.COMPLETED);
+        llmResp.setErrorMsg(null);
+    }
+
+    static boolean containsTranslatorUnsafeWindowAgg(SemanticParseInfo parseInfo) {
+        if (parseInfo == null || parseInfo.getSqlInfo() == null
+                || !LLMSqlQuery.QUERY_MODE.equalsIgnoreCase(parseInfo.getQueryMode())) {
+            return false;
+        }
+        String querySql = StringUtils.defaultIfBlank(parseInfo.getSqlInfo().getQuerySQL(),
+                parseInfo.getSqlInfo().getCorrectedS2SQL());
+        return StringUtils.isNotBlank(querySql)
+                && UNSAFE_WINDOW_AGG_PATTERN.matcher(querySql).find();
     }
 
     private void doParse(QueryNLReq req, ChatParseResp resp) {
@@ -171,10 +216,6 @@ public class NL2SQLParser implements ChatQueryParser {
             return;
         }
 
-        // derive mapping result of current question and parsing result of last question.
-        ChatLayerService chatLayerService = ContextUtils.getBean(ChatLayerService.class);
-        MapResp currentMapResult = chatLayerService.map(queryNLReq);
-
         List<QueryResp> historyQueries =
                 getHistoryQueries(parseContext.getRequest().getChatId(), 1);
         if (historyQueries.isEmpty()) {
@@ -182,12 +223,18 @@ public class NL2SQLParser implements ChatQueryParser {
         }
         QueryResp lastQuery = historyQueries.get(0);
         SemanticParseInfo lastParseInfo = lastQuery.getParseInfos().get(0);
-        Long dataId = lastParseInfo.getDataSetId();
+        String histSQL = lastParseInfo.getSqlInfo().getCorrectedS2SQL();
+        if (StringUtils.isBlank(histSQL)) // 优化性能,如果问答不是chat bi 则无需重写，因为数据都不全
+            return;
 
+        // derive mapping result of current question and parsing result of last question.
+        ChatLayerService chatLayerService = ContextUtils.getBean(ChatLayerService.class);
+        MapResp currentMapResult = chatLayerService.map(queryNLReq); // 优化性能 ,只有满足条件才mapping
+
+        Long dataId = lastParseInfo.getDataSetId();
         String curtMapStr =
                 generateSchemaPrompt(currentMapResult.getMapInfo().getMatchedElements(dataId));
         String histMapStr = generateSchemaPrompt(lastParseInfo.getElementMatches());
-        String histSQL = lastParseInfo.getSqlInfo().getCorrectedS2SQL();
 
         Map<String, Object> variables = new HashMap<>();
         variables.put("current_question", currentMapResult.getQueryText());

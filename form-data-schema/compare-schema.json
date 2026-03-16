@@ -1,0 +1,552 @@
+{
+  "viz_type": "compare",
+  "display_name": "Time-series Percent Change",
+  "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/Compare/controlPanel.ts",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/Compare/controlPanel.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/Compare/index.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/transformProps.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/NVD3Controls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/sections/sections.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/mixins.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+    "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+    "D:/vsx/sources/superset-6.0.0/superset/views/core.py",
+    "D:/vsx/sources/superset-6.0.0/superset/utils/core.py"
+  ],
+  "notes": [
+    "Compare 位于 `legacy-preset-chart-nvd3/src/Compare`，metadata 明确声明 `useLegacyApi=true`，因此真实请求路径是 `/superset/explore_json/`，不是 `/api/v1/chart/data`。",
+    "前端展示名是 `Time-series Percent Change`，后端 `superset/viz.py::NVD3CompareTimeSeriesViz.verbose_name` 是 `Time Series - Percent Change`；真正稳定的主键只有 `viz_type='compare'`。",
+    "Compare 没有 `controlOverrides`，但有 `formDataOverrides`：切换 standardized controls 时，会把 standardized columns 全量写回 root `groupby`，把 standardized metrics 全量写回 root `metrics`。",
+    "Time section 直接复用 `sections.legacyTimeseriesTime`，所以同时出现 `granularity`、`granularity_sqla`、`time_grain_sqla`、`time_range`。其中 `granularity` 是 legacy 时间粒度字段，`granularity_sqla` 是 SQLA datasource 的主时间列。",
+    "Compare 复用 `NVD3TimeSeriesViz` 的查询与后处理链路：`timeseries_limit_metric`/`order_desc` 控制排序，`rolling_*`、`resample_*`、`contribution` 和 `time_compare`/`comparison_type` 决定对比序列的生成方式。",
+    "`transformProps.js` 消费的是 runtime camelCase 形态，例如 `comparisonType`、`colorScheme`、`xAxisFormat`、`yAxisBounds`、`annotationLayers`。API root form_data 仍应使用 controlPanel 的原始 snake_case 键名。"
+  ],
+  "form_data_overrides": {
+    "groupby": "getStandardizedControls().popAllColumns()",
+    "metrics": "getStandardizedControls().popAllMetrics()"
+  },
+  "legacy_api_behavior": {
+    "useLegacyApi": true,
+    "frontend_request_endpoint": "/superset/explore_json/",
+    "frontend_request_payload": {
+      "form_data": "<raw form_data>"
+    },
+    "query_builder": "Compare 没有专属前端 buildQuery。ChartClient.ts 在 `useLegacyApi=true` 且未注册 buildQuery 时，会把原始 form_data 直接包装进 legacy payload。"
+  },
+  "query_compilation": {
+    "backend_class": "superset/viz.py::NVD3CompareTimeSeriesViz",
+    "base_query": "继承 `NVD3TimeSeriesViz.query_obj()` -> `BaseViz.query_obj()`，因此会先处理 legacy filters / extra_form_data，再构造基础 timeseries query_obj。",
+    "metrics": "root `metrics` 直接进入 `query_obj.metrics`；如果 `timeseries_limit_metric` 不在其中，`NVD3TimeSeriesViz.query_obj()` 会把它追加进去。",
+    "groupby": "`BaseViz.query_obj()` 读取 root `groupby` 作为分组维度；当前图通过 `formDataOverrides` 从 standardized columns 回写它。",
+    "orderby": "`sort_by = timeseries_limit_metric || first_metric`，`is_asc = !order_desc`；若存在排序指标，则 `query_obj['orderby'] = [(sort_by, is_asc)]`。",
+    "post_processing": "`NVD3TimeSeriesViz.process_data()` 会先按 `__timestamp` + `groupby` pivot，再依次应用 `resample_rule/resample_method`、`rolling_type/rolling_periods/min_periods` 和可选 `contribution` 归一化。",
+    "time_comparison": "`run_extra_queries()` 会遍历 `time_compare`，用 `parse_past_timedelta()` 解析相对时间；如果当前时间范围不是封闭区间，会抛出 `An enclosed time range (both start and end) must be specified when using a Time Comparison.`。",
+    "comparison_output": "`comparison_type='values'` 时返回主序列 + 各 time shift 序列；`absolute`/`percentage`/`ratio` 时会先把 shifted 数据按时间插值对齐，再输出差值、百分比变化或比值序列。"
+  },
+  "field_categories": {
+    "Time": [
+      {
+        "field_name": "granularity",
+        "description": "The time granularity for the visualization. Note that you can type and use simple natural language as in `10 seconds`, `1 day` or `56 weeks`",
+        "data_type": "string | null",
+        "enum_values": [
+          null,
+          "PT5S",
+          "PT30S",
+          "PT1M",
+          "PT5M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "P1D",
+          "P7D",
+          "P1W",
+          "week_starting_sunday",
+          "week_ending_saturday",
+          "P1M",
+          "P3M",
+          "P1Y"
+        ],
+        "sample_data": "P1D",
+        "required": false,
+        "embedding": "extra_form_data.override（低置信）",
+        "default_value": "one day",
+        "notes": "共享 `granularity` 控件是 legacy 时间粒度字段，允许 freeForm，因此源码默认值使用自然语言字符串 `one day`。"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "description": "The time column for the visualization. Note that you can define arbitrary expression that return a DATETIME column in the table. Also note that the filter below is applied against this column or expression",
+        "data_type": "string | object | null",
+        "enum_source": "datasource temporal columns + arbitrary DATETIME SQL expression",
+        "sample_data": "ds",
+        "required": false,
+        "embedding": "extra_filters.__time_col / extra_form_data.override（低置信）",
+        "default_value": "datasource default temporal column",
+        "notes": "共享 `dndGranularitySqlaControl` 继承 `temporalColumnMixin`，会优先提供 datasource 默认时间列；源码没有显式 `validateNonEmpty`，但对 SQLA 时序图这是实际主时间列。"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "runtime_alias": "timeGrainSqla",
+        "description": "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart.",
+        "data_type": "string | null",
+        "enum_source": "datasource.time_grain_sqla",
+        "sample_data": "P1D",
+        "required": false,
+        "embedding": "extra_form_data.override",
+        "default_value": "P1D",
+        "notes": "initialValue 在新建未保存图表且 root form_data 尚未显式包含 `time_grain_sqla` 时，会回退到 `P1D`。"
+      },
+      {
+        "field_name": "time_range",
+        "runtime_alias": "timeRange",
+        "description": "This control filters the whole chart based on the selected time range. All relative times are evaluated on the server using the server's local time.",
+        "data_type": "string",
+        "sample_data": "Last 30 days",
+        "required": false,
+        "embedding": "extra_form_data.override",
+        "default_value": "No filter",
+        "notes": "当 `time_compare` 有值时，后端要求这里最终必须解析成封闭时间范围，否则 `run_extra_queries()` 会报错。"
+      }
+    ],
+    "Query": [
+      {
+        "field_name": "metrics",
+        "description": "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+        "data_type": "array[string | object]",
+        "enum_source": "saved metrics + adhoc metrics",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          }
+        ],
+        "required": true,
+        "embedding": "否",
+        "default_value": [],
+        "notes": "共享 `dndAdhocMetricsControl` 带 `validateNonEmpty`。Compare 的 `formDataOverrides.metrics` 也会在 standardized 切换时把当前指标数组回写到 root `metrics`。"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "description": "字段标签为 Filters。legacy `/superset/explore_json/` 路径会先把 legacy filters 归并进 `adhoc_filters`，再继续 merge `extra_form_data`。",
+        "data_type": "array[object]",
+        "enum_source": "datasource columns + saved metrics + 当前 metrics",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East"
+            ]
+          }
+        ],
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "default_value": []
+      },
+      {
+        "field_name": "groupby",
+        "description": "Dimensions contain qualitative values such as names, dates, or geographical data. Use dimensions to categorize, segment, and reveal the details in your data. Dimensions affect the level of detail in the view.",
+        "data_type": "array[string | object]",
+        "enum_source": "datasource columns",
+        "sample_data": [
+          "region"
+        ],
+        "required": false,
+        "embedding": "否",
+        "default_value": [],
+        "notes": "当前图没有把 `groupby` 改成单选；`formDataOverrides.groupby` 会把 standardized columns 全量写回这个数组字段。"
+      },
+      {
+        "field_name": "limit",
+        "description": "Limits the number of series that get displayed. A joined subquery (or an extra phase where subqueries are not supported) is applied to limit the number of series that get fetched and rendered. This feature is useful when grouping by high cardinality column(s) though does increase the query complexity and cost.",
+        "data_type": "integer | null",
+        "enum_values": [
+          5,
+          10,
+          25,
+          50,
+          100,
+          500
+        ],
+        "sample_data": 10,
+        "required": false,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "timeseries_limit_metric",
+        "description": "Orders the query result that generates the source data for this chart. If a series or row limit is reached, this determines what data are truncated. If undefined, defaults to the first metric (where appropriate).",
+        "data_type": "string | object | null",
+        "enum_source": "saved metrics + adhoc metrics",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        },
+        "required": false,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "`NVD3TimeSeriesViz.query_obj()` 会用它决定 `query_obj.orderby`，并在必要时把该指标临时追加到 `query_obj.metrics`。"
+      },
+      {
+        "field_name": "order_desc",
+        "runtime_alias": "orderDesc",
+        "description": "If enabled, this control sorts the results/values descending, otherwise it sorts the results ascending.",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true,
+        "notes": "只有 `timeseries_limit_metric` 有值时才会在 UI 中显示；后端通过 `!order_desc` 反推 `orderby` 的 ascending 标志。"
+      },
+      {
+        "field_name": "contribution",
+        "description": "Compute the contribution to the total",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false,
+        "notes": "`NVD3TimeSeriesViz.process_data()` 在应用 rolling/resample 后，会把每个时间点的序列值按行归一化成占比。"
+      },
+      {
+        "field_name": "row_limit",
+        "runtime_alias": "rowLimit",
+        "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+        "data_type": "integer",
+        "enum_values": [
+          10,
+          50,
+          100,
+          250,
+          500,
+          1000,
+          5000,
+          10000,
+          50000
+        ],
+        "sample_data": 10000,
+        "required": false,
+        "embedding": "否",
+        "default_value": 10000
+      }
+    ],
+    "Chart Options": [
+      {
+        "field_name": "color_scheme",
+        "runtime_alias": "colorScheme",
+        "description": "The color scheme for rendering chart",
+        "data_type": "string",
+        "enum_source": "categoricalSchemeRegistry.keys()",
+        "sample_data": "SUPERSET_DEFAULT",
+        "required": false,
+        "embedding": "否",
+        "default_value": "categoricalSchemeRegistry.getDefaultKey()"
+      }
+    ],
+    "X Axis": [
+      {
+        "field_name": "x_axis_label",
+        "runtime_alias": "xAxisLabel",
+        "description": "字段标签为 X Axis Label。",
+        "data_type": "string",
+        "sample_data": "Order Date",
+        "required": false,
+        "embedding": "否",
+        "default_value": ""
+      },
+      {
+        "field_name": "bottom_margin",
+        "runtime_alias": "bottomMargin",
+        "description": "Bottom margin, in pixels, allowing for more room for axis labels",
+        "data_type": "string | integer",
+        "enum_values": [
+          "auto",
+          50,
+          75,
+          100,
+          125,
+          150,
+          200
+        ],
+        "sample_data": "auto",
+        "required": false,
+        "embedding": "否",
+        "default_value": "auto"
+      },
+      {
+        "field_name": "x_ticks_layout",
+        "runtime_alias": "xTicksLayout",
+        "description": "The way the ticks are laid out on the X-axis",
+        "data_type": "string",
+        "enum_values": [
+          "auto",
+          "flat",
+          "45°",
+          "staggered"
+        ],
+        "sample_data": "auto",
+        "required": false,
+        "embedding": "否",
+        "default_value": "auto"
+      },
+      {
+        "field_name": "x_axis_format",
+        "runtime_alias": "xAxisFormat",
+        "description": "D3 time format string used on the X-axis. The control description comes from `D3_FORMAT_DOCS`.",
+        "data_type": "string",
+        "enum_source": "D3_TIME_FORMAT_OPTIONS",
+        "sample_data": "smart_date",
+        "required": false,
+        "embedding": "否",
+        "default_value": "smart_date"
+      },
+      {
+        "field_name": "x_axis_showminmax",
+        "runtime_alias": "xAxisShowMinMax",
+        "description": "Whether to display the min and max values of the X-axis",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      }
+    ],
+    "Y Axis": [
+      {
+        "field_name": "y_axis_label",
+        "runtime_alias": "yAxisLabel",
+        "description": "字段标签为 Y Axis Label。",
+        "data_type": "string",
+        "sample_data": "Percent Change",
+        "required": false,
+        "embedding": "否",
+        "default_value": ""
+      },
+      {
+        "field_name": "left_margin",
+        "runtime_alias": "leftMargin",
+        "description": "Left margin, in pixels, allowing for more room for axis labels",
+        "data_type": "string | integer",
+        "enum_values": [
+          "auto",
+          50,
+          75,
+          100,
+          125,
+          150,
+          200
+        ],
+        "sample_data": "auto",
+        "required": false,
+        "embedding": "否",
+        "default_value": "auto"
+      },
+      {
+        "field_name": "y_axis_showminmax",
+        "runtime_alias": "yAxisShowMinMax",
+        "description": "Whether to display the min and max values of the Y-axis",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      },
+      {
+        "field_name": "y_log_scale",
+        "runtime_alias": "yLogScale",
+        "description": "Use a log scale for the Y-axis",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      },
+      {
+        "field_name": "y_axis_format",
+        "runtime_alias": "yAxisFormat",
+        "description": "D3 number format string used on the Y-axis. The control description comes from `D3_FORMAT_DOCS`.",
+        "data_type": "string",
+        "enum_source": "D3_FORMAT_OPTIONS；当 `comparison_type='percentage'` 时，前端只保留包含 `%` 的格式选项",
+        "sample_data": "SMART_NUMBER",
+        "required": false,
+        "embedding": "否",
+        "default_value": "DEFAULT_NUMBER_FORMAT",
+        "notes": "`sharedControls.y_axis_format` 会根据当前 `comparison_type` 动态裁剪可选项；百分比模式下更适合显式传百分号格式。"
+      },
+      {
+        "field_name": "y_axis_bounds",
+        "runtime_alias": "yAxisBounds",
+        "description": "Bounds for the Y-axis. When left empty, the bounds are dynamically defined based on the min/max of the data. Note that this feature will only expand the axis range. It won't narrow the data's extent.",
+        "data_type": "array[number | null]",
+        "sample_data": [
+          0,
+          1
+        ],
+        "required": false,
+        "embedding": "否",
+        "default_value": [
+          null,
+          null
+        ]
+      }
+    ],
+    "Advanced Analytics": [
+      {
+        "field_name": "rolling_type",
+        "description": "Defines a rolling window function to apply, works along with the [Periods] text box",
+        "data_type": "string",
+        "enum_values": [
+          "None",
+          "mean",
+          "sum",
+          "std",
+          "cumsum"
+        ],
+        "sample_data": "mean",
+        "required": false,
+        "embedding": "否",
+        "default_value": "None"
+      },
+      {
+        "field_name": "rolling_periods",
+        "description": "Defines the size of the rolling window function, relative to the time granularity selected",
+        "data_type": "integer | string | null",
+        "sample_data": 7,
+        "required": false,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "min_periods",
+        "description": "The minimum number of rolling periods required to show a value. For instance if you do a cumulative sum on 7 days you may want your Min Period to be 7.",
+        "data_type": "integer | string | null",
+        "sample_data": 7,
+        "required": false,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "time_compare",
+        "runtime_alias": "timeCompare",
+        "description": "Overlay one or more timeseries from a relative time period. Expects relative time deltas in natural language. Free text is supported.",
+        "data_type": "array[string]",
+        "enum_values": [
+          "1 day",
+          "1 week",
+          "28 days",
+          "30 days",
+          "52 weeks",
+          "1 year",
+          "104 weeks",
+          "2 years",
+          "156 weeks",
+          "3 years"
+        ],
+        "sample_data": [
+          "1 year"
+        ],
+        "required": false,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "控件是 `multi=true` + `freeForm=true`。后端用 `parse_past_timedelta()` 解析每个字符串，因此不仅限于预置选项。"
+      },
+      {
+        "field_name": "comparison_type",
+        "runtime_alias": "comparisonType",
+        "description": "How to display time shifts: as individual lines; as the difference between the main time series and each time shift; as the percentage change; or as the ratio between series and time shifts.",
+        "data_type": "string",
+        "enum_values": [
+          "values",
+          "absolute",
+          "percentage",
+          "ratio"
+        ],
+        "sample_data": "values",
+        "required": false,
+        "embedding": "否",
+        "default_value": "values"
+      },
+      {
+        "field_name": "resample_rule",
+        "description": "Pandas resample rule",
+        "data_type": "string | null",
+        "enum_values": [
+          "1T",
+          "1H",
+          "1D",
+          "7D",
+          "1M",
+          "1AS"
+        ],
+        "sample_data": "1D",
+        "required": false,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "resample_method",
+        "description": "Pandas resample method",
+        "data_type": "string | null",
+        "enum_values": [
+          "asfreq",
+          "bfill",
+          "ffill",
+          "median",
+          "mean",
+          "sum"
+        ],
+        "sample_data": "mean",
+        "required": false,
+        "embedding": "否",
+        "default_value": null
+      }
+    ],
+    "Annotations and Layers": [
+      {
+        "field_name": "annotation_layers",
+        "runtime_alias": "annotationLayers",
+        "description": "Annotation Layers",
+        "data_type": "array[object]",
+        "sample_data": [],
+        "required": false,
+        "embedding": "否",
+        "default_value": []
+      }
+    ]
+  }
+}

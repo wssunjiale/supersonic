@@ -1,0 +1,12 @@
+{"kind": "hook.precompact", "value": "trigger=auto", "meta": {}, "created_at": "2026-03-05T14:58:21.958897+00:00"}
+{"kind": "db.uri", "value": "postgresql://${S2_DB_HOST:10.0.12.252}:${S2_DB_PORT:5439}/${S2_DB_DATABASE:supersonic}?stringtype=unspecified", "meta": {}, "created_at": "2026-03-05T14:58:21.958897+00:00"}
+{"kind": "db.uri", "value": "postgresql://10.0.12.252:5438/metricsys", "meta": {}, "created_at": "2026-03-05T14:58:21.958897+00:00"}
+{"kind": "db.uri", "value": "postgresql://metricsys:***@10.0.12.252:5438/metricsys?sslmode=disable", "meta": {}, "created_at": "2026-03-05T14:58:21.959945+00:00"}
+{"kind": "artifact.output_path", "value": "output/session_key_info/4f0cb4d1-5c16-44cb-a7a7-f44c733ab9cf/precompact_trouble_shooting_20260305_145831.md", "meta": {}, "created_at": "2026-03-05T14:58:31.608860+00:00"}
+{"kind": "artifact.download_url", "value": "/download/session_key_info/4f0cb4d1-5c16-44cb-a7a7-f44c733ab9cf/precompact_trouble_shooting_20260305_145831.md", "meta": {}, "created_at": "2026-03-05T14:58:31.608860+00:00"}
+{"kind": "trouble_shooting.snapshot", "value": "errors=12 recs=5 url=/download/session_key_info/4f0cb4d1-5c16-44cb-a7a7-f44c733ab9cf/precompact_trouble_shooting_20260305_145831.md", "meta": {}, "created_at": "2026-03-05T14:58:31.621404+00:00"}
+{"kind": "kb.experience", "value": "assets\\kb\\trouble_shooting\\metricflow-validate-configs-encoding-error.md", "meta": {"title": "MetricFlow validate-configs 编码错误解决方案"}, "created_at": "2026-03-05T14:58:31.621404+00:00"}
+{"kind": "kb.experience", "value": "assets\\kb\\trouble_shooting\\postgresql-column-naming.md", "meta": {"title": "PostgreSQL列名规范规则"}, "created_at": "2026-03-05T14:58:31.621958+00:00"}
+{"kind": "kb.experience", "value": "assets\\kb\\trouble_shooting\\short-loop-root-cause.md", "meta": {"title": "短命令闭环校验 常见根因与修复"}, "created_at": "2026-03-05T14:58:31.621958+00:00"}
+{"kind": "kb.experience", "value": "assets\\kb\\trouble_shooting\\dbt-unit-test-completeness.md", "meta": {"title": "dbt单元测试数据完整性规则"}, "created_at": "2026-03-05T14:58:31.621958+00:00"}
+{"kind": "kb.experience", "value": "assets\\kb\\trouble_shooting\\metricflow-time-spine-yaml-requirement.md", "meta": {"title": "MetricFlow Time Spine YAML 配置要求"}, "created_at": "2026-03-05T14:58:31.621958+00:00"}

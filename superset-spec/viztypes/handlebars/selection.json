@@ -1,0 +1,433 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "handlebars",
+  "display_name": "Handlebars",
+  "selection_summary": {
+    "category": "custom",
+    "tags": [
+      "handlebars",
+      "custom",
+      "template",
+      "html"
+    ],
+    "description_zh": "Handlebars Template chart renders custom HTML/JSON content using Handlebars templating engine, ideal for fully customized data presentation.",
+    "visual_shape_zh": "自定义模板（HTML/JSON）",
+    "use_cases_zh": [
+      "全自定义数据展示（如定制化报表、富文本）",
+      "非标准可视化需求",
+      "结合HTML/CSS的个性化展示"
+    ],
+    "required_slots": [
+      {
+        "field_name": "template",
+        "required": true,
+        "slot_kind": "latitude",
+        "accepted_dataset_roles": [
+          "geo_latitude"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<latitude_column>",
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Handlebars模板字符串，用于定义自定义展示内容。"
+        ]
+      }
+    ],
+    "optional_slots": [
+      {
+        "field_name": "adhoc_filters",
+        "required": false,
+        "slot_kind": "filter_list",
+        "accepted_dataset_roles": [
+          "filter_context"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [],
+        "source_categories": [
+          "Query / Time & Filters"
+        ],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "字段标签为 Filters。"
+        ]
+      },
+      {
+        "field_name": "all_columns",
+        "required": false,
+        "slot_kind": "dimension_list",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [
+          "<dimension_column>"
+        ],
+        "source_categories": [
+          "Query / Mode & Fields"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Columns to display"
+        ]
+      },
+      {
+        "field_name": "granularity_sqla",
+        "required": false,
+        "slot_kind": "time_column",
+        "accepted_dataset_roles": [
+          "time_dimension"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<time_column>",
+        "source_categories": [
+          "Query / Time & Filters"
+        ],
+        "embedding_modes": [
+          "extra_form_data.override"
+        ],
+        "descriptions": [
+          "The time column for the visualization. Note that you can define arbitrary expression that return a DATETIME column in the table. Also note that the filter below is applied against this column or expression"
+        ]
+      },
+      {
+        "field_name": "groupby",
+        "required": false,
+        "slot_kind": "dimension_list",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [
+          "<dimension_column>"
+        ],
+        "source_categories": [
+          "Query / Mode & Fields"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Dimensions contain qualitative values such as names, dates, or geographical data. Use dimensions to categorize, segment, and reveal the details in your data. Dimensions affect the level of detail in the view."
+        ]
+      },
+      {
+        "field_name": "include_time",
+        "required": false,
+        "slot_kind": "time_or_axis",
+        "accepted_dataset_roles": [
+          "time_dimension",
+          "dimension"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<time_or_axis_column>",
+        "source_categories": [
+          "Query / Time & Filters"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Whether to include the time granularity as defined in the time section"
+        ]
+      },
+      {
+        "field_name": "metrics",
+        "required": false,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "Query / Mode & Fields",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+          "聚合指标列表，用于模板中渲染数值。"
+        ]
+      },
+      {
+        "field_name": "percent_metrics",
+        "required": false,
+        "slot_kind": "metric",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "0..n",
+        "placeholder": "<metric_or_metric_list>",
+        "source_categories": [
+          "Query / Mode & Fields"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select one or many metrics to display, that will be displayed in the percentages of total. Percentage metrics will be calculated only from data within the row limit. You can use an aggregation function on a column or write custom SQL to create a percentage metric."
+        ]
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "required": false,
+        "slot_kind": "time_grain",
+        "accepted_dataset_roles": [
+          "time_grain"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "P1D",
+        "source_categories": [
+          "Query / Time & Filters"
+        ],
+        "embedding_modes": [
+          "extra_form_data.override"
+        ],
+        "descriptions": [
+          "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart."
+        ]
+      },
+      {
+        "field_name": "time_range",
+        "required": false,
+        "slot_kind": "time_or_axis",
+        "accepted_dataset_roles": [
+          "time_dimension",
+          "dimension"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<time_or_axis_column>",
+        "source_categories": [
+          "Query / Time & Filters"
+        ],
+        "embedding_modes": [
+          "extra_form_data.override"
+        ],
+        "descriptions": [
+          "This control filters the whole chart based on the selected time range. All relative times, e.g. \"Last month\", \"Last 7 days\", \"now\", etc. are evaluated on the server using the server's local time (sans timezone). All tooltips and placeholder times are expressed in UTC (sans timezone). The timestamps are then evaluated by the database using the engine's local timezone. Note one can explicitly set the timezone per the ISO 8601 format if specifying either the start and/or end time."
+        ]
+      }
+    ],
+    "required_dataset_roles": [
+      "geo_latitude"
+    ],
+    "optional_dataset_roles": [
+      "adhoc_metric",
+      "category_dimension",
+      "dimension",
+      "filter_context",
+      "metric",
+      "saved_metric",
+      "time_dimension",
+      "time_grain"
+    ],
+    "dataset_role_inventory": {
+      "adhoc_metric": [
+        "metrics",
+        "percent_metrics"
+      ],
+      "category_dimension": [
+        "all_columns",
+        "groupby"
+      ],
+      "dimension": [
+        "all_columns",
+        "groupby",
+        "include_time",
+        "time_range"
+      ],
+      "filter_context": [
+        "adhoc_filters"
+      ],
+      "metric": [
+        "metrics",
+        "percent_metrics"
+      ],
+      "saved_metric": [
+        "metrics",
+        "percent_metrics"
+      ],
+      "time_dimension": [
+        "granularity_sqla",
+        "include_time",
+        "time_range"
+      ],
+      "time_grain": [
+        "time_grain_sqla"
+      ],
+      "geo_latitude": [
+        "template"
+      ]
+    },
+    "non_binding_control_names": [
+      "handlebarsTemplate",
+      "order_by_cols",
+      "order_desc",
+      "query_mode",
+      "row_limit",
+      "show_totals",
+      "styleTemplate",
+      "timeseries_limit_metric"
+    ],
+    "embedding_runtime_field_names": [
+      "adhoc_filters",
+      "custom_form_data",
+      "filters",
+      "granularity_sqla",
+      "interactive_groupby",
+      "time_grain_sqla",
+      "time_range"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "handlebarsTemplate",
+      "metrics",
+      "query_mode",
+      "row_limit",
+      "time_range",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "groupby",
+      "handlebarsTemplate",
+      "include_time",
+      "metrics",
+      "order_desc",
+      "percent_metrics",
+      "query_mode",
+      "row_limit",
+      "show_totals",
+      "styleTemplate",
+      "time_range",
+      "timeseries_limit_metric",
+      "viz_type"
+    ],
+    "structural_flags": {
+      "time_series": true,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": true,
+      "flow_like": false,
+      "distribution_like": false,
+      "supports_breakdown": true,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": false,
+      "needs_time": false,
+      "needs_dimension": false
+    },
+    "selection_hints": [
+      "优先用于趋势、演化、时间对比类问题。",
+      "需要地理信息字段；点位地图优先经纬度，区域地图优先行政区维度。",
+      "支持按维度拆分多序列或子组。",
+      "可结合时间粒度控制趋势聚合窗口。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：全自定义数据展示（如定制化报表、富文本）；非标准可视化需求；结合HTML/CSS的个性化展示"
+    ]
+  },
+  "selection_prompt_card": {
+    "viz_type": "handlebars",
+    "display_name": "Handlebars",
+    "category": "custom",
+    "description_zh": "Handlebars Template chart renders custom HTML/JSON content using Handlebars templating engine, ideal for fully customized data presentation.",
+    "visual_shape_zh": "自定义模板（HTML/JSON）",
+    "best_for": [
+      "全自定义数据展示（如定制化报表、富文本）",
+      "非标准可视化需求",
+      "结合HTML/CSS的个性化展示"
+    ],
+    "required_dataset_roles": [
+      "geo_latitude"
+    ],
+    "optional_dataset_roles": [
+      "adhoc_metric",
+      "category_dimension",
+      "dimension",
+      "filter_context",
+      "metric",
+      "saved_metric",
+      "time_dimension",
+      "time_grain"
+    ],
+    "required_slots": [
+      {
+        "field_name": "template",
+        "required": true,
+        "slot_kind": "latitude",
+        "accepted_dataset_roles": [
+          "geo_latitude"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<latitude_column>",
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Handlebars模板字符串，用于定义自定义展示内容。"
+        ]
+      }
+    ],
+    "optional_slot_names": [
+      "adhoc_filters",
+      "all_columns",
+      "granularity_sqla",
+      "groupby",
+      "include_time",
+      "metrics",
+      "percent_metrics",
+      "time_grain_sqla",
+      "time_range"
+    ],
+    "structural_flags": {
+      "time_series": true,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": true,
+      "flow_like": false,
+      "distribution_like": false,
+      "supports_breakdown": true,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": false,
+      "needs_time": false,
+      "needs_dimension": false
+    },
+    "selection_hints": [
+      "优先用于趋势、演化、时间对比类问题。",
+      "需要地理信息字段；点位地图优先经纬度，区域地图优先行政区维度。",
+      "支持按维度拆分多序列或子组。",
+      "可结合时间粒度控制趋势聚合窗口。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：全自定义数据展示（如定制化报表、富文本）；非标准可视化需求；结合HTML/CSS的个性化展示"
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "handlebars",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/handlebars-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/handlebars-form-data-schema.json",
+      "control-schema": "form-data-schema/handlebars-schema.json"
+    }
+  }
+}

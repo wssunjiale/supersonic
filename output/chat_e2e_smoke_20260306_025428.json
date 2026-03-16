@@ -1,0 +1,470 @@
+{
+  "baseUrl": "http://localhost:9090",
+  "agentId": 5,
+  "chatId": 16,
+  "date": {
+    "start": "2023-03-06",
+    "end": "2026-03-06"
+  },
+  "results": [
+    {
+      "idx": 1,
+      "queryText": "每个产品键的总销售金额（最近三年）",
+      "parse": {
+        "code": 200,
+        "msg": "success",
+        "traceId": "supersonic_8781de1d39d54bf0844d62cf67e25962"
+      },
+      "queryId": 186,
+      "parseId": 1,
+      "query": {
+        "code": 400,
+        "msg": "维度:产品键, 不在当前查询指标的下钻维度配置中, 请检查",
+        "traceId": "supersonic_da02a4b5030a44198bc48a9e85145685"
+      },
+      "ok": false,
+      "error": "queryData failed: {'code': 400, 'msg': '维度:产品键, 不在当前查询指标的下钻维度配置中, 请检查', 'traceId': 'supersonic_da02a4b5030a44198bc48a9e85145685'}"
+    },
+    {
+      "idx": 2,
+      "queryText": "按订单日期（月）统计总销售金额趋势（最近三年）",
+      "parse": {
+        "code": 200,
+        "msg": "success",
+        "traceId": "supersonic_a1ba19f38777432aba9ed0408782e0fb"
+      },
+      "queryId": 187,
+      "ok": false,
+      "error": "no selectedParses"
+    },
+    {
+      "idx": 3,
+      "queryText": "按销售区域组统计总销售金额（最近三年）",
+      "parse": {
+        "code": 200,
+        "msg": "success",
+        "traceId": "supersonic_867fd74c879c446eb63818f9d624ee07"
+      },
+      "queryId": 188,
+      "parseId": 1,
+      "query": {
+        "code": 400,
+        "msg": "维度:销售区域组, 不在当前查询指标的下钻维度配置中, 请检查",
+        "traceId": "supersonic_4ececcfd79644f8b846e37bedb03d550"
+      },
+      "ok": false,
+      "error": "queryData failed: {'code': 400, 'msg': '维度:销售区域组, 不在当前查询指标的下钻维度配置中, 请检查', 'traceId': 'supersonic_4ececcfd79644f8b846e37bedb03d550'}"
+    },
+    {
+      "idx": 4,
+      "queryText": "按销售国家统计总销售金额 Top10（最近三年）",
+      "parse": {
+        "code": 200,
+        "msg": "success",
+        "traceId": "supersonic_549be667e77d473f9659158871595bbc"
+      },
+      "queryId": 189,
+      "parseId": 1,
+      "query": {
+        "code": 400,
+        "msg": "维度:销售国家, 不在当前查询指标的下钻维度配置中, 请检查",
+        "traceId": "supersonic_6ceadfc97c814a3898d441a05fa0a845"
+      },
+      "ok": false,
+      "error": "queryData failed: {'code': 400, 'msg': '维度:销售国家, 不在当前查询指标的下钻维度配置中, 请检查', 'traceId': 'supersonic_6ceadfc97c814a3898d441a05fa0a845'}"
+    },
+    {
+      "idx": 5,
+      "queryText": "每个促销活动的总折扣金额（最近三年）",
+      "parse": {
+        "code": 200,
+        "msg": "success",
+        "traceId": "supersonic_f5d9c0fa53d84a13ab609cfb2ba3112f"
+      },
+      "queryId": 190,
+      "parseId": 1,
+      "query": {
+        "code": 400,
+        "msg": "维度:促销键, 不在当前查询指标的下钻维度配置中, 请检查",
+        "traceId": "supersonic_bfd7adc8c69f484dac029fd71a3695a9"
+      },
+      "ok": false,
+      "error": "queryData failed: {'code': 400, 'msg': '维度:促销键, 不在当前查询指标的下钻维度配置中, 请检查', 'traceId': 'supersonic_bfd7adc8c69f484dac029fd71a3695a9'}"
+    },
+    {
+      "idx": 6,
+      "queryText": "平均折扣率按产品键 Top10（最近三年）",
+      "parse": {
+        "code": 200,
+        "msg": "success",
+        "traceId": "supersonic_6e93121355544c0aae355e460bd40c9f"
+      },
+      "queryId": 191,
+      "parseId": 1,
+      "query": {
+        "code": 200,
+        "msg": "success",
+        "traceId": "supersonic_49c1d17598a04e67af98abc6c9fe2cdb",
+        "queryState": "SUCCESS",
+        "errorMsg": null,
+        "querySqlHead": ""
+      },
+      "ok": true,
+      "latencyMs": 91415
+    },
+    {
+      "idx": 7,
+      "queryText": "最低单价和最高单价分别是多少（最近三年，按产品键）",
+      "parse": {
+        "code": 200,
+        "msg": "success",
+        "traceId": "supersonic_a035217d3b6c4210b5ac190709916440"
+      },
+      "queryId": 192,
+      "parseId": 1,
+      "query": {
+        "code": 200,
+        "msg": "success",
+        "traceId": "supersonic_249da68de97145a8a34847115bd9b3ff",
+        "queryState": "SUCCESS",
+        "errorMsg": null,
+        "querySqlHead": ""
+      },
+      "ok": true,
+      "latencyMs": 97850
+    },
+    {
+      "idx": 8,
+      "queryText": "总运费按销售区域排序（最近三年）",
+      "parse": {
+        "code": 200,
+        "msg": "success",
+        "traceId": "supersonic_79c54e92cb614658a3871ec8a42d1770"
+      },
+      "queryId": 193,
+      "parseId": 1,
+      "query": {
+        "code": 400,
+        "msg": "维度:销售区域, 不在当前查询指标的下钻维度配置中, 请检查",
+        "traceId": "supersonic_33ec475cde5c4561912c7c9b63f24974"
+      },
+      "ok": false,
+      "error": "queryData failed: {'code': 400, 'msg': '维度:销售区域, 不在当前查询指标的下钻维度配置中, 请检查', 'traceId': 'supersonic_33ec475cde5c4561912c7c9b63f24974'}"
+    },
+    {
+      "idx": 9,
+      "queryText": "总税费按订单日期（月）趋势（最近三年）",
+      "parse": {
+        "code": 200,
+        "msg": "success",
+        "traceId": "supersonic_4ef7516c88af4a9a86e6cce789e3feef"
+      },
+      "queryId": 194,
+      "parseId": 1,
+      "query": {
+        "code": 200,
+        "msg": "success",
+        "traceId": "supersonic_da713bf21b5a4888a7e4aac3ce358fd4",
+        "queryState": "SUCCESS",
+        "errorMsg": null,
+        "querySqlHead": ""
+      },
+      "ok": true,
+      "latencyMs": 87114
+    },
+    {
+      "idx": 10,
+      "queryText": "总订单数量按产品键 Top10（最近三年）",
+      "parse": {
+        "code": 200,
+        "msg": "success",
+        "traceId": "supersonic_20e72d154b7f4db1a27aef26d970aaf4"
+      },
+      "queryId": 195,
+      "parseId": 1,
+      "query": {
+        "code": 400,
+        "msg": "维度:产品键, 不在当前查询指标的下钻维度配置中, 请检查",
+        "traceId": "supersonic_73ddd550099a4ff693d5965b45920293"
+      },
+      "ok": false,
+      "error": "queryData failed: {'code': 400, 'msg': '维度:产品键, 不在当前查询指标的下钻维度配置中, 请检查', 'traceId': 'supersonic_73ddd550099a4ff693d5965b45920293'}"
+    },
+    {
+      "idx": 11,
+      "queryText": "经销商销售总额按产品键 Top10（最近三年）",
+      "parse": {
+        "code": 200,
+        "msg": "success",
+        "traceId": "supersonic_198073e11abe44d29fcd272d22c2265b"
+      },
+      "queryId": 196,
+      "parseId": 1,
+      "query": {
+        "code": 400,
+        "msg": "维度:产品键, 不在当前查询指标的下钻维度配置中, 请检查",
+        "traceId": "supersonic_1a8461e030c642dbbb01021efdd752a6"
+      },
+      "ok": false,
+      "error": "queryData failed: {'code': 400, 'msg': '维度:产品键, 不在当前查询指标的下钻维度配置中, 请检查', 'traceId': 'supersonic_1a8461e030c642dbbb01021efdd752a6'}"
+    },
+    {
+      "idx": 12,
+      "queryText": "经销商订单数量总和按销售区域键（最近三年）",
+      "parse": {
+        "code": 200,
+        "msg": "success",
+        "traceId": "supersonic_0ac49567c8cf4a6c841924c44b4c782a"
+      },
+      "queryId": 197,
+      "parseId": 1,
+      "query": {
+        "code": 400,
+        "msg": "维度:销售区域, 不在当前查询指标的下钻维度配置中, 请检查",
+        "traceId": "supersonic_df4c6cb189a64ea892298da1d9b40e0e"
+      },
+      "ok": false,
+      "error": "queryData failed: {'code': 400, 'msg': '维度:销售区域, 不在当前查询指标的下钻维度配置中, 请检查', 'traceId': 'supersonic_df4c6cb189a64ea892298da1d9b40e0e'}"
+    },
+    {
+      "idx": 13,
+      "queryText": "经销商折扣金额总和按订单日期（月）趋势（最近三年）",
+      "parse": {
+        "code": 200,
+        "msg": "success",
+        "traceId": "supersonic_fc1fe5800842448abb9e62f27aafd575"
+      },
+      "queryId": 198,
+      "ok": false,
+      "error": "no selectedParses"
+    },
+    {
+      "idx": 14,
+      "queryText": "经销商平均单价按产品键 Top10（最近三年）",
+      "parse": {
+        "code": 200,
+        "msg": "success",
+        "traceId": "supersonic_42bf69168b4c4993938bc0a0ffa8e3b0"
+      },
+      "queryId": 199,
+      "parseId": 1,
+      "query": {
+        "code": 400,
+        "msg": "维度:产品键, 不在当前查询指标的下钻维度配置中, 请检查",
+        "traceId": "supersonic_97fe5e7f24034a68947502c8f42288aa"
+      },
+      "ok": false,
+      "error": "queryData failed: {'code': 400, 'msg': '维度:产品键, 不在当前查询指标的下钻维度配置中, 请检查', 'traceId': 'supersonic_97fe5e7f24034a68947502c8f42288aa'}"
+    },
+    {
+      "idx": 15,
+      "queryText": "产品库存：总出库数量按Movement日期（月）趋势（最近三年）",
+      "parse": {
+        "code": 200,
+        "msg": "success",
+        "traceId": "supersonic_51508fbaa9614b5f86c7db2f6556d193"
+      },
+      "queryId": 200,
+      "ok": false,
+      "error": "no selectedParses"
+    },
+    {
+      "idx": 16,
+      "queryText": "产品库存：总入库数量按产品键 Top10（最近三年）",
+      "parse": {
+        "code": 200,
+        "msg": "success",
+        "traceId": "supersonic_a70c28b3e15d49a9bb1d7434c86a8ae8"
+      },
+      "queryId": 201,
+      "parseId": 1,
+      "query": {
+        "code": 400,
+        "msg": "维度:产品键, 不在当前查询指标的下钻维度配置中, 请检查",
+        "traceId": "supersonic_1c133d040af7453580c8f7b218307309"
+      },
+      "ok": false,
+      "error": "queryData failed: {'code': 400, 'msg': '维度:产品键, 不在当前查询指标的下钻维度配置中, 请检查', 'traceId': 'supersonic_1c133d040af7453580c8f7b218307309'}"
+    },
+    {
+      "idx": 17,
+      "queryText": "产品库存：总库存价值按产品键 Top10（最近三年）",
+      "parse": {
+        "code": 200,
+        "msg": "success",
+        "traceId": "supersonic_91de947ed3ba4e25abb7b23572e08730"
+      },
+      "queryId": 202,
+      "parseId": 1,
+      "query": {
+        "code": 400,
+        "msg": "维度:产品键, 不在当前查询指标的下钻维度配置中, 请检查",
+        "traceId": "supersonic_7f2a9eec6b2c45949ea7cfd6616bcb9a"
+      },
+      "ok": false,
+      "error": "queryData failed: {'code': 400, 'msg': '维度:产品键, 不在当前查询指标的下钻维度配置中, 请检查', 'traceId': 'supersonic_7f2a9eec6b2c45949ea7cfd6616bcb9a'}"
+    },
+    {
+      "idx": 18,
+      "queryText": "财务：总财务金额按Finance日期（月）趋势（最近三年）",
+      "parse": {
+        "code": 200,
+        "msg": "success",
+        "traceId": "supersonic_85b4d38867fe4cc6a638ae7bb3ddb387"
+      },
+      "queryId": 203,
+      "ok": false,
+      "error": "no selectedParses"
+    },
+    {
+      "idx": 19,
+      "queryText": "财务：总收入金额和总支出金额对比（最近三年，按Finance日期（月））",
+      "parse": {
+        "code": 200,
+        "msg": "success",
+        "traceId": "supersonic_bf0a54d9f66b4f5ab6222de537179cf2"
+      },
+      "queryId": 204,
+      "ok": false,
+      "error": "no selectedParses"
+    },
+    {
+      "idx": 20,
+      "queryText": "呼叫中心：总呼叫数按Call日期（月）趋势（最近三年）",
+      "parse": {
+        "code": 200,
+        "msg": "success",
+        "traceId": "supersonic_0bd2eb290fcf408182a5999f7941cdbc"
+      },
+      "queryId": 205,
+      "ok": false,
+      "error": "no selectedParses"
+    },
+    {
+      "idx": 21,
+      "queryText": "呼叫中心：呼叫产生订单数按Shift（最近三年）",
+      "parse": {
+        "code": 200,
+        "msg": "success",
+        "traceId": "supersonic_3d6c60ad2edd4b5c9fd32ef0a132eecd"
+      },
+      "queryId": 206,
+      "parseId": 1,
+      "query": {
+        "code": 200,
+        "msg": "success",
+        "traceId": "supersonic_773cf5cc04b24600aaf316fe229e1c0c",
+        "queryState": "SUCCESS",
+        "errorMsg": null,
+        "querySqlHead": ""
+      },
+      "ok": true,
+      "latencyMs": 108348
+    },
+    {
+      "idx": 22,
+      "queryText": "汇率：平均汇率按Rate日期（月）趋势（最近三年）",
+      "parse": {
+        "code": 200,
+        "msg": "success",
+        "traceId": "supersonic_939940c65a9946fbabe2b85429ce84c5"
+      },
+      "queryId": 207,
+      "ok": false,
+      "error": "no selectedParses"
+    },
+    {
+      "idx": 23,
+      "queryText": "汇率：平均收盘汇率按货币键（最近三年）",
+      "parse": {
+        "code": 200,
+        "msg": "success",
+        "traceId": "supersonic_f1311b0fe75a49f8aaf6b170f3865962"
+      },
+      "queryId": 208,
+      "parseId": 1,
+      "query": {
+        "code": 400,
+        "msg": "维度:货币键, 不在当前查询指标的下钻维度配置中, 请检查",
+        "traceId": "supersonic_8ae0da8217084de3af28478bd11c030b"
+      },
+      "ok": false,
+      "error": "queryData failed: {'code': 400, 'msg': '维度:货币键, 不在当前查询指标的下钻维度配置中, 请检查', 'traceId': 'supersonic_8ae0da8217084de3af28478bd11c030b'}"
+    },
+    {
+      "idx": 24,
+      "queryText": "销售配额：总销售配额按Quota日期（月）趋势（最近三年）",
+      "parse": {
+        "code": 200,
+        "msg": "success",
+        "traceId": "supersonic_9b8519c3bbf24bac84724f245d5e0c13"
+      },
+      "queryId": 209,
+      "ok": false,
+      "error": "no selectedParses"
+    },
+    {
+      "idx": 25,
+      "queryText": "销售配额：人均销售配额按日历年（最近三年）",
+      "parse": {
+        "code": 200,
+        "msg": "success",
+        "traceId": "supersonic_9c4d078061e245fdaa6204d297811214"
+      },
+      "queryId": 210,
+      "parseId": 1,
+      "query": {
+        "code": 200,
+        "msg": "success",
+        "traceId": "supersonic_b198fd17c49544b890eff569b5fffbb8",
+        "queryState": "SUCCESS",
+        "errorMsg": null,
+        "querySqlHead": ""
+      },
+      "ok": true,
+      "latencyMs": 97083
+    },
+    {
+      "idx": 26,
+      "queryText": "调查：总调查响应数按调查日期（月）趋势（最近三年）",
+      "parse": {
+        "code": 200,
+        "msg": "success",
+        "traceId": "supersonic_6913e2445a054b23a77025ec564edbb3"
+      },
+      "queryId": 211,
+      "parseId": 1,
+      "query": {
+        "code": 200,
+        "msg": "success",
+        "traceId": "supersonic_aeced18a56664e469f38bf020e3eec0b",
+        "queryState": "SUCCESS",
+        "errorMsg": null,
+        "querySqlHead": ""
+      },
+      "ok": true,
+      "latencyMs": 88315
+    },
+    {
+      "idx": 27,
+      "queryText": "调查：参与调查客户数按英文产品类别名称 Top10（最近三年）",
+      "parse": {
+        "code": 200,
+        "msg": "success",
+        "traceId": "supersonic_5f1b9788b1db4e5790e5eda6cf939b59"
+      },
+      "queryId": 212,
+      "parseId": 1,
+      "query": {
+        "code": 200,
+        "msg": "success",
+        "traceId": "supersonic_41146ea0e85f479db13cf8a07596226f",
+        "queryState": "SUCCESS",
+        "errorMsg": null,
+        "querySqlHead": ""
+      },
+      "ok": true,
+      "latencyMs": 97916
+    }
+  ]
+}

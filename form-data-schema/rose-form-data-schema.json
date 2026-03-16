@@ -1,0 +1,256 @@
+{
+  "viz_type": "rose",
+  "display_name": "Nightingale Rose Chart",
+  "purpose": "用于调用 API 创建或保存 Nightingale Rose Chart 时填写的 form_data 模板",
+  "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/rose-schema.json",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-rose/src/controlPanel.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-rose/src/index.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-rose/src/transformProps.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-rose/src/Rose.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/sections/sections.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+    "D:/vsx/sources/superset-6.0.0/superset/viz.py"
+  ],
+  "notes": [
+    "Rose 是 legacy 图，前端请求路径是 `/superset/explore_json/`，不是 `/api/v1/chart/data`。",
+    "保存态 root form_data 必须使用 controlPanel 的原始 snake_case 字段名，例如 `date_time_format`、`rose_area_proportion`、`timeseries_limit_metric`。",
+    "NVD3TimeSeriesViz.query_obj() 会在存在 metrics 时自动生成 orderby；如果未提供 timeseries_limit_metric，则回退第一个 metric。",
+    "Rose 的时间与高级分析都在后端 viz.py 中生效；前端 transformProps.js 只是把 root form_data 映射给展示组件。"
+  ],
+  "naming_and_pipeline": {
+    "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写成 form_data[name]。",
+    "api_form_data_to_backend_request": "ChartClient.ts 在 useLegacyApi=true 时，会把 root form_data 直接包装成 `{ form_data }` POST 到 `/superset/explore_json/`。",
+    "backend_form_data_to_query_obj": "Rose 通过 BaseViz.query_obj() + NVD3TimeSeriesViz.query_obj() 构造查询，并在 RoseViz.get_data() 阶段重组成玫瑰图所需的数据结构。"
+  },
+  "global_required_fields": {
+    "datasource": {
+      "data_type": "string",
+      "required": true,
+      "sample_data": "<dataset_id>__table",
+      "source": "explore_json() + datasourceAndVizType hidden control"
+    },
+    "viz_type": {
+      "data_type": "string",
+      "required": true,
+      "fixed_value": "rose",
+      "source": "RoseViz.viz_type + Rose/index.js"
+    }
+  },
+  "global_optional_fields": {
+    "slice_id": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 0,
+      "source": "datasourceAndVizType hidden control"
+    },
+    "cache_timeout": {
+      "data_type": "integer | null",
+      "required": false,
+      "sample_data": null,
+      "source": "datasourceAndVizType hidden control"
+    },
+    "url_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "QueryFormData"
+    },
+    "custom_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "QueryFormData"
+    }
+  },
+  "minimal_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "rose",
+    "granularity_sqla": "<time_column>",
+    "time_grain_sqla": "P1D",
+    "time_range": "No filter",
+    "metrics": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      }
+    ],
+    "groupby": [],
+    "adhoc_filters": [],
+    "order_desc": true
+  },
+  "recommended_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "rose",
+    "granularity": "one day",
+    "granularity_sqla": "<time_column>",
+    "time_grain_sqla": "P1D",
+    "time_range": "No filter",
+    "metrics": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      }
+    ],
+    "adhoc_filters": [],
+    "groupby": [],
+    "limit": null,
+    "timeseries_limit_metric": null,
+    "order_desc": true,
+    "contribution": false,
+    "row_limit": 10000,
+    "color_scheme": "<categoricalSchemeRegistry.defaultKey>",
+    "number_format": "SMART_NUMBER",
+    "date_time_format": "smart_date",
+    "rich_tooltip": true,
+    "rose_area_proportion": false,
+    "rolling_type": "None",
+    "rolling_periods": null,
+    "min_periods": null,
+    "time_compare": null,
+    "comparison_type": "values",
+    "resample_rule": null,
+    "resample_method": null
+  },
+  "conditional_blocks": {
+    "grouped_segments": {
+      "condition": "需要按一个或多个维度拆分玫瑰图扇区时",
+      "fields": {
+        "groupby": [
+          "<dimension_column>"
+        ]
+      }
+    },
+    "series_limit": {
+      "condition": "需要限制参与渲染的 series 数量时",
+      "fields": {
+        "limit": 10,
+        "timeseries_limit_metric": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        },
+        "order_desc": true
+      }
+    },
+    "contribution_mode": {
+      "condition": "需要把每个时间桶标准化为占比时",
+      "fields": {
+        "contribution": true,
+        "number_format": ",.0%"
+      }
+    },
+    "time_comparison": {
+      "condition": "需要做同比 / 环比偏移对比时",
+      "fields": {
+        "time_range": "2025-01-01 : 2025-01-31",
+        "time_compare": [
+          "1 year"
+        ],
+        "comparison_type": "values"
+      },
+      "notes": "backend 要求 time_compare 场景下 time_range 必须是封闭区间。"
+    },
+    "rolling_and_resample": {
+      "condition": "需要 rolling 或 resample 时",
+      "fields": {
+        "rolling_type": "mean",
+        "rolling_periods": 7,
+        "min_periods": 7,
+        "resample_rule": "1D",
+        "resample_method": "mean"
+      }
+    },
+    "tooltip_and_area_mode": {
+      "condition": "需要切换 tooltip 样式或改为面积比例时",
+      "fields": {
+        "rich_tooltip": true,
+        "rose_area_proportion": true,
+        "date_time_format": "smart_date",
+        "number_format": "SMART_NUMBER"
+      }
+    }
+  },
+  "runtime_only_or_non_template_fields": {
+    "runtime_aliases_generated_by_transformProps": [
+      {
+        "field_name": "dateTimeFormat",
+        "reason": "由 raw form_data.date_time_format 派生的运行时别名，不是 API root 键。"
+      },
+      {
+        "field_name": "numberFormat",
+        "reason": "由 raw form_data.number_format 派生的运行时别名，不是 API root 键。"
+      },
+      {
+        "field_name": "useRichTooltip",
+        "reason": "由 raw form_data.rich_tooltip 派生的运行时别名，不是 API root 键。"
+      },
+      {
+        "field_name": "useAreaProportions",
+        "reason": "由 raw form_data.rose_area_proportion 派生的运行时别名，不是 API root 键。"
+      }
+    ],
+    "backend_response_only_fields": [
+      {
+        "field_name": "queriesData[0].data",
+        "reason": "RoseViz.get_data() 返回的是按 timestamp 分组的对象，不是 root form_data 字段。"
+      }
+    ],
+    "legacy_request_wrapper": [
+      {
+        "field_name": "payload.form_data",
+        "reason": "这是 legacy `/superset/explore_json/` 请求外层包裹字段，不是图表保存态内部的 root form_data 字段。"
+      }
+    ]
+  },
+  "api_usage_guidance": {
+    "high_confidence_required_fields": [
+      "datasource",
+      "viz_type",
+      "granularity_sqla",
+      "metrics"
+    ],
+    "recommended_always_set": [
+      "time_grain_sqla",
+      "time_range",
+      "adhoc_filters",
+      "groupby",
+      "order_desc",
+      "contribution",
+      "row_limit",
+      "number_format",
+      "date_time_format",
+      "rich_tooltip",
+      "rose_area_proportion"
+    ],
+    "api_field_examples": [
+      "granularity_sqla",
+      "time_grain_sqla",
+      "time_range",
+      "metrics",
+      "timeseries_limit_metric",
+      "date_time_format",
+      "rose_area_proportion"
+    ],
+    "avoid_confusion": [
+      "不要把 `rose` 当成标准 chart data API 图表去套 `/api/v1/chart/data` 的 `query_context` 模板。",
+      "不要把运行时 camelCase 名称 `dateTimeFormat`、`numberFormat`、`useRichTooltip`、`useAreaProportions` 写回 root form_data。",
+      "不要把 comparison_type 的展示标签 Difference 错写成后端值；真实 root 值是 `absolute`。",
+      "不要在 time_compare 场景下继续使用开放式 `No filter` 时间范围。"
+    ]
+  }
+}

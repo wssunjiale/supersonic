@@ -1,0 +1,141 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "tree_chart",
+  "display_name": "Tree Chart",
+  "normalized_summary": {
+    "category": "hierarchy",
+    "tags": [
+      "tree",
+      "hierarchy",
+      "structure",
+      "drilldown"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "id",
+        "required": true,
+        "description": "节点ID字段，定义树形图的唯一节点标识。"
+      },
+      {
+        "key": "parent",
+        "required": true,
+        "description": "父节点ID字段，定义节点间的父子关系。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于计算节点的大小/数值。"
+      },
+      {
+        "key": "layout",
+        "required": false,
+        "description": "布局类型（orthogonal/radial），控制树形图的展示布局（正交/径向）。"
+      },
+      {
+        "key": "orient",
+        "required": false,
+        "description": "朝向（LR/RL/TB/BT），控制正交布局的展开方向。"
+      }
+    ],
+    "description_zh": "Tree Chart displays hierarchical data as a tree structure with nodes and branches, supporting orthogonal/radial layout and drill-down interactions.",
+    "visual_shape_zh": "树形图（层级分支型）",
+    "use_cases_zh": [
+      "层级化结构展示（如组织架构、文件目录）",
+      "节点间的父子关系分析",
+      "层级钻取的交互分析"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "tree_chart",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/tree_chart-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/tree_chart-form-data-schema.json",
+      "control-schema": "form-data-schema/tree_chart-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Tree Chart",
+    "viztype": "tree_chart",
+    "详细描述": "Tree Chart displays hierarchical data as a tree structure with nodes and branches, supporting orthogonal/radial layout and drill-down interactions.",
+    "表现形态": "树形图（层级分支型）",
+    "适用场景": [
+      "层级化结构展示（如组织架构、文件目录）",
+      "节点间的父子关系分析",
+      "层级钻取的交互分析"
+    ],
+    "vizKey": "Tree",
+    "pluginCategory": "Hierarchy",
+    "pluginTags": [],
+    "category": "hierarchy",
+    "tags": [
+      "tree",
+      "hierarchy",
+      "structure",
+      "drilldown"
+    ],
+    "关键字段": [
+      {
+        "key": "id",
+        "required": true,
+        "description": "节点ID字段，定义树形图的唯一节点标识。"
+      },
+      {
+        "key": "parent",
+        "required": true,
+        "description": "父节点ID字段，定义节点间的父子关系。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于计算节点的大小/数值。"
+      },
+      {
+        "key": "layout",
+        "required": false,
+        "description": "布局类型（orthogonal/radial），控制树形图的展示布局（正交/径向）。"
+      },
+      {
+        "key": "orient",
+        "required": false,
+        "description": "朝向（LR/RL/TB/BT），控制正交布局的展开方向。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

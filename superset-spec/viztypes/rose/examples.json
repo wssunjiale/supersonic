@@ -1,0 +1,362 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "rose",
+  "display_name": "Nightingale Rose Chart",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "region",
+          "operator": "IN",
+          "comparator": [
+            "East"
+          ]
+        }
+      ]
+    ],
+    "color_scheme": [
+      "SUPERSET_DEFAULT"
+    ],
+    "comparison_type": [
+      "values"
+    ],
+    "contribution": [
+      false
+    ],
+    "date_time_format": [
+      "smart_date"
+    ],
+    "granularity": [
+      "P1D"
+    ],
+    "granularity_sqla": [
+      "order_date"
+    ],
+    "groupby": [
+      [
+        "region"
+      ]
+    ],
+    "limit": [
+      10
+    ],
+    "metrics": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        }
+      ]
+    ],
+    "min_periods": [
+      7
+    ],
+    "number_format": [
+      "SMART_NUMBER"
+    ],
+    "order_desc": [
+      true
+    ],
+    "resample_method": [
+      "asfreq"
+    ],
+    "resample_rule": [
+      "1D"
+    ],
+    "rich_tooltip": [
+      true
+    ],
+    "rolling_periods": [
+      7
+    ],
+    "rolling_type": [
+      "None"
+    ],
+    "rose_area_proportion": [
+      false
+    ],
+    "row_limit": [
+      10000
+    ],
+    "time_compare": [
+      [
+        "1 year"
+      ]
+    ],
+    "time_grain_sqla": [
+      "P1D"
+    ],
+    "time_range": [
+      "No filter"
+    ],
+    "timeseries_limit_metric": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "sales"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(sales)"
+      }
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "rose",
+      "granularity_sqla": "<time_column>",
+      "time_grain_sqla": "P1D",
+      "time_range": "No filter",
+      "metrics": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        }
+      ],
+      "groupby": [],
+      "adhoc_filters": [],
+      "order_desc": true
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "rose",
+      "granularity": "one day",
+      "granularity_sqla": "<time_column>",
+      "time_grain_sqla": "P1D",
+      "time_range": "No filter",
+      "metrics": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        }
+      ],
+      "adhoc_filters": [],
+      "groupby": [],
+      "limit": null,
+      "timeseries_limit_metric": null,
+      "order_desc": true,
+      "contribution": false,
+      "row_limit": 10000,
+      "color_scheme": "<categoricalSchemeRegistry.defaultKey>",
+      "number_format": "SMART_NUMBER",
+      "date_time_format": "smart_date",
+      "rich_tooltip": true,
+      "rose_area_proportion": false,
+      "rolling_type": "None",
+      "rolling_periods": null,
+      "min_periods": null,
+      "time_compare": null,
+      "comparison_type": "values",
+      "resample_rule": null,
+      "resample_method": null
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "rose",
+      "granularity": "<copied_from_saved_chart>",
+      "granularity_sqla": "<copied_from_saved_chart>",
+      "time_grain_sqla": "<copied_from_saved_chart>",
+      "time_range": "<copied_from_saved_chart>",
+      "metrics": "<copied_from_saved_chart>",
+      "groupby": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "limit": "<copied_from_saved_chart>",
+      "timeseries_limit_metric": "<copied_from_saved_chart>",
+      "order_desc": "<copied_from_saved_chart>",
+      "contribution": "<copied_from_saved_chart>",
+      "row_limit": "<copied_from_saved_chart>",
+      "number_format": "<copied_from_saved_chart>",
+      "date_time_format": "<copied_from_saved_chart>",
+      "rich_tooltip": "<copied_from_saved_chart>",
+      "rose_area_proportion": "<copied_from_saved_chart>",
+      "rolling_type": "<copied_from_saved_chart>",
+      "rolling_periods": "<copied_from_saved_chart>",
+      "min_periods": "<copied_from_saved_chart>",
+      "time_compare": "<copied_from_saved_chart>",
+      "comparison_type": "<copied_from_saved_chart>",
+      "resample_rule": "<copied_from_saved_chart>",
+      "resample_method": "<copied_from_saved_chart>",
+      "extra_form_data": {
+        "time_range": "Last 30 days",
+        "time_grain_sqla": "P1D",
+        "filters": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_rose_legacy": true,
+        "recommended": true,
+        "sample_data": "Last 30 days",
+        "effect": "覆盖保存态图表的时间范围。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_rose_legacy": true,
+        "recommended": true,
+        "sample_data": "P1D",
+        "effect": "覆盖时间粒度。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_rose_legacy": true,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "覆盖 SQLA 时间列；属于高影响字段，只在确认保存态图表仍是同一时间列语义时使用。",
+        "source": "superset/constants.py + QueryFormData.ts"
+      },
+      {
+        "field_name": "granularity",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_rose_legacy": true,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "覆盖 legacy 时间粒度字段；对 Druid 等 datasource 更相关。",
+        "source": "superset/constants.py + QueryFormData.ts"
+      },
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_rose_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters；后端会并入额外过滤条件。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_rose_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会标记为 extra 并并入查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_rose_legacy": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；Rose 默认不直接消费它。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "relative_start",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_rose_legacy": true,
+        "recommended": false,
+        "sample_data": "now",
+        "effect": "写入 query extras 的相对开始时间。",
+        "source": "superset/charts/schemas.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "relative_end",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_rose_legacy": true,
+        "recommended": false,
+        "sample_data": "today",
+        "effect": "写入 query extras 的相对结束时间。",
+        "source": "superset/charts/schemas.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "time_compare",
+        "data_type": "string | array[string]",
+        "behavior": "override",
+        "safe_for_rose_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "1 year"
+        ],
+        "effect": "frontend 类型声明存在，但后端 whitelist 未将其列为高置信 override。Rose 的真正 time_compare 逻辑是直接读取 root form_data。",
+        "source": "QueryFormData.ts + query/constants.ts + superset/viz.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "rose",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/rose-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/rose-form-data-schema.json",
+      "control-schema": "form-data-schema/rose-schema.json"
+    }
+  }
+}

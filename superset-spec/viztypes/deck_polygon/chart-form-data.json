@@ -1,0 +1,810 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "deck_polygon",
+  "display_name": "deck.gl Polygon",
+  "source_kind": "schema_file",
+  "normalized_chart_form_data": {
+    "required_root_fields": [
+      "datasource",
+      "fill_color_picker",
+      "line_column",
+      "line_type",
+      "point_radius_fixed",
+      "stroke_color_picker",
+      "viz_type"
+    ],
+    "optional_root_fields": [
+      "adhoc_filters",
+      "autozoom",
+      "break_points",
+      "cache_timeout",
+      "color_breakpoints",
+      "color_scheme_type",
+      "custom_params",
+      "deafult_breakpoint_color",
+      "extra_form_data",
+      "extruded",
+      "filled",
+      "filter_nulls",
+      "granularity_sqla",
+      "js_columns",
+      "js_data_mutator",
+      "js_onclick_href",
+      "js_tooltip",
+      "legend_format",
+      "legend_position",
+      "line_width",
+      "line_width_unit",
+      "linear_color_scheme",
+      "mapbox_style",
+      "metric",
+      "multiplier",
+      "num_buckets",
+      "opacity",
+      "reverse_long_lat",
+      "row_limit",
+      "slice_id",
+      "stroked",
+      "time_grain_sqla",
+      "time_range",
+      "url_params",
+      "viewport"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "autozoom",
+      "color_scheme_type",
+      "datasource",
+      "extruded",
+      "fill_color_picker",
+      "filled",
+      "line_column",
+      "line_type",
+      "line_width",
+      "line_width_unit",
+      "mapbox_style",
+      "metric",
+      "multiplier",
+      "opacity",
+      "point_radius_fixed",
+      "stroke_color_picker",
+      "stroked",
+      "viewport",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "autozoom",
+      "break_points",
+      "color_breakpoints",
+      "color_scheme_type",
+      "datasource",
+      "deafult_breakpoint_color",
+      "extruded",
+      "fill_color_picker",
+      "filled",
+      "filter_nulls",
+      "js_columns",
+      "js_data_mutator",
+      "js_onclick_href",
+      "js_tooltip",
+      "legend_format",
+      "legend_position",
+      "line_column",
+      "line_type",
+      "line_width",
+      "line_width_unit",
+      "linear_color_scheme",
+      "mapbox_style",
+      "metric",
+      "multiplier",
+      "num_buckets",
+      "opacity",
+      "point_radius_fixed",
+      "reverse_long_lat",
+      "row_limit",
+      "stroke_color_picker",
+      "stroked",
+      "viewport",
+      "viz_type"
+    ],
+    "fallback_template_seed": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "deck_polygon",
+      "fill_color_picker": null,
+      "line_column": "<dimension_column_or_list>",
+      "line_type": null,
+      "point_radius_fixed": null,
+      "stroke_color_picker": null,
+      "adhoc_filters": [],
+      "time_range": "No filter"
+    }
+  },
+  "original_chart_form_data_schema": {
+    "viz_type": "deck_polygon",
+    "display_name": "deck.gl Polygon",
+    "purpose": "用于调用 API 创建或保存 deck.gl Polygon 时填写的 form_data 模板",
+    "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/deck_polygon-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Polygon/controlPanel.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Polygon/index.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Polygon/Polygon.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/factory.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/common.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/Shared_DeckGL.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/sharedDndControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/controls.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utils.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utils/crossFiltersDataMask.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-demo/storybook/stories/plugins/legacy-preset-chart-deckgl/Polygon/payload.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-demo/storybook/stories/plugins/legacy-preset-chart-deckgl/Polygon/Polygon.stories.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/QueryFormData.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+      "D:/vsx/sources/superset-6.0.0/superset/views/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/viz.py"
+    ],
+    "notes": [
+      "deck_polygon 是 legacy 图，metadata 明确声明 `useLegacyApi=true`，真实请求路径仍是 `/superset/explore_json/`。",
+      "Explore 导出 form_data 时走 `getFormDataFromControls()`，它按 control name 原样写入 root form_data。API 根层必须使用 `line_column`、`line_type`、`point_radius_fixed`、`color_scheme_type`、`fill_color_picker` 等原始键名。",
+      "deck_polygon 没有专属前端 buildQuery。ChartClient.ts 对它会退回 `() => formData`，也就是说，API 层真正应该构造的是原始 root `form_data`，然后由 legacy `/superset/explore_json/` 包装成 `{ form_data: ... }`。",
+      "`metric` 在当前图不是全局必填，因为 controlPanel 显式移除了它的非空校验；但在 `linear_palette`、`color_breakpoints`、默认 tooltip、legend 等分支中，它会变成条件必填。",
+      "`point_radius_fixed` 在当前图是实用意义上的高置信必填。虽然 `DeckPolygon.query_obj()` 会在缺失时回退内部默认值，但 `DeckPolygon.get_properties()` 会直接索引 `form_data['point_radius_fixed']`。",
+      "`fill_color_picker` 和 `stroke_color_picker` 虽然只有 fixed-color 模式可见，但 `Polygon.tsx` 运行时会直接读取它们。规范模板应显式携带这两个对象。",
+      "storybook payload 证明当前图的 root form_data 常见形状还可能带 `granularity_sqla`、`time_grain_sqla`、`time_range`、`table_filter`、`toggle_polygons`、`filters`、`where`、`having`。这些不属于当前 controlPanel 正式字段，但对旧保存态和兼容逻辑有参考价值。"
+    ],
+    "naming_and_pipeline": {
+      "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写成 form_data[name]，不会自动把 snake_case 改成 camelCase。",
+      "api_form_data_to_backend_request": "ChartClient.ts 在 `useLegacyApi=true` 时，把 `buildQuery(formData)` 包成 `{ form_data }` POST 到 `/superset/explore_json/`；deck_polygon 没有专属 buildQuery，因此等价于直接发送原始 form_data。",
+      "backend_form_data_normalization": "`explore_json()` 会先补 `datasource`，再执行 `convert_legacy_filters_into_adhoc(form_data)` 与 `merge_extra_filters(form_data)`。",
+      "backend_form_data_to_query_obj": "`DeckPolygon.query_obj()` 先设置 `self.elevation = point_radius_fixed or { type:'fix', value:500 }`，再复用 `DeckPathViz.query_obj()`。真正决定查询形状的是 `DeckPolygon.get_metrics()`：它会把 `metric` 和可选的 metric-based elevation 一并纳入 metrics。",
+      "standardized_control_shift": "`formDataOverrides.metric = getStandardizedControls().shiftMetric()` 只影响图表切换时 standardized controls 的 metric 迁移，不改变最终 API root 键名；真正提交给 API 的字段仍然叫 `metric`。",
+      "runtime_chart_props": "`transformProps.ts` 直接把 `rawFormData` 透传成 runtime `formData`，把 `queriesData[0]` 透传成 runtime `payload`，并把 `viewport` 与 `width`/`height` 合并。"
+    },
+    "global_required_fields": {
+      "datasource": {
+        "data_type": "string",
+        "required": true,
+        "sample_data": "<dataset_id>__table",
+        "source": "explore_json() + datasourceAndVizType hidden control"
+      },
+      "viz_type": {
+        "data_type": "string",
+        "required": true,
+        "fixed_value": "deck_polygon",
+        "source": "Polygon/index.ts + VizType.DeckPolygon"
+      },
+      "line_column": {
+        "data_type": "string | object",
+        "required": true,
+        "sample_data": "contour",
+        "source": "dndLineColumn + dndEntityControl validator + DeckPathViz.query_obj() + DeckPathViz.get_properties()"
+      },
+      "line_type": {
+        "data_type": "string",
+        "required": true,
+        "sample_data": "json",
+        "source": "Polygon Query section + DeckPathViz.deser_map"
+      },
+      "fill_color_picker": {
+        "data_type": "object",
+        "required": true,
+        "sample_data": {
+          "r": 0,
+          "g": 122,
+          "b": 135,
+          "a": 1
+        },
+        "source": "Shared_DeckGL fillColorPicker + Polygon.tsx direct property access"
+      },
+      "stroke_color_picker": {
+        "data_type": "object",
+        "required": true,
+        "sample_data": {
+          "r": 0,
+          "g": 122,
+          "b": 135,
+          "a": 1
+        },
+        "source": "Shared_DeckGL strokeColorPicker + Polygon.tsx direct property access"
+      },
+      "point_radius_fixed": {
+        "data_type": "object",
+        "required": true,
+        "sample_data": {
+          "type": "fix",
+          "value": 1000
+        },
+        "source": "Polygon Query section + DeckPolygon.get_properties()",
+        "notes": "当前图标签虽为 `Elevation`，但 API 根层字段名仍然是 `point_radius_fixed`。"
+      }
+    },
+    "global_optional_fields": {
+      "adhoc_filters": {
+        "data_type": "array[object]",
+        "required": false,
+        "sample_data": [],
+        "source": "Query section"
+      },
+      "metric": {
+        "data_type": "string | object | null",
+        "required": false,
+        "sample_data": "count",
+        "source": "Query section + formDataOverrides.metric",
+        "notes": "当前图移除了 `metric` 的非空校验。若需要按指标着色、显示 legend、默认 tooltip 或同时传入 metric-based elevation，请显式提供。"
+      },
+      "row_limit": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 10000,
+        "source": "Query section"
+      },
+      "reverse_long_lat": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": false,
+        "source": "Query section"
+      },
+      "filter_nulls": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": true,
+        "source": "Query section",
+        "notes": "为 true 时，后端会自动补 `line_column IS NOT NULL` 过滤。"
+      },
+      "mapbox_style": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+        "source": "Map section"
+      },
+      "viewport": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {
+          "longitude": 6.85236157047845,
+          "latitude": 31.222656842808707,
+          "zoom": 1,
+          "bearing": 0,
+          "pitch": 0
+        },
+        "source": "Map section"
+      },
+      "autozoom": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": true,
+        "source": "Map section"
+      },
+      "color_scheme_type": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "linear_palette",
+        "source": "Polygon Settings section"
+      },
+      "linear_color_scheme": {
+        "data_type": "string | array[string]",
+        "required": false,
+        "sample_data": "blue_white_yellow",
+        "source": "Polygon Settings section"
+      },
+      "deafult_breakpoint_color": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {
+          "r": 158,
+          "g": 158,
+          "b": 158,
+          "a": 1
+        },
+        "source": "Polygon Settings section"
+      },
+      "color_breakpoints": {
+        "data_type": "array[ColorBreakpointType]",
+        "required": false,
+        "sample_data": [
+          {
+            "minValue": 0,
+            "maxValue": 100,
+            "color": {
+              "r": 255,
+              "g": 0,
+              "b": 0,
+              "a": 1
+            }
+          }
+        ],
+        "source": "Polygon Settings section"
+      },
+      "filled": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": true,
+        "source": "Polygon Settings section"
+      },
+      "stroked": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": false,
+        "source": "Polygon Settings section"
+      },
+      "extruded": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": true,
+        "source": "Polygon Settings section"
+      },
+      "multiplier": {
+        "data_type": "number | string",
+        "required": false,
+        "sample_data": 1,
+        "source": "Polygon Settings section"
+      },
+      "line_width": {
+        "data_type": "integer | string",
+        "required": false,
+        "sample_data": 10,
+        "source": "Polygon Settings section"
+      },
+      "line_width_unit": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "pixels",
+        "source": "Polygon Settings section"
+      },
+      "opacity": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 80,
+        "source": "Polygon Settings section"
+      },
+      "num_buckets": {
+        "data_type": "string | integer",
+        "required": false,
+        "sample_data": 5,
+        "source": "Polygon Settings section"
+      },
+      "break_points": {
+        "data_type": "array[string]",
+        "required": false,
+        "sample_data": [],
+        "source": "Polygon Settings section"
+      },
+      "legend_position": {
+        "data_type": "string | null",
+        "required": false,
+        "sample_data": "tr",
+        "source": "Polygon Settings section"
+      },
+      "legend_format": {
+        "data_type": "string | null",
+        "required": false,
+        "sample_data": null,
+        "source": "Polygon Settings section"
+      },
+      "js_columns": {
+        "data_type": "array[string | object]",
+        "required": false,
+        "sample_data": [],
+        "source": "Advanced section"
+      },
+      "js_data_mutator": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "data => data",
+        "source": "Advanced section"
+      },
+      "js_tooltip": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "o => `<div>${o.object.elevation}</div>`",
+        "source": "Advanced section"
+      },
+      "js_onclick_href": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "o => `https://example.com/?name=${o.object.name}`",
+        "source": "Advanced section"
+      },
+      "granularity_sqla": {
+        "data_type": "string | null",
+        "required": false,
+        "sample_data": null,
+        "source": "storybook payload + BaseViz hidden time form_data fields",
+        "notes": "当前 controlPanel 未正式暴露；若上层调用方手工传入，后端会沿 BaseViz 时间查询路径消费它。"
+      },
+      "time_grain_sqla": {
+        "data_type": "string | null",
+        "required": false,
+        "sample_data": null,
+        "source": "controlOverrides.time_grain_sqla + DeckPathViz.query_obj()",
+        "notes": "当该字段有值时，`DeckPathViz.query_obj()` 会把 `self.is_timeseries` 置为 true。"
+      },
+      "time_range": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "Last 30 days",
+        "source": "storybook payload + BaseViz hidden time form_data fields"
+      },
+      "slice_id": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 0,
+        "source": "datasourceAndVizType hidden control",
+        "notes": "新建图表时通常省略；编辑已存在图表时由服务端或上层调用方提供。"
+      },
+      "cache_timeout": {
+        "data_type": "integer | null",
+        "required": false,
+        "sample_data": null,
+        "source": "datasourceAndVizType hidden control"
+      },
+      "url_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "QueryFormData"
+      },
+      "custom_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "QueryFormData"
+      },
+      "extra_form_data": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "utils.merge_extra_form_data()",
+        "notes": "虽然不属于 deck_polygon controlPanel 正式字段，但 legacy explore_json 路径会消费它。"
+      }
+    },
+    "minimal_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "deck_polygon",
+      "line_column": "contour",
+      "line_type": "json",
+      "metric": null,
+      "point_radius_fixed": {
+        "type": "fix",
+        "value": 1000
+      },
+      "adhoc_filters": [],
+      "mapbox_style": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+      "viewport": {
+        "longitude": 6.85236157047845,
+        "latitude": 31.222656842808707,
+        "zoom": 1,
+        "bearing": 0,
+        "pitch": 0
+      },
+      "autozoom": true,
+      "color_scheme_type": "fixed_color",
+      "fill_color_picker": {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      },
+      "stroke_color_picker": {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      },
+      "filled": true,
+      "stroked": false,
+      "extruded": true,
+      "multiplier": 1,
+      "line_width": 1,
+      "line_width_unit": "pixels",
+      "opacity": 80
+    },
+    "recommended_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "deck_polygon",
+      "line_column": "contour",
+      "line_type": "json",
+      "adhoc_filters": [],
+      "metric": "count",
+      "point_radius_fixed": {
+        "type": "fix",
+        "value": 1000
+      },
+      "row_limit": 10000,
+      "reverse_long_lat": false,
+      "filter_nulls": true,
+      "mapbox_style": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+      "viewport": {
+        "longitude": 6.85236157047845,
+        "latitude": 31.222656842808707,
+        "zoom": 1,
+        "bearing": 0,
+        "pitch": 0
+      },
+      "autozoom": true,
+      "color_scheme_type": "linear_palette",
+      "fill_color_picker": {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      },
+      "stroke_color_picker": {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      },
+      "linear_color_scheme": "blue_white_yellow",
+      "deafult_breakpoint_color": {
+        "r": 158,
+        "g": 158,
+        "b": 158,
+        "a": 1
+      },
+      "color_breakpoints": [],
+      "filled": true,
+      "stroked": false,
+      "extruded": true,
+      "multiplier": 1,
+      "line_width": 10,
+      "line_width_unit": "pixels",
+      "opacity": 80,
+      "num_buckets": 5,
+      "break_points": [],
+      "legend_position": "tr",
+      "legend_format": null,
+      "js_columns": [],
+      "js_data_mutator": "",
+      "js_tooltip": "",
+      "js_onclick_href": ""
+    },
+    "conditional_blocks": {
+      "fixed_color_mode": {
+        "condition": "只需要固定填充色，不按指标着色时",
+        "fields": {
+          "metric": null,
+          "color_scheme_type": "fixed_color",
+          "fill_color_picker": {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          },
+          "stroke_color_picker": {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          }
+        }
+      },
+      "metric_coloring_linear_palette": {
+        "condition": "需要按指标用顺序色带着色 polygon 时",
+        "fields": {
+          "metric": "count",
+          "color_scheme_type": "linear_palette",
+          "linear_color_scheme": "blue_white_yellow",
+          "num_buckets": 5,
+          "break_points": [],
+          "legend_position": "tr"
+        }
+      },
+      "color_breakpoints_mode": {
+        "condition": "需要自定义颜色断点时",
+        "fields": {
+          "metric": "count",
+          "color_scheme_type": "color_breakpoints",
+          "deafult_breakpoint_color": {
+            "r": 158,
+            "g": 158,
+            "b": 158,
+            "a": 1
+          },
+          "color_breakpoints": [
+            {
+              "minValue": 0,
+              "maxValue": 100,
+              "color": {
+                "r": 255,
+                "g": 0,
+                "b": 0,
+                "a": 1
+              }
+            }
+          ]
+        }
+      },
+      "metric_based_elevation": {
+        "condition": "需要用另一个指标驱动 polygon 高度时",
+        "fields": {
+          "point_radius_fixed": {
+            "type": "metric",
+            "value": "sum__population"
+          },
+          "multiplier": 1
+        },
+        "notes": "此时 `DeckPolygon.get_metrics()` 会把 `point_radius_fixed.value` 也纳入查询指标。"
+      },
+      "manual_break_points": {
+        "condition": "希望手工指定 legend / color bucket 边界时",
+        "fields": {
+          "break_points": [
+            "0",
+            "100",
+            "200",
+            "300"
+          ],
+          "num_buckets": 3
+        },
+        "notes": "若 `break_points` 为空，源码会按 `num_buckets` 自动推导。"
+      },
+      "geohash_or_polyline_polygon_encoding": {
+        "condition": "polygon 列不是 JSON，而是 geohash 或 polyline 编码时",
+        "fields": {
+          "line_type": "geohash",
+          "line_column": "geohash_polygon"
+        },
+        "notes": "controlPanel 正式支持 `geohash`。若使用 `polyline`，只需把 `line_type` 改成 `polyline`。"
+      },
+      "hidden_timeseries_mode": {
+        "condition": "数据集含时间列且需要手工沿用隐藏的时间查询路径时",
+        "fields": {
+          "granularity_sqla": "ds",
+          "time_grain_sqla": "P1D",
+          "time_range": "Last 30 days"
+        },
+        "notes": "这不是当前 controlPanel 正式字段，但 `DeckPathViz.query_obj()` 明确会读取 `time_grain_sqla`。"
+      }
+    },
+    "runtime_only_or_non_template_fields": {
+      "runtime_props_generated_by_transformProps": [
+        {
+          "field_name": "payload",
+          "reason": "这是运行时从 `queriesData[0]` 注入的对象，不是 API root form_data 字段。"
+        },
+        {
+          "field_name": "formData",
+          "reason": "这是 runtime 对 `rawFormData` 的整体透传容器，不是额外的 API root 字段。"
+        },
+        {
+          "field_name": "viewport.width",
+          "reason": "运行时由图表尺寸补入，不需要写到 root form_data。"
+        },
+        {
+          "field_name": "viewport.height",
+          "reason": "运行时由图表尺寸补入，不需要写到 root form_data。"
+        },
+        {
+          "field_name": "emitCrossFilters",
+          "reason": "这是 ChartProps/hook 层运行时能力，不是 API root 字段。"
+        },
+        {
+          "field_name": "filterState",
+          "reason": "这是 runtime 交互状态，不是 API root 字段。"
+        }
+      ],
+      "backend_response_only_fields": [
+        {
+          "field_name": "queriesData[0].data.features[*].polygon",
+          "reason": "这是后端 `DeckPathViz.get_properties()` 反序列化后的 polygon 顶点数组，不是 root form_data 字段。"
+        },
+        {
+          "field_name": "queriesData[0].data.features[*].__timestamp",
+          "reason": "这是后端补入的运行时时间戳字段，不是 root form_data 字段。"
+        },
+        {
+          "field_name": "queriesData[0].data.features[*].elevation",
+          "reason": "这是后端根据 `point_radius_fixed` 写入的运行时高度值，不是 root form_data 字段。"
+        },
+        {
+          "field_name": "queriesData[0].data.features[*].extraProps",
+          "reason": "这是后端根据 `js_columns` 生成的附加属性容器，不是 root form_data 字段。"
+        },
+        {
+          "field_name": "queriesData[0].data.mapboxApiKey",
+          "reason": "这是后端 payload 附带的运行时地图密钥，不是 root form_data 字段。"
+        },
+        {
+          "field_name": "queriesData[0].data.metricLabels",
+          "reason": "这是后端返回的指标标签列表，不是 root form_data 字段。"
+        }
+      ],
+      "legacy_hidden_or_non_canonical_fields": [
+        {
+          "field_name": "table_filter",
+          "reason": "`commonLayerProps()` 仍会读取它决定点击时是否走 table filter，但当前 Polygon controlPanel 没有正式暴露该字段。"
+        },
+        {
+          "field_name": "toggle_polygons",
+          "reason": "storybook payload 中出现过，但当前 `Polygon.tsx` / `controlPanel.ts` 没有正式暴露它。"
+        },
+        {
+          "field_name": "filters",
+          "reason": "这不是当前 controlPanel 正式字段。它可能在旧保存态或 legacy 兼容处理中出现，但当前创建模板应优先使用 `adhoc_filters`。"
+        },
+        {
+          "field_name": "where",
+          "reason": "legacy 兼容字段，不是当前 deck_polygon controlPanel 正式字段。"
+        },
+        {
+          "field_name": "having",
+          "reason": "legacy 兼容字段，不是当前 deck_polygon controlPanel 正式字段。"
+        },
+        {
+          "field_name": "payload.form_data",
+          "reason": "这是 legacy `/superset/explore_json/` 请求的外层包裹字段，不是图表保存态内部的 root form_data 字段。"
+        }
+      ]
+    },
+    "api_usage_guidance": {
+      "high_confidence_required_fields": [
+        "datasource",
+        "viz_type",
+        "line_column",
+        "line_type",
+        "fill_color_picker",
+        "stroke_color_picker",
+        "point_radius_fixed"
+      ],
+      "conditionally_required_fields": {
+        "metric": "当 `color_scheme_type` 为 `linear_palette` 或 `color_breakpoints`、需要显示 legend、使用默认 tooltip，或与 metric-based elevation 组合时",
+        "linear_color_scheme": "当 `color_scheme_type='linear_palette'` 时",
+        "color_breakpoints": "当 `color_scheme_type='color_breakpoints'` 时",
+        "deafult_breakpoint_color": "当 `color_scheme_type='color_breakpoints'` 且需要为未命中断点的值提供回退颜色时"
+      },
+      "recommended_always_set": [
+        "adhoc_filters",
+        "filter_nulls",
+        "row_limit",
+        "mapbox_style",
+        "viewport",
+        "autozoom",
+        "color_scheme_type",
+        "filled",
+        "stroked",
+        "extruded",
+        "multiplier",
+        "line_width",
+        "line_width_unit",
+        "opacity"
+      ],
+      "api_field_examples": [
+        "line_column",
+        "line_type",
+        "metric",
+        "point_radius_fixed",
+        "color_scheme_type",
+        "linear_color_scheme",
+        "color_breakpoints",
+        "break_points",
+        "line_width",
+        "line_width_unit",
+        "opacity"
+      ],
+      "avoid_confusion": [
+        "不要把 deck_polygon 当成标准 chart data API 图表去套 `/api/v1/chart/data` 的 `query_context` 模板；当前图真实入口是 legacy `/superset/explore_json/`。",
+        "`line_column` 这里传的是列名，不是 polygon 顶点数组本身。",
+        "`point_radius_fixed` 虽然 UI 标签显示为 `Elevation`，但根层字段名必须仍然写 `point_radius_fixed`。",
+        "`deafult_breakpoint_color` 的字段名拼写来自源码，不能擅自改成 `default_breakpoint_color`。",
+        "`metric` 不是全局必填，但如果你把 `color_scheme_type` 设成 `linear_palette` 或 `color_breakpoints`，又不传 `metric`，前端会退回 fixed fill color 且 legend 不显示。",
+        "`table_filter`、`toggle_polygons`、`filters`、`where`、`having` 不是当前 controlPanel 的正式创建字段。"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "deck_polygon",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/deck_polygon-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/deck_polygon-form-data-schema.json",
+      "control-schema": "form-data-schema/deck_polygon-schema.json"
+    }
+  }
+}

@@ -2,52 +2,26 @@ package com.tencent.supersonic.headless.server.service.impl;
 
 import com.google.common.collect.Lists;
 import com.tencent.supersonic.auth.api.authentication.service.UserService;
-import com.tencent.supersonic.common.pojo.DataEvent;
-import com.tencent.supersonic.common.pojo.DataItem;
-import com.tencent.supersonic.common.pojo.ItemDateResp;
-import com.tencent.supersonic.common.pojo.ModelRela;
-import com.tencent.supersonic.common.pojo.User;
+import com.tencent.supersonic.common.pojo.*;
 import com.tencent.supersonic.common.pojo.enums.AuthType;
 import com.tencent.supersonic.common.pojo.enums.EventType;
 import com.tencent.supersonic.common.pojo.enums.StatusEnum;
 import com.tencent.supersonic.common.pojo.enums.TypeEnums;
 import com.tencent.supersonic.common.pojo.exception.InvalidArgumentException;
 import com.tencent.supersonic.common.util.JsonUtil;
-import com.tencent.supersonic.headless.api.pojo.DBColumn;
-import com.tencent.supersonic.headless.api.pojo.DbSchema;
-import com.tencent.supersonic.headless.api.pojo.Dimension;
-import com.tencent.supersonic.headless.api.pojo.Identify;
-import com.tencent.supersonic.headless.api.pojo.ItemDateFilter;
-import com.tencent.supersonic.headless.api.pojo.Measure;
-import com.tencent.supersonic.headless.api.pojo.MetaFilter;
-import com.tencent.supersonic.headless.api.pojo.ModelSchema;
-import com.tencent.supersonic.headless.api.pojo.request.DateInfoReq;
-import com.tencent.supersonic.headless.api.pojo.request.DimensionReq;
-import com.tencent.supersonic.headless.api.pojo.request.FieldRemovedReq;
-import com.tencent.supersonic.headless.api.pojo.request.MetaBatchReq;
-import com.tencent.supersonic.headless.api.pojo.request.MetricReq;
-import com.tencent.supersonic.headless.api.pojo.request.ModelBuildReq;
-import com.tencent.supersonic.headless.api.pojo.request.ModelReq;
-import com.tencent.supersonic.headless.api.pojo.response.DataSetResp;
-import com.tencent.supersonic.headless.api.pojo.response.DatabaseResp;
-import com.tencent.supersonic.headless.api.pojo.response.DimensionResp;
-import com.tencent.supersonic.headless.api.pojo.response.DomainResp;
-import com.tencent.supersonic.headless.api.pojo.response.MetricResp;
-import com.tencent.supersonic.headless.api.pojo.response.ModelResp;
-import com.tencent.supersonic.headless.api.pojo.response.UnAvailableItemResp;
+import com.tencent.supersonic.headless.api.pojo.*;
+import com.tencent.supersonic.headless.api.pojo.enums.DimensionType;
+import com.tencent.supersonic.headless.api.pojo.request.*;
+import com.tencent.supersonic.headless.api.pojo.response.*;
 import com.tencent.supersonic.headless.server.modeller.SemanticModeller;
 import com.tencent.supersonic.headless.server.persistence.dataobject.DateInfoDO;
+import com.tencent.supersonic.headless.server.persistence.dataobject.DimensionDO;
+import com.tencent.supersonic.headless.server.persistence.dataobject.MetricDO;
 import com.tencent.supersonic.headless.server.persistence.dataobject.ModelDO;
 import com.tencent.supersonic.headless.server.persistence.repository.DateInfoRepository;
 import com.tencent.supersonic.headless.server.persistence.repository.ModelRepository;
 import com.tencent.supersonic.headless.server.pojo.ModelFilter;
-import com.tencent.supersonic.headless.server.service.DataSetService;
-import com.tencent.supersonic.headless.server.service.DatabaseService;
-import com.tencent.supersonic.headless.server.service.DimensionService;
-import com.tencent.supersonic.headless.server.service.DomainService;
-import com.tencent.supersonic.headless.server.service.MetricService;
-import com.tencent.supersonic.headless.server.service.ModelRelaService;
-import com.tencent.supersonic.headless.server.service.ModelService;
+import com.tencent.supersonic.headless.server.service.*;
 import com.tencent.supersonic.headless.server.utils.CoreComponentFactory;
 import com.tencent.supersonic.headless.server.utils.ModelConverter;
 import com.tencent.supersonic.headless.server.utils.NameCheckUtils;
@@ -62,13 +36,10 @@ import org.springframework.util.CollectionUtils;
 
 import java.sql.SQLException;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
+
+import static com.tencent.supersonic.common.pojo.DimensionConstants.DIMENSION_TIME_FORMAT;
 
 @Service
 @Slf4j
@@ -120,9 +91,13 @@ public class ModelServiceImpl implements ModelService {
         // checkParams(modelReq);
         ModelDO modelDO = ModelConverter.convert(modelReq, user);
         modelRepository.createModel(modelDO);
-        batchCreateDimension(modelDO, user);
-        batchCreateMetric(modelDO, user);
-        sendEvent(modelDO, EventType.ADD);
+        // create or update dimension
+        List<DimensionReq> dimensionReqs = ModelConverter.convertDimensionList(modelDO);
+        dimensionService.alterDimensionBatch(dimensionReqs, modelDO.getId(), user);
+        // create or update metric
+        List<MetricReq> metricReqs = ModelConverter.convertMetricList(modelDO);
+        metricService.alterMetricBatch(metricReqs, modelDO.getId(), user);
+        sendEvent(modelDO, EventType.ADD, user);
         return ModelConverter.convert(modelDO);
     }
 
@@ -150,9 +125,13 @@ public class ModelServiceImpl implements ModelService {
         ModelDO modelDO = modelRepository.getModelById(modelReq.getId());
         ModelConverter.convert(modelDO, modelReq, user);
         modelRepository.updateModel(modelDO);
-        batchCreateDimension(modelDO, user);
-        batchCreateMetric(modelDO, user);
-        sendEvent(modelDO, EventType.UPDATE);
+        // create or update dimension
+        List<DimensionReq> dimensionReqs = ModelConverter.convertDimensionList(modelDO);
+        dimensionService.alterDimensionBatch(dimensionReqs, modelDO.getId(), user);
+        // create or update metric
+        List<MetricReq> metricReqs = ModelConverter.convertMetricList(modelDO);
+        metricService.alterMetricBatch(metricReqs, modelDO.getId(), user);
+        sendEvent(modelDO, EventType.UPDATE, user);
         return ModelConverter.convert(modelDO);
     }
 
@@ -270,16 +249,6 @@ public class ModelServiceImpl implements ModelService {
         dbSchema.setSql(modelSchemaReq.getSql());
         dbSchema.setDbColumns(dbColumns);
         return dbSchema;
-    }
-
-    private void batchCreateDimension(ModelDO modelDO, User user) throws Exception {
-        List<DimensionReq> dimensionReqs = ModelConverter.convertDimensionList(modelDO);
-        dimensionService.createDimensionBatch(dimensionReqs, user);
-    }
-
-    private void batchCreateMetric(ModelDO datasourceDO, User user) throws Exception {
-        List<MetricReq> metricReqs = ModelConverter.convertMetricList(datasourceDO);
-        metricService.createMetricBatch(metricReqs, user);
     }
 
     private void checkParams(ModelReq modelReq) {
@@ -540,17 +509,108 @@ public class ModelServiceImpl implements ModelService {
             if (StatusEnum.OFFLINE.getCode().equals(metaBatchReq.getStatus())
                     || StatusEnum.DELETED.getCode().equals(metaBatchReq.getStatus())) {
                 metricService.sendMetricEventBatch(Lists.newArrayList(modelDO.getId()),
-                        EventType.DELETE);
+                        EventType.DELETE, user);
                 dimensionService.sendDimensionEventBatch(Lists.newArrayList(modelDO.getId()),
-                        EventType.DELETE);
+                        EventType.DELETE, user);
             } else if (StatusEnum.ONLINE.getCode().equals(metaBatchReq.getStatus())) {
                 metricService.sendMetricEventBatch(Lists.newArrayList(modelDO.getId()),
-                        EventType.ADD);
+                        EventType.ADD, user);
                 dimensionService.sendDimensionEventBatch(Lists.newArrayList(modelDO.getId()),
-                        EventType.ADD);
+                        EventType.ADD, user);
             }
         }).collect(Collectors.toList());
         modelRepository.batchUpdate(modelDOS);
+    }
+
+    @Override
+    public void updateModelByDimAndMetric(Long modelId, List<DimensionReq> dimensionReqList,
+            List<MetricReq> metricReqList, User user) {
+        ModelDO modelDO = getModelDO(modelId);
+        ModelDetail modelDetail = JsonUtil.toObject(modelDO.getModelDetail(), ModelDetail.class);
+        if (!CollectionUtils.isEmpty(dimensionReqList)) {
+            dimensionReqList.forEach(dimensionReq -> {
+                Optional<Dimension> dimOptional = modelDetail.getDimensions().stream().filter(
+                        dimension -> dimension.getBizName().equals(dimensionReq.getBizName()))
+                        .findFirst();
+                String dateFormat = null;
+                if (dimensionReq.getExt().containsKey(DIMENSION_TIME_FORMAT)) {
+                    dateFormat = (String) dimensionReq.getExt().get(DIMENSION_TIME_FORMAT);
+                }
+                if (dimOptional.isPresent()) {
+                    Dimension dimension = dimOptional.get();
+                    dimension.setExpr(dimensionReq.getExpr());
+                    dimension.setName(dimensionReq.getName());
+                    dimension.setType(DimensionType.valueOf(dimensionReq.getType()));
+                    dimension.setDescription(dimensionReq.getDescription());
+                    dimension.setDateFormat(dateFormat);
+                } else {
+                    Dimension dimension = Dimension.builder().name(dimensionReq.getName())
+                            .bizName(dimensionReq.getBizName()).expr(dimensionReq.getExpr())
+                            .type(DimensionType.valueOf(dimensionReq.getType()))
+                            .dateFormat(dateFormat).description(dimensionReq.getDescription())
+                            .build();
+                    modelDetail.getDimensions().add(dimension);
+                }
+            });
+        }
+
+        if (!CollectionUtils.isEmpty(metricReqList)) {
+            // 目前modeltail中的measure
+            Map<String, Measure> mesureMap = modelDetail.getMeasures().stream()
+                    .collect(Collectors.toMap(Measure::getBizName, a -> a, (k1, k2) -> k1));
+            metricReqList.forEach(metricReq -> {
+                if (null != metricReq.getMetricDefineByMeasureParams() && !CollectionUtils
+                        .isEmpty(metricReq.getMetricDefineByMeasureParams().getMeasures())) {
+                    for (Measure alterMeasure : metricReq.getMetricDefineByMeasureParams()
+                            .getMeasures()) {
+                        if (mesureMap.containsKey(alterMeasure.getBizName())) {
+                            Measure measure = mesureMap.get(alterMeasure.getBizName());
+                            BeanUtils.copyProperties(alterMeasure, measure);
+                        } else {
+                            modelDetail.getMeasures().add(alterMeasure);
+                        }
+                    }
+                } else {
+                    modelDetail.getMeasures().clear();
+                }
+            });
+        }
+
+        modelDO.setModelDetail(JsonUtil.toString(modelDetail));
+        modelRepository.updateModel(modelDO);
+    }
+
+    @Override
+    public void deleteModelDetailByDimAndMetric(Long modelId, List<DimensionDO> dimensionList,
+            List<MetricDO> metricReqList) {
+        ModelDO modelDO = getModelDO(modelId);
+        ModelDetail modelDetail = JsonUtil.toObject(modelDO.getModelDetail(), ModelDetail.class);
+        if (!CollectionUtils.isEmpty(dimensionList)) {
+            dimensionList.forEach(dimensionReq -> {
+                Optional<Dimension> dimOptional = modelDetail.getDimensions().stream().filter(
+                        dimension -> dimension.getBizName().equals(dimensionReq.getBizName()))
+                        .findFirst();
+                if (dimOptional.isPresent()) {
+                    Dimension dimension = dimOptional.get();
+                    modelDetail.getDimensions().remove(dimension);
+                }
+            });
+        }
+
+        if (!CollectionUtils.isEmpty(metricReqList)) {
+            metricReqList.forEach(metricReq -> {
+                Optional<Measure> metricOptional = modelDetail.getMeasures().stream()
+                        .filter(measure -> measure.getBizName().equals(metricReq.getBizName()))
+                        .findFirst();
+                if (metricOptional.isPresent()) {
+                    Measure measure = metricOptional.get();
+                    modelDetail.getMeasures().remove(measure);
+                }
+            });
+        }
+
+        modelDO.setModelDetail(JsonUtil.toString(modelDetail));
+        modelRepository.updateModel(modelDO);
     }
 
     protected ModelDO getModelDO(Long id) {
@@ -618,9 +678,10 @@ public class ModelServiceImpl implements ModelService {
         return false;
     }
 
-    private void sendEvent(ModelDO modelDO, EventType eventType) {
+    private void sendEvent(ModelDO modelDO, EventType eventType, User user) {
         DataItem dataItem = getDataItem(modelDO);
-        eventPublisher.publishEvent(new DataEvent(this, Lists.newArrayList(dataItem), eventType));
+        eventPublisher.publishEvent(
+                new DataEvent(this, Lists.newArrayList(dataItem), eventType, user.getName()));
     }
 
     private DataItem getDataItem(ModelDO modelDO) {

@@ -5,11 +5,11 @@ import com.tencent.supersonic.headless.api.pojo.DBColumn;
 import com.tencent.supersonic.headless.api.pojo.enums.FieldType;
 import com.tencent.supersonic.headless.core.pojo.ConnectInfo;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 
 @Slf4j
@@ -147,17 +147,20 @@ public abstract class BaseDbAdaptor implements DbAdaptor {
         String url = connectionInfo.getUrl().toLowerCase();
 
         // 设置通用属性
-        properties.setProperty("user", connectionInfo.getUserName());
+        String userName = Optional.ofNullable(connectionInfo.getUserName()).orElse("");
+        properties.setProperty("user", userName);
 
+
+        String password = Optional.ofNullable(connectionInfo.getPassword()).orElse("");
         // 针对 Presto 和 Trino ssl=false 的情况，不需要设置密码
         if (url.startsWith("jdbc:presto") || url.startsWith("jdbc:trino")) {
             // 检查是否需要处理 SSL
             if (!url.contains("ssl=false")) {
-                properties.setProperty("password", connectionInfo.getPassword());
+                properties.setProperty("password", password);
             }
         } else {
             // 针对其他数据库类型
-            properties.setProperty("password", connectionInfo.getPassword());
+            properties.setProperty("password", password);
         }
 
         return properties;

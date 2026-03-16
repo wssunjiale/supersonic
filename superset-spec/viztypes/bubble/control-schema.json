@@ -1,0 +1,2155 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "bubble",
+  "display_name": "Bubble Chart (legacy)",
+  "source_kind": "schema_file",
+  "normalized_control_schema": {
+    "field_category_order": [
+      "Query",
+      "Chart Options",
+      "X Axis",
+      "Y Axis"
+    ],
+    "field_occurrences": [
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "series",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Defines the grouping of entities. Each series is represented by a specific color in the chart.",
+        "data_type": "string | object | null",
+        "sample_data": "state",
+        "original_field": {
+          "field_name": "series",
+          "description": "Defines the grouping of entities. Each series is represented by a specific color in the chart.",
+          "data_type": "string | object | null",
+          "enum_source": "datasource columns",
+          "sample_data": "state",
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "若为空，后端 BubbleViz 会回退成 entity，自行作为 group 字段。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "entity",
+        "runtime_alias": null,
+        "required": true,
+        "embedding": "否",
+        "description": "This defines the element to be plotted on the chart",
+        "data_type": "string | object",
+        "sample_data": "gender",
+        "original_field": {
+          "field_name": "entity",
+          "description": "This defines the element to be plotted on the chart",
+          "data_type": "string | object",
+          "enum_source": "datasource columns",
+          "sample_data": "gender",
+          "required": true,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "前端使用 dndEntityControl，带 validateNonEmpty；后端 BubbleViz.query_obj() 也要求它存在。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "x",
+        "runtime_alias": null,
+        "required": true,
+        "embedding": "否",
+        "description": "The dataset column/metric that returns the values on your chart's x-axis.",
+        "data_type": "string | object",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "num_boys"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(num_boys)"
+        },
+        "original_field": {
+          "field_name": "x",
+          "description": "The dataset column/metric that returns the values on your chart's x-axis.",
+          "data_type": "string | object",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "num_boys"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(num_boys)"
+          },
+          "required": true,
+          "embedding": "否",
+          "default_value": null
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "y",
+        "runtime_alias": null,
+        "required": true,
+        "embedding": "否",
+        "description": "The dataset column/metric that returns the values on your chart's y-axis.",
+        "data_type": "string | object",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "num_girls"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(num_girls)"
+        },
+        "original_field": {
+          "field_name": "y",
+          "description": "The dataset column/metric that returns the values on your chart's y-axis.",
+          "data_type": "string | object",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "num_girls"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(num_girls)"
+          },
+          "required": true,
+          "embedding": "否",
+          "default_value": null
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "adhoc_filters",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "description": "字段标签为 Filters。legacy explore_json 路径会先把 legacy filters 转成 adhoc_filters，再继续处理 extra filters。",
+        "data_type": "array[object]",
+        "sample_data": [
+          {
+            "clause": "WHERE",
+            "subject": "name",
+            "operator": "NOT IN",
+            "comparator": [
+              "TCA",
+              "MNP"
+            ],
+            "expressionType": "SIMPLE"
+          }
+        ],
+        "original_field": {
+          "field_name": "adhoc_filters",
+          "description": "字段标签为 Filters。legacy explore_json 路径会先把 legacy filters 转成 adhoc_filters，再继续处理 extra filters。",
+          "data_type": "array[object]",
+          "enum_source": "dataset columns + saved metrics + 当前 x/y/size 指标",
+          "sample_data": [
+            {
+              "clause": "WHERE",
+              "subject": "name",
+              "operator": "NOT IN",
+              "comparator": [
+                "TCA",
+                "MNP"
+              ],
+              "expressionType": "SIMPLE"
+            }
+          ],
+          "required": false,
+          "embedding": "extra_form_data.append",
+          "default_value": []
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "size",
+        "runtime_alias": null,
+        "required": true,
+        "embedding": "否",
+        "description": "Metric used to calculate bubble size",
+        "data_type": "string | object",
+        "sample_data": "count",
+        "original_field": {
+          "field_name": "size",
+          "description": "Metric used to calculate bubble size",
+          "data_type": "string | object",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": "count",
+          "required": true,
+          "embedding": "否",
+          "default_value": null
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "max_bubble_size",
+        "runtime_alias": "maxBubbleSize",
+        "required": false,
+        "embedding": "否",
+        "description": "Max Bubble Size",
+        "data_type": "string",
+        "sample_data": "50",
+        "original_field": {
+          "field_name": "max_bubble_size",
+          "runtime_alias": "maxBubbleSize",
+          "description": "Max Bubble Size",
+          "data_type": "string",
+          "enum_values": [
+            "5",
+            "10",
+            "15",
+            "25",
+            "50",
+            "75",
+            "100"
+          ],
+          "sample_data": "50",
+          "required": false,
+          "embedding": "否",
+          "default_value": "25"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "limit",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "UI 标签沿用共享控件的 Series limit，但 legacy Bubble 后端会把它直接写成 query_obj.row_limit。",
+        "data_type": "integer | null",
+        "sample_data": 0,
+        "original_field": {
+          "field_name": "limit",
+          "description": "UI 标签沿用共享控件的 Series limit，但 legacy Bubble 后端会把它直接写成 query_obj.row_limit。",
+          "data_type": "integer | null",
+          "enum_values": [
+            5,
+            10,
+            25,
+            50,
+            100,
+            500
+          ],
+          "sample_data": 0,
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "world_bank.py 的官方示例显式写了 limit=0。BubbleViz.query_obj() 不再读取 row_limit。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "color_scheme",
+        "runtime_alias": "colorScheme",
+        "required": false,
+        "embedding": "否",
+        "description": "The color scheme for rendering chart",
+        "data_type": "string",
+        "sample_data": "supersetColors",
+        "original_field": {
+          "field_name": "color_scheme",
+          "runtime_alias": "colorScheme",
+          "description": "The color scheme for rendering chart",
+          "data_type": "string",
+          "enum_source": "categoricalSchemeRegistry.keys()",
+          "sample_data": "supersetColors",
+          "required": false,
+          "embedding": "否",
+          "default_value": "categoricalSchemeRegistry.getDefaultKey()"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "show_legend",
+        "runtime_alias": "showLegend",
+        "required": false,
+        "embedding": "否",
+        "description": "Whether to display the legend (toggles)",
+        "data_type": "boolean",
+        "sample_data": true,
+        "original_field": {
+          "field_name": "show_legend",
+          "runtime_alias": "showLegend",
+          "description": "Whether to display the legend (toggles)",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "X Axis",
+        "field_name": "x_axis_label",
+        "runtime_alias": "xAxisLabel",
+        "required": false,
+        "embedding": "否",
+        "description": "X Axis Label",
+        "data_type": "string",
+        "sample_data": "Boys",
+        "original_field": {
+          "field_name": "x_axis_label",
+          "runtime_alias": "xAxisLabel",
+          "description": "X Axis Label",
+          "data_type": "string",
+          "sample_data": "Boys",
+          "required": false,
+          "embedding": "否",
+          "default_value": ""
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "X Axis",
+        "field_name": "left_margin",
+        "runtime_alias": "leftMargin",
+        "required": false,
+        "embedding": "否",
+        "description": "Left margin, in pixels, allowing for more room for axis labels",
+        "data_type": "string | integer",
+        "sample_data": "auto",
+        "original_field": {
+          "field_name": "left_margin",
+          "runtime_alias": "leftMargin",
+          "description": "Left margin, in pixels, allowing for more room for axis labels",
+          "data_type": "string | integer",
+          "enum_values": [
+            "auto",
+            50,
+            75,
+            100,
+            125,
+            150,
+            200
+          ],
+          "sample_data": "auto",
+          "required": false,
+          "embedding": "否",
+          "default_value": "auto"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "X Axis",
+        "field_name": "x_axis_format",
+        "runtime_alias": "xAxisFormat",
+        "required": false,
+        "embedding": "否",
+        "description": "D3 format syntax: https://github.com/d3/d3-format",
+        "data_type": "string",
+        "sample_data": "SMART_NUMBER",
+        "original_field": {
+          "field_name": "x_axis_format",
+          "runtime_alias": "xAxisFormat",
+          "description": "D3 format syntax: https://github.com/d3/d3-format",
+          "data_type": "string",
+          "enum_source": "D3_FORMAT_OPTIONS",
+          "sample_data": "SMART_NUMBER",
+          "required": false,
+          "embedding": "否",
+          "default_value": "SMART_NUMBER",
+          "notes": "legacy bubble 的 x 轴格式被 Bubble/controlPanel.ts 显式改成数值格式选项，不再沿用时间格式。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "X Axis",
+        "field_name": "x_ticks_layout",
+        "runtime_alias": "xTicksLayout",
+        "required": false,
+        "embedding": "否",
+        "description": "The way the ticks are laid out on the X-axis",
+        "data_type": "string",
+        "sample_data": "45°",
+        "original_field": {
+          "field_name": "x_ticks_layout",
+          "runtime_alias": "xTicksLayout",
+          "description": "The way the ticks are laid out on the X-axis",
+          "data_type": "string",
+          "enum_values": [
+            "auto",
+            "flat",
+            "45°",
+            "staggered"
+          ],
+          "sample_data": "45°",
+          "required": false,
+          "embedding": "否",
+          "default_value": "auto",
+          "notes": "NVD3Vis.js 只对 45° 和 staggered 有专门逻辑；flat 在运行时行为上接近 auto。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "X Axis",
+        "field_name": "x_log_scale",
+        "runtime_alias": "xLogScale",
+        "required": false,
+        "embedding": "否",
+        "description": "Use a log scale for the X-axis",
+        "data_type": "boolean",
+        "sample_data": false,
+        "original_field": {
+          "field_name": "x_log_scale",
+          "runtime_alias": "xLogScale",
+          "description": "Use a log scale for the X-axis",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "X Axis",
+        "field_name": "x_axis_showminmax",
+        "runtime_alias": "xAxisShowminmax",
+        "required": false,
+        "embedding": "否",
+        "description": "Whether to display the min and max values of the X-axis",
+        "data_type": "boolean",
+        "sample_data": false,
+        "original_field": {
+          "field_name": "x_axis_showminmax",
+          "runtime_alias": "xAxisShowminmax",
+          "description": "Whether to display the min and max values of the X-axis",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Y Axis",
+        "field_name": "y_axis_label",
+        "runtime_alias": "yAxisLabel",
+        "required": false,
+        "embedding": "否",
+        "description": "Y Axis Label",
+        "data_type": "string",
+        "sample_data": "Girls",
+        "original_field": {
+          "field_name": "y_axis_label",
+          "runtime_alias": "yAxisLabel",
+          "description": "Y Axis Label",
+          "data_type": "string",
+          "sample_data": "Girls",
+          "required": false,
+          "embedding": "否",
+          "default_value": ""
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Y Axis",
+        "field_name": "bottom_margin",
+        "runtime_alias": "bottomMargin",
+        "required": false,
+        "embedding": "否",
+        "description": "Bottom margin, in pixels, allowing for more room for axis labels",
+        "data_type": "string | integer",
+        "sample_data": "auto",
+        "original_field": {
+          "field_name": "bottom_margin",
+          "runtime_alias": "bottomMargin",
+          "description": "Bottom margin, in pixels, allowing for more room for axis labels",
+          "data_type": "string | integer",
+          "enum_values": [
+            "auto",
+            50,
+            75,
+            100,
+            125,
+            150,
+            200
+          ],
+          "sample_data": "auto",
+          "required": false,
+          "embedding": "否",
+          "default_value": "auto"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Y Axis",
+        "field_name": "y_axis_format",
+        "runtime_alias": "yAxisFormat",
+        "required": false,
+        "embedding": "否",
+        "description": "D3 format syntax: https://github.com/d3/d3-format",
+        "data_type": "string",
+        "sample_data": "SMART_NUMBER",
+        "original_field": {
+          "field_name": "y_axis_format",
+          "runtime_alias": "yAxisFormat",
+          "description": "D3 format syntax: https://github.com/d3/d3-format",
+          "data_type": "string",
+          "enum_source": "D3_FORMAT_OPTIONS",
+          "sample_data": "SMART_NUMBER",
+          "required": false,
+          "embedding": "否",
+          "default_value": "SMART_NUMBER"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Y Axis",
+        "field_name": "y_log_scale",
+        "runtime_alias": "yLogScale",
+        "required": false,
+        "embedding": "否",
+        "description": "Use a log scale for the Y-axis",
+        "data_type": "boolean",
+        "sample_data": false,
+        "original_field": {
+          "field_name": "y_log_scale",
+          "runtime_alias": "yLogScale",
+          "description": "Use a log scale for the Y-axis",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Y Axis",
+        "field_name": "y_axis_showminmax",
+        "runtime_alias": "yAxisShowminmax",
+        "required": false,
+        "embedding": "否",
+        "description": "Whether to display the min and max values of the Y-axis",
+        "data_type": "boolean",
+        "sample_data": false,
+        "original_field": {
+          "field_name": "y_axis_showminmax",
+          "runtime_alias": "yAxisShowminmax",
+          "description": "Whether to display the min and max values of the Y-axis",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Y Axis",
+        "field_name": "y_axis_bounds",
+        "runtime_alias": "yAxisBounds",
+        "required": false,
+        "embedding": "否",
+        "description": "Bounds for the Y-axis. When left empty, the bounds are dynamically defined based on the min/max of the data. Note that this feature will only expand the axis range. It won't narrow the data's extent.",
+        "data_type": "array[number | null]",
+        "sample_data": [
+          0,
+          100
+        ],
+        "original_field": {
+          "field_name": "y_axis_bounds",
+          "runtime_alias": "yAxisBounds",
+          "description": "Bounds for the Y-axis. When left empty, the bounds are dynamically defined based on the min/max of the data. Note that this feature will only expand the axis range. It won't narrow the data's extent.",
+          "data_type": "array[number | null]",
+          "sample_data": [
+            0,
+            100
+          ],
+          "required": false,
+          "embedding": "否",
+          "default_value": [
+            null,
+            null
+          ]
+        }
+      }
+    ],
+    "field_inventory": [
+      {
+        "field_name": "adhoc_filters",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "字段标签为 Filters。legacy explore_json 路径会先把 legacy filters 转成 adhoc_filters，再继续处理 extra filters。"
+        ],
+        "data_types": [
+          "array[object]"
+        ],
+        "sample_data_examples": [
+          [
+            {
+              "clause": "WHERE",
+              "subject": "name",
+              "operator": "NOT IN",
+              "comparator": [
+                "TCA",
+                "MNP"
+              ],
+              "expressionType": "SIMPLE"
+            }
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "adhoc_filters",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "extra_form_data.append",
+            "description": "字段标签为 Filters。legacy explore_json 路径会先把 legacy filters 转成 adhoc_filters，再继续处理 extra filters。",
+            "data_type": "array[object]",
+            "sample_data": [
+              {
+                "clause": "WHERE",
+                "subject": "name",
+                "operator": "NOT IN",
+                "comparator": [
+                  "TCA",
+                  "MNP"
+                ],
+                "expressionType": "SIMPLE"
+              }
+            ],
+            "original_field": {
+              "field_name": "adhoc_filters",
+              "description": "字段标签为 Filters。legacy explore_json 路径会先把 legacy filters 转成 adhoc_filters，再继续处理 extra filters。",
+              "data_type": "array[object]",
+              "enum_source": "dataset columns + saved metrics + 当前 x/y/size 指标",
+              "sample_data": [
+                {
+                  "clause": "WHERE",
+                  "subject": "name",
+                  "operator": "NOT IN",
+                  "comparator": [
+                    "TCA",
+                    "MNP"
+                  ],
+                  "expressionType": "SIMPLE"
+                }
+              ],
+              "required": false,
+              "embedding": "extra_form_data.append",
+              "default_value": []
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "bottom_margin",
+        "required": false,
+        "categories": [
+          "Y Axis"
+        ],
+        "runtime_aliases": [
+          "bottomMargin"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Bottom margin, in pixels, allowing for more room for axis labels"
+        ],
+        "data_types": [
+          "string | integer"
+        ],
+        "sample_data_examples": [
+          "auto"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Y Axis",
+            "field_name": "bottom_margin",
+            "runtime_alias": "bottomMargin",
+            "required": false,
+            "embedding": "否",
+            "description": "Bottom margin, in pixels, allowing for more room for axis labels",
+            "data_type": "string | integer",
+            "sample_data": "auto",
+            "original_field": {
+              "field_name": "bottom_margin",
+              "runtime_alias": "bottomMargin",
+              "description": "Bottom margin, in pixels, allowing for more room for axis labels",
+              "data_type": "string | integer",
+              "enum_values": [
+                "auto",
+                50,
+                75,
+                100,
+                125,
+                150,
+                200
+              ],
+              "sample_data": "auto",
+              "required": false,
+              "embedding": "否",
+              "default_value": "auto"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "color_scheme",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [
+          "colorScheme"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "The color scheme for rendering chart"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "supersetColors"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "color_scheme",
+            "runtime_alias": "colorScheme",
+            "required": false,
+            "embedding": "否",
+            "description": "The color scheme for rendering chart",
+            "data_type": "string",
+            "sample_data": "supersetColors",
+            "original_field": {
+              "field_name": "color_scheme",
+              "runtime_alias": "colorScheme",
+              "description": "The color scheme for rendering chart",
+              "data_type": "string",
+              "enum_source": "categoricalSchemeRegistry.keys()",
+              "sample_data": "supersetColors",
+              "required": false,
+              "embedding": "否",
+              "default_value": "categoricalSchemeRegistry.getDefaultKey()"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "entity",
+        "required": true,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "This defines the element to be plotted on the chart"
+        ],
+        "data_types": [
+          "string | object"
+        ],
+        "sample_data_examples": [
+          "gender"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "entity",
+            "runtime_alias": null,
+            "required": true,
+            "embedding": "否",
+            "description": "This defines the element to be plotted on the chart",
+            "data_type": "string | object",
+            "sample_data": "gender",
+            "original_field": {
+              "field_name": "entity",
+              "description": "This defines the element to be plotted on the chart",
+              "data_type": "string | object",
+              "enum_source": "datasource columns",
+              "sample_data": "gender",
+              "required": true,
+              "embedding": "否",
+              "default_value": null,
+              "notes": "前端使用 dndEntityControl，带 validateNonEmpty；后端 BubbleViz.query_obj() 也要求它存在。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "left_margin",
+        "required": false,
+        "categories": [
+          "X Axis"
+        ],
+        "runtime_aliases": [
+          "leftMargin"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Left margin, in pixels, allowing for more room for axis labels"
+        ],
+        "data_types": [
+          "string | integer"
+        ],
+        "sample_data_examples": [
+          "auto"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "X Axis",
+            "field_name": "left_margin",
+            "runtime_alias": "leftMargin",
+            "required": false,
+            "embedding": "否",
+            "description": "Left margin, in pixels, allowing for more room for axis labels",
+            "data_type": "string | integer",
+            "sample_data": "auto",
+            "original_field": {
+              "field_name": "left_margin",
+              "runtime_alias": "leftMargin",
+              "description": "Left margin, in pixels, allowing for more room for axis labels",
+              "data_type": "string | integer",
+              "enum_values": [
+                "auto",
+                50,
+                75,
+                100,
+                125,
+                150,
+                200
+              ],
+              "sample_data": "auto",
+              "required": false,
+              "embedding": "否",
+              "default_value": "auto"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "limit",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "UI 标签沿用共享控件的 Series limit，但 legacy Bubble 后端会把它直接写成 query_obj.row_limit。"
+        ],
+        "data_types": [
+          "integer | null"
+        ],
+        "sample_data_examples": [
+          0
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "limit",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "UI 标签沿用共享控件的 Series limit，但 legacy Bubble 后端会把它直接写成 query_obj.row_limit。",
+            "data_type": "integer | null",
+            "sample_data": 0,
+            "original_field": {
+              "field_name": "limit",
+              "description": "UI 标签沿用共享控件的 Series limit，但 legacy Bubble 后端会把它直接写成 query_obj.row_limit。",
+              "data_type": "integer | null",
+              "enum_values": [
+                5,
+                10,
+                25,
+                50,
+                100,
+                500
+              ],
+              "sample_data": 0,
+              "required": false,
+              "embedding": "否",
+              "default_value": null,
+              "notes": "world_bank.py 的官方示例显式写了 limit=0。BubbleViz.query_obj() 不再读取 row_limit。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "max_bubble_size",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [
+          "maxBubbleSize"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Max Bubble Size"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "50"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "max_bubble_size",
+            "runtime_alias": "maxBubbleSize",
+            "required": false,
+            "embedding": "否",
+            "description": "Max Bubble Size",
+            "data_type": "string",
+            "sample_data": "50",
+            "original_field": {
+              "field_name": "max_bubble_size",
+              "runtime_alias": "maxBubbleSize",
+              "description": "Max Bubble Size",
+              "data_type": "string",
+              "enum_values": [
+                "5",
+                "10",
+                "15",
+                "25",
+                "50",
+                "75",
+                "100"
+              ],
+              "sample_data": "50",
+              "required": false,
+              "embedding": "否",
+              "default_value": "25"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "series",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Defines the grouping of entities. Each series is represented by a specific color in the chart."
+        ],
+        "data_types": [
+          "string | object | null"
+        ],
+        "sample_data_examples": [
+          "state"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "series",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Defines the grouping of entities. Each series is represented by a specific color in the chart.",
+            "data_type": "string | object | null",
+            "sample_data": "state",
+            "original_field": {
+              "field_name": "series",
+              "description": "Defines the grouping of entities. Each series is represented by a specific color in the chart.",
+              "data_type": "string | object | null",
+              "enum_source": "datasource columns",
+              "sample_data": "state",
+              "required": false,
+              "embedding": "否",
+              "default_value": null,
+              "notes": "若为空，后端 BubbleViz 会回退成 entity，自行作为 group 字段。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "show_legend",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [
+          "showLegend"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Whether to display the legend (toggles)"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          true
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "show_legend",
+            "runtime_alias": "showLegend",
+            "required": false,
+            "embedding": "否",
+            "description": "Whether to display the legend (toggles)",
+            "data_type": "boolean",
+            "sample_data": true,
+            "original_field": {
+              "field_name": "show_legend",
+              "runtime_alias": "showLegend",
+              "description": "Whether to display the legend (toggles)",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": true,
+              "required": false,
+              "embedding": "否",
+              "default_value": true
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "size",
+        "required": true,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Metric used to calculate bubble size"
+        ],
+        "data_types": [
+          "string | object"
+        ],
+        "sample_data_examples": [
+          "count"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "size",
+            "runtime_alias": null,
+            "required": true,
+            "embedding": "否",
+            "description": "Metric used to calculate bubble size",
+            "data_type": "string | object",
+            "sample_data": "count",
+            "original_field": {
+              "field_name": "size",
+              "description": "Metric used to calculate bubble size",
+              "data_type": "string | object",
+              "enum_source": "saved metrics + adhoc metrics",
+              "sample_data": "count",
+              "required": true,
+              "embedding": "否",
+              "default_value": null
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "x",
+        "required": true,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "The dataset column/metric that returns the values on your chart's x-axis."
+        ],
+        "data_types": [
+          "string | object"
+        ],
+        "sample_data_examples": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "num_boys"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(num_boys)"
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "x",
+            "runtime_alias": null,
+            "required": true,
+            "embedding": "否",
+            "description": "The dataset column/metric that returns the values on your chart's x-axis.",
+            "data_type": "string | object",
+            "sample_data": {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "num_boys"
+              },
+              "aggregate": "SUM",
+              "label": "SUM(num_boys)"
+            },
+            "original_field": {
+              "field_name": "x",
+              "description": "The dataset column/metric that returns the values on your chart's x-axis.",
+              "data_type": "string | object",
+              "enum_source": "saved metrics + adhoc metrics",
+              "sample_data": {
+                "expressionType": "SIMPLE",
+                "column": {
+                  "column_name": "num_boys"
+                },
+                "aggregate": "SUM",
+                "label": "SUM(num_boys)"
+              },
+              "required": true,
+              "embedding": "否",
+              "default_value": null
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "x_axis_format",
+        "required": false,
+        "categories": [
+          "X Axis"
+        ],
+        "runtime_aliases": [
+          "xAxisFormat"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "D3 format syntax: https://github.com/d3/d3-format"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "SMART_NUMBER"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "X Axis",
+            "field_name": "x_axis_format",
+            "runtime_alias": "xAxisFormat",
+            "required": false,
+            "embedding": "否",
+            "description": "D3 format syntax: https://github.com/d3/d3-format",
+            "data_type": "string",
+            "sample_data": "SMART_NUMBER",
+            "original_field": {
+              "field_name": "x_axis_format",
+              "runtime_alias": "xAxisFormat",
+              "description": "D3 format syntax: https://github.com/d3/d3-format",
+              "data_type": "string",
+              "enum_source": "D3_FORMAT_OPTIONS",
+              "sample_data": "SMART_NUMBER",
+              "required": false,
+              "embedding": "否",
+              "default_value": "SMART_NUMBER",
+              "notes": "legacy bubble 的 x 轴格式被 Bubble/controlPanel.ts 显式改成数值格式选项，不再沿用时间格式。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "x_axis_label",
+        "required": false,
+        "categories": [
+          "X Axis"
+        ],
+        "runtime_aliases": [
+          "xAxisLabel"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "X Axis Label"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "Boys"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "X Axis",
+            "field_name": "x_axis_label",
+            "runtime_alias": "xAxisLabel",
+            "required": false,
+            "embedding": "否",
+            "description": "X Axis Label",
+            "data_type": "string",
+            "sample_data": "Boys",
+            "original_field": {
+              "field_name": "x_axis_label",
+              "runtime_alias": "xAxisLabel",
+              "description": "X Axis Label",
+              "data_type": "string",
+              "sample_data": "Boys",
+              "required": false,
+              "embedding": "否",
+              "default_value": ""
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "x_axis_showminmax",
+        "required": false,
+        "categories": [
+          "X Axis"
+        ],
+        "runtime_aliases": [
+          "xAxisShowminmax"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Whether to display the min and max values of the X-axis"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          false
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "X Axis",
+            "field_name": "x_axis_showminmax",
+            "runtime_alias": "xAxisShowminmax",
+            "required": false,
+            "embedding": "否",
+            "description": "Whether to display the min and max values of the X-axis",
+            "data_type": "boolean",
+            "sample_data": false,
+            "original_field": {
+              "field_name": "x_axis_showminmax",
+              "runtime_alias": "xAxisShowminmax",
+              "description": "Whether to display the min and max values of the X-axis",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": false,
+              "required": false,
+              "embedding": "否",
+              "default_value": false
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "x_log_scale",
+        "required": false,
+        "categories": [
+          "X Axis"
+        ],
+        "runtime_aliases": [
+          "xLogScale"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Use a log scale for the X-axis"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          false
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "X Axis",
+            "field_name": "x_log_scale",
+            "runtime_alias": "xLogScale",
+            "required": false,
+            "embedding": "否",
+            "description": "Use a log scale for the X-axis",
+            "data_type": "boolean",
+            "sample_data": false,
+            "original_field": {
+              "field_name": "x_log_scale",
+              "runtime_alias": "xLogScale",
+              "description": "Use a log scale for the X-axis",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": false,
+              "required": false,
+              "embedding": "否",
+              "default_value": false
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "x_ticks_layout",
+        "required": false,
+        "categories": [
+          "X Axis"
+        ],
+        "runtime_aliases": [
+          "xTicksLayout"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "The way the ticks are laid out on the X-axis"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "45°"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "X Axis",
+            "field_name": "x_ticks_layout",
+            "runtime_alias": "xTicksLayout",
+            "required": false,
+            "embedding": "否",
+            "description": "The way the ticks are laid out on the X-axis",
+            "data_type": "string",
+            "sample_data": "45°",
+            "original_field": {
+              "field_name": "x_ticks_layout",
+              "runtime_alias": "xTicksLayout",
+              "description": "The way the ticks are laid out on the X-axis",
+              "data_type": "string",
+              "enum_values": [
+                "auto",
+                "flat",
+                "45°",
+                "staggered"
+              ],
+              "sample_data": "45°",
+              "required": false,
+              "embedding": "否",
+              "default_value": "auto",
+              "notes": "NVD3Vis.js 只对 45° 和 staggered 有专门逻辑；flat 在运行时行为上接近 auto。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "y",
+        "required": true,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "The dataset column/metric that returns the values on your chart's y-axis."
+        ],
+        "data_types": [
+          "string | object"
+        ],
+        "sample_data_examples": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "num_girls"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(num_girls)"
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "y",
+            "runtime_alias": null,
+            "required": true,
+            "embedding": "否",
+            "description": "The dataset column/metric that returns the values on your chart's y-axis.",
+            "data_type": "string | object",
+            "sample_data": {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "num_girls"
+              },
+              "aggregate": "SUM",
+              "label": "SUM(num_girls)"
+            },
+            "original_field": {
+              "field_name": "y",
+              "description": "The dataset column/metric that returns the values on your chart's y-axis.",
+              "data_type": "string | object",
+              "enum_source": "saved metrics + adhoc metrics",
+              "sample_data": {
+                "expressionType": "SIMPLE",
+                "column": {
+                  "column_name": "num_girls"
+                },
+                "aggregate": "SUM",
+                "label": "SUM(num_girls)"
+              },
+              "required": true,
+              "embedding": "否",
+              "default_value": null
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "y_axis_bounds",
+        "required": false,
+        "categories": [
+          "Y Axis"
+        ],
+        "runtime_aliases": [
+          "yAxisBounds"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Bounds for the Y-axis. When left empty, the bounds are dynamically defined based on the min/max of the data. Note that this feature will only expand the axis range. It won't narrow the data's extent."
+        ],
+        "data_types": [
+          "array[number | null]"
+        ],
+        "sample_data_examples": [
+          [
+            0,
+            100
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Y Axis",
+            "field_name": "y_axis_bounds",
+            "runtime_alias": "yAxisBounds",
+            "required": false,
+            "embedding": "否",
+            "description": "Bounds for the Y-axis. When left empty, the bounds are dynamically defined based on the min/max of the data. Note that this feature will only expand the axis range. It won't narrow the data's extent.",
+            "data_type": "array[number | null]",
+            "sample_data": [
+              0,
+              100
+            ],
+            "original_field": {
+              "field_name": "y_axis_bounds",
+              "runtime_alias": "yAxisBounds",
+              "description": "Bounds for the Y-axis. When left empty, the bounds are dynamically defined based on the min/max of the data. Note that this feature will only expand the axis range. It won't narrow the data's extent.",
+              "data_type": "array[number | null]",
+              "sample_data": [
+                0,
+                100
+              ],
+              "required": false,
+              "embedding": "否",
+              "default_value": [
+                null,
+                null
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "y_axis_format",
+        "required": false,
+        "categories": [
+          "Y Axis"
+        ],
+        "runtime_aliases": [
+          "yAxisFormat"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "D3 format syntax: https://github.com/d3/d3-format"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "SMART_NUMBER"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Y Axis",
+            "field_name": "y_axis_format",
+            "runtime_alias": "yAxisFormat",
+            "required": false,
+            "embedding": "否",
+            "description": "D3 format syntax: https://github.com/d3/d3-format",
+            "data_type": "string",
+            "sample_data": "SMART_NUMBER",
+            "original_field": {
+              "field_name": "y_axis_format",
+              "runtime_alias": "yAxisFormat",
+              "description": "D3 format syntax: https://github.com/d3/d3-format",
+              "data_type": "string",
+              "enum_source": "D3_FORMAT_OPTIONS",
+              "sample_data": "SMART_NUMBER",
+              "required": false,
+              "embedding": "否",
+              "default_value": "SMART_NUMBER"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "y_axis_label",
+        "required": false,
+        "categories": [
+          "Y Axis"
+        ],
+        "runtime_aliases": [
+          "yAxisLabel"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Y Axis Label"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "Girls"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Y Axis",
+            "field_name": "y_axis_label",
+            "runtime_alias": "yAxisLabel",
+            "required": false,
+            "embedding": "否",
+            "description": "Y Axis Label",
+            "data_type": "string",
+            "sample_data": "Girls",
+            "original_field": {
+              "field_name": "y_axis_label",
+              "runtime_alias": "yAxisLabel",
+              "description": "Y Axis Label",
+              "data_type": "string",
+              "sample_data": "Girls",
+              "required": false,
+              "embedding": "否",
+              "default_value": ""
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "y_axis_showminmax",
+        "required": false,
+        "categories": [
+          "Y Axis"
+        ],
+        "runtime_aliases": [
+          "yAxisShowminmax"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Whether to display the min and max values of the Y-axis"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          false
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Y Axis",
+            "field_name": "y_axis_showminmax",
+            "runtime_alias": "yAxisShowminmax",
+            "required": false,
+            "embedding": "否",
+            "description": "Whether to display the min and max values of the Y-axis",
+            "data_type": "boolean",
+            "sample_data": false,
+            "original_field": {
+              "field_name": "y_axis_showminmax",
+              "runtime_alias": "yAxisShowminmax",
+              "description": "Whether to display the min and max values of the Y-axis",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": false,
+              "required": false,
+              "embedding": "否",
+              "default_value": false
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "y_log_scale",
+        "required": false,
+        "categories": [
+          "Y Axis"
+        ],
+        "runtime_aliases": [
+          "yLogScale"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Use a log scale for the Y-axis"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          false
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Y Axis",
+            "field_name": "y_log_scale",
+            "runtime_alias": "yLogScale",
+            "required": false,
+            "embedding": "否",
+            "description": "Use a log scale for the Y-axis",
+            "data_type": "boolean",
+            "sample_data": false,
+            "original_field": {
+              "field_name": "y_log_scale",
+              "runtime_alias": "yLogScale",
+              "description": "Use a log scale for the Y-axis",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": false,
+              "required": false,
+              "embedding": "否",
+              "default_value": false
+            }
+          }
+        ]
+      }
+    ],
+    "required_field_names": [
+      "entity",
+      "size",
+      "x",
+      "y"
+    ],
+    "embedding_enabled_field_names": [
+      "adhoc_filters"
+    ],
+    "runtime_alias_index": {
+      "bottom_margin": [
+        "bottomMargin"
+      ],
+      "color_scheme": [
+        "colorScheme"
+      ],
+      "left_margin": [
+        "leftMargin"
+      ],
+      "max_bubble_size": [
+        "maxBubbleSize"
+      ],
+      "show_legend": [
+        "showLegend"
+      ],
+      "x_axis_format": [
+        "xAxisFormat"
+      ],
+      "x_axis_label": [
+        "xAxisLabel"
+      ],
+      "x_axis_showminmax": [
+        "xAxisShowminmax"
+      ],
+      "x_log_scale": [
+        "xLogScale"
+      ],
+      "x_ticks_layout": [
+        "xTicksLayout"
+      ],
+      "y_axis_bounds": [
+        "yAxisBounds"
+      ],
+      "y_axis_format": [
+        "yAxisFormat"
+      ],
+      "y_axis_label": [
+        "yAxisLabel"
+      ],
+      "y_axis_showminmax": [
+        "yAxisShowminmax"
+      ],
+      "y_log_scale": [
+        "yLogScale"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "bubble",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/bubble-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/bubble-form-data-schema.json",
+      "control-schema": "form-data-schema/bubble-schema.json"
+    }
+  },
+  "fallback_online_field_categories": {
+    "Query": [],
+    "Advanced analytics": [],
+    "Annotations & Layers": [],
+    "Predictive Analytics（Forecast）": [],
+    "Chart Options": [],
+    "Chart Title": [],
+    "图表专属": [],
+    "通用图表选项": []
+  },
+  "original_control_schema": {
+    "viz_type": "bubble",
+    "display_name": "Bubble Chart (legacy)",
+    "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/Bubble/controlPanel.ts",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/Bubble/controlPanel.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/Bubble/index.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/NVD3Controls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/transformProps.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/NVD3Vis.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/utils.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/utils/D3Formatting.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+      "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+      "D:/vsx/sources/superset-6.0.0/superset/migrations/shared/migrate_viz/processors.py",
+      "D:/vsx/sources/superset-6.0.0/superset/examples/world_bank.py",
+      "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py"
+    ],
+    "notes": [
+      "legacy Bubble 插件位于 legacy-preset-chart-nvd3/src/Bubble，metadata.name 是 Bubble Chart (legacy)，并显式标记 label=Deprecated、useLegacyApi=true。",
+      "这张图没有前端 buildQuery.ts。ChartClient.ts 在 useLegacyApi=true 时会把原始 form_data 直接 POST 到 /superset/explore_json/，而不是先构造 /api/v1/chart/data 的 query_context。",
+      "Bubble/controlPanel.ts 同时使用了共享字段和 legacy NVD3 公共控件。series/entity/x/y/size/adhoc_filters/color_scheme 来自共享控件；show_legend、left_margin、bottom_margin、x_ticks_layout、x_axis_format、x_log_scale、y_log_scale、y_axis_bounds 等来自 legacy-preset-chart-nvd3/src/NVD3Controls.tsx。",
+      "Bubble/controlPanel.ts 定义了 formDataOverrides：切换 viz 时，会把 standardized controls 的前两个列字段依次映射成 series、entity，把前三个指标依次映射成 x、y、size。这个逻辑是 viz switch 辅助逻辑，不是直接导出 bubble form_data 时的必经路径。",
+      "真正的查询结构在后端 superset/viz.py::BubbleViz.query_obj() 中形成：groupby = [entity, series?]，metrics = [size, x, y]，row_limit = form_data.limit。和 ECharts bubble_v2 不同，legacy bubble 使用的是 limit，不是 row_limit。",
+      "BubbleViz.query_obj() 还要求 x/y/size 三个指标的最终 metric label 必须互不相同，否则抛出 Please use 3 different metric labels。另一个校验是 entity、x、y、size 都必须存在，否则抛出 Pick a metric for x, y and size。",
+      "当 series 为空时，BubbleViz.get_data() 会令 self.series = entity，因此最终 group 字段回退为 entity 本身；这意味着没有独立 series 时，气泡颜色分组实际上按 entity 值拆开。",
+      "legacy bubble 到 bubble_v2 的迁移规则在 migrations/shared/migrate_viz/processors.py::MigrateBubbleChart 中有明确定义：bottom_margin -> x_axis_title_margin，left_margin -> y_axis_title_margin，limit -> row_limit，x_axis_format -> xAxisFormat，x_log_scale -> logXAxis，y_log_scale -> logYAxis，y_axis_showminmax -> truncateYAxis。"
+    ],
+    "legacy_api_behavior": {
+      "useLegacyApi": true,
+      "frontend_request_endpoint": "/superset/explore_json/",
+      "frontend_request_payload": {
+        "form_data": "<raw form_data>"
+      },
+      "query_builder": "前端没有 bubble 专属 buildQuery，ChartClient.ts 对 legacy bubble 默认直接传 form_data；真正的 query 编译发生在后端 BubbleViz.query_obj()。"
+    },
+    "form_data_overrides": {
+      "series": "getStandardizedControls().shiftColumn()",
+      "entity": "getStandardizedControls().shiftColumn()",
+      "x": "getStandardizedControls().shiftMetric()",
+      "y": "getStandardizedControls().shiftMetric()",
+      "size": "getStandardizedControls().shiftMetric()"
+    },
+    "query_compilation": {
+      "backend_class": "superset/viz.py::BubbleViz",
+      "groupby": "query_obj['groupby'] = [entity]，若 series 存在则追加 series，然后做 dedup",
+      "metrics": "query_obj['metrics'] = [size, x, y]",
+      "row_limit": "query_obj['row_limit'] = form_data.get('limit')",
+      "series_fallback": "self.series = form_data.get('series') or self.entity"
+    },
+    "field_categories": {
+      "Query": [
+        {
+          "field_name": "series",
+          "description": "Defines the grouping of entities. Each series is represented by a specific color in the chart.",
+          "data_type": "string | object | null",
+          "enum_source": "datasource columns",
+          "sample_data": "state",
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "若为空，后端 BubbleViz 会回退成 entity，自行作为 group 字段。"
+        },
+        {
+          "field_name": "entity",
+          "description": "This defines the element to be plotted on the chart",
+          "data_type": "string | object",
+          "enum_source": "datasource columns",
+          "sample_data": "gender",
+          "required": true,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "前端使用 dndEntityControl，带 validateNonEmpty；后端 BubbleViz.query_obj() 也要求它存在。"
+        },
+        {
+          "field_name": "x",
+          "description": "The dataset column/metric that returns the values on your chart's x-axis.",
+          "data_type": "string | object",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "num_boys"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(num_boys)"
+          },
+          "required": true,
+          "embedding": "否",
+          "default_value": null
+        },
+        {
+          "field_name": "y",
+          "description": "The dataset column/metric that returns the values on your chart's y-axis.",
+          "data_type": "string | object",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "num_girls"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(num_girls)"
+          },
+          "required": true,
+          "embedding": "否",
+          "default_value": null
+        },
+        {
+          "field_name": "adhoc_filters",
+          "description": "字段标签为 Filters。legacy explore_json 路径会先把 legacy filters 转成 adhoc_filters，再继续处理 extra filters。",
+          "data_type": "array[object]",
+          "enum_source": "dataset columns + saved metrics + 当前 x/y/size 指标",
+          "sample_data": [
+            {
+              "clause": "WHERE",
+              "subject": "name",
+              "operator": "NOT IN",
+              "comparator": [
+                "TCA",
+                "MNP"
+              ],
+              "expressionType": "SIMPLE"
+            }
+          ],
+          "required": false,
+          "embedding": "extra_form_data.append",
+          "default_value": []
+        },
+        {
+          "field_name": "size",
+          "description": "Metric used to calculate bubble size",
+          "data_type": "string | object",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": "count",
+          "required": true,
+          "embedding": "否",
+          "default_value": null
+        },
+        {
+          "field_name": "max_bubble_size",
+          "runtime_alias": "maxBubbleSize",
+          "description": "Max Bubble Size",
+          "data_type": "string",
+          "enum_values": [
+            "5",
+            "10",
+            "15",
+            "25",
+            "50",
+            "75",
+            "100"
+          ],
+          "sample_data": "50",
+          "required": false,
+          "embedding": "否",
+          "default_value": "25"
+        },
+        {
+          "field_name": "limit",
+          "description": "UI 标签沿用共享控件的 Series limit，但 legacy Bubble 后端会把它直接写成 query_obj.row_limit。",
+          "data_type": "integer | null",
+          "enum_values": [
+            5,
+            10,
+            25,
+            50,
+            100,
+            500
+          ],
+          "sample_data": 0,
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "world_bank.py 的官方示例显式写了 limit=0。BubbleViz.query_obj() 不再读取 row_limit。"
+        }
+      ],
+      "Chart Options": [
+        {
+          "field_name": "color_scheme",
+          "runtime_alias": "colorScheme",
+          "description": "The color scheme for rendering chart",
+          "data_type": "string",
+          "enum_source": "categoricalSchemeRegistry.keys()",
+          "sample_data": "supersetColors",
+          "required": false,
+          "embedding": "否",
+          "default_value": "categoricalSchemeRegistry.getDefaultKey()"
+        },
+        {
+          "field_name": "show_legend",
+          "runtime_alias": "showLegend",
+          "description": "Whether to display the legend (toggles)",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true
+        }
+      ],
+      "X Axis": [
+        {
+          "field_name": "x_axis_label",
+          "runtime_alias": "xAxisLabel",
+          "description": "X Axis Label",
+          "data_type": "string",
+          "sample_data": "Boys",
+          "required": false,
+          "embedding": "否",
+          "default_value": ""
+        },
+        {
+          "field_name": "left_margin",
+          "runtime_alias": "leftMargin",
+          "description": "Left margin, in pixels, allowing for more room for axis labels",
+          "data_type": "string | integer",
+          "enum_values": [
+            "auto",
+            50,
+            75,
+            100,
+            125,
+            150,
+            200
+          ],
+          "sample_data": "auto",
+          "required": false,
+          "embedding": "否",
+          "default_value": "auto"
+        },
+        {
+          "field_name": "x_axis_format",
+          "runtime_alias": "xAxisFormat",
+          "description": "D3 format syntax: https://github.com/d3/d3-format",
+          "data_type": "string",
+          "enum_source": "D3_FORMAT_OPTIONS",
+          "sample_data": "SMART_NUMBER",
+          "required": false,
+          "embedding": "否",
+          "default_value": "SMART_NUMBER",
+          "notes": "legacy bubble 的 x 轴格式被 Bubble/controlPanel.ts 显式改成数值格式选项，不再沿用时间格式。"
+        },
+        {
+          "field_name": "x_ticks_layout",
+          "runtime_alias": "xTicksLayout",
+          "description": "The way the ticks are laid out on the X-axis",
+          "data_type": "string",
+          "enum_values": [
+            "auto",
+            "flat",
+            "45°",
+            "staggered"
+          ],
+          "sample_data": "45°",
+          "required": false,
+          "embedding": "否",
+          "default_value": "auto",
+          "notes": "NVD3Vis.js 只对 45° 和 staggered 有专门逻辑；flat 在运行时行为上接近 auto。"
+        },
+        {
+          "field_name": "x_log_scale",
+          "runtime_alias": "xLogScale",
+          "description": "Use a log scale for the X-axis",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false
+        },
+        {
+          "field_name": "x_axis_showminmax",
+          "runtime_alias": "xAxisShowminmax",
+          "description": "Whether to display the min and max values of the X-axis",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false
+        }
+      ],
+      "Y Axis": [
+        {
+          "field_name": "y_axis_label",
+          "runtime_alias": "yAxisLabel",
+          "description": "Y Axis Label",
+          "data_type": "string",
+          "sample_data": "Girls",
+          "required": false,
+          "embedding": "否",
+          "default_value": ""
+        },
+        {
+          "field_name": "bottom_margin",
+          "runtime_alias": "bottomMargin",
+          "description": "Bottom margin, in pixels, allowing for more room for axis labels",
+          "data_type": "string | integer",
+          "enum_values": [
+            "auto",
+            50,
+            75,
+            100,
+            125,
+            150,
+            200
+          ],
+          "sample_data": "auto",
+          "required": false,
+          "embedding": "否",
+          "default_value": "auto"
+        },
+        {
+          "field_name": "y_axis_format",
+          "runtime_alias": "yAxisFormat",
+          "description": "D3 format syntax: https://github.com/d3/d3-format",
+          "data_type": "string",
+          "enum_source": "D3_FORMAT_OPTIONS",
+          "sample_data": "SMART_NUMBER",
+          "required": false,
+          "embedding": "否",
+          "default_value": "SMART_NUMBER"
+        },
+        {
+          "field_name": "y_log_scale",
+          "runtime_alias": "yLogScale",
+          "description": "Use a log scale for the Y-axis",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false
+        },
+        {
+          "field_name": "y_axis_showminmax",
+          "runtime_alias": "yAxisShowminmax",
+          "description": "Whether to display the min and max values of the Y-axis",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false
+        },
+        {
+          "field_name": "y_axis_bounds",
+          "runtime_alias": "yAxisBounds",
+          "description": "Bounds for the Y-axis. When left empty, the bounds are dynamically defined based on the min/max of the data. Note that this feature will only expand the axis range. It won't narrow the data's extent.",
+          "data_type": "array[number | null]",
+          "sample_data": [
+            0,
+            100
+          ],
+          "required": false,
+          "embedding": "否",
+          "default_value": [
+            null,
+            null
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -15,6 +15,7 @@ import com.tencent.supersonic.headless.chat.query.llm.s2sql.LLMSqlQuery;
 import com.tencent.supersonic.headless.chat.query.llm.s2sql.LLMSqlResp;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.MapUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -25,6 +26,9 @@ import java.util.Objects;
 @Slf4j
 @Service
 public class LLMResponseService {
+
+    @Autowired
+    private LLMRequestService requestService;
 
     public void addParseInfo(ChatQueryContext queryCtx, ParseResult parseResult, String s2SQL,
             Double weight) {
@@ -39,16 +43,13 @@ public class LLMResponseService {
         parseInfo.getElementMatches()
                 .addAll(queryCtx.getMapInfo().getMatchedElements(parseInfo.getDataSetId()));
 
-        Map<String, Object> properties = new HashMap<>();
-        properties.put(Constants.CONTEXT, parseResult);
-        properties.put("type", "internal");
+        addParseContext(parseInfo, parseResult);
         Text2SQLExemplar exemplar =
                 Text2SQLExemplar.builder().question(queryCtx.getRequest().getQueryText())
                         .sideInfo(parseResult.getLlmResp().getSideInfo())
                         .dbSchema(parseResult.getLlmResp().getSchema())
                         .sql(parseResult.getLlmResp().getSqlOutput()).build();
-        properties.put(Text2SQLExemplar.PROPERTY_KEY, exemplar);
-        parseInfo.setProperties(properties);
+        parseInfo.getProperties().put(Text2SQLExemplar.PROPERTY_KEY, exemplar);
         parseInfo.setScore(queryCtx.getRequest().getQueryText().length() * (1 + weight));
         parseInfo.setQueryMode(semanticQuery.getQueryMode());
         parseInfo.getSqlInfo().setParsedS2SQL(s2SQL);
@@ -63,6 +64,29 @@ public class LLMResponseService {
             parseInfo.setDateInfo(dateConf);
         }
         queryCtx.getCandidateQueries().add(semanticQuery);
+    }
+
+    public void addParseContext(ChatQueryContext queryCtx, SemanticParseInfo parseInfo) {
+        if (Objects.isNull(queryCtx) || Objects.isNull(parseInfo)
+                || Objects.isNull(parseInfo.getDataSetId())) {
+            return;
+        }
+        ParseResult parseResult = ParseResult.builder().dataSetId(parseInfo.getDataSetId())
+                .llmReq(requestService.getLlmReq(queryCtx, parseInfo.getDataSetId())).build();
+        addParseContext(parseInfo, parseResult);
+    }
+
+    private void addParseContext(SemanticParseInfo parseInfo, ParseResult parseResult) {
+        if (Objects.isNull(parseInfo) || Objects.isNull(parseResult)) {
+            return;
+        }
+        Map<String, Object> properties = parseInfo.getProperties();
+        if (Objects.isNull(properties)) {
+            properties = new HashMap<>();
+        }
+        properties.put(Constants.CONTEXT, parseResult);
+        properties.put("type", "internal");
+        parseInfo.setProperties(properties);
     }
 
     public Map<String, LLMSqlResp> getDeduplicationSqlResp(int currentRetry, LLMResp llmResp) {

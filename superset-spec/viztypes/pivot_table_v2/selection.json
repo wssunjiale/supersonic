@@ -1,0 +1,464 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "pivot_table_v2",
+  "display_name": "Pivot Table",
+  "selection_summary": {
+    "category": "table",
+    "tags": [
+      "pivot",
+      "table",
+      "multi_dimensional",
+      "tabular"
+    ],
+    "description_zh": "Pivot Table (v2) displays multi-dimensional aggregated data in a tabular format, with rows/columns as dimensions and cells as metric values, supporting sorting/filtering.",
+    "visual_shape_zh": "透视表（多维表格型）",
+    "use_cases_zh": [
+      "多维数据交叉分析（如行：区域、列：时间、值：销售额）",
+      "结构化数据明细展示",
+      "可交互的表格分析（排序/过滤/钻取）"
+    ],
+    "required_slots": [
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "Query",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+          "聚合指标列表，用于计算单元格的数值。"
+        ]
+      },
+      {
+        "field_name": "groupbyColumns",
+        "required": true,
+        "slot_kind": "column_dimension_list",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          "<column_dimension_column>"
+        ],
+        "source_categories": [
+          "Query",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Columns to group by on the columns",
+          "列维度字段列表，用于定义透视表的列。"
+        ]
+      },
+      {
+        "field_name": "groupbyRows",
+        "required": true,
+        "slot_kind": "row_dimension_list",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          "<row_dimension_column>"
+        ],
+        "source_categories": [
+          "Query",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Columns to group by on the rows",
+          "行维度字段列表，用于定义透视表的行。"
+        ]
+      }
+    ],
+    "optional_slots": [
+      {
+        "field_name": "adhoc_filters",
+        "required": false,
+        "slot_kind": "filter_list",
+        "accepted_dataset_roles": [
+          "filter_context"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [],
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "Filters"
+        ]
+      },
+      {
+        "field_name": "series_limit",
+        "required": false,
+        "slot_kind": "dimension",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "0..n",
+        "placeholder": "<dimension_column_or_list>",
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Limits the number of series that get displayed. A joined subquery (or an extra phase where subqueries are not supported) is applied to limit the number of series that get fetched and rendered."
+        ]
+      },
+      {
+        "field_name": "series_limit_metric",
+        "required": false,
+        "slot_kind": "metric",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "0..n",
+        "placeholder": "<metric_or_metric_list>",
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Metric used to define how the top series are sorted if a series or cell limit is present. If undefined reverts to the first metric (where appropriate)."
+        ]
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "required": false,
+        "slot_kind": "time_grain",
+        "accepted_dataset_roles": [
+          "time_grain"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "P1D",
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [
+          "extra_form_data.override（guest 下不建议）"
+        ],
+        "descriptions": [
+          "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart."
+        ]
+      }
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "category_dimension",
+      "dimension",
+      "metric",
+      "saved_metric"
+    ],
+    "optional_dataset_roles": [
+      "adhoc_metric",
+      "category_dimension",
+      "dimension",
+      "filter_context",
+      "metric",
+      "saved_metric",
+      "time_grain"
+    ],
+    "dataset_role_inventory": {
+      "adhoc_metric": [
+        "metrics",
+        "series_limit_metric"
+      ],
+      "category_dimension": [
+        "groupbyColumns",
+        "groupbyRows",
+        "series_limit"
+      ],
+      "dimension": [
+        "groupbyColumns",
+        "groupbyRows",
+        "series_limit"
+      ],
+      "filter_context": [
+        "adhoc_filters"
+      ],
+      "metric": [
+        "metrics",
+        "series_limit_metric"
+      ],
+      "saved_metric": [
+        "metrics",
+        "series_limit_metric"
+      ],
+      "time_grain": [
+        "time_grain_sqla"
+      ]
+    },
+    "non_binding_control_names": [
+      "aggregateFunction",
+      "allow_render_html",
+      "colOrder",
+      "colSubTotals",
+      "colSubtotalPosition",
+      "colTotals",
+      "combineMetric",
+      "conditional_formatting",
+      "currency_format",
+      "date_format",
+      "metricsLayout",
+      "order_desc",
+      "rowOrder",
+      "rowSubTotals",
+      "rowSubtotalPosition",
+      "rowTotals",
+      "row_limit",
+      "temporal_columns_lookup",
+      "transposePivot",
+      "valueFormat"
+    ],
+    "embedding_runtime_field_names": [
+      "adhoc_filters",
+      "custom_form_data",
+      "filters",
+      "granularity_sqla",
+      "interactive_drilldown",
+      "interactive_groupby",
+      "interactive_highlight",
+      "relative_end",
+      "relative_start",
+      "time_column",
+      "time_grain",
+      "time_grain_sqla",
+      "time_range"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "groupbyColumns",
+      "groupbyRows",
+      "metrics",
+      "metricsLayout",
+      "order_desc",
+      "row_limit",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "aggregateFunction",
+      "allow_render_html",
+      "colOrder",
+      "colSubTotals",
+      "colSubtotalPosition",
+      "colTotals",
+      "combineMetric",
+      "conditional_formatting",
+      "currency_format",
+      "datasource",
+      "date_format",
+      "groupbyColumns",
+      "groupbyRows",
+      "metrics",
+      "metricsLayout",
+      "order_desc",
+      "rowOrder",
+      "rowSubTotals",
+      "rowSubtotalPosition",
+      "rowTotals",
+      "row_limit",
+      "series_limit",
+      "series_limit_metric",
+      "transposePivot",
+      "valueFormat",
+      "viz_type"
+    ],
+    "structural_flags": {
+      "time_series": false,
+      "kpi_like": false,
+      "table_like": true,
+      "map_like": false,
+      "flow_like": false,
+      "distribution_like": false,
+      "supports_breakdown": false,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": false,
+      "needs_dimension": true
+    },
+    "selection_hints": [
+      "更适合明细浏览、交叉对照或结果兜底，不优先用于趋势或占比叙事。",
+      "仅在需要行列交叉汇总、透视分析或多维聚合时使用，不适合简单原始明细列表。",
+      "至少需要 1 个可聚合指标字段。",
+      "需要至少 1 个维度字段用于分组、拆分或定位。",
+      "可结合时间粒度控制趋势聚合窗口。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：多维数据交叉分析（如行：区域、列：时间、值：销售额）；结构化数据明细展示；可交互的表格分析（排序/过滤/钻取）"
+    ]
+  },
+  "selection_prompt_card": {
+    "viz_type": "pivot_table_v2",
+    "display_name": "Pivot Table",
+    "category": "table",
+    "description_zh": "Pivot Table (v2) displays multi-dimensional aggregated data in a tabular format, with rows/columns as dimensions and cells as metric values, supporting sorting/filtering.",
+    "visual_shape_zh": "透视表（多维表格型）",
+    "best_for": [
+      "多维数据交叉分析（如行：区域、列：时间、值：销售额）",
+      "结构化数据明细展示",
+      "可交互的表格分析（排序/过滤/钻取）"
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "category_dimension",
+      "dimension",
+      "metric",
+      "saved_metric"
+    ],
+    "optional_dataset_roles": [
+      "adhoc_metric",
+      "category_dimension",
+      "dimension",
+      "filter_context",
+      "metric",
+      "saved_metric",
+      "time_grain"
+    ],
+    "required_slots": [
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "Query",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+          "聚合指标列表，用于计算单元格的数值。"
+        ]
+      },
+      {
+        "field_name": "groupbyColumns",
+        "required": true,
+        "slot_kind": "column_dimension_list",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          "<column_dimension_column>"
+        ],
+        "source_categories": [
+          "Query",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Columns to group by on the columns",
+          "列维度字段列表，用于定义透视表的列。"
+        ]
+      },
+      {
+        "field_name": "groupbyRows",
+        "required": true,
+        "slot_kind": "row_dimension_list",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          "<row_dimension_column>"
+        ],
+        "source_categories": [
+          "Query",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Columns to group by on the rows",
+          "行维度字段列表，用于定义透视表的行。"
+        ]
+      }
+    ],
+    "optional_slot_names": [
+      "adhoc_filters",
+      "series_limit",
+      "series_limit_metric",
+      "time_grain_sqla"
+    ],
+    "structural_flags": {
+      "time_series": false,
+      "kpi_like": false,
+      "table_like": true,
+      "map_like": false,
+      "flow_like": false,
+      "distribution_like": false,
+      "supports_breakdown": false,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": false,
+      "needs_dimension": true
+    },
+    "selection_hints": [
+      "更适合明细浏览、交叉对照或结果兜底，不优先用于趋势或占比叙事。",
+      "仅在需要行列交叉汇总、透视分析或多维聚合时使用，不适合简单原始明细列表。",
+      "至少需要 1 个可聚合指标字段。",
+      "需要至少 1 个维度字段用于分组、拆分或定位。",
+      "可结合时间粒度控制趋势聚合窗口。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：多维数据交叉分析（如行：区域、列：时间、值：销售额）；结构化数据明细展示；可交互的表格分析（排序/过滤/钻取）"
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "pivot_table_v2",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/pivot_table_v2-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/pivot_table_v2-form-data-schema.json",
+      "control-schema": "form-data-schema/pivot_table_v2-schema.json"
+    }
+  }
+}

@@ -24,14 +24,15 @@ import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.PriorityBlockingQueue;
 import java.util.stream.Collectors;
 
 @Slf4j
 public class SearchService {
 
     public static final int SEARCH_SIZE = 200;
-    private static BinTrie<List<String>> trie;
-    private static BinTrie<List<String>> suffixTrie;
+    private static volatile BinTrie<List<String>> trie;
+    private static volatile BinTrie<List<String>> suffixTrie;
 
     static {
         trie = new BinTrie<>();
@@ -200,7 +201,7 @@ public class SearchService {
     public static List<String> getDimensionValue(DimensionValueReq dimensionValueReq) {
         String nature = DictWordType.NATURE_SPILT + dimensionValueReq.getModelId()
                 + DictWordType.NATURE_SPILT + dimensionValueReq.getElementID();
-        PriorityQueue<Term> terms = MultiCustomDictionary.NATURE_TO_VALUES.get(nature);
+        PriorityBlockingQueue<Term> terms = MultiCustomDictionary.NATURE_TO_VALUES.get(nature);
         if (CollectionUtils.isEmpty(terms)) {
             return new ArrayList<>();
         }

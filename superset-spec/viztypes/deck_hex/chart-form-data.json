@@ -1,0 +1,554 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "deck_hex",
+  "display_name": "deck.gl 3D Hexagon",
+  "source_kind": "schema_file",
+  "normalized_chart_form_data": {
+    "required_root_fields": [
+      "datasource",
+      "spatial",
+      "viz_type"
+    ],
+    "optional_root_fields": [
+      "adhoc_filters",
+      "autozoom",
+      "cache_timeout",
+      "color_breakpoints",
+      "color_picker",
+      "color_scheme",
+      "color_scheme_type",
+      "custom_params",
+      "deafult_breakpoint_color",
+      "extra_form_data",
+      "extruded",
+      "filter_nulls",
+      "grid_size",
+      "js_agg_function",
+      "js_columns",
+      "js_data_mutator",
+      "js_onclick_href",
+      "js_tooltip",
+      "mapbox_style",
+      "row_limit",
+      "size",
+      "slice_id",
+      "url_params",
+      "viewport"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "spatial",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "autozoom",
+      "color_breakpoints",
+      "color_picker",
+      "color_scheme",
+      "color_scheme_type",
+      "datasource",
+      "deafult_breakpoint_color",
+      "extruded",
+      "filter_nulls",
+      "grid_size",
+      "js_agg_function",
+      "js_columns",
+      "js_data_mutator",
+      "js_onclick_href",
+      "js_tooltip",
+      "mapbox_style",
+      "row_limit",
+      "size",
+      "spatial",
+      "viewport",
+      "viz_type"
+    ],
+    "fallback_template_seed": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "deck_hex",
+      "spatial": "<spatial_column_or_expression>",
+      "adhoc_filters": [],
+      "time_range": "No filter"
+    }
+  },
+  "original_chart_form_data_schema": {
+    "viz_type": "deck_hex",
+    "display_name": "deck.gl 3D Hexagon",
+    "purpose": "用于调用 API 创建或保存 deck.gl 3D Hexagon 时填写的 form_data 模板",
+    "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/deck_hex-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Hex/controlPanel.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Hex/index.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Hex/Hex.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/common.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/Shared_DeckGL.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/utils.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/components/controls/SpatialControl.jsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-demo/storybook/stories/plugins/legacy-preset-chart-deckgl/Hex/payload.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+      "D:/vsx/sources/superset-6.0.0/superset/views/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/viz.py"
+    ],
+    "notes": [
+      "deck_hex 是 legacy 图，metadata 明确声明 `useLegacyApi=true`，真实请求路径仍是 `/superset/explore_json/`。",
+      "Explore 导出 form_data 时走 `getFormDataFromControls()`，它按 control name 原样写入 root form_data。API 根层必须使用 `spatial`、`size`、`filter_nulls`、`mapbox_style`、`grid_size`、`js_agg_function` 等原始键名。",
+      "deck_hex 没有专属前端 buildQuery。ChartClient.ts 对它会退回 `() => formData`，也就是说，API 层真正应该构造的是原始 root `form_data`，然后由 legacy `/superset/explore_json/` 包装成 `{ form_data: ... }`。",
+      "这个图的主空间输入是 `spatial` 对象，不是单列 `entity` / `all_columns_x`。后端 `BaseDeckGLViz.query_obj()` 依赖它展开成真实经纬度列或 geohash 列。",
+      "`size` 在当前图里不是必填。如果不传，`DeckHex.get_properties()` 会让每个点的 `weight` 回退为 1，此时配合默认 `js_agg_function='sum'`，hex cell 的高度本质上等于点数。",
+      "`viewport` 是正式 root form_data 字段，但运行时 `transformProps.ts` 会把 `width`/`height` 补进去，所以 API root 不必手填尺寸。",
+      "`filters` 不是当前 controlPanel 正式字段。虽然 legacy payload 或老保存态可能出现它，但当前创建模板应优先使用 `adhoc_filters`。"
+    ],
+    "naming_and_pipeline": {
+      "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写成 form_data[name]，不会自动把 snake_case 改成 camelCase。",
+      "api_form_data_to_backend_request": "ChartClient.ts 在 `useLegacyApi=true` 时，把 `buildQuery(formData)` 包成 `{ form_data }` POST 到 `/superset/explore_json/`；deck_hex 没有专属 buildQuery，因此等价于直接发送原始 form_data。",
+      "backend_form_data_normalization": "`explore_json()` 会先补 `datasource`，再执行 `convert_legacy_filters_into_adhoc(form_data)` 与 `merge_extra_filters(form_data)`。",
+      "backend_form_data_to_query_obj": "`BaseDeckGLViz.query_obj()` 会先按 `filter_nulls` 给空间列补空值过滤，再把 `spatial` 展开为实际空间列，拼上可选 `js_columns`，最后根据 `size` 是否存在决定走 metrics 聚合还是纯 columns 查询。",
+      "runtime_chart_props": "`transformProps.ts` 直接把 `rawFormData` 透传成 runtime `formData`，把 `queriesData[0]` 透传成 runtime `payload`，并把 `viewport` 与 `width`/`height` 合并。"
+    },
+    "global_required_fields": {
+      "datasource": {
+        "data_type": "string",
+        "required": true,
+        "sample_data": "<dataset_id>__table",
+        "source": "explore_json() + datasourceAndVizType hidden control"
+      },
+      "viz_type": {
+        "data_type": "string",
+        "required": true,
+        "fixed_value": "deck_hex",
+        "source": "Hex/index.ts + VizType.DeckHex"
+      },
+      "spatial": {
+        "data_type": "object",
+        "required": true,
+        "sample_data": {
+          "type": "latlong",
+          "lonCol": "LON",
+          "latCol": "LAT"
+        },
+        "source": "Hex Query section + SpatialControl validator + BaseDeckGLViz.query_obj()",
+        "notes": "高置信必填。没有它，后端无法展开空间列并构造 `position`。"
+      }
+    },
+    "global_optional_fields": {
+      "size": {
+        "data_type": "string | object | null",
+        "required": false,
+        "sample_data": "count",
+        "source": "Query section",
+        "notes": "可选。若省略，Hex cell 聚合会基于点数而不是显式指标。"
+      },
+      "row_limit": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 5000,
+        "source": "Query section"
+      },
+      "filter_nulls": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": true,
+        "source": "Query section"
+      },
+      "adhoc_filters": {
+        "data_type": "array[object]",
+        "required": false,
+        "sample_data": [],
+        "source": "Query section"
+      },
+      "mapbox_style": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+        "source": "Map section"
+      },
+      "color_scheme_type": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "categorical_palette",
+        "source": "Map section"
+      },
+      "color_picker": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {
+          "r": 0,
+          "g": 122,
+          "b": 135,
+          "a": 1
+        },
+        "source": "Map section"
+      },
+      "color_scheme": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "SUPERSET_DEFAULT",
+        "source": "Map section"
+      },
+      "deafult_breakpoint_color": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {
+          "r": 158,
+          "g": 158,
+          "b": 158,
+          "a": 1
+        },
+        "source": "Map section"
+      },
+      "color_breakpoints": {
+        "data_type": "array[object]",
+        "required": false,
+        "sample_data": [],
+        "source": "Map section"
+      },
+      "viewport": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {
+          "longitude": -122.42066918995666,
+          "latitude": 37.7942314882596,
+          "zoom": 12.699690845482069,
+          "bearing": 155.80099696026355,
+          "pitch": 53.470800300695146
+        },
+        "source": "Map section"
+      },
+      "autozoom": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": true,
+        "source": "Map section"
+      },
+      "grid_size": {
+        "data_type": "integer | string",
+        "required": false,
+        "sample_data": 120,
+        "source": "Map section"
+      },
+      "extruded": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": true,
+        "source": "Map section"
+      },
+      "js_agg_function": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "sum",
+        "source": "Map section"
+      },
+      "js_columns": {
+        "data_type": "array[string | object]",
+        "required": false,
+        "sample_data": [],
+        "source": "Advanced section"
+      },
+      "js_data_mutator": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "data => data",
+        "source": "Advanced section"
+      },
+      "js_tooltip": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "o => `<div>${o.object.elevationValue}</div>`",
+        "source": "Advanced section"
+      },
+      "js_onclick_href": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "o => `https://example.com/${o.coordinate[0]},${o.coordinate[1]}`",
+        "source": "Advanced section"
+      },
+      "slice_id": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 0,
+        "source": "datasourceAndVizType hidden control",
+        "notes": "新建图表时通常省略；编辑已存在图表时由服务端或上层调用方提供。"
+      },
+      "cache_timeout": {
+        "data_type": "integer | null",
+        "required": false,
+        "sample_data": null,
+        "source": "datasourceAndVizType hidden control"
+      },
+      "url_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "QueryFormData"
+      },
+      "custom_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "QueryFormData"
+      },
+      "extra_form_data": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "utils.merge_extra_form_data()",
+        "notes": "虽然不属于 deck_hex controlPanel 正式字段，但 legacy explore_json 路径会消费它。"
+      }
+    },
+    "minimal_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "deck_hex",
+      "spatial": {
+        "type": "latlong",
+        "lonCol": "LON",
+        "latCol": "LAT"
+      },
+      "adhoc_filters": []
+    },
+    "recommended_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "deck_hex",
+      "spatial": {
+        "type": "latlong",
+        "lonCol": "LON",
+        "latCol": "LAT"
+      },
+      "size": "count",
+      "row_limit": 5000,
+      "filter_nulls": true,
+      "adhoc_filters": [],
+      "mapbox_style": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+      "color_scheme_type": "categorical_palette",
+      "color_picker": {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      },
+      "color_scheme": "SUPERSET_DEFAULT",
+      "deafult_breakpoint_color": {
+        "r": 158,
+        "g": 158,
+        "b": 158,
+        "a": 1
+      },
+      "color_breakpoints": [],
+      "viewport": {
+        "longitude": 6.85236157047845,
+        "latitude": 31.222656842808707,
+        "zoom": 1,
+        "bearing": 0,
+        "pitch": 0
+      },
+      "autozoom": true,
+      "grid_size": 20,
+      "extruded": true,
+      "js_agg_function": "sum",
+      "js_columns": [],
+      "js_data_mutator": "",
+      "js_tooltip": "",
+      "js_onclick_href": ""
+    },
+    "conditional_blocks": {
+      "delimited_spatial_column": {
+        "condition": "空间字段存储在单列经纬度字符串中时",
+        "fields": {
+          "spatial": {
+            "type": "delimited",
+            "lonlatCol": "LONLAT",
+            "delimiter": ",",
+            "reverseCheckbox": false
+          }
+        }
+      },
+      "geohash_spatial_column": {
+        "condition": "空间字段存储为 geohash 时",
+        "fields": {
+          "spatial": {
+            "type": "geohash",
+            "geohashCol": "geohash",
+            "reverseCheckbox": false
+          }
+        }
+      },
+      "count_points_instead_of_metric": {
+        "condition": "只想按点数量聚合 hex cell，而不想显式传指标时",
+        "fields": {
+          "size": null,
+          "js_agg_function": "sum"
+        },
+        "notes": "此时每个点的 `weight` 在后端会回退为 1。"
+      },
+      "fixed_color_mode": {
+        "condition": "需要所有 hex cell 使用同一固定色时",
+        "fields": {
+          "color_scheme_type": "fixed_color",
+          "color_picker": {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          }
+        }
+      },
+      "categorical_palette_mode": {
+        "condition": "需要使用调色板颜色范围时",
+        "fields": {
+          "color_scheme_type": "categorical_palette",
+          "color_scheme": "SUPERSET_DEFAULT"
+        }
+      },
+      "breakpoint_color_mode": {
+        "condition": "需要手工定义聚合值区间对应颜色时",
+        "fields": {
+          "color_scheme_type": "color_breakpoints",
+          "deafult_breakpoint_color": {
+            "r": 158,
+            "g": 158,
+            "b": 158,
+            "a": 1
+          },
+          "color_breakpoints": [
+            {
+              "minValue": 0,
+              "maxValue": 100,
+              "color": {
+                "r": 255,
+                "g": 0,
+                "b": 0,
+                "a": 1
+              }
+            }
+          ]
+        }
+      },
+      "custom_js": {
+        "condition": "需要自定义数据加工、tooltip 或点击跳转行为时",
+        "fields": {
+          "js_columns": [
+            "city"
+          ],
+          "js_data_mutator": "data => data",
+          "js_tooltip": "o => `<div>${o.object.elevationValue}</div>`",
+          "js_onclick_href": "o => `https://example.com/${o.coordinate[0]},${o.coordinate[1]}`"
+        }
+      }
+    },
+    "runtime_only_or_non_template_fields": {
+      "runtime_props_generated_by_transformProps": [
+        {
+          "field_name": "payload",
+          "reason": "这是运行时从 `queriesData[0]` 注入的对象，不是 API root form_data 字段。"
+        },
+        {
+          "field_name": "formData",
+          "reason": "这是 runtime 对 `rawFormData` 的整体透传容器，不是额外的 API root 字段。"
+        },
+        {
+          "field_name": "viewport.width",
+          "reason": "运行时由图表尺寸补入，不需要写到 root form_data。"
+        },
+        {
+          "field_name": "viewport.height",
+          "reason": "运行时由图表尺寸补入，不需要写到 root form_data。"
+        },
+        {
+          "field_name": "emitCrossFilters",
+          "reason": "这是 ChartProps/hook 层运行时能力，不是 API root 字段。"
+        },
+        {
+          "field_name": "filterState",
+          "reason": "这是 runtime 交互状态，不是 API root 字段。"
+        }
+      ],
+      "backend_response_only_fields": [
+        {
+          "field_name": "queriesData[0].data.features[*].position",
+          "reason": "这是后端 `DeckHex.get_data()` 产出的空间点位，不是 root form_data 字段。"
+        },
+        {
+          "field_name": "queriesData[0].data.features[*].weight",
+          "reason": "这是后端 `DeckHex.get_data()` 产出的点权重，不是 root form_data 字段。"
+        },
+        {
+          "field_name": "queriesData[0].data.mapboxApiKey",
+          "reason": "这是后端 payload 附带的运行时地图密钥，不是 root form_data 字段。"
+        },
+        {
+          "field_name": "queriesData[0].data.metricLabels",
+          "reason": "这是后端返回的指标标签列表，不是 root form_data 字段。"
+        }
+      ],
+      "legacy_or_generated_non_primary_fields": [
+        {
+          "field_name": "filters",
+          "reason": "这不是当前 controlPanel 正式字段。它可能在旧保存态或 legacy 兼容处理中出现，但当前创建模板应优先使用 `adhoc_filters`。"
+        },
+        {
+          "field_name": "payload.form_data",
+          "reason": "这是 legacy `/superset/explore_json/` 请求的外层包裹字段，不是图表保存态内部的 root form_data 字段。"
+        }
+      ],
+      "viz_switch_only": [
+        {
+          "field_name": "formDataOverrides(size)",
+          "reason": "只在 standardized form data 切换 viz_type 时触发，不是常规 API 导出 deck_hex form_data 的必经步骤。"
+        }
+      ]
+    },
+    "api_usage_guidance": {
+      "high_confidence_required_fields": [
+        "datasource",
+        "viz_type",
+        "spatial"
+      ],
+      "recommended_always_set": [
+        "adhoc_filters",
+        "filter_nulls",
+        "row_limit",
+        "mapbox_style",
+        "color_scheme_type",
+        "viewport",
+        "autozoom",
+        "grid_size",
+        "extruded",
+        "js_agg_function"
+      ],
+      "api_field_examples": [
+        "spatial",
+        "size",
+        "filter_nulls",
+        "mapbox_style",
+        "color_scheme_type",
+        "color_breakpoints",
+        "viewport",
+        "grid_size",
+        "js_agg_function"
+      ],
+      "avoid_confusion": [
+        "不要把 deck_hex 当成标准 chart data API 图表去套 `/api/v1/chart/data` 的 `query_context` 模板；当前图真实入口是 legacy `/superset/explore_json/`。",
+        "不要把 `size` 误写成 `metric` 或 `metrics`；当前图的正式指标字段名就是 `size`。",
+        "不要把 `deafult_breakpoint_color` 更正成自认为更合理的拼写；源码正式字段名就是这个拼写。",
+        "`spatial` 不是单个字符串列名，而是一个对象。根据你的空间数据编码方式，必须传 `latlong` / `delimited` / `geohash` 三种形状之一。",
+        "`viewport` 是正式保存态字段，但 `width`/`height` 由运行时补入，不要把这两个字段写回 root form_data。"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "deck_hex",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/deck_hex-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/deck_hex-form-data-schema.json",
+      "control-schema": "form-data-schema/deck_hex-schema.json"
+    }
+  }
+}

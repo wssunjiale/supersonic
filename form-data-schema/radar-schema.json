@@ -1,0 +1,357 @@
+{
+  "viz_type": "radar",
+  "display_name": "Radar Chart",
+  "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Radar/controlPanel.tsx",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Radar/controlPanel.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Radar/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Radar/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Radar/index.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Radar/EchartsRadar.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Radar/types.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Radar/utils.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/controls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/constants.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/utils/eventHandlers.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryContext.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryObject.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractQueryFields.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/components/controls/ColumnConfigControl/ColumnConfigControl.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/test/Radar/transformProps.test.ts"
+  ],
+  "notes": [
+    "Radar Chart 是 ECharts 图，走 chart data API / `buildQueryContext()`，不是 legacy `/superset/explore_json/`。",
+    "当前图的 API root form_data 键名混合了 snake_case 与 camelCase。必须按 control name 原样提交，例如 `show_legend`、`label_type`、`label_position`、`number_format`、`date_format`、`column_config`、`is_circle` 是 snake_case，而 `legendType`、`legendOrientation`、`legendMargin` 是 camelCase。",
+    "`metrics` 来自共享 `dndAdhocMetricsControl`，带 `validateNonEmpty`，是当前图最高置信的必填字段；`groupby` 没有 validator，因此源码层面它是可选的。",
+    "`row_limit` 在 Radar controlPanel 中覆盖成默认值 `10`，不是共享控件默认的 `10000`。",
+    "Radar 的排序字段链路存在源码不一致：controlPanel 暴露的是 `timeseries_limit_metric`，`getFormDataFromControls()` 会按原名写回 root form_data；但 `Radar/buildQuery.ts` 实际读取的是 `series_limit_metric`。因此从当前源码看，UI 中的 Sort by metric 很可能不会覆盖 `orderby`，查询通常仍回退到按第一个 metric 降序排序。",
+    "`column_config` 是 radar 的专属字段。它是一个按 metric label 为 key 的对象，每个 metric 可配置 `radarMetricMinValue` / `radarMetricMaxValue`。`transformProps.ts` 只有在 `radarMetricMaxValue` 已定义，或 `radarMetricMinValue` 已定义且不等于 0 时，才会把该指标视为“自定义边界”。",
+    "交互筛选走 ECharts 通用事件处理器。只有 `groupby.length > 0` 时，点击系列才会通过 `setDataMask({ extraFormData: { filters: ... } })` 发出 cross-filter。"
+  ],
+  "metadata_summary": {
+    "description": "Visualize a parallel set of metrics across multiple groups. Each group is visualized using its own line of points and each metric is represented as an edge in the chart.",
+    "category": "Ranking",
+    "tags": [
+      "Business",
+      "Comparison",
+      "Multi-Variables",
+      "Report",
+      "Web",
+      "ECharts",
+      "Featured"
+    ]
+  },
+  "query_compilation": {
+    "frontend_builder": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Radar/buildQuery.ts",
+    "query_context_builder": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryContext.ts",
+    "query_field_aliases": {
+      "groupby": "columns"
+    },
+    "base_query_effect": "`buildQueryObject()` 会从 raw form_data 提取 `metrics`、`groupby`、`adhoc_filters`、`row_limit` 等字段，生成 query `metrics` / `columns` / filters。`extractQueryFields()` 会把 `groupby` 统一折叠为 query `columns`。",
+    "radar_build_query_effect": "`Radar/buildQuery.ts` 会优先读取 raw `series_limit_metric` 并写 `orderby=[[sortMetric, false]]`；如果没有，就回退为 `orderby=[[metrics[0], false]]`。由于 controlPanel 实际暴露的是 `timeseries_limit_metric`，当前图存在字段不一致。",
+    "frontend_post_processing": "`transformProps.ts` 会把 raw form_data 转成 runtime alias，计算 legend、labels、radar indicator、normalized tooltip、custom metric bounds，并生成 `labelMap` / `selectedValues` 供交互使用。",
+    "query_sensitive_fields": [
+      "groupby",
+      "metrics",
+      "adhoc_filters",
+      "row_limit"
+    ],
+    "query_sensitive_fields_low_confidence": [
+      {
+        "field_name": "timeseries_limit_metric",
+        "reason": "controlPanel 暴露了它，但当前 `Radar/buildQuery.ts` 并不读取这个 root 键。"
+      },
+      {
+        "field_name": "series_limit_metric",
+        "reason": "`Radar/buildQuery.ts` 会读取它，但它不是 controlPanel 暴露字段，也不会由 `getFormDataFromControls()` 从 UI 自动导出。"
+      }
+    ]
+  },
+  "form_data_overrides": {
+    "metrics": "getStandardizedControls().popAllMetrics()",
+    "groupby": "getStandardizedControls().popAllColumns()"
+  },
+  "field_categories": {
+    "Query": [
+      {
+        "field_name": "groupby",
+        "description": "Dimensions contain qualitative values such as names, dates, or geographical data. Use dimensions to categorize, segment, and reveal the details in your data. Dimensions affect the level of detail in the view.",
+        "data_type": "array[string | object]",
+        "enum_source": "datasource columns",
+        "sample_data": [
+          "region"
+        ],
+        "required": false,
+        "embedding": "否",
+        "default_value": []
+      },
+      {
+        "field_name": "metrics",
+        "description": "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+        "data_type": "array[string | object]",
+        "enum_source": "saved metrics + adhoc metrics",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          }
+        ],
+        "required": true,
+        "embedding": "否",
+        "default_value": [],
+        "notes": "复用了共享 `metrics` 控件，带 `validateNonEmpty`。"
+      },
+      {
+        "field_name": "timeseries_limit_metric",
+        "description": "Orders the query result that generates the source data for this chart. If undefined, defaults to the first metric (where appropriate).",
+        "data_type": "string | object | null",
+        "enum_source": "saved metrics + adhoc metrics",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        },
+        "required": false,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "这是 controlPanel 暴露的真实 root 键。但当前 `Radar/buildQuery.ts` 并不读取它，而是读取 `series_limit_metric`，所以从源码看它对 query `orderby` 的作用是低置信的。"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "description": "Filters",
+        "data_type": "array[object]",
+        "enum_source": "dataset filterable columns + saved metrics + current metrics",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "default_value": []
+      },
+      {
+        "field_name": "row_limit",
+        "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+        "data_type": "integer",
+        "enum_values": [
+          10,
+          50,
+          100,
+          250,
+          500,
+          1000,
+          5000,
+          10000,
+          50000
+        ],
+        "sample_data": 10,
+        "required": false,
+        "embedding": "否",
+        "default_value": 10
+      }
+    ],
+    "Chart Options / General": [
+      {
+        "field_name": "color_scheme",
+        "runtime_alias": "colorScheme",
+        "description": "The color scheme for rendering chart",
+        "data_type": "string",
+        "enum_source": "categoricalSchemeRegistry.keys()",
+        "sample_data": "supersetColors",
+        "required": false,
+        "embedding": "否",
+        "default_value": "categoricalSchemeRegistry.getDefaultKey()"
+      }
+    ],
+    "Chart Options / Legend": [
+      {
+        "field_name": "show_legend",
+        "runtime_alias": "showLegend",
+        "description": "Whether to display a legend for the chart",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true
+      },
+      {
+        "field_name": "legendType",
+        "description": "Legend type",
+        "data_type": "string",
+        "enum_values": [
+          "scroll",
+          "plain"
+        ],
+        "sample_data": "scroll",
+        "required": false,
+        "embedding": "否",
+        "default_value": "scroll"
+      },
+      {
+        "field_name": "legendOrientation",
+        "description": "Legend Orientation",
+        "data_type": "string",
+        "enum_values": [
+          "top",
+          "bottom",
+          "left",
+          "right"
+        ],
+        "sample_data": "top",
+        "required": false,
+        "embedding": "否",
+        "default_value": "top"
+      },
+      {
+        "field_name": "legendMargin",
+        "description": "Additional padding for legend.",
+        "data_type": "integer | null",
+        "sample_data": null,
+        "required": false,
+        "embedding": "否",
+        "default_value": null
+      }
+    ],
+    "Chart Options / Labels": [
+      {
+        "field_name": "show_labels",
+        "runtime_alias": "showLabels",
+        "description": "Whether to display the labels.",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true
+      },
+      {
+        "field_name": "label_type",
+        "runtime_alias": "labelType",
+        "description": "What should be shown on the label?",
+        "data_type": "string",
+        "enum_values": [
+          "value",
+          "key_value"
+        ],
+        "sample_data": "value",
+        "required": false,
+        "embedding": "否",
+        "default_value": "value"
+      },
+      {
+        "field_name": "label_position",
+        "runtime_alias": "labelPosition",
+        "description": "Label position",
+        "data_type": "string",
+        "enum_values": [
+          "top",
+          "left",
+          "right",
+          "bottom",
+          "inside",
+          "insideLeft",
+          "insideRight",
+          "insideTop",
+          "insideBottom",
+          "insideTopLeft",
+          "insideBottomLeft",
+          "insideTopRight",
+          "insideBottomRight"
+        ],
+        "sample_data": "top",
+        "required": false,
+        "embedding": "否",
+        "default_value": "top"
+      },
+      {
+        "field_name": "number_format",
+        "runtime_alias": "numberFormat",
+        "description": "D3 format syntax for numbers",
+        "data_type": "string",
+        "enum_source": "D3_FORMAT_OPTIONS + freeForm",
+        "sample_data": "SMART_NUMBER",
+        "required": false,
+        "embedding": "否",
+        "default_value": "SMART_NUMBER"
+      },
+      {
+        "field_name": "date_format",
+        "runtime_alias": "dateFormat",
+        "description": "D3 format syntax for dates and times",
+        "data_type": "string",
+        "enum_source": "D3_TIME_FORMAT_OPTIONS + freeForm",
+        "sample_data": "smart_date",
+        "required": false,
+        "embedding": "否",
+        "default_value": "smart_date"
+      }
+    ],
+    "Chart Options / Radar": [
+      {
+        "field_name": "column_config",
+        "runtime_alias": "columnConfig",
+        "description": "Further customize how to display each metric",
+        "data_type": "object[string, object]",
+        "sample_data": {
+          "SUM(sales)": {
+            "radarMetricMinValue": 0,
+            "radarMetricMaxValue": null
+          },
+          "AVG(profit_margin)": {
+            "radarMetricMinValue": -10,
+            "radarMetricMaxValue": 100
+          }
+        },
+        "required": false,
+        "embedding": "否",
+        "default_value": {},
+        "object_schema": {
+          "<metricLabel>": {
+            "radarMetricMinValue": "number",
+            "radarMetricMaxValue": "number | null"
+          }
+        },
+        "notes": "key 是 metric label。`transformProps.ts` 只有在 max 已定义，或 min 已定义且不等于 0 时，才把该指标视为自定义边界。测试文件里也使用了 `{ radarMetricMaxValue: null, radarMetricMinValue: 0 }` 这种结构。"
+      },
+      {
+        "field_name": "is_circle",
+        "runtime_alias": "isCircle",
+        "description": "Radar render type, whether to display 'circle' shape.",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      }
+    ]
+  }
+}

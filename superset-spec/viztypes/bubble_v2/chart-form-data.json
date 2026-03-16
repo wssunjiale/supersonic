@@ -1,0 +1,699 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "bubble_v2",
+  "display_name": "Bubble Chart",
+  "source_kind": "schema_file",
+  "normalized_chart_form_data": {
+    "required_root_fields": [
+      "datasource",
+      "entity",
+      "size",
+      "viz_type",
+      "x",
+      "y"
+    ],
+    "optional_root_fields": [
+      "adhoc_filters",
+      "cache_timeout",
+      "color_scheme",
+      "custom_params",
+      "extra_form_data",
+      "legendMargin",
+      "legendOrientation",
+      "legendType",
+      "logXAxis",
+      "logYAxis",
+      "max_bubble_size",
+      "opacity",
+      "order_desc",
+      "orderby",
+      "row_limit",
+      "series",
+      "show_legend",
+      "slice_id",
+      "tooltipSizeFormat",
+      "truncateXAxis",
+      "truncateYAxis",
+      "url_params",
+      "xAxisBounds",
+      "xAxisFormat",
+      "xAxisLabelInterval",
+      "xAxisLabelRotation",
+      "x_axis_label",
+      "x_axis_title_margin",
+      "yAxisLabelRotation",
+      "y_axis_bounds",
+      "y_axis_format",
+      "y_axis_label",
+      "y_axis_title_margin"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "entity",
+      "size",
+      "viz_type",
+      "x",
+      "y"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "color_scheme",
+      "datasource",
+      "entity",
+      "extra_form_data",
+      "legendMargin",
+      "legendOrientation",
+      "legendType",
+      "max_bubble_size",
+      "opacity",
+      "order_desc",
+      "orderby",
+      "row_limit",
+      "series",
+      "show_legend",
+      "size",
+      "tooltipSizeFormat",
+      "truncateXAxis",
+      "truncateYAxis",
+      "viz_type",
+      "x",
+      "xAxisBounds",
+      "xAxisFormat",
+      "xAxisLabelInterval",
+      "xAxisLabelRotation",
+      "x_axis_label",
+      "x_axis_title_margin",
+      "y",
+      "yAxisLabelRotation",
+      "y_axis_bounds",
+      "y_axis_format",
+      "y_axis_label",
+      "y_axis_title_margin"
+    ],
+    "fallback_template_seed": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "bubble_v2",
+      "entity": "<entity_column>",
+      "size": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "x": null,
+      "y": null,
+      "adhoc_filters": [],
+      "time_range": "No filter"
+    }
+  },
+  "original_chart_form_data_schema": {
+    "viz_type": "bubble_v2",
+    "display_name": "Bubble Chart",
+    "purpose": "用于调用 API 创建或保存 Bubble Chart 时填写的 form_data 模板",
+    "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/bubble_v2-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Bubble/controlPanel.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Bubble/index.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Bubble/buildQuery.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Bubble/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Bubble/types.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Bubble/constants.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/test/Bubble/buildQuery.test.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/test/Bubble/transformProps.test.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/controls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/constants.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/defaults.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryContext.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryObject.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractQueryFields.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/models/ChartProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+      "D:/vsx/sources/superset-6.0.0/superset/examples/configs/charts/Featured Charts/Bubble.yaml",
+      "D:/vsx/sources/superset-6.0.0/superset/migrations/shared/migrate_viz/processors.py"
+    ],
+    "notes": [
+      "API form_data 的键名必须保留源码 control name。Bubble 同时混用了 snake_case 和 camelCase：例如 root 键是 `show_legend`、`max_bubble_size`、`y_axis_format`，但同时也有 `legendType`、`legendOrientation`、`xAxisFormat`、`xAxisBounds`、`tooltipSizeFormat` 这样的 camelCase 键。",
+      "Explore 导出 form_data 时走 getFormDataFromControls()，它按 controlName 原样写入 form_data，不会把 `show_legend` 变成 `showLegend`，也不会把 `max_bubble_size` 变成 `maxBubbleSize`。",
+      "transformProps.ts 中读到的 `colorScheme`、`showLegend`、`maxBubbleSize`、`xAxisLabel`、`yAxisBounds` 等 camelCase 名称，来自 ChartProps.ts 的 convertKeysToCamelCase(formData)。这属于运行时别名，不是 API 保存态 form_data 的主键名。",
+      "Bubble 的正式 viz_type 是 bubble_v2。Bubble 单测里保留的 echarts_bubble 只是旧测试残留；examples/configs/charts/Featured Charts/Bubble.yaml 和 VizType.ts 才反映 6.0.0 的正式键名。",
+      "Bubble/buildQuery.ts 会把 query.columns 固定编译成 entity + series；同时 extractQueryFields.ts 会把 x / y / size 编译成 query.metrics。因此 Bubble 创建模板的最核心字段是 entity、x、y、size，series 可选。",
+      "Bubble/controlPanel.tsx 的 logXAxis / logYAxis 默认值存在源码缺陷。为了保持与官方示例和运行时行为一致，推荐模板里可以直接省略这两个键；需要显式使用对数轴时再手动写入 true 或 false。",
+      "官方 Bubble 示例保存态中出现了 `extra_form_data: {}`。这不是 controlPanel 定义的控件，但属于 QueryFormData 的通用字段，保存态里允许存在。"
+    ],
+    "naming_and_pipeline": {
+      "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写成 form_data[name]",
+      "api_form_data_to_query_context": "buildQueryContext() -> buildQueryObject() -> extractQueryFields() 先把 x/y/size 编译到 query.metrics，再由 Bubble/buildQuery.ts 把 query.columns 覆写为 [entity, series]，并把 orderby 重写成 [[metric, !order_desc]]",
+      "api_form_data_to_runtime_form_data": "ChartProps.ts 会把 form_data 转成 camelCase 的 runtime formData，同时保留 rawFormData"
+    },
+    "global_required_fields": {
+      "datasource": {
+        "data_type": "string",
+        "required": true,
+        "sample_data": "<dataset_id>__table",
+        "source": "datasourceAndVizType section"
+      },
+      "viz_type": {
+        "data_type": "string",
+        "required": true,
+        "fixed_value": "bubble_v2",
+        "source": "VizType.Bubble + Featured Charts/Bubble.yaml"
+      },
+      "entity": {
+        "data_type": "string | object",
+        "required": true,
+        "sample_data": "deal_size",
+        "source": "Bubble Query section"
+      },
+      "x": {
+        "data_type": "string | object",
+        "required": true,
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "quantity_ordered"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(quantity_ordered)"
+        },
+        "source": "Bubble Query section"
+      },
+      "y": {
+        "data_type": "string | object",
+        "required": true,
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "country"
+          },
+          "aggregate": "COUNT_DISTINCT",
+          "label": "COUNT_DISTINCT(country)"
+        },
+        "source": "Bubble Query section"
+      },
+      "size": {
+        "data_type": "string | object",
+        "required": true,
+        "sample_data": "count",
+        "source": "Bubble Query section"
+      }
+    },
+    "global_optional_fields": {
+      "series": {
+        "data_type": "string | object | null",
+        "required": false,
+        "sample_data": "product_line",
+        "source": "Bubble Query section",
+        "notes": "可选分组维度。Bubble/buildQuery.ts 会把它追加进 query.columns。"
+      },
+      "adhoc_filters": {
+        "data_type": "array[object]",
+        "required": false,
+        "sample_data": [
+          {
+            "clause": "WHERE",
+            "subject": "order_date",
+            "operator": "TEMPORAL_RANGE",
+            "comparator": "No filter",
+            "expressionType": "SIMPLE"
+          }
+        ],
+        "source": "Bubble Query section"
+      },
+      "orderby": {
+        "data_type": "string | object | null",
+        "required": false,
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "quantity_ordered"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(quantity_ordered)"
+        },
+        "source": "Bubble Query section",
+        "notes": "最终 query.orderby 会被重写成 [[metric, !order_desc]]。"
+      },
+      "order_desc": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": true,
+        "source": "sharedControls.order_desc"
+      },
+      "row_limit": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 10000,
+        "source": "sharedControls.row_limit"
+      },
+      "color_scheme": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "supersetColors",
+        "source": "Bubble Chart Options section"
+      },
+      "show_legend": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": true,
+        "source": "legendSection"
+      },
+      "legendType": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "scroll",
+        "source": "legendSection"
+      },
+      "legendOrientation": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "top",
+        "source": "legendSection"
+      },
+      "legendMargin": {
+        "data_type": "integer | null",
+        "required": false,
+        "sample_data": null,
+        "source": "legendSection"
+      },
+      "max_bubble_size": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "25",
+        "source": "Bubble Chart Options section",
+        "notes": "源码 choice 使用字符串，不是 number。"
+      },
+      "tooltipSizeFormat": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "SMART_NUMBER",
+        "source": "Bubble Chart Options section"
+      },
+      "opacity": {
+        "data_type": "number",
+        "required": false,
+        "sample_data": 0.6,
+        "source": "Bubble Chart Options section"
+      },
+      "x_axis_label": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "Quantity Ordered",
+        "source": "Bubble X Axis section"
+      },
+      "xAxisLabelRotation": {
+        "data_type": "integer | string",
+        "required": false,
+        "sample_data": 45,
+        "source": "Bubble X Axis section"
+      },
+      "xAxisLabelInterval": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "auto",
+        "source": "Bubble X Axis section"
+      },
+      "x_axis_title_margin": {
+        "data_type": "integer | string",
+        "required": false,
+        "sample_data": 30,
+        "source": "Bubble X Axis section"
+      },
+      "xAxisFormat": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "SMART_NUMBER",
+        "source": "Bubble X Axis section"
+      },
+      "logXAxis": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": false,
+        "source": "Bubble X Axis section",
+        "notes": "controlPanel 默认值有源码缺陷；推荐模板可省略，显式需要时再传。"
+      },
+      "y_axis_label": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "Distinct Countries",
+        "source": "Bubble Y Axis section"
+      },
+      "yAxisLabelRotation": {
+        "data_type": "integer | string",
+        "required": false,
+        "sample_data": 45,
+        "source": "Bubble Y Axis section"
+      },
+      "y_axis_title_margin": {
+        "data_type": "integer | string",
+        "required": false,
+        "sample_data": 30,
+        "source": "Bubble Y Axis section"
+      },
+      "y_axis_format": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "SMART_NUMBER",
+        "source": "Bubble Y Axis section"
+      },
+      "logYAxis": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": false,
+        "source": "Bubble Y Axis section",
+        "notes": "controlPanel 默认值有源码缺陷；推荐模板可省略，显式需要时再传。"
+      },
+      "truncateXAxis": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": false,
+        "source": "Bubble Y Axis section"
+      },
+      "xAxisBounds": {
+        "data_type": "array[number | null]",
+        "required": false,
+        "sample_data": [
+          0,
+          5000
+        ],
+        "source": "Bubble Y Axis section"
+      },
+      "truncateYAxis": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": false,
+        "source": "Bubble Y Axis section"
+      },
+      "y_axis_bounds": {
+        "data_type": "array[number | null]",
+        "required": false,
+        "sample_data": [
+          0,
+          100
+        ],
+        "source": "Bubble Y Axis section"
+      },
+      "slice_id": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 0,
+        "source": "datasourceAndVizType hidden control",
+        "notes": "新建图表时通常省略；编辑已存在图表时由服务端或上层调用方提供。"
+      },
+      "cache_timeout": {
+        "data_type": "integer | null",
+        "required": false,
+        "sample_data": null,
+        "source": "datasourceAndVizType hidden control"
+      },
+      "url_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "QueryFormData"
+      },
+      "custom_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "QueryFormData"
+      },
+      "extra_form_data": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "QueryFormData",
+        "notes": "官方 Bubble 示例保存态里就带有 extra_form_data: {}。"
+      }
+    },
+    "minimal_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "bubble_v2",
+      "entity": "<entity_dimension>",
+      "x": "<x_metric_or_saved_metric>",
+      "y": "<y_metric_or_saved_metric>",
+      "size": "<size_metric_or_saved_metric>",
+      "adhoc_filters": []
+    },
+    "recommended_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "bubble_v2",
+      "series": null,
+      "entity": "deal_size",
+      "x": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "quantity_ordered"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(quantity_ordered)"
+      },
+      "y": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "country"
+        },
+        "aggregate": "COUNT_DISTINCT",
+        "label": "COUNT_DISTINCT(country)"
+      },
+      "adhoc_filters": [],
+      "size": "count",
+      "orderby": null,
+      "order_desc": true,
+      "row_limit": 10000,
+      "color_scheme": "supersetColors",
+      "show_legend": true,
+      "legendType": "scroll",
+      "legendOrientation": "top",
+      "legendMargin": null,
+      "max_bubble_size": "25",
+      "tooltipSizeFormat": "SMART_NUMBER",
+      "opacity": 0.6,
+      "x_axis_label": "",
+      "xAxisLabelRotation": 0,
+      "xAxisLabelInterval": "auto",
+      "x_axis_title_margin": 30,
+      "xAxisFormat": "SMART_NUMBER",
+      "y_axis_label": "",
+      "yAxisLabelRotation": 0,
+      "y_axis_title_margin": 30,
+      "y_axis_format": "SMART_NUMBER",
+      "truncateXAxis": false,
+      "xAxisBounds": [
+        null,
+        null
+      ],
+      "truncateYAxis": false,
+      "y_axis_bounds": [
+        null,
+        null
+      ],
+      "extra_form_data": {}
+    },
+    "conditional_blocks": {
+      "series_grouping": {
+        "condition": "需要按某个维度给气泡上色并拆分系列时",
+        "fields": {
+          "series": "product_line",
+          "show_legend": true,
+          "legendType": "scroll",
+          "legendOrientation": "top"
+        }
+      },
+      "query_sorting": {
+        "condition": "需要指定截断前的排序指标时",
+        "fields": {
+          "orderby": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "quantity_ordered"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(quantity_ordered)"
+          },
+          "order_desc": true
+        }
+      },
+      "filters": {
+        "condition": "需要对数据做筛选时",
+        "fields": {
+          "adhoc_filters": [
+            {
+              "clause": "WHERE",
+              "subject": "product_line",
+              "operator": "IN",
+              "comparator": [
+                "Classic Cars",
+                "Motorcycles"
+              ],
+              "expressionType": "SIMPLE"
+            }
+          ]
+        }
+      },
+      "bubble_sizing_and_tooltip": {
+        "condition": "需要控制气泡大小上限或 tooltip 中的 size 格式时",
+        "fields": {
+          "max_bubble_size": "50",
+          "tooltipSizeFormat": "$,.2f",
+          "opacity": 0.8
+        }
+      },
+      "axis_titles_and_formatting": {
+        "condition": "需要显式配置轴标题和数值格式时",
+        "fields": {
+          "x_axis_label": "Quantity Ordered",
+          "x_axis_title_margin": 30,
+          "xAxisFormat": "SMART_NUMBER",
+          "y_axis_label": "Distinct Countries",
+          "y_axis_title_margin": 30,
+          "y_axis_format": "SMART_NUMBER"
+        }
+      },
+      "log_axes": {
+        "condition": "需要显式启用对数轴时",
+        "fields": {
+          "logXAxis": true,
+          "logYAxis": true
+        }
+      },
+      "axis_bounds": {
+        "condition": "需要手工扩展或截断数值轴范围时",
+        "fields": {
+          "truncateXAxis": true,
+          "xAxisBounds": [
+            0,
+            5000
+          ],
+          "truncateYAxis": true,
+          "y_axis_bounds": [
+            0,
+            100
+          ]
+        }
+      }
+    },
+    "runtime_only_or_non_template_fields": {
+      "legacy_or_confusing_keys": [
+        {
+          "field_name": "echarts_bubble",
+          "reason": "只在 Bubble 单测里出现的旧 viz_type，不应作为 Superset 6.0.0 新建图表的主键名。正式值是 bubble_v2。"
+        },
+        {
+          "field_name": "logXAis",
+          "reason": "Bubble/constants.ts 里的拼写错误键，controlPanel 和 API 都不应使用它。"
+        },
+        {
+          "field_name": "yAXisFormat",
+          "reason": "Bubble/types.ts 里的拼写错误。实际 API 主键是 y_axis_format，运行时别名是 yAxisFormat。"
+        }
+      ],
+      "runtime_aliases_generated_by_ChartProps": [
+        {
+          "field_name": "showLegend",
+          "reason": "由 raw form_data.show_legend 经 convertKeysToCamelCase() 生成。"
+        },
+        {
+          "field_name": "maxBubbleSize",
+          "reason": "由 raw form_data.max_bubble_size 经 convertKeysToCamelCase() 生成。"
+        },
+        {
+          "field_name": "xAxisLabel",
+          "reason": "由 raw form_data.x_axis_label 经 convertKeysToCamelCase() 生成。"
+        },
+        {
+          "field_name": "yAxisLabel",
+          "reason": "由 raw form_data.y_axis_label 经 convertKeysToCamelCase() 生成。"
+        },
+        {
+          "field_name": "yAxisBounds",
+          "reason": "由 raw form_data.y_axis_bounds 经 convertKeysToCamelCase() 生成。"
+        }
+      ],
+      "derived_query_fields": [
+        {
+          "field_name": "query.columns",
+          "reason": "Bubble/buildQuery.ts 把 entity + series 组合后写到 query.columns。"
+        },
+        {
+          "field_name": "query.metrics",
+          "reason": "extractQueryFields.ts 会把 x / y / size 编译到 query.metrics。"
+        },
+        {
+          "field_name": "query.orderby",
+          "reason": "Bubble/buildQuery.ts 会把 root form_data.orderby 与 order_desc 重写成二维 orderby 数组。"
+        }
+      ],
+      "runtime_derived_fields": [
+        {
+          "field_name": "echartOptions",
+          "reason": "transformProps.ts 动态生成的 ECharts 配置，不是可保存的 form_data 字段。"
+        },
+        {
+          "field_name": "refs",
+          "reason": "transformProps.ts 为 tooltip / context menu 生成的运行时引用，不是 form_data 字段。"
+        },
+        {
+          "field_name": "series",
+          "reason": "transformProps.ts 里的本地变量名也叫 series，但那是 ECharts scatter series 数组，不要和 root form_data.series 维度字段混淆。"
+        }
+      ]
+    },
+    "api_usage_guidance": {
+      "high_confidence_required_fields": [
+        "datasource",
+        "viz_type",
+        "entity",
+        "x",
+        "y",
+        "size"
+      ],
+      "recommended_always_set": [
+        "adhoc_filters",
+        "row_limit",
+        "color_scheme",
+        "show_legend",
+        "legendType",
+        "legendOrientation",
+        "max_bubble_size",
+        "tooltipSizeFormat",
+        "opacity"
+      ],
+      "api_field_examples": [
+        "entity",
+        "series",
+        "x",
+        "y",
+        "size",
+        "orderby",
+        "max_bubble_size",
+        "tooltipSizeFormat",
+        "xAxisBounds",
+        "y_axis_bounds"
+      ],
+      "avoid_confusion": [
+        "不要把正式 viz_type 写成旧测试值 echarts_bubble；Superset 6.0.0 正式值是 bubble_v2。",
+        "不要把运行时别名 showLegend / maxBubbleSize / yAxisBounds 当成 API 主键；保存态 root form_data 仍应使用 show_legend / max_bubble_size / y_axis_bounds。",
+        "不要把 Bubble/types.ts 里的 yAXisFormat 拼写错误照抄到模板。正式 API 主键是 y_axis_format。",
+        "不要把 max_bubble_size 当成纯 number；当前 controlPanel choices 全是字符串。",
+        "如果不需要对数轴，logXAxis / logYAxis 可以省略；源码默认值存在缺陷，显式写 false 也可以。"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "bubble_v2",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/bubble_v2-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/bubble_v2-form-data-schema.json",
+      "control-schema": "form-data-schema/bubble_v2-schema.json"
+    }
+  }
+}

@@ -153,7 +153,8 @@ CREATE TABLE IF NOT EXISTS s2_chat_model (
     updated_at timestamp NOT NULL,
     updated_by varchar(100) NOT NULL,
     admin varchar(500) DEFAULT NULL,
-    viewer varchar(500) DEFAULT NULL
+    viewer varchar(500) DEFAULT NULL,
+    is_open smallint DEFAULT NULL
 );
 
 CREATE TABLE IF NOT EXISTS s2_database (
@@ -168,7 +169,8 @@ CREATE TABLE IF NOT EXISTS s2_database (
     updated_at timestamp NOT NULL,
     updated_by varchar(100) NOT NULL,
     admin varchar(500) DEFAULT NULL,
-    viewer varchar(500) DEFAULT NULL
+    viewer varchar(500) DEFAULT NULL,
+    is_open smallint DEFAULT NULL
 );
 
 
@@ -325,6 +327,13 @@ CREATE TABLE IF NOT EXISTS s2_superset_dataset (
     superset_dataset_id bigint DEFAULT NULL,
     columns text DEFAULT NULL,
     metrics text DEFAULT NULL,
+    source_type varchar(50) DEFAULT NULL,
+    sync_state varchar(20) DEFAULT NULL,
+    sync_attempt_at timestamp DEFAULT NULL,
+    next_retry_at timestamp DEFAULT NULL,
+    retry_count integer DEFAULT 0,
+    sync_error_type varchar(20) DEFAULT NULL,
+    sync_error_msg text DEFAULT NULL,
     created_at timestamp DEFAULT NULL,
     created_by varchar(100) DEFAULT NULL,
     updated_at timestamp DEFAULT NULL,
@@ -495,7 +504,7 @@ CREATE TABLE IF NOT EXISTS s2_model_rela (
     from_model_id bigint,
     to_model_id bigint,
     join_type VARCHAR(255),
-    join_condition VARCHAR(255)
+    join_condition text
 );
 
 CREATE TABLE IF NOT EXISTS s2_collect (
@@ -526,5 +535,6 @@ CREATE TABLE IF NOT EXISTS s2_user (
     salt varchar(256) DEFAULT NULL,
     email varchar(100) NULL,
     is_admin smallint NULL,
+    last_login timestamp NULL,
     UNIQUE(name)
 );

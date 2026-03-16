@@ -1,0 +1,584 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "pivot_table_v2",
+  "display_name": "Pivot Table",
+  "source_kind": "schema_file",
+  "normalized_chart_form_data": {
+    "required_root_fields": [
+      "datasource",
+      "metrics",
+      "viz_type"
+    ],
+    "optional_root_fields": [
+      "adhoc_filters",
+      "aggregateFunction",
+      "allow_render_html",
+      "cache_timeout",
+      "colOrder",
+      "colSubTotals",
+      "colSubtotalPosition",
+      "colTotals",
+      "combineMetric",
+      "conditional_formatting",
+      "currency_format",
+      "custom_params",
+      "date_format",
+      "groupbyColumns",
+      "groupbyRows",
+      "metricsLayout",
+      "order_desc",
+      "rowOrder",
+      "rowSubTotals",
+      "rowSubtotalPosition",
+      "rowTotals",
+      "row_limit",
+      "series_limit",
+      "series_limit_metric",
+      "slice_id",
+      "temporal_columns_lookup",
+      "time_grain_sqla",
+      "transposePivot",
+      "url_params",
+      "valueFormat"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "groupbyColumns",
+      "groupbyRows",
+      "metrics",
+      "metricsLayout",
+      "order_desc",
+      "row_limit",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "aggregateFunction",
+      "allow_render_html",
+      "colOrder",
+      "colSubTotals",
+      "colSubtotalPosition",
+      "colTotals",
+      "combineMetric",
+      "conditional_formatting",
+      "currency_format",
+      "datasource",
+      "date_format",
+      "groupbyColumns",
+      "groupbyRows",
+      "metrics",
+      "metricsLayout",
+      "order_desc",
+      "rowOrder",
+      "rowSubTotals",
+      "rowSubtotalPosition",
+      "rowTotals",
+      "row_limit",
+      "series_limit",
+      "series_limit_metric",
+      "transposePivot",
+      "valueFormat",
+      "viz_type"
+    ],
+    "fallback_template_seed": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "pivot_table_v2",
+      "metrics": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        }
+      ],
+      "adhoc_filters": [],
+      "time_range": "No filter"
+    }
+  },
+  "original_chart_form_data_schema": {
+    "viz_type": "pivot_table_v2",
+    "display_name": "Pivot Table",
+    "purpose": "用于调用 API 创建或保存 Pivot Table 时填写的 form_data 模板",
+    "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/pivot_table_v2-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-pivot-table/src/plugin/controlPanel.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-pivot-table/src/plugin/buildQuery.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-pivot-table/src/plugin/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-pivot-table/src/plugin/index.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-pivot-table/src/PivotTableChart.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-pivot-table/src/react-pivottable/PivotTable.jsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-pivot-table/src/react-pivottable/TableRenderers.jsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-pivot-table/src/types.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/utils/getColorFormatters.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryContext.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryObject.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractQueryFields.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/QueryFormData.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts"
+    ],
+    "notes": [
+      "Explore 导出 form_data 时走 `getFormDataFromControls()`，因此 API root 必须使用 control name 原样键名。",
+      "Pivot Table 的 root form_data 不是纯 snake_case。`groupbyRows`、`groupbyColumns`、`metricsLayout`、`aggregateFunction`、`rowTotals`、`valueFormat`、`rowOrder` 等都要按 camelCase 提交；只有 `time_grain_sqla`、`date_format`、`currency_format`、`conditional_formatting`、`allow_render_html` 等保持 snake_case。",
+      "真正的 query `columns` 与 `orderby` 不是直接由 root form_data 提交，而是由 `buildQuery.ts` 根据 `groupbyRows`、`groupbyColumns`、`time_grain_sqla`、`series_limit_metric`、`metrics`、`order_desc` 派生。",
+      "如果需要让 `time_grain_sqla` 对物理 temporal column 生效，源码链路还依赖隐藏字段 `temporal_columns_lookup` 来判断某列是否为时间列。",
+      "`tableRenderer` 虽然出现在 `types.ts` 与 `transformProps.ts` 中，但当前 controlPanel 未暴露、当前渲染实现也未按它分支；它不属于当前图的正式 API 模板字段。"
+    ],
+    "naming_and_pipeline": {
+      "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写入 root form_data。",
+      "api_form_data_to_query_context": "PivotTable/buildQuery.ts 调用 buildQueryContext(formData, ...)，raw formData 会原样放入 query_context.form_data。",
+      "api_form_data_to_query_object": "buildQueryObject() 先提取 `metrics`、`adhoc_filters`、`row_limit`、`series_limit`、`series_limit_metric` 等基础字段；随后 PivotTable/buildQuery.ts 再把 `groupbyRows + groupbyColumns` 编译进 query `columns`，并按 `series_limit_metric` / `metrics[0]` 计算 `orderby`。",
+      "api_form_data_to_runtime_form_data": "ChartProps 会把 raw form_data 转成 runtime props；`conditional_formatting -> conditionalFormatting`、`date_format -> dateFormat`、`currency_format -> currencyFormat`、`allow_render_html -> allowRenderHtml`、`time_grain_sqla -> timeGrainSqla`。"
+    },
+    "global_required_fields": {
+      "datasource": {
+        "data_type": "string",
+        "required": true,
+        "sample_data": "<dataset_id>__table",
+        "source": "datasourceAndVizType hidden control"
+      },
+      "viz_type": {
+        "data_type": "string",
+        "required": true,
+        "fixed_value": "pivot_table_v2",
+        "source": "plugin registration key"
+      },
+      "metrics": {
+        "data_type": "array[string | object]",
+        "required": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source": "Query section validators"
+      }
+    },
+    "global_optional_fields": {
+      "slice_id": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 0,
+        "source": "datasourceAndVizType hidden control"
+      },
+      "cache_timeout": {
+        "data_type": "integer | null",
+        "required": false,
+        "sample_data": null,
+        "source": "QueryFormData"
+      },
+      "url_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "QueryFormData"
+      },
+      "custom_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "QueryFormData"
+      },
+      "groupbyColumns": {
+        "data_type": "array[string | object]",
+        "required": false,
+        "sample_data": [
+          "<column_dimension>"
+        ],
+        "source": "Query section"
+      },
+      "groupbyRows": {
+        "data_type": "array[string | object]",
+        "required": false,
+        "sample_data": [
+          "<row_dimension>"
+        ],
+        "source": "Query section"
+      },
+      "time_grain_sqla": {
+        "data_type": "string | null",
+        "required": false,
+        "sample_data": "P1D",
+        "source": "Query section",
+        "notes": "只有在 rows/columns 中选中 temporal 列时才真正有意义。"
+      },
+      "temporal_columns_lookup": {
+        "data_type": "object[string, boolean]",
+        "required": false,
+        "sample_data": {
+          "<temporal_column>": true
+        },
+        "source": "hidden control",
+        "notes": "通常由 Explore 自动生成。手工构造 API form_data 且要用 `time_grain_sqla` 时，建议一并带上。"
+      },
+      "metricsLayout": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "COLUMNS",
+        "source": "Query section"
+      },
+      "adhoc_filters": {
+        "data_type": "array[object]",
+        "required": false,
+        "sample_data": [],
+        "source": "Query section"
+      },
+      "series_limit": {
+        "data_type": "integer | null",
+        "required": false,
+        "sample_data": 25,
+        "source": "Query section"
+      },
+      "row_limit": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 10000,
+        "source": "Query section"
+      },
+      "series_limit_metric": {
+        "data_type": "string | object | null",
+        "required": false,
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<sort_metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<sort_metric_column>)"
+        },
+        "source": "Query section"
+      },
+      "order_desc": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": true,
+        "source": "Query section"
+      },
+      "aggregateFunction": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "Sum",
+        "source": "Options / Pivot Structure"
+      },
+      "rowTotals": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": false,
+        "source": "Options / Totals"
+      },
+      "rowSubTotals": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": false,
+        "source": "Options / Totals"
+      },
+      "colTotals": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": false,
+        "source": "Options / Totals"
+      },
+      "colSubTotals": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": false,
+        "source": "Options / Totals"
+      },
+      "transposePivot": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": false,
+        "source": "Options / Pivot Structure"
+      },
+      "combineMetric": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": false,
+        "source": "Options / Pivot Structure"
+      },
+      "valueFormat": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "SMART_NUMBER",
+        "source": "Options / Formatting & Sorting",
+        "notes": "当前 root 键名是 `valueFormat`，不是 `value_format`。"
+      },
+      "currency_format": {
+        "data_type": "string | object | null",
+        "required": false,
+        "sample_data": null,
+        "source": "Options / Formatting & Sorting"
+      },
+      "date_format": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "smart_date",
+        "source": "Options / Formatting & Sorting"
+      },
+      "rowOrder": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "key_a_to_z",
+        "source": "Options / Formatting & Sorting"
+      },
+      "colOrder": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "key_a_to_z",
+        "source": "Options / Formatting & Sorting"
+      },
+      "rowSubtotalPosition": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": false,
+        "source": "Options / Totals"
+      },
+      "colSubtotalPosition": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": false,
+        "source": "Options / Totals"
+      },
+      "conditional_formatting": {
+        "data_type": "array[object]",
+        "required": false,
+        "sample_data": [],
+        "source": "Options / Conditional Formatting & Rendering"
+      },
+      "allow_render_html": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": true,
+        "source": "Options / Conditional Formatting & Rendering"
+      }
+    },
+    "minimal_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "pivot_table_v2",
+      "groupbyColumns": [],
+      "groupbyRows": [
+        "<row_dimension>"
+      ],
+      "metrics": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        }
+      ],
+      "metricsLayout": "COLUMNS",
+      "adhoc_filters": [],
+      "row_limit": 10000,
+      "order_desc": true
+    },
+    "recommended_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "pivot_table_v2",
+      "groupbyColumns": [
+        "<column_dimension>"
+      ],
+      "groupbyRows": [
+        "<row_dimension>"
+      ],
+      "metrics": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        }
+      ],
+      "metricsLayout": "COLUMNS",
+      "adhoc_filters": [],
+      "series_limit": null,
+      "row_limit": 10000,
+      "series_limit_metric": null,
+      "order_desc": true,
+      "aggregateFunction": "Sum",
+      "rowTotals": false,
+      "rowSubTotals": false,
+      "colTotals": false,
+      "colSubTotals": false,
+      "transposePivot": false,
+      "combineMetric": false,
+      "valueFormat": "SMART_NUMBER",
+      "currency_format": null,
+      "date_format": "smart_date",
+      "rowOrder": "key_a_to_z",
+      "colOrder": "key_a_to_z",
+      "rowSubtotalPosition": false,
+      "colSubtotalPosition": false,
+      "conditional_formatting": [],
+      "allow_render_html": true
+    },
+    "conditional_blocks": {
+      "temporal_bucketization": {
+        "condition": "rows/columns 中使用 temporal 列，且希望按时间粒度分桶时",
+        "fields": {
+          "groupbyColumns": [
+            "order_date"
+          ],
+          "time_grain_sqla": "P1D",
+          "temporal_columns_lookup": {
+            "order_date": true
+          }
+        },
+        "notes": "`buildQuery.ts` 依赖 `time_grain_sqla + temporal_columns_lookup` 把物理时间列改写成带 `timeGrain` 的 AdhocColumn。"
+      },
+      "top_series_sorting": {
+        "condition": "需要按指定指标截断 top series / top cells 时",
+        "fields": {
+          "series_limit": 25,
+          "series_limit_metric": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          },
+          "order_desc": true
+        },
+        "notes": "如果 `series_limit_metric` 为空，`buildQuery.ts` 会退回使用 `metrics[0]` 生成 `orderby`。"
+      },
+      "metrics_on_rows": {
+        "condition": "需要把指标作为行级顶层分组时",
+        "fields": {
+          "metricsLayout": "ROWS"
+        }
+      },
+      "totals_and_subtotals": {
+        "condition": "需要显示总计与小计时",
+        "fields": {
+          "rowTotals": true,
+          "rowSubTotals": true,
+          "colTotals": true,
+          "colSubTotals": true,
+          "rowSubtotalPosition": true,
+          "colSubtotalPosition": false
+        }
+      },
+      "conditional_coloring": {
+        "condition": "需要按指标值给单元格着色时",
+        "fields": {
+          "conditional_formatting": [
+            {
+              "column": "SUM(sales)",
+              "operator": ">",
+              "targetValue": 1000,
+              "colorScheme": "rgba(0, 122, 135, 1)"
+            }
+          ]
+        }
+      },
+      "html_rendering": {
+        "condition": "单元格值包含 `<a>` 等 HTML，且希望按 HTML 渲染时",
+        "fields": {
+          "allow_render_html": true
+        }
+      }
+    },
+    "runtime_only_or_non_template_fields": {
+      "runtime_aliases_generated_by_transformProps": [
+        {
+          "field_name": "conditionalFormatting",
+          "reason": "由 raw form_data.conditional_formatting 派生的 runtime 别名，不是 API root 键。"
+        },
+        {
+          "field_name": "dateFormat",
+          "reason": "由 raw form_data.date_format 派生的 runtime 别名，不是 API root 键。"
+        },
+        {
+          "field_name": "currencyFormat",
+          "reason": "由 raw form_data.currency_format 派生的 runtime 别名，不是 API root 键。"
+        },
+        {
+          "field_name": "timeGrainSqla",
+          "reason": "由 raw form_data.time_grain_sqla 派生的 runtime 别名，不是 API root 键。"
+        },
+        {
+          "field_name": "allowRenderHtml",
+          "reason": "由 raw form_data.allow_render_html 派生的 runtime 别名，不是 API root 键。"
+        }
+      ],
+      "query_object_only_fields": [
+        {
+          "field_name": "queries[*].columns",
+          "reason": "这是 `buildQuery.ts` 把 `groupbyRows + groupbyColumns` 编译后的结果，不是 root form_data 直接提交字段。"
+        },
+        {
+          "field_name": "queries[*].orderby",
+          "reason": "这是 `buildQuery.ts` 基于 `series_limit_metric` 或 `metrics[0]` 与 `order_desc` 推导出的 query 字段。"
+        }
+      ],
+      "non_template_fields": [
+        {
+          "field_name": "tableRenderer",
+          "reason": "当前 controlPanel 未暴露该控件，且 `PivotTable.jsx` 最终固定渲染 `TableRenderer`；不属于正式模板字段。"
+        },
+        {
+          "field_name": "dateFormatters / metricColorFormatters / selectedFilters",
+          "reason": "这些是 `transformProps.ts` 在运行时计算出来的组件 props，不是 root form_data。"
+        }
+      ]
+    },
+    "api_usage_guidance": {
+      "high_confidence_required_fields": [
+        "datasource",
+        "viz_type",
+        "metrics"
+      ],
+      "recommended_always_set": [
+        "groupbyRows",
+        "groupbyColumns",
+        "adhoc_filters",
+        "metricsLayout",
+        "row_limit",
+        "aggregateFunction",
+        "valueFormat",
+        "date_format",
+        "allow_render_html"
+      ],
+      "api_field_examples": [
+        "groupbyRows",
+        "groupbyColumns",
+        "time_grain_sqla",
+        "metricsLayout",
+        "aggregateFunction",
+        "series_limit_metric",
+        "conditional_formatting"
+      ],
+      "avoid_confusion": [
+        "不要把 `valueFormat` 写成 `value_format`；当前图 control name 就是 camelCase 的 `valueFormat`。",
+        "不要把 runtime 字段 `conditionalFormatting`、`dateFormat`、`currencyFormat`、`timeGrainSqla`、`allowRenderHtml` 写回 root form_data。",
+        "不要把 `tableRenderer` 当成当前图可配置字段；源码里它不是 controlPanel 暴露字段。",
+        "如果要让 `time_grain_sqla` 对物理时间列生效，不要漏掉 `temporal_columns_lookup`。"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "pivot_table_v2",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/pivot_table_v2-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/pivot_table_v2-form-data-schema.json",
+      "control-schema": "form-data-schema/pivot_table_v2-schema.json"
+    }
+  }
+}

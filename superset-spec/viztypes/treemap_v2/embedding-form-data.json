@@ -1,0 +1,320 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "treemap_v2",
+  "display_name": "Treemap",
+  "source_kind": "schema_file",
+  "normalized_embedding_policy": {
+    "immutable_root_keys": [
+      "slice_id",
+      "datasource",
+      "viz_type",
+      "all_saved_chart_definition_fields"
+    ],
+    "allowed_runtime_fields": [
+      {
+        "field_name": "adhoc_filters",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "custom_form_data",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "filters",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_range",
+        "behavior": "override",
+        "source": "embedding-schema"
+      }
+    ],
+    "safe_embedding_form_data_seed": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "treemap_v2",
+      "extra_form_data": {
+        "filters": [],
+        "adhoc_filters": []
+      }
+    }
+  },
+  "original_embedding_form_data_schema": {
+    "viz_type": "treemap_v2",
+    "display_name": "Treemap",
+    "purpose": "第三方 embedding / guest token 场景下安全传输的 form_data 模板",
+    "base_form_data_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/treemap_v2-form-data-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset/security/manager.py",
+      "D:/vsx/sources/superset-6.0.0/superset/constants.py",
+      "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/charts/data/api.py",
+      "D:/vsx/sources/superset-6.0.0/superset/commands/chart/data/get_data_command.py",
+      "D:/vsx/sources/superset-6.0.0/superset/charts/schemas.py",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/constants.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/QueryFormData.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/processExtraFormData.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/dashboard/components/nativeFilters/utils.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataWithDashboardContext.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Treemap/controlPanel.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Treemap/buildQuery.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Treemap/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Treemap/types.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/utils/treeBuilder.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractQueryFields.ts"
+    ],
+    "notes": [
+      "treemap_v2 是现代 chart data API 图。embedded guest 的核心限制不在前端，而在后端 `security/manager.py::query_context_modified()`。",
+      "安全做法不是重新拼装一份新的 Treemap form_data，而是以已保存图表的 form_data 原样复制为 base，只把动态条件放进 `extra_form_data`。",
+      "Treemap 的 query 关键字段是 `groupby`、`metric`、`adhoc_filters`、`row_limit`、`sort_by_metric`。其中 `groupby` 会进入 query.columns，`metric` 会进入 query.metrics，`sort_by_metric` 会改写 orderby。",
+      "`color_scheme`、`show_labels`、`show_upper_labels`、`label_type`、`number_format`、`currency_format`、`date_format` 虽然不改 query，但仍属于图表定义字段；guest 请求里不应临时改写。",
+      "Treemap controlPanel 没有时间相关控件；embedding 下虽然 extra_form_data 白名单允许时间相关 override，但它们不属于这个 viztype 的常规推荐动态入口。"
+    ],
+    "security_enforcement": {
+      "backend_check_function": "superset/security/manager.py::query_context_modified",
+      "checked_when": "ChartDataCommand.validate() -> QueryContext.raise_for_access()",
+      "error_message": "Guest user cannot modify chart payload",
+      "hard_block_fields": [
+        "slice_id",
+        "metrics",
+        "columns",
+        "groupby",
+        "orderby"
+      ],
+      "indirectly_sensitive_fields_for_treemap": [
+        "groupby",
+        "metric",
+        "adhoc_filters",
+        "row_limit",
+        "sort_by_metric"
+      ],
+      "recommended_strategy": "复制保存态 chart form_data 作为 base，仅通过 extra_form_data 追加 filters / adhoc_filters；不要在 guest 请求里重构 Treemap 的 root 查询字段或图表格式字段。"
+    },
+    "safe_base_rule": {
+      "description": "第三方 embedding 请求中的根层 form_data，应当从已保存图表的 form_data 直接复制，不要重构。",
+      "must_be_copied_from_saved_chart": [
+        "slice_id",
+        "datasource",
+        "viz_type",
+        "groupby",
+        "metric",
+        "adhoc_filters",
+        "row_limit",
+        "sort_by_metric",
+        "color_scheme",
+        "show_labels",
+        "show_upper_labels",
+        "label_type",
+        "number_format",
+        "currency_format",
+        "date_format",
+        "all other chart-definition fields"
+      ],
+      "why": [
+        "query_context_modified() 会把请求 query_context 与保存态图表对比。",
+        "Treemap/buildQuery.ts 会把 `sort_by_metric=true` 改写成 orderby。",
+        "core `extractQueryFields()` 会把 `groupby` 归并到 query.columns，把 `metric` 归并到 query.metrics。",
+        "`row_limit` 与 `adhoc_filters` 直接改变查询结果。",
+        "`color_scheme`、标签开关、格式化字段虽然不改 query，但会改变 Treemap 的可视定义；保守 guest 模式也应直接复制保存态。"
+      ]
+    },
+    "safe_embedding_form_data_template": {
+      "description": "这是 guest embedding 下的安全写法。根层以保存态图表为 base，仅改 extra_form_data。",
+      "template": {
+        "slice_id": "<saved_chart_id>",
+        "dashboardId": "<dashboard_id>",
+        "datasource": "<copied_from_saved_chart>",
+        "viz_type": "treemap_v2",
+        "groupby": "<copied_from_saved_chart>",
+        "metric": "<copied_from_saved_chart>",
+        "adhoc_filters": "<copied_from_saved_chart>",
+        "row_limit": "<copied_from_saved_chart>",
+        "sort_by_metric": "<copied_from_saved_chart>",
+        "color_scheme": "<copied_from_saved_chart>",
+        "show_labels": "<copied_from_saved_chart>",
+        "show_upper_labels": "<copied_from_saved_chart>",
+        "label_type": "<copied_from_saved_chart>",
+        "number_format": "<copied_from_saved_chart>",
+        "currency_format": "<copied_from_saved_chart>",
+        "date_format": "<copied_from_saved_chart>",
+        "extra_form_data": {
+          "filters": [
+            {
+              "col": "region",
+              "op": "IN",
+              "val": [
+                "APAC"
+              ]
+            }
+          ],
+          "adhoc_filters": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "region",
+              "operator": "IN",
+              "comparator": [
+                "APAC"
+              ]
+            }
+          ],
+          "custom_form_data": {}
+        }
+      }
+    },
+    "preferred_dynamic_container": {
+      "field_name": "extra_form_data",
+      "description": "chart data API 与 dashboard filter context 都会把动态过滤条件并入这里。",
+      "append_keys": [
+        "adhoc_filters",
+        "filters",
+        "custom_form_data"
+      ],
+      "override_keys_backend_high_confidence": [],
+      "notes": "Treemap 常规 guest 动态入口应聚焦 `filters` / `adhoc_filters`。"
+    },
+    "extra_form_data_field_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_treemap": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "APAC"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_treemap": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "APAC"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_treemap": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；Treemap 默认不直接消费它。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_treemap": false,
+        "recommended": false,
+        "sample_data": "Last 90 days",
+        "effect": "Treemap controlPanel 本身没有时间控件；guest 场景下不建议把它当成常规动态入口。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      }
+    ],
+    "unsafe_root_form_data_changes": [
+      {
+        "field_name": "slice_id",
+        "reason": "与保存态图表 id 不一致会被后端立即判定为请求了另一张图。"
+      },
+      {
+        "field_name": "groupby",
+        "reason": "会改变 query.columns 与 hierarchy。"
+      },
+      {
+        "field_name": "metric",
+        "reason": "会改变 query.metrics 与矩形面积值。"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "reason": "会直接改变查询结果；guest 动态过滤应走 extra_form_data。"
+      },
+      {
+        "field_name": "row_limit",
+        "reason": "会改变查询结果规模。"
+      },
+      {
+        "field_name": "sort_by_metric",
+        "reason": "会改写 orderby。"
+      },
+      {
+        "field_name": "color_scheme",
+        "reason": "属于图表定义字段；会改变分类着色。"
+      },
+      {
+        "field_name": "show_labels",
+        "reason": "属于图表定义字段；会改变标签显示。"
+      },
+      {
+        "field_name": "show_upper_labels",
+        "reason": "属于图表定义字段；会改变父节点标签显示。"
+      },
+      {
+        "field_name": "label_type",
+        "reason": "属于图表定义字段；会改变标签内容。"
+      },
+      {
+        "field_name": "number_format",
+        "reason": "属于图表定义字段；会改变数值格式。"
+      },
+      {
+        "field_name": "currency_format",
+        "reason": "属于图表定义字段；会改变货币格式。"
+      },
+      {
+        "field_name": "date_format",
+        "reason": "属于图表定义字段；会改变 temporal groupby 标签格式。"
+      }
+    ],
+    "practical_guidance": {
+      "best_practice": [
+        "先从保存态图表读取完整 form_data。",
+        "根层字段保持不变。",
+        "Treemap 优先只在 extra_form_data 中放 filters / adhoc_filters / custom_form_data。",
+        "如果页面需要 guest 联动筛选，优先使用 filters 或 adhoc_filters，而不是改 groupby、metric 或格式字段。"
+      ],
+      "avoid": [
+        "不要在 guest embedding 请求里手工重写 groupby、metric、sort_by_metric。",
+        "不要在 guest 请求里临时改 color_scheme、show_labels、label_type、number_format 等图表定义字段。",
+        "不要把运行时 camelCase 字段当成 API 根键名使用。",
+        "Treemap 常规场景不要把 time_range 当成首选动态入口。"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "treemap_v2",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/treemap_v2-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/treemap_v2-form-data-schema.json",
+      "control-schema": "form-data-schema/treemap_v2-schema.json"
+    }
+  }
+}

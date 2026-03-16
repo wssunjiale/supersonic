@@ -1,0 +1,2388 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "rose",
+  "display_name": "Nightingale Rose Chart",
+  "source_kind": "schema_file",
+  "normalized_control_schema": {
+    "field_category_order": [
+      "Time",
+      "Query",
+      "Chart Options",
+      "Advanced Analytics"
+    ],
+    "field_occurrences": [
+      {
+        "source_name": "control-schema",
+        "category": "Time",
+        "field_name": "granularity",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "extra_form_data.override",
+        "description": "The time granularity for the visualization. Note that you can type and use simple natural language as in `10 seconds`, `1 day` or `56 weeks`",
+        "data_type": "string | null",
+        "sample_data": "P1D",
+        "original_field": {
+          "field_name": "granularity",
+          "description": "The time granularity for the visualization. Note that you can type and use simple natural language as in `10 seconds`, `1 day` or `56 weeks`",
+          "data_type": "string | null",
+          "enum_values": [
+            null,
+            "PT5S",
+            "PT30S",
+            "PT1M",
+            "PT5M",
+            "PT30M",
+            "PT1H",
+            "PT6H",
+            "P1D",
+            "P7D",
+            "P1W",
+            "week_starting_sunday",
+            "week_ending_saturday",
+            "P1M",
+            "P3M",
+            "P1Y"
+          ],
+          "sample_data": "P1D",
+          "required": false,
+          "embedding": "extra_form_data.override",
+          "default_value": "one day",
+          "notes": "这是 legacy 通用时间粒度控件，常用于 Druid 等 datasource；SQLA datasource 实际查询主要依赖 granularity_sqla 与 time_grain_sqla。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Time",
+        "field_name": "granularity_sqla",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "extra_form_data.override",
+        "description": "The time column for the visualization. Note that you can define arbitrary expression that return a DATETIME column in the table. Also note that the filter below is applied against this column or expression",
+        "data_type": "string | object | null",
+        "sample_data": "order_date",
+        "original_field": {
+          "field_name": "granularity_sqla",
+          "description": "The time column for the visualization. Note that you can define arbitrary expression that return a DATETIME column in the table. Also note that the filter below is applied against this column or expression",
+          "data_type": "string | object | null",
+          "enum_source": "datasource temporal columns",
+          "sample_data": "order_date",
+          "required": false,
+          "embedding": "extra_form_data.override",
+          "default_value": "datasource default temporal column",
+          "notes": "对 SQLA datasource 的 Rose 时序图来说通常是实质必填。dndGranularitySqlaControl 会从 temporalColumnMixin 自动取默认时间列。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Time",
+        "field_name": "time_grain_sqla",
+        "runtime_alias": "timeGrainSqla",
+        "required": false,
+        "embedding": "extra_form_data.override",
+        "description": "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart.",
+        "data_type": "string | null",
+        "sample_data": "P1D",
+        "original_field": {
+          "field_name": "time_grain_sqla",
+          "runtime_alias": "timeGrainSqla",
+          "description": "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart.",
+          "data_type": "string | null",
+          "enum_source": "datasource.time_grain_sqla",
+          "sample_data": "P1D",
+          "required": false,
+          "embedding": "extra_form_data.override",
+          "default_value": "P1D"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Time",
+        "field_name": "time_range",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "extra_form_data.override",
+        "description": "This control filters the whole chart based on the selected time range.",
+        "data_type": "string",
+        "sample_data": "No filter",
+        "original_field": {
+          "field_name": "time_range",
+          "description": "This control filters the whole chart based on the selected time range.",
+          "data_type": "string",
+          "sample_data": "No filter",
+          "required": false,
+          "embedding": "extra_form_data.override",
+          "default_value": "No filter",
+          "notes": "NVD3TimeSeriesViz.run_extra_queries() 在使用 time_compare 时要求 time_range 必须能解析出封闭起止时间。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "metrics",
+        "runtime_alias": null,
+        "required": true,
+        "embedding": "否",
+        "description": "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+        "data_type": "array[string | object]",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          }
+        ],
+        "original_field": {
+          "field_name": "metrics",
+          "description": "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+          "data_type": "array[string | object]",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "sales"
+              },
+              "aggregate": "SUM",
+              "label": "SUM(sales)"
+            }
+          ],
+          "required": true,
+          "embedding": "否",
+          "default_value": []
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "adhoc_filters",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "description": "字段标签为 Filters。legacy explore_json 路径会先把 legacy filters 转成 adhoc_filters，再继续处理 extra filters / extra_form_data。",
+        "data_type": "array[object]",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East"
+            ]
+          }
+        ],
+        "original_field": {
+          "field_name": "adhoc_filters",
+          "description": "字段标签为 Filters。legacy explore_json 路径会先把 legacy filters 转成 adhoc_filters，再继续处理 extra filters / extra_form_data。",
+          "data_type": "array[object]",
+          "enum_source": "datasource columns + saved metrics + 当前 metrics",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "region",
+              "operator": "IN",
+              "comparator": [
+                "East"
+              ]
+            }
+          ],
+          "required": false,
+          "embedding": "extra_form_data.append",
+          "default_value": []
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "groupby",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Dimensions contain qualitative values such as names, dates, or geographical data. Use dimensions to categorize, segment, and reveal the details in your data. Dimensions affect the level of detail in the view.",
+        "data_type": "array[string | object]",
+        "sample_data": [
+          "region"
+        ],
+        "original_field": {
+          "field_name": "groupby",
+          "description": "Dimensions contain qualitative values such as names, dates, or geographical data. Use dimensions to categorize, segment, and reveal the details in your data. Dimensions affect the level of detail in the view.",
+          "data_type": "array[string | object]",
+          "enum_source": "datasource columns",
+          "sample_data": [
+            "region"
+          ],
+          "required": false,
+          "embedding": "否",
+          "default_value": []
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "limit",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Limits the number of series that get displayed. A joined subquery (or an extra phase where subqueries are not supported) is applied to limit the number of series that get fetched and rendered.",
+        "data_type": "integer | null",
+        "sample_data": 10,
+        "original_field": {
+          "field_name": "limit",
+          "description": "Limits the number of series that get displayed. A joined subquery (or an extra phase where subqueries are not supported) is applied to limit the number of series that get fetched and rendered.",
+          "data_type": "integer | null",
+          "enum_values": [
+            5,
+            10,
+            25,
+            50,
+            100,
+            500
+          ],
+          "sample_data": 10,
+          "required": false,
+          "embedding": "否",
+          "default_value": null
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "timeseries_limit_metric",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Orders the query result that generates the source data for this chart. If a series or row limit is reached, this determines what data are truncated. If undefined, defaults to the first metric (where appropriate).",
+        "data_type": "string | object | null",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        },
+        "original_field": {
+          "field_name": "timeseries_limit_metric",
+          "description": "Orders the query result that generates the source data for this chart. If a series or row limit is reached, this determines what data are truncated. If undefined, defaults to the first metric (where appropriate).",
+          "data_type": "string | object | null",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": null
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "order_desc",
+        "runtime_alias": "orderDesc",
+        "required": false,
+        "embedding": "否",
+        "description": "If enabled, this control sorts the results/values descending, otherwise it sorts the results ascending.",
+        "data_type": "boolean",
+        "sample_data": true,
+        "original_field": {
+          "field_name": "order_desc",
+          "runtime_alias": "orderDesc",
+          "description": "If enabled, this control sorts the results/values descending, otherwise it sorts the results ascending.",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true,
+          "notes": "NVD3TimeSeriesViz.query_obj() 会结合 timeseries_limit_metric 或第一个 metric 生成 orderby。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "contribution",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Compute the contribution to the total",
+        "data_type": "boolean",
+        "sample_data": false,
+        "original_field": {
+          "field_name": "contribution",
+          "description": "Compute the contribution to the total",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false,
+          "notes": "NVD3TimeSeriesViz.process_data() 中会把每个时间桶按总和归一化。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "row_limit",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+        "data_type": "integer",
+        "sample_data": 10000,
+        "original_field": {
+          "field_name": "row_limit",
+          "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+          "data_type": "integer",
+          "enum_values": [
+            10,
+            50,
+            100,
+            250,
+            500,
+            1000,
+            5000,
+            10000,
+            50000
+          ],
+          "sample_data": 10000,
+          "required": false,
+          "embedding": "否",
+          "default_value": 10000
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "color_scheme",
+        "runtime_alias": "colorScheme",
+        "required": false,
+        "embedding": "否",
+        "description": "The color scheme for rendering chart",
+        "data_type": "string",
+        "sample_data": "SUPERSET_DEFAULT",
+        "original_field": {
+          "field_name": "color_scheme",
+          "runtime_alias": "colorScheme",
+          "description": "The color scheme for rendering chart",
+          "data_type": "string",
+          "enum_source": "categoricalSchemeRegistry.keys()",
+          "sample_data": "SUPERSET_DEFAULT",
+          "required": false,
+          "embedding": "否",
+          "default_value": "categoricalSchemeRegistry.getDefaultKey()"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "number_format",
+        "runtime_alias": "numberFormat",
+        "required": false,
+        "embedding": "否",
+        "description": "D3 format syntax: https://github.com/d3/d3-format",
+        "data_type": "string",
+        "sample_data": "SMART_NUMBER",
+        "original_field": {
+          "field_name": "number_format",
+          "runtime_alias": "numberFormat",
+          "description": "D3 format syntax: https://github.com/d3/d3-format",
+          "data_type": "string",
+          "enum_source": "D3_FORMAT_OPTIONS",
+          "sample_data": "SMART_NUMBER",
+          "required": false,
+          "embedding": "否",
+          "default_value": "SMART_NUMBER",
+          "notes": "transformProps.js 会把它映射成 numberFormat，Rose.js 再用 getNumberFormatter(numberFormat) 格式化 tooltip 数值。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "date_time_format",
+        "runtime_alias": "dateTimeFormat",
+        "required": false,
+        "embedding": "否",
+        "description": "源码直接复用了 D3_FORMAT_DOCS 作为说明；实际可选值来自 D3_TIME_FORMAT_OPTIONS。",
+        "data_type": "string",
+        "sample_data": "smart_date",
+        "original_field": {
+          "field_name": "date_time_format",
+          "runtime_alias": "dateTimeFormat",
+          "description": "源码直接复用了 D3_FORMAT_DOCS 作为说明；实际可选值来自 D3_TIME_FORMAT_OPTIONS。",
+          "data_type": "string",
+          "enum_source": "D3_TIME_FORMAT_OPTIONS",
+          "sample_data": "smart_date",
+          "required": false,
+          "embedding": "否",
+          "default_value": "smart_date",
+          "notes": "Rose.js 会用 getTimeFormatter(dateTimeFormat) 格式化 tooltip header 与时间标签。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "rich_tooltip",
+        "runtime_alias": "useRichTooltip",
+        "required": false,
+        "embedding": "否",
+        "description": "The rich tooltip shows a list of all series for that point in time",
+        "data_type": "boolean",
+        "sample_data": true,
+        "original_field": {
+          "field_name": "rich_tooltip",
+          "runtime_alias": "useRichTooltip",
+          "description": "The rich tooltip shows a list of all series for that point in time",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true,
+          "notes": "Rose.js 中 rich tooltip=true 时，同一个时间桶会展示所有未禁用 series；false 时只展示当前悬停扇区。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "rose_area_proportion",
+        "runtime_alias": "useAreaProportions",
+        "required": false,
+        "embedding": "否",
+        "description": "Check if the Rose Chart should use segment area instead of segment radius for proportioning",
+        "data_type": "boolean",
+        "sample_data": false,
+        "original_field": {
+          "field_name": "rose_area_proportion",
+          "runtime_alias": "useAreaProportions",
+          "description": "Check if the Rose Chart should use segment area instead of segment radius for proportioning",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Advanced Analytics",
+        "field_name": "rolling_type",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Defines a rolling window function to apply, works along with the [Periods] text box",
+        "data_type": "string",
+        "sample_data": "None",
+        "original_field": {
+          "field_name": "rolling_type",
+          "description": "Defines a rolling window function to apply, works along with the [Periods] text box",
+          "data_type": "string",
+          "enum_values": [
+            "None",
+            "mean",
+            "sum",
+            "std",
+            "cumsum"
+          ],
+          "sample_data": "None",
+          "required": false,
+          "embedding": "否",
+          "default_value": "None"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Advanced Analytics",
+        "field_name": "rolling_periods",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Defines the size of the rolling window function, relative to the time granularity selected",
+        "data_type": "integer | null",
+        "sample_data": 7,
+        "original_field": {
+          "field_name": "rolling_periods",
+          "description": "Defines the size of the rolling window function, relative to the time granularity selected",
+          "data_type": "integer | null",
+          "sample_data": 7,
+          "required": false,
+          "embedding": "否",
+          "default_value": null
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Advanced Analytics",
+        "field_name": "min_periods",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "The minimum number of rolling periods required to show a value.",
+        "data_type": "integer | null",
+        "sample_data": 7,
+        "original_field": {
+          "field_name": "min_periods",
+          "description": "The minimum number of rolling periods required to show a value.",
+          "data_type": "integer | null",
+          "sample_data": 7,
+          "required": false,
+          "embedding": "否",
+          "default_value": null
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Advanced Analytics",
+        "field_name": "time_compare",
+        "runtime_alias": "timeCompare",
+        "required": false,
+        "embedding": "否",
+        "description": "Overlay one or more timeseries from a relative time period. Expects relative time deltas in natural language. Free text is supported.",
+        "data_type": "array[string]",
+        "sample_data": [
+          "1 year"
+        ],
+        "original_field": {
+          "field_name": "time_compare",
+          "runtime_alias": "timeCompare",
+          "description": "Overlay one or more timeseries from a relative time period. Expects relative time deltas in natural language. Free text is supported.",
+          "data_type": "array[string]",
+          "enum_values": [
+            "1 day",
+            "1 week",
+            "28 days",
+            "30 days",
+            "52 weeks",
+            "1 year",
+            "104 weeks",
+            "2 years",
+            "156 weeks",
+            "3 years"
+          ],
+          "sample_data": [
+            "1 year"
+          ],
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "backend run_extra_queries() 会为每个 time_compare 追加一条偏移后的时序查询，并要求 time_range 可解析出封闭起止时间。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Advanced Analytics",
+        "field_name": "comparison_type",
+        "runtime_alias": "comparisonType",
+        "required": false,
+        "embedding": "否",
+        "description": "How to display time shifts: as individual lines; as the difference between the main time series and each time shift; as the percentage change; or as the ratio between series and time shifts.",
+        "data_type": "string",
+        "sample_data": "values",
+        "original_field": {
+          "field_name": "comparison_type",
+          "runtime_alias": "comparisonType",
+          "description": "How to display time shifts: as individual lines; as the difference between the main time series and each time shift; as the percentage change; or as the ratio between series and time shifts.",
+          "data_type": "string",
+          "enum_values": [
+            "values",
+            "absolute",
+            "percentage",
+            "ratio"
+          ],
+          "sample_data": "values",
+          "required": false,
+          "embedding": "否",
+          "default_value": "values",
+          "notes": "UI 标签里 absolute 显示为 Difference。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Advanced Analytics",
+        "field_name": "resample_rule",
+        "runtime_alias": "resampleRule",
+        "required": false,
+        "embedding": "否",
+        "description": "Pandas resample rule",
+        "data_type": "string | null",
+        "sample_data": "1D",
+        "original_field": {
+          "field_name": "resample_rule",
+          "runtime_alias": "resampleRule",
+          "description": "Pandas resample rule",
+          "data_type": "string | null",
+          "enum_values": [
+            "1T",
+            "1H",
+            "1D",
+            "7D",
+            "1M",
+            "1AS"
+          ],
+          "sample_data": "1D",
+          "required": false,
+          "embedding": "否",
+          "default_value": null
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Advanced Analytics",
+        "field_name": "resample_method",
+        "runtime_alias": "resampleMethod",
+        "required": false,
+        "embedding": "否",
+        "description": "Pandas resample method",
+        "data_type": "string | null",
+        "sample_data": "asfreq",
+        "original_field": {
+          "field_name": "resample_method",
+          "runtime_alias": "resampleMethod",
+          "description": "Pandas resample method",
+          "data_type": "string | null",
+          "enum_values": [
+            "asfreq",
+            "bfill",
+            "ffill",
+            "median",
+            "mean",
+            "sum"
+          ],
+          "sample_data": "asfreq",
+          "required": false,
+          "embedding": "否",
+          "default_value": null
+        }
+      }
+    ],
+    "field_inventory": [
+      {
+        "field_name": "adhoc_filters",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "字段标签为 Filters。legacy explore_json 路径会先把 legacy filters 转成 adhoc_filters，再继续处理 extra filters / extra_form_data。"
+        ],
+        "data_types": [
+          "array[object]"
+        ],
+        "sample_data_examples": [
+          [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "region",
+              "operator": "IN",
+              "comparator": [
+                "East"
+              ]
+            }
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "adhoc_filters",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "extra_form_data.append",
+            "description": "字段标签为 Filters。legacy explore_json 路径会先把 legacy filters 转成 adhoc_filters，再继续处理 extra filters / extra_form_data。",
+            "data_type": "array[object]",
+            "sample_data": [
+              {
+                "expressionType": "SIMPLE",
+                "clause": "WHERE",
+                "subject": "region",
+                "operator": "IN",
+                "comparator": [
+                  "East"
+                ]
+              }
+            ],
+            "original_field": {
+              "field_name": "adhoc_filters",
+              "description": "字段标签为 Filters。legacy explore_json 路径会先把 legacy filters 转成 adhoc_filters，再继续处理 extra filters / extra_form_data。",
+              "data_type": "array[object]",
+              "enum_source": "datasource columns + saved metrics + 当前 metrics",
+              "sample_data": [
+                {
+                  "expressionType": "SIMPLE",
+                  "clause": "WHERE",
+                  "subject": "region",
+                  "operator": "IN",
+                  "comparator": [
+                    "East"
+                  ]
+                }
+              ],
+              "required": false,
+              "embedding": "extra_form_data.append",
+              "default_value": []
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "color_scheme",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [
+          "colorScheme"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "The color scheme for rendering chart"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "SUPERSET_DEFAULT"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "color_scheme",
+            "runtime_alias": "colorScheme",
+            "required": false,
+            "embedding": "否",
+            "description": "The color scheme for rendering chart",
+            "data_type": "string",
+            "sample_data": "SUPERSET_DEFAULT",
+            "original_field": {
+              "field_name": "color_scheme",
+              "runtime_alias": "colorScheme",
+              "description": "The color scheme for rendering chart",
+              "data_type": "string",
+              "enum_source": "categoricalSchemeRegistry.keys()",
+              "sample_data": "SUPERSET_DEFAULT",
+              "required": false,
+              "embedding": "否",
+              "default_value": "categoricalSchemeRegistry.getDefaultKey()"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "comparison_type",
+        "required": false,
+        "categories": [
+          "Advanced Analytics"
+        ],
+        "runtime_aliases": [
+          "comparisonType"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "How to display time shifts: as individual lines; as the difference between the main time series and each time shift; as the percentage change; or as the ratio between series and time shifts."
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "values"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Advanced Analytics",
+            "field_name": "comparison_type",
+            "runtime_alias": "comparisonType",
+            "required": false,
+            "embedding": "否",
+            "description": "How to display time shifts: as individual lines; as the difference between the main time series and each time shift; as the percentage change; or as the ratio between series and time shifts.",
+            "data_type": "string",
+            "sample_data": "values",
+            "original_field": {
+              "field_name": "comparison_type",
+              "runtime_alias": "comparisonType",
+              "description": "How to display time shifts: as individual lines; as the difference between the main time series and each time shift; as the percentage change; or as the ratio between series and time shifts.",
+              "data_type": "string",
+              "enum_values": [
+                "values",
+                "absolute",
+                "percentage",
+                "ratio"
+              ],
+              "sample_data": "values",
+              "required": false,
+              "embedding": "否",
+              "default_value": "values",
+              "notes": "UI 标签里 absolute 显示为 Difference。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "contribution",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Compute the contribution to the total"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          false
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "contribution",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Compute the contribution to the total",
+            "data_type": "boolean",
+            "sample_data": false,
+            "original_field": {
+              "field_name": "contribution",
+              "description": "Compute the contribution to the total",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": false,
+              "required": false,
+              "embedding": "否",
+              "default_value": false,
+              "notes": "NVD3TimeSeriesViz.process_data() 中会把每个时间桶按总和归一化。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "date_time_format",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [
+          "dateTimeFormat"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "源码直接复用了 D3_FORMAT_DOCS 作为说明；实际可选值来自 D3_TIME_FORMAT_OPTIONS。"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "smart_date"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "date_time_format",
+            "runtime_alias": "dateTimeFormat",
+            "required": false,
+            "embedding": "否",
+            "description": "源码直接复用了 D3_FORMAT_DOCS 作为说明；实际可选值来自 D3_TIME_FORMAT_OPTIONS。",
+            "data_type": "string",
+            "sample_data": "smart_date",
+            "original_field": {
+              "field_name": "date_time_format",
+              "runtime_alias": "dateTimeFormat",
+              "description": "源码直接复用了 D3_FORMAT_DOCS 作为说明；实际可选值来自 D3_TIME_FORMAT_OPTIONS。",
+              "data_type": "string",
+              "enum_source": "D3_TIME_FORMAT_OPTIONS",
+              "sample_data": "smart_date",
+              "required": false,
+              "embedding": "否",
+              "default_value": "smart_date",
+              "notes": "Rose.js 会用 getTimeFormatter(dateTimeFormat) 格式化 tooltip header 与时间标签。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "granularity",
+        "required": false,
+        "categories": [
+          "Time"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [
+          "extra_form_data.override"
+        ],
+        "descriptions": [
+          "The time granularity for the visualization. Note that you can type and use simple natural language as in `10 seconds`, `1 day` or `56 weeks`"
+        ],
+        "data_types": [
+          "string | null"
+        ],
+        "sample_data_examples": [
+          "P1D"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Time",
+            "field_name": "granularity",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "extra_form_data.override",
+            "description": "The time granularity for the visualization. Note that you can type and use simple natural language as in `10 seconds`, `1 day` or `56 weeks`",
+            "data_type": "string | null",
+            "sample_data": "P1D",
+            "original_field": {
+              "field_name": "granularity",
+              "description": "The time granularity for the visualization. Note that you can type and use simple natural language as in `10 seconds`, `1 day` or `56 weeks`",
+              "data_type": "string | null",
+              "enum_values": [
+                null,
+                "PT5S",
+                "PT30S",
+                "PT1M",
+                "PT5M",
+                "PT30M",
+                "PT1H",
+                "PT6H",
+                "P1D",
+                "P7D",
+                "P1W",
+                "week_starting_sunday",
+                "week_ending_saturday",
+                "P1M",
+                "P3M",
+                "P1Y"
+              ],
+              "sample_data": "P1D",
+              "required": false,
+              "embedding": "extra_form_data.override",
+              "default_value": "one day",
+              "notes": "这是 legacy 通用时间粒度控件，常用于 Druid 等 datasource；SQLA datasource 实际查询主要依赖 granularity_sqla 与 time_grain_sqla。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "granularity_sqla",
+        "required": false,
+        "categories": [
+          "Time"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [
+          "extra_form_data.override"
+        ],
+        "descriptions": [
+          "The time column for the visualization. Note that you can define arbitrary expression that return a DATETIME column in the table. Also note that the filter below is applied against this column or expression"
+        ],
+        "data_types": [
+          "string | object | null"
+        ],
+        "sample_data_examples": [
+          "order_date"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Time",
+            "field_name": "granularity_sqla",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "extra_form_data.override",
+            "description": "The time column for the visualization. Note that you can define arbitrary expression that return a DATETIME column in the table. Also note that the filter below is applied against this column or expression",
+            "data_type": "string | object | null",
+            "sample_data": "order_date",
+            "original_field": {
+              "field_name": "granularity_sqla",
+              "description": "The time column for the visualization. Note that you can define arbitrary expression that return a DATETIME column in the table. Also note that the filter below is applied against this column or expression",
+              "data_type": "string | object | null",
+              "enum_source": "datasource temporal columns",
+              "sample_data": "order_date",
+              "required": false,
+              "embedding": "extra_form_data.override",
+              "default_value": "datasource default temporal column",
+              "notes": "对 SQLA datasource 的 Rose 时序图来说通常是实质必填。dndGranularitySqlaControl 会从 temporalColumnMixin 自动取默认时间列。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "groupby",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Dimensions contain qualitative values such as names, dates, or geographical data. Use dimensions to categorize, segment, and reveal the details in your data. Dimensions affect the level of detail in the view."
+        ],
+        "data_types": [
+          "array[string | object]"
+        ],
+        "sample_data_examples": [
+          [
+            "region"
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "groupby",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Dimensions contain qualitative values such as names, dates, or geographical data. Use dimensions to categorize, segment, and reveal the details in your data. Dimensions affect the level of detail in the view.",
+            "data_type": "array[string | object]",
+            "sample_data": [
+              "region"
+            ],
+            "original_field": {
+              "field_name": "groupby",
+              "description": "Dimensions contain qualitative values such as names, dates, or geographical data. Use dimensions to categorize, segment, and reveal the details in your data. Dimensions affect the level of detail in the view.",
+              "data_type": "array[string | object]",
+              "enum_source": "datasource columns",
+              "sample_data": [
+                "region"
+              ],
+              "required": false,
+              "embedding": "否",
+              "default_value": []
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "limit",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Limits the number of series that get displayed. A joined subquery (or an extra phase where subqueries are not supported) is applied to limit the number of series that get fetched and rendered."
+        ],
+        "data_types": [
+          "integer | null"
+        ],
+        "sample_data_examples": [
+          10
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "limit",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Limits the number of series that get displayed. A joined subquery (or an extra phase where subqueries are not supported) is applied to limit the number of series that get fetched and rendered.",
+            "data_type": "integer | null",
+            "sample_data": 10,
+            "original_field": {
+              "field_name": "limit",
+              "description": "Limits the number of series that get displayed. A joined subquery (or an extra phase where subqueries are not supported) is applied to limit the number of series that get fetched and rendered.",
+              "data_type": "integer | null",
+              "enum_values": [
+                5,
+                10,
+                25,
+                50,
+                100,
+                500
+              ],
+              "sample_data": 10,
+              "required": false,
+              "embedding": "否",
+              "default_value": null
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "metrics",
+        "required": true,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+        ],
+        "data_types": [
+          "array[string | object]"
+        ],
+        "sample_data_examples": [
+          [
+            {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "sales"
+              },
+              "aggregate": "SUM",
+              "label": "SUM(sales)"
+            }
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "metrics",
+            "runtime_alias": null,
+            "required": true,
+            "embedding": "否",
+            "description": "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+            "data_type": "array[string | object]",
+            "sample_data": [
+              {
+                "expressionType": "SIMPLE",
+                "column": {
+                  "column_name": "sales"
+                },
+                "aggregate": "SUM",
+                "label": "SUM(sales)"
+              }
+            ],
+            "original_field": {
+              "field_name": "metrics",
+              "description": "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+              "data_type": "array[string | object]",
+              "enum_source": "saved metrics + adhoc metrics",
+              "sample_data": [
+                {
+                  "expressionType": "SIMPLE",
+                  "column": {
+                    "column_name": "sales"
+                  },
+                  "aggregate": "SUM",
+                  "label": "SUM(sales)"
+                }
+              ],
+              "required": true,
+              "embedding": "否",
+              "default_value": []
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "min_periods",
+        "required": false,
+        "categories": [
+          "Advanced Analytics"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "The minimum number of rolling periods required to show a value."
+        ],
+        "data_types": [
+          "integer | null"
+        ],
+        "sample_data_examples": [
+          7
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Advanced Analytics",
+            "field_name": "min_periods",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "The minimum number of rolling periods required to show a value.",
+            "data_type": "integer | null",
+            "sample_data": 7,
+            "original_field": {
+              "field_name": "min_periods",
+              "description": "The minimum number of rolling periods required to show a value.",
+              "data_type": "integer | null",
+              "sample_data": 7,
+              "required": false,
+              "embedding": "否",
+              "default_value": null
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "number_format",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [
+          "numberFormat"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "D3 format syntax: https://github.com/d3/d3-format"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "SMART_NUMBER"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "number_format",
+            "runtime_alias": "numberFormat",
+            "required": false,
+            "embedding": "否",
+            "description": "D3 format syntax: https://github.com/d3/d3-format",
+            "data_type": "string",
+            "sample_data": "SMART_NUMBER",
+            "original_field": {
+              "field_name": "number_format",
+              "runtime_alias": "numberFormat",
+              "description": "D3 format syntax: https://github.com/d3/d3-format",
+              "data_type": "string",
+              "enum_source": "D3_FORMAT_OPTIONS",
+              "sample_data": "SMART_NUMBER",
+              "required": false,
+              "embedding": "否",
+              "default_value": "SMART_NUMBER",
+              "notes": "transformProps.js 会把它映射成 numberFormat，Rose.js 再用 getNumberFormatter(numberFormat) 格式化 tooltip 数值。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "order_desc",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [
+          "orderDesc"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "If enabled, this control sorts the results/values descending, otherwise it sorts the results ascending."
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          true
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "order_desc",
+            "runtime_alias": "orderDesc",
+            "required": false,
+            "embedding": "否",
+            "description": "If enabled, this control sorts the results/values descending, otherwise it sorts the results ascending.",
+            "data_type": "boolean",
+            "sample_data": true,
+            "original_field": {
+              "field_name": "order_desc",
+              "runtime_alias": "orderDesc",
+              "description": "If enabled, this control sorts the results/values descending, otherwise it sorts the results ascending.",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": true,
+              "required": false,
+              "embedding": "否",
+              "default_value": true,
+              "notes": "NVD3TimeSeriesViz.query_obj() 会结合 timeseries_limit_metric 或第一个 metric 生成 orderby。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "resample_method",
+        "required": false,
+        "categories": [
+          "Advanced Analytics"
+        ],
+        "runtime_aliases": [
+          "resampleMethod"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Pandas resample method"
+        ],
+        "data_types": [
+          "string | null"
+        ],
+        "sample_data_examples": [
+          "asfreq"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Advanced Analytics",
+            "field_name": "resample_method",
+            "runtime_alias": "resampleMethod",
+            "required": false,
+            "embedding": "否",
+            "description": "Pandas resample method",
+            "data_type": "string | null",
+            "sample_data": "asfreq",
+            "original_field": {
+              "field_name": "resample_method",
+              "runtime_alias": "resampleMethod",
+              "description": "Pandas resample method",
+              "data_type": "string | null",
+              "enum_values": [
+                "asfreq",
+                "bfill",
+                "ffill",
+                "median",
+                "mean",
+                "sum"
+              ],
+              "sample_data": "asfreq",
+              "required": false,
+              "embedding": "否",
+              "default_value": null
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "resample_rule",
+        "required": false,
+        "categories": [
+          "Advanced Analytics"
+        ],
+        "runtime_aliases": [
+          "resampleRule"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Pandas resample rule"
+        ],
+        "data_types": [
+          "string | null"
+        ],
+        "sample_data_examples": [
+          "1D"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Advanced Analytics",
+            "field_name": "resample_rule",
+            "runtime_alias": "resampleRule",
+            "required": false,
+            "embedding": "否",
+            "description": "Pandas resample rule",
+            "data_type": "string | null",
+            "sample_data": "1D",
+            "original_field": {
+              "field_name": "resample_rule",
+              "runtime_alias": "resampleRule",
+              "description": "Pandas resample rule",
+              "data_type": "string | null",
+              "enum_values": [
+                "1T",
+                "1H",
+                "1D",
+                "7D",
+                "1M",
+                "1AS"
+              ],
+              "sample_data": "1D",
+              "required": false,
+              "embedding": "否",
+              "default_value": null
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "rich_tooltip",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [
+          "useRichTooltip"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "The rich tooltip shows a list of all series for that point in time"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          true
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "rich_tooltip",
+            "runtime_alias": "useRichTooltip",
+            "required": false,
+            "embedding": "否",
+            "description": "The rich tooltip shows a list of all series for that point in time",
+            "data_type": "boolean",
+            "sample_data": true,
+            "original_field": {
+              "field_name": "rich_tooltip",
+              "runtime_alias": "useRichTooltip",
+              "description": "The rich tooltip shows a list of all series for that point in time",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": true,
+              "required": false,
+              "embedding": "否",
+              "default_value": true,
+              "notes": "Rose.js 中 rich tooltip=true 时，同一个时间桶会展示所有未禁用 series；false 时只展示当前悬停扇区。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "rolling_periods",
+        "required": false,
+        "categories": [
+          "Advanced Analytics"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Defines the size of the rolling window function, relative to the time granularity selected"
+        ],
+        "data_types": [
+          "integer | null"
+        ],
+        "sample_data_examples": [
+          7
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Advanced Analytics",
+            "field_name": "rolling_periods",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Defines the size of the rolling window function, relative to the time granularity selected",
+            "data_type": "integer | null",
+            "sample_data": 7,
+            "original_field": {
+              "field_name": "rolling_periods",
+              "description": "Defines the size of the rolling window function, relative to the time granularity selected",
+              "data_type": "integer | null",
+              "sample_data": 7,
+              "required": false,
+              "embedding": "否",
+              "default_value": null
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "rolling_type",
+        "required": false,
+        "categories": [
+          "Advanced Analytics"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Defines a rolling window function to apply, works along with the [Periods] text box"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "None"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Advanced Analytics",
+            "field_name": "rolling_type",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Defines a rolling window function to apply, works along with the [Periods] text box",
+            "data_type": "string",
+            "sample_data": "None",
+            "original_field": {
+              "field_name": "rolling_type",
+              "description": "Defines a rolling window function to apply, works along with the [Periods] text box",
+              "data_type": "string",
+              "enum_values": [
+                "None",
+                "mean",
+                "sum",
+                "std",
+                "cumsum"
+              ],
+              "sample_data": "None",
+              "required": false,
+              "embedding": "否",
+              "default_value": "None"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "rose_area_proportion",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [
+          "useAreaProportions"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Check if the Rose Chart should use segment area instead of segment radius for proportioning"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          false
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "rose_area_proportion",
+            "runtime_alias": "useAreaProportions",
+            "required": false,
+            "embedding": "否",
+            "description": "Check if the Rose Chart should use segment area instead of segment radius for proportioning",
+            "data_type": "boolean",
+            "sample_data": false,
+            "original_field": {
+              "field_name": "rose_area_proportion",
+              "runtime_alias": "useAreaProportions",
+              "description": "Check if the Rose Chart should use segment area instead of segment radius for proportioning",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": false,
+              "required": false,
+              "embedding": "否",
+              "default_value": false
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "row_limit",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Limits the number of the rows that are computed in the query that is the source of the data used for this chart."
+        ],
+        "data_types": [
+          "integer"
+        ],
+        "sample_data_examples": [
+          10000
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "row_limit",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+            "data_type": "integer",
+            "sample_data": 10000,
+            "original_field": {
+              "field_name": "row_limit",
+              "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+              "data_type": "integer",
+              "enum_values": [
+                10,
+                50,
+                100,
+                250,
+                500,
+                1000,
+                5000,
+                10000,
+                50000
+              ],
+              "sample_data": 10000,
+              "required": false,
+              "embedding": "否",
+              "default_value": 10000
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "time_compare",
+        "required": false,
+        "categories": [
+          "Advanced Analytics"
+        ],
+        "runtime_aliases": [
+          "timeCompare"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Overlay one or more timeseries from a relative time period. Expects relative time deltas in natural language. Free text is supported."
+        ],
+        "data_types": [
+          "array[string]"
+        ],
+        "sample_data_examples": [
+          [
+            "1 year"
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Advanced Analytics",
+            "field_name": "time_compare",
+            "runtime_alias": "timeCompare",
+            "required": false,
+            "embedding": "否",
+            "description": "Overlay one or more timeseries from a relative time period. Expects relative time deltas in natural language. Free text is supported.",
+            "data_type": "array[string]",
+            "sample_data": [
+              "1 year"
+            ],
+            "original_field": {
+              "field_name": "time_compare",
+              "runtime_alias": "timeCompare",
+              "description": "Overlay one or more timeseries from a relative time period. Expects relative time deltas in natural language. Free text is supported.",
+              "data_type": "array[string]",
+              "enum_values": [
+                "1 day",
+                "1 week",
+                "28 days",
+                "30 days",
+                "52 weeks",
+                "1 year",
+                "104 weeks",
+                "2 years",
+                "156 weeks",
+                "3 years"
+              ],
+              "sample_data": [
+                "1 year"
+              ],
+              "required": false,
+              "embedding": "否",
+              "default_value": null,
+              "notes": "backend run_extra_queries() 会为每个 time_compare 追加一条偏移后的时序查询，并要求 time_range 可解析出封闭起止时间。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "required": false,
+        "categories": [
+          "Time"
+        ],
+        "runtime_aliases": [
+          "timeGrainSqla"
+        ],
+        "embedding_modes": [
+          "extra_form_data.override"
+        ],
+        "descriptions": [
+          "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart."
+        ],
+        "data_types": [
+          "string | null"
+        ],
+        "sample_data_examples": [
+          "P1D"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Time",
+            "field_name": "time_grain_sqla",
+            "runtime_alias": "timeGrainSqla",
+            "required": false,
+            "embedding": "extra_form_data.override",
+            "description": "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart.",
+            "data_type": "string | null",
+            "sample_data": "P1D",
+            "original_field": {
+              "field_name": "time_grain_sqla",
+              "runtime_alias": "timeGrainSqla",
+              "description": "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart.",
+              "data_type": "string | null",
+              "enum_source": "datasource.time_grain_sqla",
+              "sample_data": "P1D",
+              "required": false,
+              "embedding": "extra_form_data.override",
+              "default_value": "P1D"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "time_range",
+        "required": false,
+        "categories": [
+          "Time"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [
+          "extra_form_data.override"
+        ],
+        "descriptions": [
+          "This control filters the whole chart based on the selected time range."
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "No filter"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Time",
+            "field_name": "time_range",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "extra_form_data.override",
+            "description": "This control filters the whole chart based on the selected time range.",
+            "data_type": "string",
+            "sample_data": "No filter",
+            "original_field": {
+              "field_name": "time_range",
+              "description": "This control filters the whole chart based on the selected time range.",
+              "data_type": "string",
+              "sample_data": "No filter",
+              "required": false,
+              "embedding": "extra_form_data.override",
+              "default_value": "No filter",
+              "notes": "NVD3TimeSeriesViz.run_extra_queries() 在使用 time_compare 时要求 time_range 必须能解析出封闭起止时间。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "timeseries_limit_metric",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Orders the query result that generates the source data for this chart. If a series or row limit is reached, this determines what data are truncated. If undefined, defaults to the first metric (where appropriate)."
+        ],
+        "data_types": [
+          "string | object | null"
+        ],
+        "sample_data_examples": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "timeseries_limit_metric",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Orders the query result that generates the source data for this chart. If a series or row limit is reached, this determines what data are truncated. If undefined, defaults to the first metric (where appropriate).",
+            "data_type": "string | object | null",
+            "sample_data": {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "sales"
+              },
+              "aggregate": "SUM",
+              "label": "SUM(sales)"
+            },
+            "original_field": {
+              "field_name": "timeseries_limit_metric",
+              "description": "Orders the query result that generates the source data for this chart. If a series or row limit is reached, this determines what data are truncated. If undefined, defaults to the first metric (where appropriate).",
+              "data_type": "string | object | null",
+              "enum_source": "saved metrics + adhoc metrics",
+              "sample_data": {
+                "expressionType": "SIMPLE",
+                "column": {
+                  "column_name": "sales"
+                },
+                "aggregate": "SUM",
+                "label": "SUM(sales)"
+              },
+              "required": false,
+              "embedding": "否",
+              "default_value": null
+            }
+          }
+        ]
+      }
+    ],
+    "required_field_names": [
+      "metrics"
+    ],
+    "embedding_enabled_field_names": [
+      "adhoc_filters",
+      "granularity",
+      "granularity_sqla",
+      "time_grain_sqla",
+      "time_range"
+    ],
+    "runtime_alias_index": {
+      "color_scheme": [
+        "colorScheme"
+      ],
+      "comparison_type": [
+        "comparisonType"
+      ],
+      "date_time_format": [
+        "dateTimeFormat"
+      ],
+      "number_format": [
+        "numberFormat"
+      ],
+      "order_desc": [
+        "orderDesc"
+      ],
+      "resample_method": [
+        "resampleMethod"
+      ],
+      "resample_rule": [
+        "resampleRule"
+      ],
+      "rich_tooltip": [
+        "useRichTooltip"
+      ],
+      "rose_area_proportion": [
+        "useAreaProportions"
+      ],
+      "time_compare": [
+        "timeCompare"
+      ],
+      "time_grain_sqla": [
+        "timeGrainSqla"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "rose",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/rose-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/rose-form-data-schema.json",
+      "control-schema": "form-data-schema/rose-schema.json"
+    }
+  },
+  "fallback_online_field_categories": {
+    "Query": [],
+    "Advanced analytics": [],
+    "Annotations & Layers": [],
+    "Predictive Analytics（Forecast）": [],
+    "Chart Options": [],
+    "Chart Title": [],
+    "图表专属": [],
+    "通用图表选项": []
+  },
+  "original_control_schema": {
+    "viz_type": "rose",
+    "display_name": "Nightingale Rose Chart",
+    "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-rose/src/controlPanel.tsx",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-rose/src/controlPanel.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-rose/src/index.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-rose/src/transformProps.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-rose/src/ReactRose.jsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-rose/src/Rose.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/sections/sections.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/mixins.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+      "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+      "D:/vsx/sources/superset-6.0.0/superset/views/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/utils/core.py"
+    ],
+    "notes": [
+      "rose 位于 legacy-plugin-chart-rose，metadata 显式声明 useLegacyApi=true，因此前端请求路径是 /superset/explore_json/，不是 /api/v1/chart/data。",
+      "Rose controlPanel 由 4 段组成：Time、Query、Chart Options、Advanced Analytics。其中 Time 直接复用 sections.legacyTimeseriesTime。",
+      "RoseViz 继承 NVD3TimeSeriesViz。查询、rolling、contribution、time comparison、resample 等核心数据处理都在后端 viz.py 完成，前端 Rose.js 只负责把后端结果按极坐标形式渲染。",
+      "NVD3TimeSeriesViz.query_obj() 会把 timeseries_limit_metric 或第一个 metric 写入 orderby，因此即使不显式选择 timeseries_limit_metric，只要存在 metrics，排序字段也会落到查询里。",
+      "RoseViz.get_data() 会把 NVD3TimeSeriesViz.get_data() 的 series 结果重组为 {timestamp: [{key, value, name, time}, ...]} 结构；Rose.js 再按时间桶绘制扇区。",
+      "Chart Options 中 number_format / date_time_format / rich_tooltip / rose_area_proportion 都是纯展示字段，不参与后端 SQL 查询。",
+      "comparison_type 的真实后端值是 values / absolute / percentage / ratio；controlPanel UI 中 absolute 的展示标签是 Difference。"
+    ],
+    "form_data_overrides": {
+      "groupby": "getStandardizedControls().popAllColumns()",
+      "metrics": "getStandardizedControls().popAllMetrics()"
+    },
+    "legacy_api_behavior": {
+      "useLegacyApi": true,
+      "frontend_request_endpoint": "/superset/explore_json/",
+      "frontend_request_payload": {
+        "form_data": "<raw form_data>"
+      },
+      "frontend_build_query": "Rose 没有专属前端 buildQuery。ChartClient.ts 在 useLegacyApi=true 且未注册 buildQuery 时，会直接把原始 form_data 包装进 legacy payload。"
+    },
+    "query_compilation": {
+      "backend_class": "superset/viz.py::RoseViz",
+      "query_obj_chain": [
+        "BaseViz.query_obj()",
+        "NVD3TimeSeriesViz.query_obj()",
+        "RoseViz.get_data()"
+      ],
+      "base_query_effect": "BaseViz.query_obj() 会根据 granularity_sqla / time_range / time_grain_sqla / metrics / groupby / row_limit / limit / adhoc_filters 构造基础 query_obj。",
+      "orderby_behavior": "NVD3TimeSeriesViz.query_obj() 会优先用 timeseries_limit_metric 排序；若未提供则退回第一个 metric，并写入 query_obj['orderby'] = [(sort_by, not order_desc)]。",
+      "post_processing_behavior": "NVD3TimeSeriesViz.process_data() 先 pivot，再按 resample_rule/resample_method 重采样，随后 apply_rolling()，若 contribution=true 则把每个时间桶标准化为占比。",
+      "time_compare_behavior": "NVD3TimeSeriesViz.run_extra_queries() 会对每个 time_compare 选项额外生成对比查询，并要求 time_range 必须是封闭区间。",
+      "response_shape": "RoseViz.get_data() 返回 { timestamp: [{ key, value, name, time }, ...] }，timestamp 是 val['x'].value。"
+    },
+    "field_categories": {
+      "Time": [
+        {
+          "field_name": "granularity",
+          "description": "The time granularity for the visualization. Note that you can type and use simple natural language as in `10 seconds`, `1 day` or `56 weeks`",
+          "data_type": "string | null",
+          "enum_values": [
+            null,
+            "PT5S",
+            "PT30S",
+            "PT1M",
+            "PT5M",
+            "PT30M",
+            "PT1H",
+            "PT6H",
+            "P1D",
+            "P7D",
+            "P1W",
+            "week_starting_sunday",
+            "week_ending_saturday",
+            "P1M",
+            "P3M",
+            "P1Y"
+          ],
+          "sample_data": "P1D",
+          "required": false,
+          "embedding": "extra_form_data.override",
+          "default_value": "one day",
+          "notes": "这是 legacy 通用时间粒度控件，常用于 Druid 等 datasource；SQLA datasource 实际查询主要依赖 granularity_sqla 与 time_grain_sqla。"
+        },
+        {
+          "field_name": "granularity_sqla",
+          "description": "The time column for the visualization. Note that you can define arbitrary expression that return a DATETIME column in the table. Also note that the filter below is applied against this column or expression",
+          "data_type": "string | object | null",
+          "enum_source": "datasource temporal columns",
+          "sample_data": "order_date",
+          "required": false,
+          "embedding": "extra_form_data.override",
+          "default_value": "datasource default temporal column",
+          "notes": "对 SQLA datasource 的 Rose 时序图来说通常是实质必填。dndGranularitySqlaControl 会从 temporalColumnMixin 自动取默认时间列。"
+        },
+        {
+          "field_name": "time_grain_sqla",
+          "runtime_alias": "timeGrainSqla",
+          "description": "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart.",
+          "data_type": "string | null",
+          "enum_source": "datasource.time_grain_sqla",
+          "sample_data": "P1D",
+          "required": false,
+          "embedding": "extra_form_data.override",
+          "default_value": "P1D"
+        },
+        {
+          "field_name": "time_range",
+          "description": "This control filters the whole chart based on the selected time range.",
+          "data_type": "string",
+          "sample_data": "No filter",
+          "required": false,
+          "embedding": "extra_form_data.override",
+          "default_value": "No filter",
+          "notes": "NVD3TimeSeriesViz.run_extra_queries() 在使用 time_compare 时要求 time_range 必须能解析出封闭起止时间。"
+        }
+      ],
+      "Query": [
+        {
+          "field_name": "metrics",
+          "description": "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+          "data_type": "array[string | object]",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "sales"
+              },
+              "aggregate": "SUM",
+              "label": "SUM(sales)"
+            }
+          ],
+          "required": true,
+          "embedding": "否",
+          "default_value": []
+        },
+        {
+          "field_name": "adhoc_filters",
+          "description": "字段标签为 Filters。legacy explore_json 路径会先把 legacy filters 转成 adhoc_filters，再继续处理 extra filters / extra_form_data。",
+          "data_type": "array[object]",
+          "enum_source": "datasource columns + saved metrics + 当前 metrics",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "region",
+              "operator": "IN",
+              "comparator": [
+                "East"
+              ]
+            }
+          ],
+          "required": false,
+          "embedding": "extra_form_data.append",
+          "default_value": []
+        },
+        {
+          "field_name": "groupby",
+          "description": "Dimensions contain qualitative values such as names, dates, or geographical data. Use dimensions to categorize, segment, and reveal the details in your data. Dimensions affect the level of detail in the view.",
+          "data_type": "array[string | object]",
+          "enum_source": "datasource columns",
+          "sample_data": [
+            "region"
+          ],
+          "required": false,
+          "embedding": "否",
+          "default_value": []
+        },
+        {
+          "field_name": "limit",
+          "description": "Limits the number of series that get displayed. A joined subquery (or an extra phase where subqueries are not supported) is applied to limit the number of series that get fetched and rendered.",
+          "data_type": "integer | null",
+          "enum_values": [
+            5,
+            10,
+            25,
+            50,
+            100,
+            500
+          ],
+          "sample_data": 10,
+          "required": false,
+          "embedding": "否",
+          "default_value": null
+        },
+        {
+          "field_name": "timeseries_limit_metric",
+          "description": "Orders the query result that generates the source data for this chart. If a series or row limit is reached, this determines what data are truncated. If undefined, defaults to the first metric (where appropriate).",
+          "data_type": "string | object | null",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": null
+        },
+        {
+          "field_name": "order_desc",
+          "runtime_alias": "orderDesc",
+          "description": "If enabled, this control sorts the results/values descending, otherwise it sorts the results ascending.",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true,
+          "notes": "NVD3TimeSeriesViz.query_obj() 会结合 timeseries_limit_metric 或第一个 metric 生成 orderby。"
+        },
+        {
+          "field_name": "contribution",
+          "description": "Compute the contribution to the total",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false,
+          "notes": "NVD3TimeSeriesViz.process_data() 中会把每个时间桶按总和归一化。"
+        },
+        {
+          "field_name": "row_limit",
+          "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+          "data_type": "integer",
+          "enum_values": [
+            10,
+            50,
+            100,
+            250,
+            500,
+            1000,
+            5000,
+            10000,
+            50000
+          ],
+          "sample_data": 10000,
+          "required": false,
+          "embedding": "否",
+          "default_value": 10000
+        }
+      ],
+      "Chart Options": [
+        {
+          "field_name": "color_scheme",
+          "runtime_alias": "colorScheme",
+          "description": "The color scheme for rendering chart",
+          "data_type": "string",
+          "enum_source": "categoricalSchemeRegistry.keys()",
+          "sample_data": "SUPERSET_DEFAULT",
+          "required": false,
+          "embedding": "否",
+          "default_value": "categoricalSchemeRegistry.getDefaultKey()"
+        },
+        {
+          "field_name": "number_format",
+          "runtime_alias": "numberFormat",
+          "description": "D3 format syntax: https://github.com/d3/d3-format",
+          "data_type": "string",
+          "enum_source": "D3_FORMAT_OPTIONS",
+          "sample_data": "SMART_NUMBER",
+          "required": false,
+          "embedding": "否",
+          "default_value": "SMART_NUMBER",
+          "notes": "transformProps.js 会把它映射成 numberFormat，Rose.js 再用 getNumberFormatter(numberFormat) 格式化 tooltip 数值。"
+        },
+        {
+          "field_name": "date_time_format",
+          "runtime_alias": "dateTimeFormat",
+          "description": "源码直接复用了 D3_FORMAT_DOCS 作为说明；实际可选值来自 D3_TIME_FORMAT_OPTIONS。",
+          "data_type": "string",
+          "enum_source": "D3_TIME_FORMAT_OPTIONS",
+          "sample_data": "smart_date",
+          "required": false,
+          "embedding": "否",
+          "default_value": "smart_date",
+          "notes": "Rose.js 会用 getTimeFormatter(dateTimeFormat) 格式化 tooltip header 与时间标签。"
+        },
+        {
+          "field_name": "rich_tooltip",
+          "runtime_alias": "useRichTooltip",
+          "description": "The rich tooltip shows a list of all series for that point in time",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true,
+          "notes": "Rose.js 中 rich tooltip=true 时，同一个时间桶会展示所有未禁用 series；false 时只展示当前悬停扇区。"
+        },
+        {
+          "field_name": "rose_area_proportion",
+          "runtime_alias": "useAreaProportions",
+          "description": "Check if the Rose Chart should use segment area instead of segment radius for proportioning",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false
+        }
+      ],
+      "Advanced Analytics": [
+        {
+          "field_name": "rolling_type",
+          "description": "Defines a rolling window function to apply, works along with the [Periods] text box",
+          "data_type": "string",
+          "enum_values": [
+            "None",
+            "mean",
+            "sum",
+            "std",
+            "cumsum"
+          ],
+          "sample_data": "None",
+          "required": false,
+          "embedding": "否",
+          "default_value": "None"
+        },
+        {
+          "field_name": "rolling_periods",
+          "description": "Defines the size of the rolling window function, relative to the time granularity selected",
+          "data_type": "integer | null",
+          "sample_data": 7,
+          "required": false,
+          "embedding": "否",
+          "default_value": null
+        },
+        {
+          "field_name": "min_periods",
+          "description": "The minimum number of rolling periods required to show a value.",
+          "data_type": "integer | null",
+          "sample_data": 7,
+          "required": false,
+          "embedding": "否",
+          "default_value": null
+        },
+        {
+          "field_name": "time_compare",
+          "runtime_alias": "timeCompare",
+          "description": "Overlay one or more timeseries from a relative time period. Expects relative time deltas in natural language. Free text is supported.",
+          "data_type": "array[string]",
+          "enum_values": [
+            "1 day",
+            "1 week",
+            "28 days",
+            "30 days",
+            "52 weeks",
+            "1 year",
+            "104 weeks",
+            "2 years",
+            "156 weeks",
+            "3 years"
+          ],
+          "sample_data": [
+            "1 year"
+          ],
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "backend run_extra_queries() 会为每个 time_compare 追加一条偏移后的时序查询，并要求 time_range 可解析出封闭起止时间。"
+        },
+        {
+          "field_name": "comparison_type",
+          "runtime_alias": "comparisonType",
+          "description": "How to display time shifts: as individual lines; as the difference between the main time series and each time shift; as the percentage change; or as the ratio between series and time shifts.",
+          "data_type": "string",
+          "enum_values": [
+            "values",
+            "absolute",
+            "percentage",
+            "ratio"
+          ],
+          "sample_data": "values",
+          "required": false,
+          "embedding": "否",
+          "default_value": "values",
+          "notes": "UI 标签里 absolute 显示为 Difference。"
+        },
+        {
+          "field_name": "resample_rule",
+          "runtime_alias": "resampleRule",
+          "description": "Pandas resample rule",
+          "data_type": "string | null",
+          "enum_values": [
+            "1T",
+            "1H",
+            "1D",
+            "7D",
+            "1M",
+            "1AS"
+          ],
+          "sample_data": "1D",
+          "required": false,
+          "embedding": "否",
+          "default_value": null
+        },
+        {
+          "field_name": "resample_method",
+          "runtime_alias": "resampleMethod",
+          "description": "Pandas resample method",
+          "data_type": "string | null",
+          "enum_values": [
+            "asfreq",
+            "bfill",
+            "ffill",
+            "median",
+            "mean",
+            "sum"
+          ],
+          "sample_data": "asfreq",
+          "required": false,
+          "embedding": "否",
+          "default_value": null
+        }
+      ]
+    }
+  }
+}

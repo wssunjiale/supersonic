@@ -1,0 +1,419 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "box_plot",
+  "display_name": "Box Plot",
+  "selection_summary": {
+    "category": "distribution",
+    "tags": [
+      "boxplot",
+      "distribution",
+      "statistics",
+      "outliers"
+    ],
+    "description_zh": "Box Plot (Box and Whisker) chart displays the distribution of numerical data based on the five-number summary: minimum, first quartile, median, third quartile, and maximum.",
+    "visual_shape_zh": "箱线图（分布型）",
+    "use_cases_zh": [
+      "数据分布特征分析（如中位数、四分位、异常值）",
+      "多组数据分布对比",
+      "离群值检测"
+    ],
+    "required_slots": [
+      {
+        "field_name": "columns",
+        "required": true,
+        "slot_kind": "dimension_list",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [
+          "<dimension_column>"
+        ],
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Columns to calculate distribution across."
+        ]
+      },
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "Query",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+          "数值型指标，用于计算箱线图的分布特征（中位数、四分位等）。"
+        ]
+      }
+    ],
+    "optional_slots": [
+      {
+        "field_name": "adhoc_filters",
+        "required": false,
+        "slot_kind": "filter_list",
+        "accepted_dataset_roles": [
+          "filter_context"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [],
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "字段标签为 Filters。可用于普通筛选，也可通过 TEMPORAL_RANGE 表达时间过滤。"
+        ]
+      },
+      {
+        "field_name": "groupby",
+        "required": false,
+        "slot_kind": "dimension_list",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [
+          "<dimension_column>"
+        ],
+        "source_categories": [
+          "Query",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Categories to group by on the x-axis.",
+          "维度字段列表，用于分组展示不同类别的箱线图。"
+        ]
+      },
+      {
+        "field_name": "series_limit",
+        "required": false,
+        "slot_kind": "dimension",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "0..n",
+        "placeholder": "<dimension_column_or_list>",
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Limits the number of series that get displayed. A joined subquery (or an extra phase where subqueries are not supported) is applied to limit the number of series that get fetched and rendered. This feature is useful when grouping by high cardinality column(s) though does increase the query complexity and cost."
+        ]
+      },
+      {
+        "field_name": "series_limit_metric",
+        "required": false,
+        "slot_kind": "metric",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "0..n",
+        "placeholder": "<metric_or_metric_list>",
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Orders the query result that generates the source data for this chart. If a series or row limit is reached, this determines what data are truncated. If undefined, defaults to the first metric (where appropriate)."
+        ]
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "required": false,
+        "slot_kind": "time_grain",
+        "accepted_dataset_roles": [
+          "time_grain"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "P1D",
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [
+          "extra_form_data.override"
+        ],
+        "descriptions": [
+          "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart."
+        ]
+      }
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "category_dimension",
+      "dimension",
+      "metric",
+      "saved_metric"
+    ],
+    "optional_dataset_roles": [
+      "adhoc_metric",
+      "category_dimension",
+      "dimension",
+      "filter_context",
+      "metric",
+      "saved_metric",
+      "time_grain"
+    ],
+    "dataset_role_inventory": {
+      "adhoc_metric": [
+        "metrics",
+        "series_limit_metric"
+      ],
+      "category_dimension": [
+        "columns",
+        "groupby",
+        "series_limit"
+      ],
+      "dimension": [
+        "columns",
+        "groupby",
+        "series_limit"
+      ],
+      "filter_context": [
+        "adhoc_filters"
+      ],
+      "metric": [
+        "metrics",
+        "series_limit_metric"
+      ],
+      "saved_metric": [
+        "metrics",
+        "series_limit_metric"
+      ],
+      "time_grain": [
+        "time_grain_sqla"
+      ]
+    },
+    "non_binding_control_names": [
+      "color_scheme",
+      "date_format",
+      "number_format",
+      "row_limit",
+      "temporal_columns_lookup",
+      "whiskerOptions",
+      "x_axis_title",
+      "x_axis_title_margin",
+      "x_ticks_layout",
+      "y_axis_title",
+      "y_axis_title_margin",
+      "y_axis_title_position"
+    ],
+    "embedding_runtime_field_names": [
+      "adhoc_filters",
+      "custom_form_data",
+      "filters",
+      "granularity",
+      "granularity_sqla",
+      "interactive_drilldown",
+      "interactive_groupby",
+      "interactive_highlight",
+      "relative_end",
+      "relative_start",
+      "time_column",
+      "time_compare",
+      "time_grain",
+      "time_grain_sqla",
+      "time_range"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "columns",
+      "datasource",
+      "metrics",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "color_scheme",
+      "columns",
+      "datasource",
+      "date_format",
+      "groupby",
+      "metrics",
+      "number_format",
+      "row_limit",
+      "series_limit",
+      "series_limit_metric",
+      "viz_type",
+      "whiskerOptions",
+      "x_axis_title",
+      "x_axis_title_margin",
+      "x_ticks_layout",
+      "y_axis_title",
+      "y_axis_title_margin",
+      "y_axis_title_position"
+    ],
+    "structural_flags": {
+      "time_series": false,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": false,
+      "flow_like": false,
+      "distribution_like": true,
+      "supports_breakdown": true,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": false,
+      "needs_dimension": true
+    },
+    "selection_hints": [
+      "至少需要 1 个可聚合指标字段。",
+      "需要至少 1 个维度字段用于分组、拆分或定位。",
+      "支持按维度拆分多序列或子组。",
+      "可结合时间粒度控制趋势聚合窗口。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：数据分布特征分析（如中位数、四分位、异常值）；多组数据分布对比；离群值检测"
+    ]
+  },
+  "selection_prompt_card": {
+    "viz_type": "box_plot",
+    "display_name": "Box Plot",
+    "category": "distribution",
+    "description_zh": "Box Plot (Box and Whisker) chart displays the distribution of numerical data based on the five-number summary: minimum, first quartile, median, third quartile, and maximum.",
+    "visual_shape_zh": "箱线图（分布型）",
+    "best_for": [
+      "数据分布特征分析（如中位数、四分位、异常值）",
+      "多组数据分布对比",
+      "离群值检测"
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "category_dimension",
+      "dimension",
+      "metric",
+      "saved_metric"
+    ],
+    "optional_dataset_roles": [
+      "adhoc_metric",
+      "category_dimension",
+      "dimension",
+      "filter_context",
+      "metric",
+      "saved_metric",
+      "time_grain"
+    ],
+    "required_slots": [
+      {
+        "field_name": "columns",
+        "required": true,
+        "slot_kind": "dimension_list",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [
+          "<dimension_column>"
+        ],
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Columns to calculate distribution across."
+        ]
+      },
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "Query",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+          "数值型指标，用于计算箱线图的分布特征（中位数、四分位等）。"
+        ]
+      }
+    ],
+    "optional_slot_names": [
+      "adhoc_filters",
+      "groupby",
+      "series_limit",
+      "series_limit_metric",
+      "time_grain_sqla"
+    ],
+    "structural_flags": {
+      "time_series": false,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": false,
+      "flow_like": false,
+      "distribution_like": true,
+      "supports_breakdown": true,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": false,
+      "needs_dimension": true
+    },
+    "selection_hints": [
+      "至少需要 1 个可聚合指标字段。",
+      "需要至少 1 个维度字段用于分组、拆分或定位。",
+      "支持按维度拆分多序列或子组。",
+      "可结合时间粒度控制趋势聚合窗口。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：数据分布特征分析（如中位数、四分位、异常值）；多组数据分布对比；离群值检测"
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "box_plot",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/box_plot-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/box_plot-form-data-schema.json",
+      "control-schema": "form-data-schema/box_plot-schema.json"
+    }
+  }
+}

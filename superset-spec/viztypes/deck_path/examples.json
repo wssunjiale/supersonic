@@ -1,0 +1,258 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "deck_path",
+  "display_name": "deck.gl Path",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "path_json",
+          "operator": "IS NOT NULL",
+          "comparator": ""
+        }
+      ]
+    ],
+    "autozoom": [
+      true
+    ],
+    "color_picker": [
+      {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      }
+    ],
+    "filter_nulls": [
+      true
+    ],
+    "js_columns": [
+      [
+        "color"
+      ]
+    ],
+    "js_data_mutator": [
+      "data => data"
+    ],
+    "js_onclick_href": [
+      "o => `https://example.com/?color=${o.object.extraProps?.color}`"
+    ],
+    "js_tooltip": [
+      "o => `<div>${o.object.extraProps?.color}</div>`"
+    ],
+    "line_column": [
+      "path_json"
+    ],
+    "line_type": [
+      "json"
+    ],
+    "line_width": [
+      1
+    ],
+    "line_width_unit": [
+      "pixels"
+    ],
+    "mapbox_style": [
+      "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+    ],
+    "reverse_long_lat": [
+      false
+    ],
+    "row_limit": [
+      5000
+    ],
+    "viewport": [
+      {
+        "longitude": 6.85236157047845,
+        "latitude": 31.222656842808707,
+        "zoom": 1,
+        "bearing": 0,
+        "pitch": 0
+      }
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "deck_path",
+      "line_column": "path_json",
+      "line_type": "json",
+      "adhoc_filters": [],
+      "mapbox_style": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+      "viewport": {
+        "longitude": 6.85236157047845,
+        "latitude": 31.222656842808707,
+        "zoom": 1,
+        "bearing": 0,
+        "pitch": 0
+      },
+      "color_picker": {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      },
+      "line_width": 1,
+      "line_width_unit": "pixels"
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "deck_path",
+      "line_column": "path_json",
+      "line_type": "json",
+      "row_limit": 10000,
+      "filter_nulls": true,
+      "adhoc_filters": [],
+      "mapbox_style": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+      "viewport": {
+        "longitude": 6.85236157047845,
+        "latitude": 31.222656842808707,
+        "zoom": 1,
+        "bearing": 0,
+        "pitch": 0
+      },
+      "color_picker": {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      },
+      "line_width": 1,
+      "line_width_unit": "pixels",
+      "reverse_long_lat": false,
+      "autozoom": true,
+      "js_columns": [],
+      "js_data_mutator": "",
+      "js_tooltip": "",
+      "js_onclick_href": ""
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "deck_path",
+      "line_column": "<copied_from_saved_chart>",
+      "line_type": "<copied_from_saved_chart>",
+      "row_limit": "<copied_from_saved_chart_if_present>",
+      "filter_nulls": "<copied_from_saved_chart_if_present>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "mapbox_style": "<copied_from_saved_chart_if_present>",
+      "viewport": "<copied_from_saved_chart_if_present>",
+      "color_picker": "<copied_from_saved_chart>",
+      "line_width": "<copied_from_saved_chart_if_present>",
+      "line_width_unit": "<copied_from_saved_chart_if_present>",
+      "reverse_long_lat": "<copied_from_saved_chart_if_present>",
+      "autozoom": "<copied_from_saved_chart_if_present>",
+      "js_columns": "<copied_from_saved_chart_if_present>",
+      "js_data_mutator": "<copied_from_saved_chart_if_present>",
+      "js_tooltip": "<copied_from_saved_chart_if_present>",
+      "js_onclick_href": "<copied_from_saved_chart_if_present>",
+      "granularity_sqla": "<copied_from_saved_chart_if_present>",
+      "time_grain_sqla": "<copied_from_saved_chart_if_present>",
+      "time_range": "<copied_from_saved_chart_if_present>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": {
+              "expressionType": "SQL",
+              "sqlExpression": "REPLACE(path_json, ' ', '')",
+              "label": "path_json"
+            },
+            "op": "==",
+            "val": "[[-122.3535851,37.9360513],[-122.3179784,37.9249513]]"
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "route_name",
+            "operator": "IN",
+            "comparator": [
+              "Blue Line"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_deck_path_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": {
+              "expressionType": "SQL",
+              "sqlExpression": "REPLACE(path_json, ' ', '')",
+              "label": "path_json"
+            },
+            "op": "==",
+            "val": "[[-122.3535851,37.9360513],[-122.3179784,37.9249513]]"
+          }
+        ],
+        "effect": "追加 simple filters；对 deck_path 来说，点击路径时由 `crossFiltersDataMask.ts` 生成的是 SQL expression 过滤，而不是普通列过滤。",
+        "source": "superset/constants.py + superset/utils/core.py + crossFiltersDataMask.ts"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_deck_path_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "route_name",
+            "operator": "IN",
+            "comparator": [
+              "Blue Line"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会标记为 `isExtra` 并并入查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_deck_path_legacy": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；deck_path 默认不直接消费它。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_deck_path_legacy": false,
+        "recommended": false,
+        "sample_data": "Last 30 days",
+        "effect": "deck_path 后端确实存在隐藏的时间查询路径，但当前 controlPanel 未正式暴露时间字段。guest embedding 不建议依赖 override 去动态改它。",
+        "source": "QueryFormData.ts + superset/constants.py + superset/utils/core.py + superset/viz.py",
+        "status": "有后端消费证据，但不建议在 guest embedding 中依赖"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "deck_path",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/deck_path-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/deck_path-form-data-schema.json",
+      "control-schema": "form-data-schema/deck_path-schema.json"
+    }
+  }
+}

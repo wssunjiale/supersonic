@@ -146,6 +146,10 @@ public class SqlReplaceHelper {
     public static String replaceFields(String sql, Map<String, String> fieldNameMap,
             boolean exactReplace) {
         Select selectStatement = SqlSelectHelper.getSelect(sql);
+        // alias field should not be replaced
+        Set<String> aliases = SqlSelectHelper.getAliasFields(sql);
+        aliases.forEach(alias -> fieldNameMap.put(alias, alias));
+
         Set<Select> plainSelectList = SqlSelectHelper.getAllSelect(selectStatement);
         for (Select plainSelect : plainSelectList) {
             if (plainSelect instanceof PlainSelect) {
@@ -475,19 +479,37 @@ public class SqlReplaceHelper {
 
     public static String replaceAliasFieldName(String sql, Map<String, String> fieldNameMap) {
         Select selectStatement = SqlSelectHelper.getSelect(sql);
-        if (!(selectStatement instanceof PlainSelect)) {
+        if (selectStatement == null) {
             return sql;
         }
-        PlainSelect plainSelect = (PlainSelect) selectStatement;
-        FieldAliasReplaceNameVisitor visitor = new FieldAliasReplaceNameVisitor(fieldNameMap);
-        for (SelectItem selectItem : plainSelect.getSelectItems()) {
-            selectItem.accept(visitor);
+
+        List<PlainSelect> plainSelects =
+                SqlSelectHelper.getPlainSelects(SqlSelectHelper.getPlainSelect(selectStatement));
+        if (CollectionUtils.isEmpty(plainSelects)) {
+            return selectStatement.toString();
         }
-        Map<String, String> aliasToActualExpression = visitor.getAliasToActualExpression();
-        if (Objects.nonNull(aliasToActualExpression) && !aliasToActualExpression.isEmpty()) {
-            return replaceFields(selectStatement.toString(), aliasToActualExpression, true);
+
+        Map<String, String> aliasToActualExpression = new HashMap<>();
+        for (PlainSelect plainSelect : plainSelects) {
+            if (plainSelect == null || CollectionUtils.isEmpty(plainSelect.getSelectItems())) {
+                continue;
+            }
+            FieldAliasReplaceNameVisitor visitor = new FieldAliasReplaceNameVisitor(fieldNameMap);
+            for (SelectItem selectItem : plainSelect.getSelectItems()) {
+                selectItem.accept(visitor);
+            }
+            Map<String, String> subAliasToActualExpression = visitor.getAliasToActualExpression();
+            if (Objects.nonNull(subAliasToActualExpression)
+                    && !subAliasToActualExpression.isEmpty()) {
+                aliasToActualExpression.putAll(subAliasToActualExpression);
+            }
         }
-        return selectStatement.toString();
+
+        String replaced = selectStatement.toString();
+        if (aliasToActualExpression.isEmpty()) {
+            return replaced;
+        }
+        return replaceFields(replaced, aliasToActualExpression, true);
     }
 
     public static String replaceAliasWithBackticks(String sql) {
@@ -723,7 +745,7 @@ public class SqlReplaceHelper {
         List<PlainSelect> plainSelects = SqlSelectHelper.getPlainSelects(plainSelectList);
         for (PlainSelect plainSelect : plainSelects) {
             if (Objects.nonNull(plainSelect.getFromItem())) {
-                Table table = (Table) plainSelect.getFromItem();
+                Table table = SqlSelectHelper.getTable(plainSelect.getFromItem());
                 if (table.getName().equals(tableName)) {
                     replacePlainSelectByExpr(plainSelect, replace);
                     if (SqlSelectHelper.hasAggregateFunction(plainSelect)) {

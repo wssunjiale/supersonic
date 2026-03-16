@@ -1,0 +1,429 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "waterfall",
+  "display_name": "Waterfall Chart",
+  "source_kind": "schema_file",
+  "normalized_chart_form_data": {
+    "required_root_fields": [
+      "datasource",
+      "metric",
+      "viz_type",
+      "x_axis"
+    ],
+    "optional_root_fields": [
+      "adhoc_filters",
+      "cache_timeout",
+      "currency_format",
+      "custom_params",
+      "decrease_color",
+      "extra_form_data",
+      "granularity_sqla",
+      "groupby",
+      "increase_color",
+      "row_limit",
+      "show_legend",
+      "show_value",
+      "slice_id",
+      "time_grain_sqla",
+      "total_color",
+      "url_params",
+      "x_axis_label",
+      "x_axis_time_format",
+      "x_ticks_layout",
+      "y_axis_format",
+      "y_axis_label"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "metric",
+      "row_limit",
+      "viz_type",
+      "x_axis"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "currency_format",
+      "datasource",
+      "decrease_color",
+      "groupby",
+      "increase_color",
+      "metric",
+      "row_limit",
+      "show_legend",
+      "show_value",
+      "time_grain_sqla",
+      "total_color",
+      "viz_type",
+      "x_axis",
+      "x_axis_label",
+      "x_axis_time_format",
+      "x_ticks_layout",
+      "y_axis_format",
+      "y_axis_label"
+    ],
+    "fallback_template_seed": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "waterfall",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "x_axis": "<x_axis_column>",
+      "adhoc_filters": [],
+      "time_range": "No filter"
+    }
+  },
+  "original_chart_form_data_schema": {
+    "viz_type": "waterfall",
+    "display_name": "Waterfall Chart",
+    "purpose": "用于调用 API 创建或保存 Waterfall Chart 时填写的 form_data 模板",
+    "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/waterfall-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Waterfall/index.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Waterfall/controlPanel.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Waterfall/buildQuery.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Waterfall/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Waterfall/types.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/controls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/test/Waterfall/buildQuery.test.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/sections/sections.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/mixins.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getControlState.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/models/ChartProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractQueryFields.ts"
+    ],
+    "notes": [
+      "API form_data 的键名必须保留源码中的原始 control name。Waterfall 的 root 字段既有 Query 字段，也有展示字段。",
+      "Explore 导出 form_data 时走 getFormDataFromControls()，它只会按 controlName 原样取 value，不会自动改成 camelCase。",
+      "transformProps 里看到的 `showLegend`、`increaseColor`、`xAxisTimeFormat` 等 camelCase，是 ChartProps 运行时对 form_data 做 key conversion 之后的形态，不是 API 入参键名。",
+      "datasource 和 viz_type 来自 datasourceAndVizType section，不是 Waterfall 专属控件，但创建图表时必须提供。",
+      "Waterfall 的 query 主轴字段优先用 `x_axis`。这不是经验建议：`x_axis` 在 UI 控件层有 validator；若旧 form_data 只有 `granularity_sqla`，control 初始化会把它回填到 `x_axis`，然后再导出为 root form_data。",
+      "Waterfall 的 `groupby` 虽然当前 UI 只允许单选 breakdown，但 runtime 同时兼容字符串、对象、数组三种输入形态。",
+      "Waterfall/buildQuery.ts 会覆盖 query.columns 和 query.orderby，因此这两个 query 字段不应在 form_data 根层直接手写。"
+    ],
+    "naming_and_pipeline": {
+      "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写成 form_data[name]。",
+      "api_form_data_to_query_context": "Waterfall/buildQuery.ts 使用原始 snake_case form_data 构建 query context。",
+      "api_form_data_to_runtime_form_data": "ChartProps 会把 form_data 转成 camelCase 的 runtime formData，同时保留 rawFormData。",
+      "core_aliasing": "core `extractQueryFields()` 会把 `metric` 归并到 query.metrics；Waterfall/buildQuery.ts 再显式决定 query.columns 与 query.orderby。"
+    },
+    "global_required_fields": {
+      "datasource": {
+        "data_type": "string",
+        "required": true,
+        "sample_data": "<dataset_id>__table",
+        "source": "datasourceAndVizType section"
+      },
+      "viz_type": {
+        "data_type": "string",
+        "required": true,
+        "fixed_value": "waterfall",
+        "source": "datasourceAndVizType section"
+      },
+      "x_axis": {
+        "data_type": "string | object",
+        "required": true,
+        "sample_data": "order_date",
+        "source": "Waterfall Query section + xAxisMixin validator",
+        "notes": "UI 保存态通常会显式包含 `x_axis`。只有 raw API 绕过 UI 时，才建议依赖 `buildQuery.ts` 对 `granularity_sqla` 的 fallback。"
+      },
+      "metric": {
+        "data_type": "string | object",
+        "required": true,
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        },
+        "source": "Waterfall Query section + sharedControls.metric"
+      }
+    },
+    "global_optional_fields": {
+      "granularity_sqla": {
+        "data_type": "string | object",
+        "required": false,
+        "sample_data": "ds",
+        "source": "Waterfall/buildQuery.ts + xAxisMixin compatibility path",
+        "notes": "只建议用于兼容旧 form_data。`x_axis` 存在时，buildQuery 优先使用 `x_axis`。"
+      },
+      "time_grain_sqla": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "P1D",
+        "source": "Waterfall Query section"
+      },
+      "groupby": {
+        "data_type": "string | object | array[string | object]",
+        "required": false,
+        "sample_data": "region",
+        "source": "Waterfall Query section",
+        "notes": "当前 UI 只允许一个 breakdown；若传数组，runtime 也只消费第一个元素。"
+      },
+      "adhoc_filters": {
+        "data_type": "array[object]",
+        "required": false,
+        "sample_data": [],
+        "source": "Waterfall Query section"
+      },
+      "row_limit": {
+        "data_type": "integer | string",
+        "required": false,
+        "sample_data": 10000,
+        "source": "Waterfall Query section"
+      },
+      "show_value": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": false,
+        "source": "Chart Options section"
+      },
+      "show_legend": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": false,
+        "source": "Chart Options section",
+        "notes": "controlPanel 默认 false；types.ts runtime DEFAULT_FORM_DATA 是 true。"
+      },
+      "increase_color": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {
+          "r": 90,
+          "g": 193,
+          "b": 137,
+          "a": 1
+        },
+        "source": "Chart Options section"
+      },
+      "decrease_color": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {
+          "r": 224,
+          "g": 67,
+          "b": 85,
+          "a": 1
+        },
+        "source": "Chart Options section"
+      },
+      "total_color": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {
+          "r": 102,
+          "g": 102,
+          "b": 102,
+          "a": 1
+        },
+        "source": "Chart Options section"
+      },
+      "x_axis_label": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "Month",
+        "source": "Chart Options section"
+      },
+      "x_axis_time_format": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "smart_date",
+        "source": "Chart Options section"
+      },
+      "x_ticks_layout": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "auto",
+        "source": "Chart Options section"
+      },
+      "y_axis_label": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "Revenue",
+        "source": "Chart Options section"
+      },
+      "y_axis_format": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "SMART_NUMBER",
+        "source": "Chart Options section"
+      },
+      "currency_format": {
+        "data_type": "object | null",
+        "required": false,
+        "sample_data": {
+          "symbol": "$",
+          "symbolPosition": "prefix"
+        },
+        "source": "Chart Options section"
+      },
+      "slice_id": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 0,
+        "source": "datasourceAndVizType hidden control"
+      },
+      "cache_timeout": {
+        "data_type": "integer | null",
+        "required": false,
+        "sample_data": null,
+        "source": "datasourceAndVizType hidden control"
+      },
+      "url_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "datasourceAndVizType hidden control"
+      },
+      "custom_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "datasourceAndVizType hidden control"
+      },
+      "extra_form_data": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "QueryFormData.extra_form_data"
+      }
+    },
+    "minimal_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "waterfall",
+      "x_axis": "order_date",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "sales"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(sales)"
+      },
+      "adhoc_filters": [],
+      "row_limit": 10000
+    },
+    "recommended_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "waterfall",
+      "x_axis": "order_date",
+      "time_grain_sqla": "P1D",
+      "groupby": "region",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "sales"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(sales)"
+      },
+      "adhoc_filters": [],
+      "row_limit": 10000,
+      "show_value": false,
+      "show_legend": false,
+      "increase_color": {
+        "r": 90,
+        "g": 193,
+        "b": 137,
+        "a": 1
+      },
+      "decrease_color": {
+        "r": 224,
+        "g": 67,
+        "b": 85,
+        "a": 1
+      },
+      "total_color": {
+        "r": 102,
+        "g": 102,
+        "b": 102,
+        "a": 1
+      },
+      "x_axis_label": "Month",
+      "x_axis_time_format": "smart_date",
+      "x_ticks_layout": "auto",
+      "y_axis_label": "Revenue",
+      "y_axis_format": "SMART_NUMBER",
+      "currency_format": null
+    },
+    "conditional_blocks": {
+      "compat_granularity_sqla_fallback": {
+        "condition": "迁移旧保存态 form_data，原来只有 `granularity_sqla` 而没有 `x_axis` 时",
+        "fields": {
+          "granularity_sqla": "ds"
+        },
+        "notes": "buildQuery 会在 `x_axis` 为空时回退到 `granularity_sqla`。但新建模板仍建议显式传 `x_axis`。"
+      },
+      "single_breakdown_mode": {
+        "condition": "需要把每个 period 再按一个类别拆分时",
+        "fields": {
+          "groupby": "region"
+        },
+        "notes": "runtime 只消费第一个 breakdown；有 breakdown 时会为每个 period 额外补一条 total bar。"
+      },
+      "temporal_axis_formatting": {
+        "condition": "X 轴列是 temporal，且需要时间粒度与显示格式控制时",
+        "fields": {
+          "time_grain_sqla": "P1D",
+          "x_axis_time_format": "smart_date"
+        }
+      },
+      "currency_display": {
+        "condition": "Y 轴数值需要按货币格式渲染时",
+        "fields": {
+          "y_axis_format": ",.2f",
+          "currency_format": {
+            "symbol": "$",
+            "symbolPosition": "prefix"
+          }
+        },
+        "notes": "只有设置了 currency symbol 时，transformProps 才会用 CurrencyFormatter。"
+      }
+    },
+    "runtime_only_or_non_template_fields": {
+      "runtime_aliases_only": [
+        {
+          "field_name": "showLegend/increaseColor/decreaseColor/totalColor/xAxis/xAxisLabel/xAxisTimeFormat/xTicksLayout/yAxisLabel/yAxisFormat/currencyFormat/granularitySqla",
+          "reason": "这些是 runtime camelCase 形态；API 调用时应使用 controlPanel 导出的原始 snake_case 键。"
+        }
+      ],
+      "query_context_generated_only": [
+        {
+          "field_name": "columns",
+          "reason": "Waterfall/buildQuery.ts 会按 `x_axis 或 granularity_sqla + groupby` 自动生成 query.columns。"
+        },
+        {
+          "field_name": "orderby",
+          "reason": "Waterfall/buildQuery.ts 会强制把 columns 生成为升序 `orderby`。"
+        }
+      ],
+      "source_inconsistencies": [
+        {
+          "field_name": "show_legend",
+          "reason": "controlPanel 默认值为 false，但 types.ts 里的 runtime DEFAULT_FORM_DATA.showLegend 为 true。构造 API form_data 时应优先信任 control 名与显式值。"
+        }
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "waterfall",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/waterfall-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/waterfall-form-data-schema.json",
+      "control-schema": "form-data-schema/waterfall-schema.json"
+    }
+  }
+}

@@ -74,7 +74,8 @@ public class MapFilter {
             List<SchemaElementMatch> value = entry.getValue();
             if (!CollectionUtils.isEmpty(value)) {
                 value.removeIf(
-                        schemaElementMatch -> StringUtils.length(schemaElementMatch.getWord()) <= 2
+                        schemaElementMatch -> !schemaElementMatch.isLlmMatched()
+                                && StringUtils.length(schemaElementMatch.getWord()) <= 2
                                 && schemaElementMatch.getSimilarity() < 1);
             }
         }

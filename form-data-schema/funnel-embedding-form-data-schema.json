@@ -1,0 +1,283 @@
+{
+  "viz_type": "funnel",
+  "display_name": "Funnel Chart",
+  "purpose": "第三方 embedding / guest token 场景下安全传输的 Funnel Chart form_data 模板",
+  "base_form_data_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/funnel-form-data-schema.json",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset/security/manager.py",
+    "D:/vsx/sources/superset-6.0.0/superset/constants.py",
+    "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+    "D:/vsx/sources/superset-6.0.0/superset/charts/data/api.py",
+    "D:/vsx/sources/superset-6.0.0/superset/commands/chart/data/get_data_command.py",
+    "D:/vsx/sources/superset-6.0.0/superset/charts/schemas.py",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/constants.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/QueryFormData.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/processExtraFormData.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Funnel/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Funnel/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/utils/eventHandlers.ts"
+  ],
+  "notes": [
+    "embedded guest 的核心限制在后端 `security/manager.py::query_context_modified()`。报错原文是 `Guest user cannot modify chart payload`。",
+    "Funnel 是标准 chart data API 图表。guest 请求的安全做法不是重新拼装一份新的 funnel form_data，而是以已保存图表的 form_data 原样复制为 base，只把动态条件放进 extra_form_data。",
+    "对 Funnel 而言，最敏感的根字段是 `metric`、`groupby` 和 `sort_by_metric`，因为它们会直接影响 query_context.queries[*].metrics / columns / orderby。",
+    "Funnel 的交互筛选形状已经在 `utils/eventHandlers.ts` 中明确：点击 step 后，会按 `groupby` 各列生成 `extraFormData.filters=[{col:<groupby_col>, op:'IN', val:[...]}]`。",
+    "当前 Funnel controlPanel 不包含正式时间字段，所以 guest embedding 的动态入口主要应是 `extra_form_data.filters` 与 `extra_form_data.adhoc_filters`，而不是时间 override。"
+  ],
+  "security_enforcement": {
+    "backend_check_function": "superset/security/manager.py::query_context_modified",
+    "checked_when": "ChartDataCommand.validate() -> QueryContext.raise_for_access()",
+    "error_message": "Guest user cannot modify chart payload",
+    "hard_block_fields": [
+      "slice_id",
+      "metrics",
+      "groupby",
+      "columns",
+      "orderby"
+    ],
+    "indirectly_sensitive_fields_for_funnel": [
+      "metric",
+      "groupby",
+      "sort_by_metric"
+    ],
+    "recommended_strategy": "复制保存态 chart form_data 作为 base，仅通过 extra_form_data 追加过滤条件。"
+  },
+  "safe_base_rule": {
+    "description": "第三方 embedding 请求中的根层 form_data，应当从已保存 Funnel 图表的 form_data 直接复制，不要重构。",
+    "must_be_copied_from_saved_chart": [
+      "slice_id",
+      "datasource",
+      "viz_type",
+      "metric",
+      "groupby",
+      "adhoc_filters",
+      "row_limit",
+      "sort_by_metric",
+      "percent_calculation_type",
+      "color_scheme",
+      "show_legend",
+      "legendOrientation",
+      "legendMargin",
+      "label_type",
+      "tooltip_label_type",
+      "number_format",
+      "currency_format",
+      "show_labels",
+      "show_tooltip_labels",
+      "all other chart-definition fields"
+    ],
+    "why": [
+      "`query_context_modified()` 会把请求中的 metrics/groupby/columns/orderby 与保存态图表对比。",
+      "Funnel 的 `metric` 会进入 query.metrics，`groupby` 会进入 query.columns，`sort_by_metric` 会决定 query.orderby 是否存在。",
+      "guest 模式下，即使只是为了嵌入联动筛选，也不应在根层主动改这些图表定义字段。"
+    ]
+  },
+  "safe_embedding_form_data_template": {
+    "description": "这是 guest embedding 下的安全写法。根层以保存态 Funnel 图表为 base，仅改 extra_form_data。",
+    "template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "funnel",
+      "metric": "<copied_from_saved_chart>",
+      "groupby": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "row_limit": "<copied_from_saved_chart>",
+      "sort_by_metric": "<copied_from_saved_chart>",
+      "percent_calculation_type": "<copied_from_saved_chart_if_present>",
+      "color_scheme": "<copied_from_saved_chart_if_present>",
+      "show_legend": "<copied_from_saved_chart_if_present>",
+      "legendOrientation": "<copied_from_saved_chart_if_present>",
+      "legendMargin": "<copied_from_saved_chart_if_present>",
+      "label_type": "<copied_from_saved_chart_if_present>",
+      "tooltip_label_type": "<copied_from_saved_chart_if_present>",
+      "number_format": "<copied_from_saved_chart_if_present>",
+      "currency_format": "<copied_from_saved_chart_if_present>",
+      "show_labels": "<copied_from_saved_chart_if_present>",
+      "show_tooltip_labels": "<copied_from_saved_chart_if_present>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "stage",
+            "op": "IN",
+            "val": [
+              "Lead",
+              "Qualified"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    }
+  },
+  "preferred_dynamic_container": {
+    "field_name": "extra_form_data",
+    "description": "第三方 embedding 允许动态传入的上下文容器；后端会在 merge_extra_form_data() 中把它并入实际查询。",
+    "append_keys": [
+      "adhoc_filters",
+      "filters",
+      "interactive_groupby",
+      "interactive_highlight",
+      "interactive_drilldown",
+      "custom_form_data"
+    ],
+    "override_keys_backend_high_confidence": [
+      "granularity_sqla",
+      "granularity",
+      "time_column",
+      "time_grain",
+      "time_range",
+      "time_grain_sqla",
+      "relative_start",
+      "relative_end"
+    ],
+    "notes": "Funnel 当前 controlPanel 没有正式时间字段，因此这些 override 键对 Funnel 通常不是主路径。实际最有意义的是 `filters` 和 `adhoc_filters`。"
+  },
+  "extra_form_data_field_schema": [
+    {
+      "field_name": "filters",
+      "data_type": "array[QueryObjectFilterClause]",
+      "behavior": "append",
+      "safe_for_funnel": true,
+      "recommended": true,
+      "sample_data": [
+        {
+          "col": "stage",
+          "op": "IN",
+          "val": [
+            "Lead",
+            "Qualified"
+          ]
+        }
+      ],
+      "effect": "追加 simple filters；后端会转成额外过滤条件。对 Funnel 来说，这也是 `utils/eventHandlers.ts` 交互筛选明确产出的容器。",
+      "source": "superset/constants.py + superset/utils/core.py + plugin-chart-echarts/utils/eventHandlers.ts"
+    },
+    {
+      "field_name": "adhoc_filters",
+      "data_type": "array[AdhocFilter]",
+      "behavior": "append",
+      "safe_for_funnel": true,
+      "recommended": true,
+      "sample_data": [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "region",
+          "operator": "IN",
+          "comparator": [
+            "East"
+          ]
+        }
+      ],
+      "effect": "追加 adhoc filters；后端会标记为 `isExtra` 并并入查询。",
+      "source": "superset/constants.py + superset/utils/core.py"
+    },
+    {
+      "field_name": "custom_form_data",
+      "data_type": "object",
+      "behavior": "append",
+      "safe_for_funnel": true,
+      "recommended": false,
+      "sample_data": {},
+      "effect": "可传非标准附加数据；Funnel 默认 buildQuery / transformProps 不直接消费它。",
+      "source": "superset/constants.py + frontend QueryFormData.ts"
+    },
+    {
+      "field_name": "time_range",
+      "data_type": "string",
+      "behavior": "override",
+      "safe_for_funnel": false,
+      "recommended": false,
+      "sample_data": "Last 30 days",
+      "effect": "这是通用 extra_form_data override 字段，但 Funnel 当前 controlPanel 不以时间字段为主，通常没有必要在 guest embedding 中依赖它。",
+      "source": "superset/constants.py + frontend QueryFormData.ts",
+      "status": "低相关，不建议在 guest embedding 中依赖"
+    }
+  ],
+  "minimal_extra_form_data_template": {
+    "filters": [
+      {
+        "col": "stage",
+        "op": "IN",
+        "val": [
+          "Lead"
+        ]
+      }
+    ]
+  },
+  "recommended_extra_form_data_template": {
+    "filters": [
+      {
+        "col": "stage",
+        "op": "IN",
+        "val": [
+          "Lead",
+          "Qualified"
+        ]
+      }
+    ],
+    "adhoc_filters": [
+      {
+        "expressionType": "SIMPLE",
+        "clause": "WHERE",
+        "subject": "region",
+        "operator": "IN",
+        "comparator": [
+          "East"
+        ]
+      }
+    ],
+    "custom_form_data": {}
+  },
+  "unsafe_root_form_data_changes": [
+    {
+      "field_name": "slice_id",
+      "reason": "与保存态图表 id 不一致会被后端立即判定为请求了另一张图。"
+    },
+    {
+      "field_name": "metric",
+      "reason": "它会进入 query_context.queries[*].metrics，并且在 `sort_by_metric=true` 时还会进入 `orderby`。guest 模式下不应在根层修改。"
+    },
+    {
+      "field_name": "groupby",
+      "reason": "它会进入 query_context.queries[*].columns，也决定交互筛选最终使用哪些列。guest 模式下不应在根层修改。"
+    },
+    {
+      "field_name": "sort_by_metric",
+      "reason": "它会改变 query_context 是否写入 `orderby`，因此属于高敏感查询字段。"
+    },
+    {
+      "field_name": "datasource",
+      "reason": "embedded guest 不应改图表绑定数据集。"
+    },
+    {
+      "field_name": "viz_type",
+      "reason": "embedded guest 不应把已分享图表改成另一种图。"
+    }
+  ],
+  "practical_guidance": {
+    "best_practice": [
+      "先从保存态 Funnel 图表读取完整 form_data。",
+      "根层字段保持不变，尤其保留 `metric`、`groupby` 和 `sort_by_metric`。",
+      "只在 extra_form_data 中放动态 `filters` / `adhoc_filters`。",
+      "如果你的嵌入页只是需要做阶段联动筛选，优先使用 `extra_form_data.filters`。"
+    ],
+    "avoid": [
+      "不要在 guest embedding 请求里手工重写 `metric`、`groupby` 或 `sort_by_metric`。",
+      "不要把 runtime camelCase 字段名当成 API root 键名使用。",
+      "不要把当前 UI 没有正式暴露的 `sort`、`orient`、`gap`、`labelLine`、`legendType` 当成新的 embedding 动态参数。"
+    ]
+  }
+}

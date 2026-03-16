@@ -6,7 +6,8 @@ import {
   MsgDataType,
   ParseDataType,
   SearchRecommendItem,
-  SupersetDashboardType,
+  SupersetDashboardItem,
+  SupersetDashboardManageResp,
   SupersetGuestTokenResp,
 } from '../common/type';
 import { isMobile } from '../utils/utils';
@@ -81,7 +82,8 @@ export function chatExecute(
   queryText: string,
   chatId: number,
   parseInfo: ChatContextType,
-  agentId?: number
+  agentId?: number,
+  streamingResult?:boolean
 ) {
   // AgentService executes external agent calls that may take a long time.
   // Override axiosInstance default timeout (120s) to avoid frontend aborting the request.
@@ -94,28 +96,48 @@ export function chatExecute(
       agentId,
       chatId: chatId || DEFAULT_CHAT_ID,
       queryId: parseInfo.queryId,
-      parseId: parseInfo.id
+      parseId: parseInfo.id,
+      streamingResult:streamingResult
     },
     requestConfig as any
   );
 }
 
-export function fetchSupersetDashboards(pluginId?: number) {
-  return axios.post<SupersetDashboardType[]>(`${prefix}/chat/superset/dashboards`, {
-    pluginId,
+export function getExecuteSummary(
+    queryId: number
+) {
+  return axios.post<MsgDataType>(`${prefix}/chat/query/getExecuteSummary`, {
+    queryId: queryId,
   });
+}
+
+export function fetchSupersetGuestToken(
+  params: { pluginId?: number; embeddedId: string }
+): Promise<SupersetGuestTokenResp> {
+  return axios.post(`${prefix}/chat/superset/guest-token`, params) as unknown as Promise<SupersetGuestTokenResp>;
+}
+
+export function fetchSupersetManualDashboards(
+  pluginId?: number
+): Promise<SupersetDashboardManageResp> {
+  return axios.post(`${prefix}/chat/superset/dashboards/manage`, {
+    pluginId,
+  }) as unknown as Promise<SupersetDashboardManageResp>;
+}
+
+export function createSupersetDashboard(params: {
+  pluginId?: number;
+  title: string;
+}): Promise<SupersetDashboardItem> {
+  return axios.post(`${prefix}/chat/superset/dashboard/create`, params) as unknown as Promise<SupersetDashboardItem>;
 }
 
 export function pushSupersetChartToDashboard(params: {
   pluginId?: number;
   dashboardId: number;
   chartId: number;
-}) {
-  return axios.post<boolean>(`${prefix}/chat/superset/dashboard/push`, params);
-}
-
-export function fetchSupersetGuestToken(params: { pluginId?: number; embeddedId: string }) {
-  return axios.post<SupersetGuestTokenResp>(`${prefix}/chat/superset/guest-token`, params);
+}): Promise<boolean> {
+  return axios.post(`${prefix}/chat/superset/dashboard/push`, params) as unknown as Promise<boolean>;
 }
 
 export function switchEntity(entityId: string, modelId?: number, chatId?: number) {

@@ -207,7 +207,7 @@ const Chat: ForwardRefRenderFunction<any, Props> = (
       parseTimeCost: item.parseTimeCost,
       msgData: { ...(item.queryResult || {}), similarQueries: item.similarQueries },
       score: item.score,
-      agentId: currentAgent?.id,
+      agentId: item.agentId ?? currentAgent?.id,
     }));
   };
 
@@ -339,6 +339,9 @@ const Chat: ForwardRefRenderFunction<any, Props> = (
     const msg = msgs.find(item => item.id === questionId);
     if (msg) {
       msg.msgData = data;
+      if (data.parseInfos) {
+        msg.parseInfos = data.parseInfos;
+      }
       setMessageList(msgs);
     }
     if (!isRefresh) {

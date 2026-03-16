@@ -1,0 +1,326 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "world_map",
+  "display_name": "World Map",
+  "generation_mode": "heuristic_seed",
+  "slot_candidates": [
+    {
+      "field_name": "adhoc_filters",
+      "required": false,
+      "slot_kind": "filter_list",
+      "accepted_dataset_roles": [
+        "filter_context"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [],
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [
+        "extra_form_data.append"
+      ],
+      "descriptions": [
+        "Filters"
+      ]
+    },
+    {
+      "field_name": "country_fieldtype",
+      "required": false,
+      "slot_kind": "geo_region",
+      "accepted_dataset_roles": [
+        "geo_country_code",
+        "geo_country_name",
+        "geo_region"
+      ],
+      "cardinality": "0..1",
+      "placeholder": "<region_column>",
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The country code standard that Superset should expect to find in the [country] column"
+      ]
+    },
+    {
+      "field_name": "entity",
+      "required": true,
+      "slot_kind": "entity",
+      "accepted_dataset_roles": [
+        "entity",
+        "entity_id",
+        "dimension"
+      ],
+      "cardinality": "0..1",
+      "placeholder": "<entity_column>",
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "3 letter code of the country"
+      ]
+    },
+    {
+      "field_name": "metric",
+      "required": true,
+      "slot_kind": "metric",
+      "accepted_dataset_roles": [
+        "metric",
+        "saved_metric",
+        "adhoc_metric"
+      ],
+      "cardinality": "1",
+      "placeholder": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+      ]
+    },
+    {
+      "field_name": "secondary_metric",
+      "required": false,
+      "slot_kind": "secondary_metric",
+      "accepted_dataset_roles": [
+        "metric",
+        "saved_metric",
+        "adhoc_metric"
+      ],
+      "cardinality": "0..1",
+      "placeholder": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<secondary_metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<secondary_metric_column>)"
+      },
+      "source_categories": [
+        "Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Metric that defines the size of the bubble"
+      ]
+    }
+  ],
+  "non_binding_form_controls": [
+    {
+      "field_name": "color_by",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Choose whether a country should be shaded by the metric, or assigned a color based on a categorical color palette"
+      ]
+    },
+    {
+      "field_name": "color_picker",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Use this to define a static color for all circles"
+      ]
+    },
+    {
+      "field_name": "color_scheme",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The color scheme for rendering chart"
+      ]
+    },
+    {
+      "field_name": "currency_format",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Currency format"
+      ]
+    },
+    {
+      "field_name": "linear_color_scheme",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        ""
+      ]
+    },
+    {
+      "field_name": "max_bubble_size",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Maximum pixel size of bubble radius after runtime parseInt."
+      ]
+    },
+    {
+      "field_name": "row_limit",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Limits the number of the rows that are computed in the query that is the source of the data used for this chart."
+      ]
+    },
+    {
+      "field_name": "show_bubbles",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to display bubbles on top of countries"
+      ]
+    },
+    {
+      "field_name": "sort_by_metric",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to sort results by the selected metric in descending order."
+      ]
+    },
+    {
+      "field_name": "y_axis_format",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "D3 number format string."
+      ]
+    }
+  ],
+  "dataset_role_inventory": {
+    "adhoc_metric": [
+      "metric",
+      "secondary_metric"
+    ],
+    "dimension": [
+      "entity"
+    ],
+    "entity": [
+      "entity"
+    ],
+    "entity_id": [
+      "entity"
+    ],
+    "filter_context": [
+      "adhoc_filters"
+    ],
+    "geo_country_code": [
+      "country_fieldtype"
+    ],
+    "geo_country_name": [
+      "country_fieldtype"
+    ],
+    "geo_region": [
+      "country_fieldtype"
+    ],
+    "metric": [
+      "metric",
+      "secondary_metric"
+    ],
+    "saved_metric": [
+      "metric",
+      "secondary_metric"
+    ]
+  },
+  "binding_seed_example": {
+    "entity": "<entity_column>",
+    "metric": {
+      "expressionType": "SIMPLE",
+      "column": {
+        "column_name": "<metric_column>"
+      },
+      "aggregate": "SUM",
+      "label": "SUM(<metric_column>)"
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "world_map",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/world_map-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/world_map-form-data-schema.json",
+      "control-schema": "form-data-schema/world_map-schema.json"
+    }
+  }
+}

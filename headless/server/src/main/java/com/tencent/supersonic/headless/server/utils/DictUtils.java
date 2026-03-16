@@ -138,7 +138,8 @@ public class DictUtils {
         semanticQueryReq.setNeedAuth(false);
         String bizName = dictItemResp.getBizName();
         try {
-            SemanticQueryResp semanticQueryResp = queryService.queryByReq(semanticQueryReq, null);
+            SemanticQueryResp semanticQueryResp =
+                    queryService.queryByReq(semanticQueryReq, User.getDefaultUser());
             if (Objects.isNull(semanticQueryResp)
                     || CollectionUtils.isEmpty(semanticQueryResp.getResultList())) {
                 return lines;
@@ -274,6 +275,9 @@ public class DictUtils {
     private QuerySqlReq constructQuerySqlReq(DictItemResp dictItemResp) {
 
         ModelResp model = modelService.getModel(dictItemResp.getModelId());
+        String tableStr = StringUtils.isNotBlank(model.getModelDetail().getTableQuery())
+                ? model.getModelDetail().getTableQuery()
+                : "(" + model.getModelDetail().getSqlQuery() + ") AS t";
         String sqlPattern =
                 "select %s,count(1) from %s %s group by %s order by count(1) desc limit %d";
         String dimBizName = dictItemResp.getBizName();
@@ -287,12 +291,13 @@ public class DictUtils {
             limit = Integer.MAX_VALUE;
         }
 
-        String sql =
-                String.format(sqlPattern, dimBizName, model.getBizName(), where, dimBizName, limit);
+        String sql = String.format(sqlPattern, dimBizName, tableStr, where, dimBizName, limit);
         Set<Long> modelIds = new HashSet<>();
         modelIds.add(dictItemResp.getModelId());
         QuerySqlReq querySqlReq = new QuerySqlReq();
         querySqlReq.setSql(sql);
+        // bypass semantic translation
+        querySqlReq.getSqlInfo().setQuerySQL(sql);
         querySqlReq.setNeedAuth(false);
         querySqlReq.setModelIds(modelIds);
 
@@ -419,56 +424,67 @@ public class DictUtils {
         return joiner.toString();
     }
 
-    public String defaultDateFilter(DateConf dateConf) {
-        String format = itemValueDateFormat;
-        String start = LocalDate.now().minusDays(itemValueDateStart)
-                .format(DateTimeFormatter.ofPattern(format));
-        String end = LocalDate.now().minusDays(itemValueDateEnd)
-                .format(DateTimeFormatter.ofPattern(format));
-        return String.format("( %s >= '%s' and %s <= '%s' )", dateConf.getDateField(), start,
-                dateConf.getDateField(), end);
-    }
-
     private String generateDictDateFilter(DictItemResp dictItemResp) {
-        ItemValueConfig config = dictItemResp.getConfig();
-        if (config == null) {
+        Dimension partitionTimeDimension = getPartitionTimeDimension(dictItemResp.getModelId());
+        // 如果没有设置数据时间维度，则无法做时间分区过滤
+        if (partitionTimeDimension == null) {
             return "";
         }
 
-        if (!partitionedModel(dictItemResp.getModelId())) {
-            return "";
-        }
-        // 未进行设置
+        ItemValueConfig config = dictItemResp.getConfig();
+        // 默认使用数据时间维度进行时间分区过滤
         if (Objects.isNull(config) || Objects.isNull(config.getDateConf())) {
-            return defaultDateFilter(config.getDateConf());
+            String startDate = LocalDate.now().minusDays(itemValueDateStart)
+                    .format(DateTimeFormatter.ofPattern(partitionTimeDimension.getDateFormat()));
+            String endDate = LocalDate.now().minusDays(itemValueDateEnd)
+                    .format(DateTimeFormatter.ofPattern(partitionTimeDimension.getDateFormat()));
+            return String.format("( %s >= '%s' and %s <= '%s' )",
+                    partitionTimeDimension.getBizName(), startDate,
+                    partitionTimeDimension.getBizName(), endDate);
         }
+
         // 全表扫描
         if (DateConf.DateMode.ALL.equals(config.getDateConf().getDateMode())) {
             return "";
         }
+
         // 静态日期
         if (DateConf.DateMode.BETWEEN.equals(config.getDateConf().getDateMode())) {
+            String dateFormat = partitionTimeDimension.getDateFormat();
+            if (StringUtils.isEmpty(dateFormat)) {
+                dateFormat = "yyyy-MM-dd"; // 默认格式
+            }
+
+            // 格式化起止日期
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateFormat);
+            String startDate =
+                    LocalDate.parse(config.getDateConf().getStartDate()).format(formatter);
+            String endDate = LocalDate.parse(config.getDateConf().getEndDate()).format(formatter);
+
             return String.format("( %s >= '%s' and %s <= '%s' )",
-                    config.getDateConf().getDateField(), config.getDateConf().getStartDate(),
-                    config.getDateConf().getDateField(), config.getDateConf().getEndDate());
+                    partitionTimeDimension.getBizName(), startDate,
+                    partitionTimeDimension.getBizName(), endDate);
         }
+
         // 动态日期
         if (DateConf.DateMode.RECENT.equals(config.getDateConf().getDateMode())) {
+            dictItemResp.getConfig().getDateConf()
+                    .setDateField(partitionTimeDimension.getBizName());
             return generateDictDateFilterRecent(dictItemResp);
         }
 
         return "";
     }
 
-    private boolean partitionedModel(Long modelId) {
+    private Dimension getPartitionTimeDimension(Long modelId) {
         ModelResp model = modelService.getModel(modelId);
         if (Objects.nonNull(model)) {
             List<Dimension> timeDims = model.getTimeDimension();
             if (!CollectionUtils.isEmpty(timeDims)) {
-                return true;
+                return timeDims.get(0);
             }
         }
-        return false;
+        return null;
     }
 
     private String generateDictDateFilterRecent(DictItemResp dictItemResp) {

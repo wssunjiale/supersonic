@@ -1,0 +1,121 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "echarts_timeseries_step",
+  "display_name": "Stepped Line",
+  "normalized_summary": {
+    "category": "time_series",
+    "tags": [
+      "step_line",
+      "time_series",
+      "discrete",
+      "step"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "granularity_sqla",
+        "required": true,
+        "description": "时间粒度字段，定义时序图的时间轴维度（如小时、天、月）。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于计算每个时间点的阶梯数值。"
+      },
+      {
+        "key": "step_type",
+        "required": false,
+        "description": "阶梯类型（start/middle/end），控制阶梯线的拐点位置。"
+      }
+    ],
+    "description_zh": "Step Line Time Series Chart displays metric values over time with a step-wise line, highlighting discrete value changes at time intervals.",
+    "visual_shape_zh": "阶梯线时序图（时间轴离散型）",
+    "use_cases_zh": [
+      "离散型时间节点的数值变化（如版本发布后的指标变化）",
+      "阶段性指标展示（如按周统计的库存变化）",
+      "非连续型趋势的精准呈现"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "echarts_timeseries_step",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/echarts_timeseries_step-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/echarts_timeseries_step-form-data-schema.json",
+      "control-schema": "form-data-schema/echarts_timeseries_step-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Stepped Line",
+    "viztype": "echarts_timeseries_step",
+    "详细描述": "Step Line Time Series Chart displays metric values over time with a step-wise line, highlighting discrete value changes at time intervals.",
+    "表现形态": "阶梯线时序图（时间轴离散型）",
+    "适用场景": [
+      "离散型时间节点的数值变化（如版本发布后的指标变化）",
+      "阶段性指标展示（如按周统计的库存变化）",
+      "非连续型趋势的精准呈现"
+    ],
+    "vizKey": "Step",
+    "pluginCategory": "Time Series",
+    "pluginTags": [],
+    "category": "time_series",
+    "tags": [
+      "step_line",
+      "time_series",
+      "discrete",
+      "step"
+    ],
+    "关键字段": [
+      {
+        "key": "granularity_sqla",
+        "required": true,
+        "description": "时间粒度字段，定义时序图的时间轴维度（如小时、天、月）。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于计算每个时间点的阶梯数值。"
+      },
+      {
+        "key": "step_type",
+        "required": false,
+        "description": "阶梯类型（start/middle/end），控制阶梯线的拐点位置。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

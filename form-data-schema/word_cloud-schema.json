@@ -1,0 +1,179 @@
+{
+  "viz_type": "word_cloud",
+  "display_name": "Word Cloud",
+  "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-word-cloud/src/plugin/controlPanel.ts",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-word-cloud/src/plugin/index.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-word-cloud/src/plugin/controlPanel.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-word-cloud/src/plugin/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-word-cloud/src/plugin/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-word-cloud/src/types.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-word-cloud/src/chart/WordCloud.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-word-cloud/src/configureEncodable.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-word-cloud/test/buildQuery.test.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/utils/getStandardizedControls.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/components/controls/CheckboxControl.jsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getControlState.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractQueryFields.ts"
+  ],
+  "notes": [
+    "word_cloud 是现代插件，走标准 chart data API，不是 legacy 图。",
+    "插件 metadata.name 是 `Word Cloud`，category 是 `Ranking`。",
+    "controlPanel 只有 2 个 section：`Query` 和 `Options`。",
+    "`series` 是这个图的核心字段。controlPanel 对 shared `series` 追加了 `validateNonEmpty` 且 `clearable=false`，因此它是高置信必填。",
+    "core `extractQueryFields()` 预置了 `series -> groupby` 别名，而 `groupby` 最终会被标准化成 query.columns。因此 Word Cloud 实际上是通过 root `series` 驱动查询维度。",
+    "`metric` 不是必填。`transformProps()` 在 `metric` 缺失时会让 `fontSize` 编码为 `undefined`，前端组件会回退到默认字号。",
+    "`sort_by_metric=true` 时，buildQuery.ts 会显式写入 `orderby=[[metric,false]]`。如果没有 `metric`，这个开关没有实际意义。",
+    "`sort_by_metric` 当前没有显式 control default。这一点也不是推断：shared control 只定义了 label/description，没有 `default`；`getControlState.ts` 只有在 `state.default` 为 truthy 时才会把默认值写进 control.value，因此这里的 root form_data 缺省态是“未显式设置”。同时，`CheckboxControl.jsx` 组件自身 `defaultProps.value=false` 且 `checked={!!value}`，所以 UI 会以未勾选状态展示。",
+    "`size_from`、`size_to`、`rotation`、`color_scheme` 都只影响前端字体大小映射、旋转方式和配色，不参与 query.columns/query.metrics 编译。",
+    "源码存在 2 处默认值不一致：controlPanel 里 `rotation.default='square'`，但 WordCloud.tsx 组件默认 `rotation='flat'`；controlPanel 里 `size_from.default=10`，但 transformProps 对缺失值的 runtime fallback 是 `sizeFrom=0`。这里按 controlPanel 导出的 root form_data 默认值记录，并在字段备注里保留该差异。"
+  ],
+  "form_data_overrides": {
+    "series": "getStandardizedControls().shiftColumn()",
+    "metric": "getStandardizedControls().shiftMetric()",
+    "notes": "这里只是 standardized controls 在切换图表时迁移 column / metric 的逻辑，不是常规新建 / 保存 word_cloud form_data 的主路径。"
+  },
+  "chart_data_api_behavior": {
+    "useLegacyApi": false,
+    "frontend_request_endpoint": "/api/v1/chart/data",
+    "build_query": "Word Cloud/buildQuery.ts 只在 `sort_by_metric=true` 时追加 `orderby=[[metric,false]]`；其余 query fields 走标准 buildQueryContext / extractQueryFields 路径。",
+    "core_aliasing": "core `extractQueryFields()` 会把 root `series` 归并到 query.columns，把 root `metric` 归并到 query.metrics。"
+  },
+  "query_compilation": {
+    "query_columns": "`series` 通过 `series -> groupby -> columns` 的 core alias 路径进入 query.columns。buildQuery 测试验证：`series='foo'` 时，query.columns = ['foo']。",
+    "query_metrics": "`metric` 为非空时进入 query.metrics；为空时可以只查维度列并用统一默认字号渲染词云。",
+    "query_filters": "`adhoc_filters` 由标准 buildQueryObject/processFilters 路径编译进 query。",
+    "query_limits": "`row_limit` 由标准 query object 路径写入 query.row_limit。",
+    "query_sorting": "`sort_by_metric=true` 时，buildQuery 会把 `orderby` 改成 `[[metric,false]]`；否则保持默认。"
+  },
+  "field_categories": {
+    "Query": [
+      {
+        "field_name": "series",
+        "description": "Defines the grouping of entities. Each series is represented by a specific color in the chart.",
+        "data_type": "string | object",
+        "enum_source": "datasource groupby columns",
+        "sample_data": "term",
+        "required": true,
+        "embedding": "否",
+        "default_value": null,
+        "required_reason": "controlPanel 对 shared `series` 追加了 `validators: [validateNonEmpty]`。",
+        "notes": "这是 root form_data 的真实字段名。查询时它通过 core alias 进入 query.columns。"
+      },
+      {
+        "field_name": "metric",
+        "description": "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+        "data_type": "string | object | null",
+        "enum_source": "saved metrics + adhoc metrics",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "cnt"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(cnt)"
+        },
+        "required": false,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "为空时，前端词云会使用组件默认字号，不做按指标缩放。"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "description": "Filters",
+        "data_type": "array[object]",
+        "enum_source": "datasource filterable columns + saved metrics + current metric",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "lang",
+            "operator": "IN",
+            "comparator": [
+              "zh"
+            ]
+          }
+        ],
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "default_value": []
+      },
+      {
+        "field_name": "row_limit",
+        "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+        "data_type": "integer | string",
+        "sample_data": 100,
+        "required": false,
+        "embedding": "否",
+        "default_value": 100,
+        "notes": "controlOverride 把 shared `row_limit` 默认值从 `10000` 改成了 `100`。"
+      },
+      {
+        "field_name": "sort_by_metric",
+        "description": "Whether to sort results by the selected metric in descending order.",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": null,
+        "ui_default_state": "unchecked",
+        "notes": "shared control 没显式给 `default`。`getControlState.ts` 不会把 falsy default 写入 control.value，因此根层 form_data 的缺省态是未设置；但 CheckboxControl 组件会以未勾选状态渲染。"
+      }
+    ],
+    "Options": [
+      {
+        "field_name": "size_from",
+        "runtime_alias": "sizeFrom",
+        "description": "Font size for the smallest value in the list",
+        "data_type": "integer",
+        "sample_data": 10,
+        "required": false,
+        "embedding": "否",
+        "default_value": 10,
+        "notes": "controlPanel 默认 10；但 transformProps 对缺失值的 runtime fallback 是 `sizeFrom=0`。"
+      },
+      {
+        "field_name": "size_to",
+        "runtime_alias": "sizeTo",
+        "description": "Font size for the biggest value in the list",
+        "data_type": "integer",
+        "sample_data": 70,
+        "required": false,
+        "embedding": "否",
+        "default_value": 70
+      },
+      {
+        "field_name": "rotation",
+        "description": "Rotation to apply to words in the cloud",
+        "data_type": "string",
+        "enum_values": [
+          "random",
+          "flat",
+          "square"
+        ],
+        "sample_data": "square",
+        "required": false,
+        "embedding": "否",
+        "default_value": "square",
+        "notes": "controlPanel 默认 `square`；但 WordCloud.tsx 组件自身 defaultProps.rotation 是 `flat`。"
+      },
+      {
+        "field_name": "color_scheme",
+        "runtime_alias": "colorScheme",
+        "description": "The color scheme for rendering chart",
+        "data_type": "string",
+        "sample_data": "bnbColors",
+        "required": false,
+        "embedding": "否",
+        "default_value": "categoricalSchemeRegistry.defaultKey"
+      }
+    ]
+  }
+}

@@ -1,0 +1,131 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "echarts_timeseries_smooth",
+  "display_name": "Smooth Line",
+  "normalized_summary": {
+    "category": "time_series",
+    "tags": [
+      "smooth_line",
+      "time_series",
+      "trend",
+      "continuous"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "granularity_sqla",
+        "required": true,
+        "description": "时间粒度字段，定义时序图的时间轴维度（如小时、天、月）。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于计算每个时间点的曲线数值。"
+      },
+      {
+        "key": "line_width",
+        "required": false,
+        "description": "曲线宽度（像素），控制平滑曲线的显示粗细。"
+      },
+      {
+        "key": "show_area",
+        "required": false,
+        "description": "是否展示面积填充（true/false），在曲线下方填充颜色增强视觉效果。"
+      }
+    ],
+    "description_zh": "Smooth Line Time Series Chart renders metric values over time with a smoothed curve, emphasizing continuous trends.",
+    "visual_shape_zh": "平滑曲线时序图（时间轴趋势型）",
+    "use_cases_zh": [
+      "连续型时间趋势展示（如产品日销量变化趋势）",
+      "多指标的趋势对比（平滑曲线更易区分）",
+      "视觉化的长期趋势分析"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "echarts_timeseries_smooth",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/echarts_timeseries_smooth-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/echarts_timeseries_smooth-form-data-schema.json",
+      "control-schema": "form-data-schema/echarts_timeseries_smooth-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Smooth Line",
+    "viztype": "echarts_timeseries_smooth",
+    "详细描述": "Smooth Line Time Series Chart renders metric values over time with a smoothed curve, emphasizing continuous trends.",
+    "表现形态": "平滑曲线时序图（时间轴趋势型）",
+    "适用场景": [
+      "连续型时间趋势展示（如产品日销量变化趋势）",
+      "多指标的趋势对比（平滑曲线更易区分）",
+      "视觉化的长期趋势分析"
+    ],
+    "vizKey": "SmoothLine",
+    "pluginCategory": "Time Series",
+    "pluginTags": [],
+    "category": "time_series",
+    "tags": [
+      "smooth_line",
+      "time_series",
+      "trend",
+      "continuous"
+    ],
+    "关键字段": [
+      {
+        "key": "granularity_sqla",
+        "required": true,
+        "description": "时间粒度字段，定义时序图的时间轴维度（如小时、天、月）。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于计算每个时间点的曲线数值。"
+      },
+      {
+        "key": "line_width",
+        "required": false,
+        "description": "曲线宽度（像素），控制平滑曲线的显示粗细。"
+      },
+      {
+        "key": "show_area",
+        "required": false,
+        "description": "是否展示面积填充（true/false），在曲线下方填充颜色增强视觉效果。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

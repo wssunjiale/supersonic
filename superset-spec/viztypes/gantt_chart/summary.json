@@ -1,0 +1,141 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "gantt_chart",
+  "display_name": "Gantt Chart",
+  "normalized_summary": {
+    "category": "planning",
+    "tags": [
+      "gantt",
+      "project",
+      "time",
+      "planning"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "start_time",
+        "required": true,
+        "description": "任务开始时间字段，用于定义甘特条的起始位置。"
+      },
+      {
+        "key": "end_time",
+        "required": true,
+        "description": "任务结束时间字段，用于定义甘特条的结束位置。"
+      },
+      {
+        "key": "y_axis",
+        "required": true,
+        "description": "Y轴分类字段（如任务名称、资源、负责人），用于分组展示任务。"
+      },
+      {
+        "key": "zoomable",
+        "required": false,
+        "description": "是否可缩放（true/false），控制时间轴的缩放交互。"
+      },
+      {
+        "key": "x_axis_time_format",
+        "required": false,
+        "description": "X轴时间格式（如 YYYY-MM-DD），控制时间轴的展示格式。"
+      }
+    ],
+    "description_zh": "Gantt Chart displays tasks/projects over time, with horizontal bars representing task duration (start/end time) and optional categorization by resource/owner.",
+    "visual_shape_zh": "甘特图（时间规划型）",
+    "use_cases_zh": [
+      "项目/任务时间规划（如任务开始/结束时间、时长）",
+      "资源分配与进度监控",
+      "多任务时间重叠分析"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "gantt_chart",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/gantt_chart-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/gantt_chart-form-data-schema.json",
+      "control-schema": "form-data-schema/gantt_chart-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Gantt Chart",
+    "viztype": "gantt_chart",
+    "详细描述": "Gantt Chart displays tasks/projects over time, with horizontal bars representing task duration (start/end time) and optional categorization by resource/owner.",
+    "表现形态": "甘特图（时间规划型）",
+    "适用场景": [
+      "项目/任务时间规划（如任务开始/结束时间、时长）",
+      "资源分配与进度监控",
+      "多任务时间重叠分析"
+    ],
+    "vizKey": "Gantt",
+    "pluginCategory": "Planning",
+    "pluginTags": [],
+    "category": "planning",
+    "tags": [
+      "gantt",
+      "project",
+      "time",
+      "planning"
+    ],
+    "关键字段": [
+      {
+        "key": "start_time",
+        "required": true,
+        "description": "任务开始时间字段，用于定义甘特条的起始位置。"
+      },
+      {
+        "key": "end_time",
+        "required": true,
+        "description": "任务结束时间字段，用于定义甘特条的结束位置。"
+      },
+      {
+        "key": "y_axis",
+        "required": true,
+        "description": "Y轴分类字段（如任务名称、资源、负责人），用于分组展示任务。"
+      },
+      {
+        "key": "zoomable",
+        "required": false,
+        "description": "是否可缩放（true/false），控制时间轴的缩放交互。"
+      },
+      {
+        "key": "x_axis_time_format",
+        "required": false,
+        "description": "X轴时间格式（如 YYYY-MM-DD），控制时间轴的展示格式。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

@@ -1,0 +1,356 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "gauge_chart",
+  "display_name": "Gauge Chart",
+  "source_kind": "schema_file",
+  "normalized_embedding_policy": {
+    "immutable_root_keys": [
+      "slice_id",
+      "datasource",
+      "viz_type",
+      "all_saved_chart_definition_fields"
+    ],
+    "allowed_runtime_fields": [
+      {
+        "field_name": "adhoc_filters",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "custom_form_data",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "filters",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_range",
+        "behavior": "override",
+        "source": "embedding-schema"
+      }
+    ],
+    "safe_embedding_form_data_seed": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "gauge_chart",
+      "extra_form_data": {
+        "filters": [],
+        "adhoc_filters": []
+      }
+    }
+  },
+  "original_embedding_form_data_schema": {
+    "viz_type": "gauge_chart",
+    "display_name": "Gauge Chart",
+    "purpose": "第三方 embedding / guest token 场景下安全传输的 Gauge Chart form_data 模板",
+    "base_form_data_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/gauge_chart-form-data-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset/security/manager.py",
+      "D:/vsx/sources/superset-6.0.0/superset/charts/data/api.py",
+      "D:/vsx/sources/superset-6.0.0/superset/commands/chart/data/get_data_command.py",
+      "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/constants.py",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/constants.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/processExtraFormData.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/QueryFormData.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Gauge/buildQuery.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Gauge/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Gauge/EchartsGauge.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/utils/eventHandlers.ts"
+    ],
+    "notes": [
+      "embedded guest 的核心限制在后端 `security/manager.py::query_context_modified()`。报错原文是 `Guest user cannot modify chart payload`。",
+      "Gauge 是标准 chart data API 图表。guest 请求的安全写法仍然是复制保存态 chart form_data 作为 base，只把动态条件放进 `extra_form_data`。",
+      "Gauge 的核心敏感根字段是 `metric`、`groupby` 和 `sort_by_metric`：`metric` 会进入 `query.metrics`，`groupby` 会进入 `query.columns`，`sort_by_metric=true` 会额外生成 `query.orderby`。",
+      "`allEventHandlers(props)` 为 Gauge 复用了通用 click/contextmenu 逻辑。只有 `groupby.length > 0` 时，点击 gauge item 才会生成 `extraFormData.filters`。",
+      "`min_val`、`max_val`、`intervals`、`value_formatter` 等大多只影响显示层，不属于 `query_context_modified()` 的核心比较对象；但 guest 场景仍建议根层原样复制，以免与保存态图表分叉。"
+    ],
+    "security_enforcement": {
+      "backend_check_function": "superset/security/manager.py::query_context_modified",
+      "validation_entry": "superset/charts/data/api.py -> ChartDataCommand.validate() -> QueryContext.raise_for_access()",
+      "error_message": "Guest user cannot modify chart payload",
+      "hard_block_fields": [
+        "slice_id",
+        "metrics",
+        "groupby",
+        "columns",
+        "orderby"
+      ],
+      "indirectly_sensitive_fields_for_gauge": [
+        "metric",
+        "groupby",
+        "sort_by_metric"
+      ],
+      "recommended_strategy": "复制保存态 chart form_data 作为 base，仅通过 extra_form_data 追加过滤条件。"
+    },
+    "safe_base_rule": {
+      "description": "第三方 embedding 请求中的根层 form_data，应直接复制保存态 Gauge 图表的 form_data，不要自行重构查询定义。",
+      "must_be_copied_from_saved_chart": [
+        "slice_id",
+        "datasource",
+        "viz_type",
+        "metric",
+        "groupby",
+        "adhoc_filters",
+        "row_limit",
+        "sort_by_metric",
+        "min_val",
+        "max_val",
+        "start_angle",
+        "end_angle",
+        "color_scheme",
+        "font_size",
+        "number_format",
+        "currency_format",
+        "value_formatter",
+        "show_pointer",
+        "animation",
+        "show_axis_tick",
+        "show_split_line",
+        "split_number",
+        "show_progress",
+        "overlap",
+        "round_cap",
+        "intervals",
+        "interval_color_indices",
+        "all other saved chart definition fields"
+      ],
+      "why": [
+        "`query_context_modified()` 会比较请求中的 `queries[*].metrics`、`queries[*].columns`、`queries[*].orderby` 与保存态图表是否一致。",
+        "Gauge 的 `metric`、`groupby`、`sort_by_metric` 会直接影响这些被比较的 query 字段。",
+        "为了最大化避免 guest payload 差异，最安全的方式仍然是根层完全复制保存态。"
+      ]
+    },
+    "safe_embedding_form_data_template": {
+      "description": "这是 guest embedding 下的安全写法。根层以保存态 Gauge 图表为 base，仅改 extra_form_data。",
+      "template": {
+        "slice_id": "<saved_chart_id>",
+        "dashboardId": "<dashboard_id>",
+        "datasource": "<copied_from_saved_chart>",
+        "viz_type": "gauge_chart",
+        "metric": "<copied_from_saved_chart>",
+        "groupby": "<copied_from_saved_chart>",
+        "adhoc_filters": "<copied_from_saved_chart>",
+        "row_limit": "<copied_from_saved_chart_if_present>",
+        "sort_by_metric": "<copied_from_saved_chart_if_present>",
+        "min_val": "<copied_from_saved_chart_if_present>",
+        "max_val": "<copied_from_saved_chart_if_present>",
+        "start_angle": "<copied_from_saved_chart_if_present>",
+        "end_angle": "<copied_from_saved_chart_if_present>",
+        "color_scheme": "<copied_from_saved_chart_if_present>",
+        "font_size": "<copied_from_saved_chart_if_present>",
+        "number_format": "<copied_from_saved_chart_if_present>",
+        "currency_format": "<copied_from_saved_chart_if_present>",
+        "value_formatter": "<copied_from_saved_chart_if_present>",
+        "show_pointer": "<copied_from_saved_chart_if_present>",
+        "animation": "<copied_from_saved_chart_if_present>",
+        "show_axis_tick": "<copied_from_saved_chart_if_present>",
+        "show_split_line": "<copied_from_saved_chart_if_present>",
+        "split_number": "<copied_from_saved_chart_if_present>",
+        "show_progress": "<copied_from_saved_chart_if_present>",
+        "overlap": "<copied_from_saved_chart_if_present>",
+        "round_cap": "<copied_from_saved_chart_if_present>",
+        "intervals": "<copied_from_saved_chart_if_present>",
+        "interval_color_indices": "<copied_from_saved_chart_if_present>",
+        "extra_form_data": {
+          "filters": [
+            {
+              "col": "name",
+              "op": "IN",
+              "val": [
+                "Speed"
+              ]
+            }
+          ],
+          "adhoc_filters": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "region",
+              "operator": "IN",
+              "comparator": [
+                "East"
+              ]
+            }
+          ],
+          "custom_form_data": {}
+        }
+      }
+    },
+    "preferred_dynamic_container": {
+      "field_name": "extra_form_data",
+      "description": "第三方 embedding 允许动态传入的上下文容器；后端会在 `merge_extra_form_data()` 中把它并入实际查询。",
+      "append_keys": [
+        "adhoc_filters",
+        "filters",
+        "interactive_groupby",
+        "interactive_highlight",
+        "interactive_drilldown",
+        "custom_form_data"
+      ],
+      "override_keys_backend_high_confidence": [
+        "granularity_sqla",
+        "granularity",
+        "time_column",
+        "time_grain",
+        "time_range",
+        "time_compare",
+        "time_grain_sqla",
+        "relative_start",
+        "relative_end"
+      ],
+      "notes": "Gauge 当前 controlPanel 没有标准时间配置，因此 guest embedding 的主要动态入口仍然是 `filters` 和 `adhoc_filters`。"
+    },
+    "extra_form_data_field_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_gauge": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "name",
+            "op": "IN",
+            "val": [
+              "Speed"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters；后端会把它们转换为额外 adhoc filters 并并入查询。Gauge 的 click cross-filter 也是这个形状。",
+        "source": "superset/constants.py + superset/utils/core.py + plugin-chart-echarts/utils/eventHandlers.ts"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_gauge": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会标记为 `isExtra` 并并入查询。",
+        "source": "superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_gauge": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "可传递非标准附加数据；Gauge 默认 buildQuery / transformProps 不直接消费它。",
+        "source": "frontend QueryFormData.ts"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_gauge": false,
+        "recommended": false,
+        "sample_data": "Last 7 days",
+        "effect": "这是通用 extra_form_data override 字段，但 Gauge 当前 controlPanel 不依赖标准时间维度，guest embedding 通常不应把它作为主要入口。",
+        "source": "frontend query/constants.ts + processExtraFormData.ts",
+        "status": "低相关，不建议作为 Gauge guest embedding 的主要动态入口"
+      }
+    ],
+    "minimal_extra_form_data_template": {
+      "filters": [
+        {
+          "col": "name",
+          "op": "IN",
+          "val": [
+            "Speed"
+          ]
+        }
+      ]
+    },
+    "recommended_extra_form_data_template": {
+      "filters": [
+        {
+          "col": "name",
+          "op": "IN",
+          "val": [
+            "Speed",
+            "Power"
+          ]
+        }
+      ],
+      "adhoc_filters": [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "region",
+          "operator": "IN",
+          "comparator": [
+            "East"
+          ]
+        }
+      ],
+      "custom_form_data": {}
+    },
+    "unsafe_root_form_data_changes": [
+      {
+        "field_name": "slice_id",
+        "reason": "与保存态图表 id 不一致会被后端立即判定为请求了另一张图。"
+      },
+      {
+        "field_name": "metric",
+        "reason": "它会进入 `query.metrics`，guest 模式下不应在根层修改。"
+      },
+      {
+        "field_name": "groupby",
+        "reason": "它会进入 `query.columns`，并决定 click cross-filter 生成哪些列过滤。"
+      },
+      {
+        "field_name": "sort_by_metric",
+        "reason": "它会决定 `query.orderby` 是否存在，因此属于高敏感查询字段。"
+      },
+      {
+        "field_name": "datasource",
+        "reason": "embedded guest 不应改图表绑定数据集。"
+      },
+      {
+        "field_name": "viz_type",
+        "reason": "embedded guest 不应把已分享图表改成另一种图。"
+      }
+    ],
+    "practical_guidance": {
+      "best_practice": [
+        "先从保存态 Gauge 图表读取完整 form_data。",
+        "根层字段保持不变，尤其保留 `metric`、`groupby` 和 `sort_by_metric`。",
+        "只在 `extra_form_data` 中放动态 `filters` / `adhoc_filters`。",
+        "如果这张 Gauge 本来就没有 `groupby`，它的 chart 内点击不会产生 cross-filter；此时外部过滤更应由宿主页面直接构造 `extra_form_data`。"
+      ],
+      "avoid": [
+        "不要在 guest embedding 请求里手工重写 `metric`、`groupby` 或 `sort_by_metric`。",
+        "不要把 runtime camelCase 字段名当成 API root 键名。",
+        "不要把 `filters` 和 `adhoc_filters` 直接覆盖到根层保存态字段，优先放在 `extra_form_data`。"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "gauge_chart",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/gauge_chart-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/gauge_chart-form-data-schema.json",
+      "control-schema": "form-data-schema/gauge_chart-schema.json"
+    }
+  }
+}

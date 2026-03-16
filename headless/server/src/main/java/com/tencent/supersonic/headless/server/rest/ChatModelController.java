@@ -46,14 +46,18 @@ public class ChatModelController {
     }
 
     @DeleteMapping("/{id}")
-    public boolean deleteModel(@PathVariable("id") Integer id) {
-        chatModelService.deleteChatModel(id);
+    public boolean deleteModel(@PathVariable("id") Integer id,
+            HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        User user = UserHolder.findUser(httpServletRequest, httpServletResponse);
+        chatModelService.deleteChatModel(id, user);
         return true;
     }
 
     @RequestMapping("/getModelList")
-    public List<ChatModel> getModelList() {
-        return chatModelService.getChatModels();
+    public List<ChatModel> getModelList(HttpServletRequest httpServletRequest,
+            HttpServletResponse httpServletResponse) {
+        User user = UserHolder.findUser(httpServletRequest, httpServletResponse);
+        return chatModelService.getChatModels(user);
     }
 
     @RequestMapping("/getModelAppList")

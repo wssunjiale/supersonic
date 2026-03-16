@@ -1,0 +1,323 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "para",
+  "display_name": "Parallel Coordinates",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "experiment_group",
+          "operator": "IN",
+          "comparator": [
+            "A",
+            "B"
+          ]
+        }
+      ]
+    ],
+    "include_series": [
+      false
+    ],
+    "limit": [
+      10
+    ],
+    "linear_color_scheme": [
+      "superset_seq_1"
+    ],
+    "metrics": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        }
+      ]
+    ],
+    "order_desc": [
+      true
+    ],
+    "row_limit": [
+      10000
+    ],
+    "secondary_metric": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "profit"
+        },
+        "aggregate": "AVG",
+        "label": "AVG(profit)"
+      }
+    ],
+    "series": [
+      "experiment_group"
+    ],
+    "show_datatable": [
+      false
+    ],
+    "timeseries_limit_metric": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "sales"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(sales)"
+      }
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "para",
+      "series": "<dimension>",
+      "metrics": [
+        "<metric_1>"
+      ],
+      "adhoc_filters": []
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "para",
+      "series": "<dimension>",
+      "metrics": [
+        "<metric_1>",
+        "<metric_2>"
+      ],
+      "secondary_metric": "<metric_for_color>",
+      "adhoc_filters": [],
+      "limit": null,
+      "row_limit": 10000,
+      "timeseries_limit_metric": null,
+      "order_desc": true,
+      "show_datatable": false,
+      "include_series": false,
+      "linear_color_scheme": "superset_seq_1"
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "para",
+      "series": "<copied_from_saved_chart>",
+      "metrics": "<copied_from_saved_chart>",
+      "secondary_metric": "<copied_from_saved_chart_if_present>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "limit": "<copied_from_saved_chart_if_present>",
+      "row_limit": "<copied_from_saved_chart_if_present>",
+      "timeseries_limit_metric": "<copied_from_saved_chart_if_present>",
+      "order_desc": "<copied_from_saved_chart_if_present>",
+      "show_datatable": "<copied_from_saved_chart_if_present>",
+      "include_series": "<copied_from_saved_chart_if_present>",
+      "linear_color_scheme": "<copied_from_saved_chart_if_present>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "experiment_group",
+            "op": "IN",
+            "val": [
+              "A",
+              "B"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "experiment_group",
+            "operator": "IN",
+            "comparator": [
+              "A",
+              "B"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_para_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "experiment_group",
+            "op": "IN",
+            "val": [
+              "A",
+              "B"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters；后端会把它们并入额外过滤条件。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_para_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "experiment_group",
+            "operator": "IN",
+            "comparator": [
+              "A",
+              "B"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会把它们标记为 extra 并并入查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_para_legacy": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；para 默认不直接消费它。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_para_legacy": false,
+        "recommended": false,
+        "sample_data": "Last 30 days",
+        "effect": "legacy merge 层接受该 key，但 para 不是时序图，也没有 controlPanel 时间字段；当前图不应把它当作 guest override 入口。",
+        "source": "superset/constants.py + superset/utils/core.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_para_legacy": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "legacy merge 层支持该 override，但 para 没有正式时间粒度字段；当前图不应依赖。",
+        "source": "superset/constants.py + superset/utils/core.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_para_legacy": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "legacy merge 白名单接受该 key，但 para 本身没有对应 controlPanel 时间列控件。",
+        "source": "superset/constants.py + superset/utils/core.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_column",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_para_legacy": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "底层 QueryObject 时间列 override；当前图没有正式时间语义。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_grain",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_para_legacy": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "底层 QueryObject 时间粒度 override；当前图没有正式时间语义。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "relative_start",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_para_legacy": false,
+        "recommended": false,
+        "sample_data": "now",
+        "effect": "会写入 query extras 的相对开始时间；para 当前没有明确的官方时间控件链路，建议谨慎使用。",
+        "source": "superset/constants.py + superset/utils/core.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "relative_end",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_para_legacy": false,
+        "recommended": false,
+        "sample_data": "today",
+        "effect": "会写入 query extras 的相对结束时间；para 当前没有明确的官方时间控件链路，建议谨慎使用。",
+        "source": "superset/constants.py + superset/utils/core.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_para_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "experiment_group"
+        ],
+        "effect": "通用 ExtraFormData 字段；para 默认不直接消费它。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_para_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "experiment_group"
+        ],
+        "effect": "通用交互字段；para 默认不直接消费。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_para_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "experiment_group"
+        ],
+        "effect": "通用交互字段；para 默认不直接消费。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "para",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/para-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/para-form-data-schema.json",
+      "control-schema": "form-data-schema/para-schema.json"
+    }
+  }
+}

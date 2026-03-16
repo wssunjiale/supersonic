@@ -1,0 +1,404 @@
+{
+  "viz_type": "heatmap_v2",
+  "display_name": "Heatmap",
+  "purpose": "第三方 embedding / guest token 场景下安全传输的 Heatmap form_data 模板",
+  "base_form_data_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/heatmap_v2-form-data-schema.json",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset/security/manager.py",
+    "D:/vsx/sources/superset-6.0.0/superset/charts/data/api.py",
+    "D:/vsx/sources/superset-6.0.0/superset/commands/chart/data/get_data_command.py",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractQueryFields.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryObject.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/getXAxis.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/operators/rankOperator.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Heatmap/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Heatmap/controlPanel.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Heatmap/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataWithDashboardContext.ts"
+  ],
+  "notes": [
+    "embedded guest 的核心限制仍在后端 `security/manager.py::query_context_modified()`，报错原文是 `Guest user cannot modify chart payload`。",
+    "Heatmap 走标准 `/api/v1/chart/data`，因此 guest 校验的入口仍是 `ChartDataCommand.validate()` -> `QueryContext.raise_for_access()`。",
+    "`query_context_modified()` 硬编码比较 `slice_id`，以及 form_data 里的 `metrics` / `columns` / `groupby` / `orderby` 与保存态 chart 的子集关系。",
+    "对 Heatmap 来说，根层 `x_axis`、`groupby`、`metric`、`sort_x_axis`、`sort_y_axis` 会分别影响编译后的 `columns`、`metrics`、`orderby`；`normalize_across` 还会影响 `rank` post_processing 的 `group_by`。",
+    "`legend_type`、`linear_color_scheme`、`border_color`、`show_values`、`normalized` 等更偏展示层字段，虽然不一定触发 guest payload 对比，但安全做法仍然是从已保存图表完整复制。"
+  ],
+  "security_enforcement": {
+    "backend_check_function": "superset/security/manager.py::query_context_modified",
+    "checked_when": "ChartDataCommand.validate() -> QueryContext.raise_for_access()",
+    "error_message": "Guest user cannot modify chart payload",
+    "hard_block_fields": [
+      "slice_id",
+      "metrics",
+      "groupby",
+      "columns",
+      "orderby"
+    ],
+    "indirectly_sensitive_fields_for_heatmap": [
+      "x_axis",
+      "groupby",
+      "metric",
+      "sort_x_axis",
+      "sort_y_axis",
+      "normalize_across",
+      "row_limit",
+      "granularity_sqla",
+      "time_grain_sqla",
+      "time_range",
+      "adhoc_filters"
+    ],
+    "presentation_only_fields_not_compared_directly": [
+      "legend_type",
+      "linear_color_scheme",
+      "border_color",
+      "border_width",
+      "xscale_interval",
+      "yscale_interval",
+      "left_margin",
+      "bottom_margin",
+      "value_bounds",
+      "y_axis_format",
+      "x_axis_time_format",
+      "xAxisLabelRotation",
+      "currency_format",
+      "show_legend",
+      "show_percentage",
+      "show_values",
+      "normalized"
+    ],
+    "recommended_strategy": "复制保存态 Heatmap 图表的完整 form_data 作为 base，仅通过 `extra_form_data` 追加过滤条件或时间 override。"
+  },
+  "safe_base_rule": {
+    "description": "第三方 embedding 请求中的根层 form_data，应当从已保存的 Heatmap 图表完整复制，不要手工重构。",
+    "must_be_copied_from_saved_chart": [
+      "slice_id",
+      "datasource",
+      "viz_type",
+      "x_axis",
+      "groupby",
+      "metric",
+      "sort_x_axis",
+      "sort_y_axis",
+      "normalize_across",
+      "row_limit",
+      "granularity_sqla",
+      "time_grain_sqla",
+      "time_range",
+      "adhoc_filters",
+      "legend_type",
+      "linear_color_scheme",
+      "border_color",
+      "border_width",
+      "xscale_interval",
+      "yscale_interval",
+      "left_margin",
+      "bottom_margin",
+      "value_bounds",
+      "y_axis_format",
+      "x_axis_time_format",
+      "xAxisLabelRotation",
+      "currency_format",
+      "show_legend",
+      "show_percentage",
+      "show_values",
+      "normalized",
+      "all other chart-definition fields"
+    ],
+    "why": [
+      "`query_context_modified()` 会直接比较 `slice_id` 以及 form_data 里的 `metrics` / `columns` / `groupby` / `orderby` 是否仍是保存态子集。",
+      "Heatmap 的 `x_axis` + `groupby` 会被编译成 `columns`，`metric` 会被归并成 `metrics`，`sort_x_axis` / `sort_y_axis` 会编译成 `orderby`。",
+      "`normalize_across` 会改变 `rankOperator` 的 `group_by`，从而改变 Heatmap 的 post_processing 语义。",
+      "展示层字段即使不一定触发 guest payload 对比，修改它们也等于改图表定义本身。"
+    ]
+  },
+  "safe_embedding_form_data_template": {
+    "description": "这是 guest embedding 下的安全写法。根层以保存态 Heatmap 图表为 base，仅把动态筛选与时间覆盖放进 `extra_form_data`。",
+    "template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "heatmap_v2",
+      "x_axis": "<copied_from_saved_chart>",
+      "groupby": "<copied_from_saved_chart>",
+      "metric": "<copied_from_saved_chart>",
+      "sort_x_axis": "<copied_from_saved_chart>",
+      "sort_y_axis": "<copied_from_saved_chart>",
+      "normalize_across": "<copied_from_saved_chart>",
+      "row_limit": "<copied_from_saved_chart>",
+      "granularity_sqla": "<copied_from_saved_chart>",
+      "time_grain_sqla": "<copied_from_saved_chart>",
+      "time_range": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "legend_type": "<copied_from_saved_chart>",
+      "linear_color_scheme": "<copied_from_saved_chart>",
+      "border_color": "<copied_from_saved_chart>",
+      "border_width": "<copied_from_saved_chart>",
+      "xscale_interval": "<copied_from_saved_chart>",
+      "yscale_interval": "<copied_from_saved_chart>",
+      "left_margin": "<copied_from_saved_chart>",
+      "bottom_margin": "<copied_from_saved_chart>",
+      "value_bounds": "<copied_from_saved_chart>",
+      "y_axis_format": "<copied_from_saved_chart>",
+      "x_axis_time_format": "<copied_from_saved_chart>",
+      "xAxisLabelRotation": "<copied_from_saved_chart>",
+      "currency_format": "<copied_from_saved_chart>",
+      "show_legend": "<copied_from_saved_chart>",
+      "show_percentage": "<copied_from_saved_chart>",
+      "show_values": "<copied_from_saved_chart>",
+      "normalized": "<copied_from_saved_chart>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "APAC"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "APAC"
+            ]
+          }
+        ],
+        "time_range": "Last 30 days",
+        "time_grain_sqla": "P1D",
+        "custom_form_data": {}
+      }
+    }
+  },
+  "preferred_dynamic_container": {
+    "field_name": "extra_form_data",
+    "description": "第三方 embedding 允许动态传入的上下文容器；后端会在 merge 阶段把它并入实际查询。",
+    "append_keys": [
+      "adhoc_filters",
+      "filters",
+      "interactive_groupby",
+      "interactive_highlight",
+      "interactive_drilldown",
+      "custom_form_data"
+    ],
+    "override_keys_backend_high_confidence": [
+      "granularity_sqla",
+      "granularity",
+      "time_column",
+      "time_grain",
+      "time_range",
+      "time_grain_sqla",
+      "relative_start",
+      "relative_end"
+    ],
+    "notes": "Heatmap 在 X 轴为时间字段时可以使用时间 override；但根层 base form_data 仍应复制保存态。"
+  },
+  "extra_form_data_field_schema": [
+    {
+      "field_name": "filters",
+      "data_type": "array[QueryObjectFilterClause]",
+      "behavior": "append",
+      "safe_for_heatmap": true,
+      "recommended": true,
+      "sample_data": [
+        {
+          "col": "region",
+          "op": "IN",
+          "val": [
+            "APAC"
+          ]
+        }
+      ],
+      "effect": "追加 simple filters；后端会把它们并入额外过滤条件。",
+      "source": "superset constants + backend extra form data merge"
+    },
+    {
+      "field_name": "adhoc_filters",
+      "data_type": "array[AdhocFilter]",
+      "behavior": "append",
+      "safe_for_heatmap": true,
+      "recommended": true,
+      "sample_data": [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "region",
+          "operator": "IN",
+          "comparator": [
+            "APAC"
+          ]
+        }
+      ],
+      "effect": "追加 adhoc filters；后端会标记为 isExtra 并并入查询。",
+      "source": "superset constants + backend extra form data merge"
+    },
+    {
+      "field_name": "time_range",
+      "data_type": "string",
+      "behavior": "override",
+      "safe_for_heatmap": true,
+      "recommended": true,
+      "sample_data": "Last 30 days",
+      "effect": "覆盖 query.time_range。",
+      "source": "backend extra form data override keys + shared time field"
+    },
+    {
+      "field_name": "time_grain_sqla",
+      "data_type": "string | null",
+      "behavior": "override",
+      "safe_for_heatmap": true,
+      "recommended": false,
+      "sample_data": "P1D",
+      "effect": "覆盖 query.extras.time_grain_sqla；只在图表本身使用时间型 X 轴时才有意义。",
+      "source": "backend extra form data override keys + Heatmap shared time grain control"
+    },
+    {
+      "field_name": "granularity_sqla",
+      "data_type": "string | null",
+      "behavior": "override",
+      "safe_for_heatmap": true,
+      "recommended": false,
+      "sample_data": "ds",
+      "effect": "覆盖 query.granularity；仅在时间链路存在时才有意义。",
+      "source": "backend extra form data override keys + shared time control"
+    },
+    {
+      "field_name": "custom_form_data",
+      "data_type": "object",
+      "behavior": "append",
+      "safe_for_heatmap": true,
+      "recommended": false,
+      "sample_data": {},
+      "effect": "可传非标准附加数据；Heatmap 默认 buildQuery/transformProps 不直接消费它。",
+      "source": "frontend QueryFormData / backend extra form data handling"
+    },
+    {
+      "field_name": "interactive_groupby",
+      "data_type": "array[string]",
+      "behavior": "append",
+      "safe_for_heatmap": false,
+      "recommended": false,
+      "sample_data": [
+        "region"
+      ],
+      "effect": "通用 ExtraFormData 字段；当前 Heatmap buildQuery 没有专门读取它。",
+      "source": "frontend QueryFormData shared definition"
+    }
+  ],
+  "minimal_extra_form_data_template": {
+    "filters": [
+      {
+        "col": "region",
+        "op": "IN",
+        "val": [
+          "APAC"
+        ]
+      }
+    ]
+  },
+  "recommended_extra_form_data_template": {
+    "filters": [
+      {
+        "col": "region",
+        "op": "IN",
+        "val": [
+          "APAC",
+          "EMEA"
+        ]
+      }
+    ],
+    "adhoc_filters": [
+      {
+        "expressionType": "SIMPLE",
+        "clause": "WHERE",
+        "subject": "region",
+        "operator": "IN",
+        "comparator": [
+          "APAC",
+          "EMEA"
+        ]
+      }
+    ],
+    "time_range": "Last 30 days",
+    "custom_form_data": {}
+  },
+  "unsafe_root_form_data_changes": [
+    {
+      "field_name": "slice_id",
+      "reason": "会改变请求对应的图表实体。"
+    },
+    {
+      "field_name": "datasource",
+      "reason": "会直接改变 Heatmap 绑定的数据集。"
+    },
+    {
+      "field_name": "viz_type",
+      "reason": "Heatmap guest 请求仍应保持 `heatmap_v2`。"
+    },
+    {
+      "field_name": "x_axis",
+      "reason": "会改变编译后的第一维 `columns`。"
+    },
+    {
+      "field_name": "groupby",
+      "reason": "会改变编译后的第二维 `columns`。"
+    },
+    {
+      "field_name": "metric",
+      "reason": "会改变编译后的 `metrics`。"
+    },
+    {
+      "field_name": "sort_x_axis",
+      "reason": "会改变编译后的 `orderby`。"
+    },
+    {
+      "field_name": "sort_y_axis",
+      "reason": "会改变编译后的 `orderby`。"
+    },
+    {
+      "field_name": "normalize_across",
+      "reason": "会改变 `rank` post_processing 的 `group_by` 语义。"
+    },
+    {
+      "field_name": "row_limit",
+      "reason": "会直接改变底层记录数。"
+    },
+    {
+      "field_name": "granularity_sqla",
+      "reason": "会直接改变 query.granularity。"
+    },
+    {
+      "field_name": "time_grain_sqla",
+      "reason": "会直接改变 query.extras.time_grain_sqla。"
+    },
+    {
+      "field_name": "time_range",
+      "reason": "会直接改变 query.time_range。"
+    },
+    {
+      "field_name": "adhoc_filters",
+      "reason": "动态筛选应优先放进 `extra_form_data.append`，不要覆盖保存态根字段。"
+    },
+    {
+      "field_name": "normalized",
+      "reason": "虽然更偏展示层，但会改变颜色映射逻辑，guest 场景下仍建议保持保存态。"
+    }
+  ],
+  "practical_guidance": {
+    "best_practice": [
+      "先从保存态 Heatmap 图表读取完整 form_data。",
+      "根层字段保持不变，尤其保留 `x_axis`、`groupby`、`metric`、`sort_x_axis`、`sort_y_axis`、`normalize_across`、`row_limit`、`time_grain_sqla`。",
+      "只在 `extra_form_data` 中放动态 filters / adhoc_filters / time_range override。",
+      "如果图表本身是时间型 X 轴，再考虑额外传 `time_grain_sqla` 或 `granularity_sqla` override。"
+    ],
+    "avoid": [
+      "不要在 guest 请求里改 `x_axis`、`groupby`、`metric` 或排序字段。",
+      "不要把动态筛选直接覆盖到根层 `adhoc_filters`；优先用 `extra_form_data.append`。",
+      "不要把 runtime camelCase 名称如 `normalizeAcross`、`showLegend`、`borderColor` 写回 guest root form_data。",
+      "不要在 guest 请求中手工重建 Heatmap 的 root form_data，尤其不要省略保存态里的展示配置。"
+    ]
+  }
+}

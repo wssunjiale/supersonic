@@ -1,0 +1,265 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "gauge_chart",
+  "display_name": "Gauge Chart",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      []
+    ],
+    "animation": [
+      true
+    ],
+    "color_scheme": [
+      "supersetColors"
+    ],
+    "currency_format": [
+      {
+        "symbol": "$",
+        "symbolPosition": "prefix"
+      }
+    ],
+    "end_angle": [
+      -45
+    ],
+    "font_size": [
+      15
+    ],
+    "groupby": [
+      [
+        "name"
+      ]
+    ],
+    "interval_color_indices": [
+      "1,2"
+    ],
+    "intervals": [
+      "60,100"
+    ],
+    "max_val": [
+      100
+    ],
+    "metric": [
+      "value"
+    ],
+    "min_val": [
+      0
+    ],
+    "number_format": [
+      "SMART_NUMBER"
+    ],
+    "overlap": [
+      true
+    ],
+    "round_cap": [
+      false
+    ],
+    "row_limit": [
+      10
+    ],
+    "show_axis_tick": [
+      false
+    ],
+    "show_pointer": [
+      true
+    ],
+    "show_progress": [
+      true
+    ],
+    "show_split_line": [
+      false
+    ],
+    "sort_by_metric": [
+      true
+    ],
+    "split_number": [
+      10
+    ],
+    "start_angle": [
+      225
+    ],
+    "value_formatter": [
+      "{value}%"
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "gauge_chart",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "groupby": [],
+      "adhoc_filters": [],
+      "row_limit": 10
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "gauge_chart",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "groupby": [
+        "<dimension_column>"
+      ],
+      "adhoc_filters": [],
+      "row_limit": 10,
+      "sort_by_metric": false,
+      "min_val": 0,
+      "max_val": 100,
+      "start_angle": 225,
+      "end_angle": -45,
+      "color_scheme": "supersetColors",
+      "font_size": 15,
+      "number_format": "SMART_NUMBER",
+      "currency_format": null,
+      "value_formatter": "{value}",
+      "show_pointer": true,
+      "animation": true,
+      "show_axis_tick": false,
+      "show_split_line": false,
+      "split_number": 10,
+      "show_progress": true,
+      "overlap": true,
+      "round_cap": false,
+      "intervals": "",
+      "interval_color_indices": ""
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "gauge_chart",
+      "metric": "<copied_from_saved_chart>",
+      "groupby": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "row_limit": "<copied_from_saved_chart_if_present>",
+      "sort_by_metric": "<copied_from_saved_chart_if_present>",
+      "min_val": "<copied_from_saved_chart_if_present>",
+      "max_val": "<copied_from_saved_chart_if_present>",
+      "start_angle": "<copied_from_saved_chart_if_present>",
+      "end_angle": "<copied_from_saved_chart_if_present>",
+      "color_scheme": "<copied_from_saved_chart_if_present>",
+      "font_size": "<copied_from_saved_chart_if_present>",
+      "number_format": "<copied_from_saved_chart_if_present>",
+      "currency_format": "<copied_from_saved_chart_if_present>",
+      "value_formatter": "<copied_from_saved_chart_if_present>",
+      "show_pointer": "<copied_from_saved_chart_if_present>",
+      "animation": "<copied_from_saved_chart_if_present>",
+      "show_axis_tick": "<copied_from_saved_chart_if_present>",
+      "show_split_line": "<copied_from_saved_chart_if_present>",
+      "split_number": "<copied_from_saved_chart_if_present>",
+      "show_progress": "<copied_from_saved_chart_if_present>",
+      "overlap": "<copied_from_saved_chart_if_present>",
+      "round_cap": "<copied_from_saved_chart_if_present>",
+      "intervals": "<copied_from_saved_chart_if_present>",
+      "interval_color_indices": "<copied_from_saved_chart_if_present>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "name",
+            "op": "IN",
+            "val": [
+              "Speed"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_gauge": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "name",
+            "op": "IN",
+            "val": [
+              "Speed"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters；后端会把它们转换为额外 adhoc filters 并并入查询。Gauge 的 click cross-filter 也是这个形状。",
+        "source": "superset/constants.py + superset/utils/core.py + plugin-chart-echarts/utils/eventHandlers.ts"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_gauge": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会标记为 `isExtra` 并并入查询。",
+        "source": "superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_gauge": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "可传递非标准附加数据；Gauge 默认 buildQuery / transformProps 不直接消费它。",
+        "source": "frontend QueryFormData.ts"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_gauge": false,
+        "recommended": false,
+        "sample_data": "Last 7 days",
+        "effect": "这是通用 extra_form_data override 字段，但 Gauge 当前 controlPanel 不依赖标准时间维度，guest embedding 通常不应把它作为主要入口。",
+        "source": "frontend query/constants.ts + processExtraFormData.ts",
+        "status": "低相关，不建议作为 Gauge guest embedding 的主要动态入口"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "gauge_chart",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/gauge_chart-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/gauge_chart-form-data-schema.json",
+      "control-schema": "form-data-schema/gauge_chart-schema.json"
+    }
+  }
+}

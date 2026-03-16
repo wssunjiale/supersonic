@@ -1,0 +1,131 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "mixed_timeseries",
+  "display_name": "Mixed Chart",
+  "normalized_summary": {
+    "category": "timeseries",
+    "tags": [
+      "timeseries",
+      "mixed",
+      "multi_type",
+      "comparison"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "groupby",
+        "required": true,
+        "description": "维度字段列表（通常为时间维度），用于分组/系列/分类轴。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标列表（可多个），用于绘制多系列混合类型对比。"
+      },
+      {
+        "key": "series_type",
+        "required": false,
+        "description": "系列类型映射（如 {metric1: 'line', metric2: 'bar'}），用于指定每个指标的展示类型。"
+      },
+      {
+        "key": "secondary_y",
+        "required": false,
+        "description": "次Y轴指标列表，用于展示不同量级的指标。"
+      }
+    ],
+    "description_zh": "Mixed Timeseries Chart combines multiple chart types (line, area, bar) in a single time-series visualization, ideal for multi-metric comparison with different display types.",
+    "visual_shape_zh": "混合时间序列（折线/面积/柱状）",
+    "use_cases_zh": [
+      "多指标混合类型展示（如折线+柱状、面积+折线）",
+      "不同量级指标对比（如绝对值+百分比）",
+      "复杂时间序列的分层展示"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "mixed_timeseries",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/mixed_timeseries-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/mixed_timeseries-form-data-schema.json",
+      "control-schema": "form-data-schema/mixed_timeseries-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Mixed Chart",
+    "viztype": "mixed_timeseries",
+    "详细描述": "Mixed Timeseries Chart combines multiple chart types (line, area, bar) in a single time-series visualization, ideal for multi-metric comparison with different display types.",
+    "表现形态": "混合时间序列（折线/面积/柱状）",
+    "适用场景": [
+      "多指标混合类型展示（如折线+柱状、面积+折线）",
+      "不同量级指标对比（如绝对值+百分比）",
+      "复杂时间序列的分层展示"
+    ],
+    "vizKey": "MixedTimeseries",
+    "pluginCategory": "Evolution",
+    "pluginTags": [],
+    "category": "timeseries",
+    "tags": [
+      "timeseries",
+      "mixed",
+      "multi_type",
+      "comparison"
+    ],
+    "关键字段": [
+      {
+        "key": "groupby",
+        "required": true,
+        "description": "维度字段列表（通常为时间维度），用于分组/系列/分类轴。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标列表（可多个），用于绘制多系列混合类型对比。"
+      },
+      {
+        "key": "series_type",
+        "required": false,
+        "description": "系列类型映射（如 {metric1: 'line', metric2: 'bar'}），用于指定每个指标的展示类型。"
+      },
+      {
+        "key": "secondary_y",
+        "required": false,
+        "description": "次Y轴指标列表，用于展示不同量级的指标。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

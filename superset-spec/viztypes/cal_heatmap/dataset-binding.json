@@ -1,0 +1,326 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "cal_heatmap",
+  "display_name": "Calendar Heatmap",
+  "generation_mode": "heuristic_seed",
+  "slot_candidates": [
+    {
+      "field_name": "adhoc_filters",
+      "required": false,
+      "slot_kind": "filter_list",
+      "accepted_dataset_roles": [
+        "filter_context"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [],
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [
+        "extra_form_data.append"
+      ],
+      "descriptions": [
+        "字段标签为 Filters。legacy explore_json 路径会先把 legacy filters 转成 adhoc_filters，再继续处理 extra filters / extra_form_data。"
+      ]
+    },
+    {
+      "field_name": "domain_granularity",
+      "required": true,
+      "slot_kind": "time_or_axis",
+      "accepted_dataset_roles": [
+        "time_dimension",
+        "dimension"
+      ],
+      "cardinality": "0..1",
+      "placeholder": "<time_or_axis_column>",
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The time unit used for the grouping of blocks"
+      ]
+    },
+    {
+      "field_name": "granularity_sqla",
+      "required": true,
+      "slot_kind": "time_column",
+      "accepted_dataset_roles": [
+        "time_dimension"
+      ],
+      "cardinality": "0..1",
+      "placeholder": "<time_column>",
+      "source_categories": [
+        "Time"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The time column for the visualization. Note that you can define arbitrary expression that return a DATETIME column in the table. Also note that the filter below is applied against this column or expression"
+      ]
+    },
+    {
+      "field_name": "metrics",
+      "required": true,
+      "slot_kind": "metric_list",
+      "accepted_dataset_roles": [
+        "metric",
+        "saved_metric",
+        "adhoc_metric"
+      ],
+      "cardinality": "1..n",
+      "placeholder": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        }
+      ],
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+      ]
+    },
+    {
+      "field_name": "subdomain_granularity",
+      "required": true,
+      "slot_kind": "time_or_axis",
+      "accepted_dataset_roles": [
+        "time_dimension",
+        "dimension"
+      ],
+      "cardinality": "0..1",
+      "placeholder": "<time_or_axis_column>",
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The time unit for each block. Should be a smaller unit than domain_granularity. Should be larger or equal to Time Grain"
+      ]
+    }
+  ],
+  "non_binding_form_controls": [
+    {
+      "field_name": "cell_padding",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The distance between cells, in pixels"
+      ]
+    },
+    {
+      "field_name": "cell_radius",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The pixel radius"
+      ]
+    },
+    {
+      "field_name": "cell_size",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The size of the square cell, in pixels"
+      ]
+    },
+    {
+      "field_name": "linear_color_scheme",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Linear color scheme used to encode metric magnitude in the calendar cells."
+      ]
+    },
+    {
+      "field_name": "show_legend",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to display the legend (toggles)"
+      ]
+    },
+    {
+      "field_name": "show_metric_name",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to display the metric name as a title"
+      ]
+    },
+    {
+      "field_name": "show_values",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to display the numerical values within the cells"
+      ]
+    },
+    {
+      "field_name": "steps",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The number color \"steps\""
+      ]
+    },
+    {
+      "field_name": "time_range",
+      "required": true,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Time"
+      ],
+      "embedding_modes": [
+        "extra_form_data.override"
+      ],
+      "descriptions": [
+        "This control filters the whole chart based on the selected time range."
+      ]
+    },
+    {
+      "field_name": "x_axis_time_format",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "D3 time format syntax: https://github.com/d3/d3-time-format"
+      ]
+    },
+    {
+      "field_name": "y_axis_format",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "D3 format syntax: https://github.com/d3/d3-format"
+      ]
+    }
+  ],
+  "dataset_role_inventory": {
+    "adhoc_metric": [
+      "metrics"
+    ],
+    "dimension": [
+      "domain_granularity",
+      "subdomain_granularity"
+    ],
+    "filter_context": [
+      "adhoc_filters"
+    ],
+    "metric": [
+      "metrics"
+    ],
+    "saved_metric": [
+      "metrics"
+    ],
+    "time_dimension": [
+      "domain_granularity",
+      "granularity_sqla",
+      "subdomain_granularity"
+    ]
+  },
+  "binding_seed_example": {
+    "domain_granularity": "<time_or_axis_column>",
+    "granularity_sqla": "<time_column>",
+    "metrics": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      }
+    ],
+    "subdomain_granularity": "<time_or_axis_column>"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "cal_heatmap",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/cal_heatmap-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/cal_heatmap-form-data-schema.json",
+      "control-schema": "form-data-schema/cal_heatmap-schema.json"
+    }
+  }
+}

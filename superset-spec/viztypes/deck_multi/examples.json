@@ -1,0 +1,186 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "deck_multi",
+  "display_name": "deck.gl Multiple Layers",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "country",
+          "operator": "IN",
+          "comparator": [
+            "US"
+          ]
+        }
+      ]
+    ],
+    "deck_slices": [
+      [
+        101,
+        102
+      ]
+    ],
+    "mapbox_style": [
+      "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+    ],
+    "viewport": [
+      {
+        "longitude": 6.85236157047845,
+        "latitude": 31.222656842808707,
+        "zoom": 1,
+        "bearing": 0,
+        "pitch": 0
+      }
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "deck_multi",
+      "mapbox_style": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+      "viewport": {
+        "longitude": 6.85236157047845,
+        "latitude": 31.222656842808707,
+        "zoom": 1,
+        "bearing": 0,
+        "pitch": 0
+      },
+      "deck_slices": [
+        101,
+        102
+      ],
+      "adhoc_filters": []
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "deck_multi",
+      "mapbox_style": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+      "viewport": {
+        "longitude": 6.85236157047845,
+        "latitude": 31.222656842808707,
+        "zoom": 1,
+        "bearing": 0,
+        "pitch": 0
+      },
+      "deck_slices": [
+        101,
+        102
+      ],
+      "adhoc_filters": [],
+      "extra_form_data": {},
+      "extra_filters": []
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "deck_multi",
+      "mapbox_style": "<copied_from_saved_chart_if_present>",
+      "viewport": "<copied_from_saved_chart_if_present>",
+      "deck_slices": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "extra_filters": "<copied_from_saved_chart_if_present>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "country",
+            "op": "IN",
+            "val": [
+              "US"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      },
+      "layer_filter_scope": "<copied_from_saved_chart_if_present>",
+      "filter_data_mapping": "<copied_from_saved_chart_if_present>"
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_deck_multi_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "country",
+            "op": "IN",
+            "val": [
+              "US"
+            ]
+          }
+        ],
+        "effect": "作为根图的动态 simple filters。对 deck_multi 而言，这些过滤条件会被继续转发给子图层；若存在 layer scope，后端会根据 `filter_data_mapping` 按层重写它们。",
+        "source": "superset/constants.py + superset/utils/core.py + DeckGLMultiLayer._apply_layer_filtering + Multi.tsx"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_deck_multi_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East"
+            ]
+          }
+        ],
+        "effect": "作为根图的动态 adhoc filters。对 deck_multi 而言，它们会被继续转发给子图层。",
+        "source": "superset/constants.py + superset/utils/core.py + DeckGLMultiLayer._apply_layer_filtering + Multi.tsx"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_deck_multi_legacy": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；deck_multi 默认不直接消费它。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_deck_multi_legacy": false,
+        "recommended": false,
+        "sample_data": "Last 30 days",
+        "effect": "这是通用 extra_form_data override 字段，但 deck_multi 根图自身不是时序查询图，当前没有高置信源码证据表明应直接依赖它控制根层行为。",
+        "source": "QueryFormData.ts + superset/constants.py + superset/utils/core.py + superset/viz.py",
+        "status": "低相关，是否生效取决于子图层自身是否消费该字段"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "deck_multi",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/deck_multi-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/deck_multi-form-data-schema.json",
+      "control-schema": "form-data-schema/deck_multi-schema.json"
+    }
+  }
+}

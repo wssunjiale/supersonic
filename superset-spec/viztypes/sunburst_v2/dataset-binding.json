@@ -1,0 +1,310 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "sunburst_v2",
+  "display_name": "Sunburst Chart",
+  "generation_mode": "heuristic_seed",
+  "slot_candidates": [
+    {
+      "field_name": "adhoc_filters",
+      "required": false,
+      "slot_kind": "filter_list",
+      "accepted_dataset_roles": [
+        "filter_context"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [],
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [
+        "extra_form_data.append"
+      ],
+      "descriptions": [
+        "源码未提供额外描述；字段标签为 Filters。"
+      ]
+    },
+    {
+      "field_name": "columns",
+      "required": false,
+      "slot_kind": "dimension_list",
+      "accepted_dataset_roles": [
+        "dimension",
+        "category_dimension"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [
+        "<dimension_column>"
+      ],
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Sets the hierarchy levels of the chart. Each level is represented by one ring with the innermost circle as the top of the hierarchy."
+      ]
+    },
+    {
+      "field_name": "metric",
+      "required": true,
+      "slot_kind": "metric",
+      "accepted_dataset_roles": [
+        "metric",
+        "saved_metric",
+        "adhoc_metric"
+      ],
+      "cardinality": "1",
+      "placeholder": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The primary metric is used to define the arc segment sizes"
+      ]
+    },
+    {
+      "field_name": "secondary_metric",
+      "required": false,
+      "slot_kind": "secondary_metric",
+      "accepted_dataset_roles": [
+        "metric",
+        "saved_metric",
+        "adhoc_metric"
+      ],
+      "cardinality": "0..1",
+      "placeholder": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<secondary_metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<secondary_metric_column>)"
+      },
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "[optional] this secondary metric is used to define the color as a ratio against the primary metric. When omitted, the color is categorical and based on labels"
+      ]
+    }
+  ],
+  "non_binding_form_controls": [
+    {
+      "field_name": "color_scheme",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Colors"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "When only a primary metric is provided, a categorical color scale is used."
+      ]
+    },
+    {
+      "field_name": "currency_format",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Formatting"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Currency format"
+      ]
+    },
+    {
+      "field_name": "date_format",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Formatting"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "D3 time format syntax: https://github.com/d3/d3-time-format"
+      ]
+    },
+    {
+      "field_name": "label_type",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Labels"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "What should be shown on the label?"
+      ]
+    },
+    {
+      "field_name": "linear_color_scheme",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Colors"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "When a secondary metric is provided, a linear color scale is used."
+      ]
+    },
+    {
+      "field_name": "number_format",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Formatting"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "D3 format syntax: https://github.com/d3/d3-format. Values like `.2f`, `,.0%`, or `,.2r` are supported."
+      ]
+    },
+    {
+      "field_name": "row_limit",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Limits the number of the rows that are computed in the query that is the source of the data used for this chart."
+      ]
+    },
+    {
+      "field_name": "show_labels",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Labels"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to display the labels."
+      ]
+    },
+    {
+      "field_name": "show_labels_threshold",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Labels"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Minimum threshold in percentage points for showing labels."
+      ]
+    },
+    {
+      "field_name": "show_total",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Labels"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to display the aggregate count"
+      ]
+    },
+    {
+      "field_name": "sort_by_metric",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to sort results by the selected metric in descending order."
+      ]
+    }
+  ],
+  "dataset_role_inventory": {
+    "adhoc_metric": [
+      "metric",
+      "secondary_metric"
+    ],
+    "category_dimension": [
+      "columns"
+    ],
+    "dimension": [
+      "columns"
+    ],
+    "filter_context": [
+      "adhoc_filters"
+    ],
+    "metric": [
+      "metric",
+      "secondary_metric"
+    ],
+    "saved_metric": [
+      "metric",
+      "secondary_metric"
+    ]
+  },
+  "binding_seed_example": {
+    "metric": {
+      "expressionType": "SIMPLE",
+      "column": {
+        "column_name": "<metric_column>"
+      },
+      "aggregate": "SUM",
+      "label": "SUM(<metric_column>)"
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "sunburst_v2",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/sunburst_v2-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/sunburst_v2-form-data-schema.json",
+      "control-schema": "form-data-schema/sunburst_v2-schema.json"
+    }
+  }
+}

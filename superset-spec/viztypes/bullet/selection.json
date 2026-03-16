@@ -1,0 +1,346 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "bullet",
+  "display_name": "Bullet Chart",
+  "selection_summary": {
+    "category": "kpi",
+    "tags": [
+      "kpi",
+      "bullet",
+      "target",
+      "comparison"
+    ],
+    "description_zh": "Bullet Chart displays a primary metric alongside comparative metrics (target, range) in a compact format, ideal for dashboards and KPI tracking.",
+    "visual_shape_zh": "子弹图（KPI对比型）",
+    "use_cases_zh": [
+      "KPI目标达成率展示（如实际值vs目标值）",
+      "指标范围对比（如实际值vs参考范围）",
+      "紧凑型多指标对比仪表盘"
+    ],
+    "required_slots": [
+      {
+        "field_name": "metric",
+        "required": true,
+        "slot_kind": "metric",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1",
+        "placeholder": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        },
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+        ]
+      },
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "核心指标（实际值），用于展示主要KPI数值。"
+        ]
+      },
+      {
+        "field_name": "target",
+        "required": true,
+        "slot_kind": "graph_target",
+        "accepted_dataset_roles": [
+          "entity_id",
+          "dimension"
+        ],
+        "cardinality": "1",
+        "placeholder": "<target_column>",
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "目标值指标，用于对比实际值与目标值的差距。"
+        ]
+      }
+    ],
+    "optional_slots": [
+      {
+        "field_name": "adhoc_filters",
+        "required": false,
+        "slot_kind": "filter_list",
+        "accepted_dataset_roles": [
+          "filter_context"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [],
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "字段标签为 Filters。legacy explore_json 路径会先把 legacy filters 转成 adhoc_filters，再继续处理 extra filters / extra_form_data。"
+        ]
+      }
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "dimension",
+      "entity_id",
+      "metric",
+      "saved_metric"
+    ],
+    "optional_dataset_roles": [
+      "filter_context"
+    ],
+    "dataset_role_inventory": {
+      "adhoc_metric": [
+        "metric",
+        "metrics"
+      ],
+      "filter_context": [
+        "adhoc_filters"
+      ],
+      "metric": [
+        "metric",
+        "metrics"
+      ],
+      "saved_metric": [
+        "metric",
+        "metrics"
+      ],
+      "entity_id": [
+        "target"
+      ],
+      "dimension": [
+        "target"
+      ]
+    },
+    "non_binding_control_names": [
+      "marker_labels",
+      "marker_line_labels",
+      "marker_lines",
+      "markers",
+      "range_labels",
+      "ranges"
+    ],
+    "embedding_runtime_field_names": [
+      "adhoc_filters",
+      "custom_form_data",
+      "filters",
+      "granularity",
+      "granularity_sqla",
+      "interactive_drilldown",
+      "interactive_groupby",
+      "interactive_highlight",
+      "relative_end",
+      "relative_start",
+      "time_column",
+      "time_compare",
+      "time_grain",
+      "time_grain_sqla",
+      "time_range"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "metric",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "marker_labels",
+      "marker_line_labels",
+      "marker_lines",
+      "markers",
+      "metric",
+      "range_labels",
+      "ranges",
+      "viz_type"
+    ],
+    "structural_flags": {
+      "time_series": false,
+      "kpi_like": true,
+      "table_like": false,
+      "map_like": false,
+      "flow_like": true,
+      "distribution_like": false,
+      "supports_breakdown": false,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": false,
+      "needs_dimension": true
+    },
+    "selection_hints": [
+      "优先用于单值 KPI、累计值或概览指标，不适合多行明细对比。",
+      "至少需要 1 个可聚合指标字段。",
+      "需要至少 1 个维度字段用于分组、拆分或定位。",
+      "适合流向、路径、节点关系或网络结构问题。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：KPI目标达成率展示（如实际值vs目标值）；指标范围对比（如实际值vs参考范围）；紧凑型多指标对比仪表盘"
+    ]
+  },
+  "selection_prompt_card": {
+    "viz_type": "bullet",
+    "display_name": "Bullet Chart",
+    "category": "kpi",
+    "description_zh": "Bullet Chart displays a primary metric alongside comparative metrics (target, range) in a compact format, ideal for dashboards and KPI tracking.",
+    "visual_shape_zh": "子弹图（KPI对比型）",
+    "best_for": [
+      "KPI目标达成率展示（如实际值vs目标值）",
+      "指标范围对比（如实际值vs参考范围）",
+      "紧凑型多指标对比仪表盘"
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "dimension",
+      "entity_id",
+      "metric",
+      "saved_metric"
+    ],
+    "optional_dataset_roles": [
+      "filter_context"
+    ],
+    "required_slots": [
+      {
+        "field_name": "metric",
+        "required": true,
+        "slot_kind": "metric",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1",
+        "placeholder": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        },
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+        ]
+      },
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "核心指标（实际值），用于展示主要KPI数值。"
+        ]
+      },
+      {
+        "field_name": "target",
+        "required": true,
+        "slot_kind": "graph_target",
+        "accepted_dataset_roles": [
+          "entity_id",
+          "dimension"
+        ],
+        "cardinality": "1",
+        "placeholder": "<target_column>",
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "目标值指标，用于对比实际值与目标值的差距。"
+        ]
+      }
+    ],
+    "optional_slot_names": [
+      "adhoc_filters"
+    ],
+    "structural_flags": {
+      "time_series": false,
+      "kpi_like": true,
+      "table_like": false,
+      "map_like": false,
+      "flow_like": true,
+      "distribution_like": false,
+      "supports_breakdown": false,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": false,
+      "needs_dimension": true
+    },
+    "selection_hints": [
+      "优先用于单值 KPI、累计值或概览指标，不适合多行明细对比。",
+      "至少需要 1 个可聚合指标字段。",
+      "需要至少 1 个维度字段用于分组、拆分或定位。",
+      "适合流向、路径、节点关系或网络结构问题。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：KPI目标达成率展示（如实际值vs目标值）；指标范围对比（如实际值vs参考范围）；紧凑型多指标对比仪表盘"
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "bullet",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/bullet-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/bullet-form-data-schema.json",
+      "control-schema": "form-data-schema/bullet-schema.json"
+    }
+  }
+}

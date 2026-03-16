@@ -1,0 +1,825 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "bullet",
+  "display_name": "Bullet Chart",
+  "source_kind": "schema_file",
+  "normalized_control_schema": {
+    "field_category_order": [
+      "Query",
+      "Chart Options"
+    ],
+    "field_occurrences": [
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "metric",
+        "runtime_alias": null,
+        "required": true,
+        "embedding": "否",
+        "description": "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+        "data_type": "string | object",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        },
+        "original_field": {
+          "field_name": "metric",
+          "description": "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+          "data_type": "string | object",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          },
+          "required": true,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "sharedControls.metric 在 6.0.0 中映射到 dndAdhocMetricControl，继承 validateNonEmpty。后端 BulletViz.query_obj() 也强制要求它存在。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "adhoc_filters",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "description": "字段标签为 Filters。legacy explore_json 路径会先把 legacy filters 转成 adhoc_filters，再继续处理 extra filters / extra_form_data。",
+        "data_type": "array[object]",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East"
+            ]
+          }
+        ],
+        "original_field": {
+          "field_name": "adhoc_filters",
+          "description": "字段标签为 Filters。legacy explore_json 路径会先把 legacy filters 转成 adhoc_filters，再继续处理 extra filters / extra_form_data。",
+          "data_type": "array[object]",
+          "enum_source": "datasource columns + saved metrics + 当前 metric",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "region",
+              "operator": "IN",
+              "comparator": [
+                "East"
+              ]
+            }
+          ],
+          "required": false,
+          "embedding": "extra_form_data.append",
+          "default_value": [],
+          "notes": "dndAdhocFilterControl 会把当前 metric 作为 selectedMetrics 传入筛选控件上下文。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "ranges",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Ranges to highlight with shading",
+        "data_type": "string",
+        "sample_data": "0,50,100",
+        "original_field": {
+          "field_name": "ranges",
+          "description": "Ranges to highlight with shading",
+          "data_type": "string",
+          "runtime_parsed_type": "array[number] | null",
+          "sample_data": "0,50,100",
+          "required": false,
+          "embedding": "否",
+          "default_value": "",
+          "notes": "root form_data 中必须是逗号分隔字符串。运行时用 tokenizeToNumericArray 解析；若为空则回退到 [0, data.measures * 1.1]。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "range_labels",
+        "runtime_alias": "rangeLabels",
+        "required": false,
+        "embedding": "否",
+        "description": "Labels for the ranges",
+        "data_type": "string",
+        "sample_data": "Bad,Satisfactory,Good",
+        "original_field": {
+          "field_name": "range_labels",
+          "runtime_alias": "rangeLabels",
+          "description": "Labels for the ranges",
+          "data_type": "string",
+          "runtime_parsed_type": "array[string] | null",
+          "sample_data": "Bad,Satisfactory,Good",
+          "required": false,
+          "embedding": "否",
+          "default_value": "",
+          "notes": "root form_data 中必须是逗号分隔字符串；运行时才会转成 string array。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "markers",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "List of values to mark with triangles",
+        "data_type": "string",
+        "sample_data": "80",
+        "original_field": {
+          "field_name": "markers",
+          "description": "List of values to mark with triangles",
+          "data_type": "string",
+          "runtime_parsed_type": "array[number] | null",
+          "sample_data": "80",
+          "required": false,
+          "embedding": "否",
+          "default_value": "",
+          "notes": "root form_data 中必须是逗号分隔字符串；运行时通过 tokenizeToNumericArray 解析。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "marker_labels",
+        "runtime_alias": "markerLabels",
+        "required": false,
+        "embedding": "否",
+        "description": "Labels for the markers",
+        "data_type": "string",
+        "sample_data": "Target",
+        "original_field": {
+          "field_name": "marker_labels",
+          "runtime_alias": "markerLabels",
+          "description": "Labels for the markers",
+          "data_type": "string",
+          "runtime_parsed_type": "array[string] | null",
+          "sample_data": "Target",
+          "required": false,
+          "embedding": "否",
+          "default_value": ""
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "marker_lines",
+        "runtime_alias": "markerLines",
+        "required": false,
+        "embedding": "否",
+        "description": "List of values to mark with lines",
+        "data_type": "string",
+        "sample_data": "90",
+        "original_field": {
+          "field_name": "marker_lines",
+          "runtime_alias": "markerLines",
+          "description": "List of values to mark with lines",
+          "data_type": "string",
+          "runtime_parsed_type": "array[number] | null",
+          "sample_data": "90",
+          "required": false,
+          "embedding": "否",
+          "default_value": "",
+          "notes": "root form_data 中必须是逗号分隔字符串；运行时通过 tokenizeToNumericArray 解析。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "marker_line_labels",
+        "runtime_alias": "markerLineLabels",
+        "required": false,
+        "embedding": "否",
+        "description": "Labels for the marker lines",
+        "data_type": "string",
+        "sample_data": "Stretch goal",
+        "original_field": {
+          "field_name": "marker_line_labels",
+          "runtime_alias": "markerLineLabels",
+          "description": "Labels for the marker lines",
+          "data_type": "string",
+          "runtime_parsed_type": "array[string] | null",
+          "sample_data": "Stretch goal",
+          "required": false,
+          "embedding": "否",
+          "default_value": ""
+        }
+      }
+    ],
+    "field_inventory": [
+      {
+        "field_name": "adhoc_filters",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "字段标签为 Filters。legacy explore_json 路径会先把 legacy filters 转成 adhoc_filters，再继续处理 extra filters / extra_form_data。"
+        ],
+        "data_types": [
+          "array[object]"
+        ],
+        "sample_data_examples": [
+          [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "region",
+              "operator": "IN",
+              "comparator": [
+                "East"
+              ]
+            }
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "adhoc_filters",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "extra_form_data.append",
+            "description": "字段标签为 Filters。legacy explore_json 路径会先把 legacy filters 转成 adhoc_filters，再继续处理 extra filters / extra_form_data。",
+            "data_type": "array[object]",
+            "sample_data": [
+              {
+                "expressionType": "SIMPLE",
+                "clause": "WHERE",
+                "subject": "region",
+                "operator": "IN",
+                "comparator": [
+                  "East"
+                ]
+              }
+            ],
+            "original_field": {
+              "field_name": "adhoc_filters",
+              "description": "字段标签为 Filters。legacy explore_json 路径会先把 legacy filters 转成 adhoc_filters，再继续处理 extra filters / extra_form_data。",
+              "data_type": "array[object]",
+              "enum_source": "datasource columns + saved metrics + 当前 metric",
+              "sample_data": [
+                {
+                  "expressionType": "SIMPLE",
+                  "clause": "WHERE",
+                  "subject": "region",
+                  "operator": "IN",
+                  "comparator": [
+                    "East"
+                  ]
+                }
+              ],
+              "required": false,
+              "embedding": "extra_form_data.append",
+              "default_value": [],
+              "notes": "dndAdhocFilterControl 会把当前 metric 作为 selectedMetrics 传入筛选控件上下文。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "marker_labels",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [
+          "markerLabels"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Labels for the markers"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "Target"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "marker_labels",
+            "runtime_alias": "markerLabels",
+            "required": false,
+            "embedding": "否",
+            "description": "Labels for the markers",
+            "data_type": "string",
+            "sample_data": "Target",
+            "original_field": {
+              "field_name": "marker_labels",
+              "runtime_alias": "markerLabels",
+              "description": "Labels for the markers",
+              "data_type": "string",
+              "runtime_parsed_type": "array[string] | null",
+              "sample_data": "Target",
+              "required": false,
+              "embedding": "否",
+              "default_value": ""
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "marker_line_labels",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [
+          "markerLineLabels"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Labels for the marker lines"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "Stretch goal"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "marker_line_labels",
+            "runtime_alias": "markerLineLabels",
+            "required": false,
+            "embedding": "否",
+            "description": "Labels for the marker lines",
+            "data_type": "string",
+            "sample_data": "Stretch goal",
+            "original_field": {
+              "field_name": "marker_line_labels",
+              "runtime_alias": "markerLineLabels",
+              "description": "Labels for the marker lines",
+              "data_type": "string",
+              "runtime_parsed_type": "array[string] | null",
+              "sample_data": "Stretch goal",
+              "required": false,
+              "embedding": "否",
+              "default_value": ""
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "marker_lines",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [
+          "markerLines"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "List of values to mark with lines"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "90"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "marker_lines",
+            "runtime_alias": "markerLines",
+            "required": false,
+            "embedding": "否",
+            "description": "List of values to mark with lines",
+            "data_type": "string",
+            "sample_data": "90",
+            "original_field": {
+              "field_name": "marker_lines",
+              "runtime_alias": "markerLines",
+              "description": "List of values to mark with lines",
+              "data_type": "string",
+              "runtime_parsed_type": "array[number] | null",
+              "sample_data": "90",
+              "required": false,
+              "embedding": "否",
+              "default_value": "",
+              "notes": "root form_data 中必须是逗号分隔字符串；运行时通过 tokenizeToNumericArray 解析。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "markers",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "List of values to mark with triangles"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "80"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "markers",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "List of values to mark with triangles",
+            "data_type": "string",
+            "sample_data": "80",
+            "original_field": {
+              "field_name": "markers",
+              "description": "List of values to mark with triangles",
+              "data_type": "string",
+              "runtime_parsed_type": "array[number] | null",
+              "sample_data": "80",
+              "required": false,
+              "embedding": "否",
+              "default_value": "",
+              "notes": "root form_data 中必须是逗号分隔字符串；运行时通过 tokenizeToNumericArray 解析。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "metric",
+        "required": true,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+        ],
+        "data_types": [
+          "string | object"
+        ],
+        "sample_data_examples": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "metric",
+            "runtime_alias": null,
+            "required": true,
+            "embedding": "否",
+            "description": "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+            "data_type": "string | object",
+            "sample_data": {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "sales"
+              },
+              "aggregate": "SUM",
+              "label": "SUM(sales)"
+            },
+            "original_field": {
+              "field_name": "metric",
+              "description": "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+              "data_type": "string | object",
+              "enum_source": "saved metrics + adhoc metrics",
+              "sample_data": {
+                "expressionType": "SIMPLE",
+                "column": {
+                  "column_name": "sales"
+                },
+                "aggregate": "SUM",
+                "label": "SUM(sales)"
+              },
+              "required": true,
+              "embedding": "否",
+              "default_value": null,
+              "notes": "sharedControls.metric 在 6.0.0 中映射到 dndAdhocMetricControl，继承 validateNonEmpty。后端 BulletViz.query_obj() 也强制要求它存在。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "range_labels",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [
+          "rangeLabels"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Labels for the ranges"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "Bad,Satisfactory,Good"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "range_labels",
+            "runtime_alias": "rangeLabels",
+            "required": false,
+            "embedding": "否",
+            "description": "Labels for the ranges",
+            "data_type": "string",
+            "sample_data": "Bad,Satisfactory,Good",
+            "original_field": {
+              "field_name": "range_labels",
+              "runtime_alias": "rangeLabels",
+              "description": "Labels for the ranges",
+              "data_type": "string",
+              "runtime_parsed_type": "array[string] | null",
+              "sample_data": "Bad,Satisfactory,Good",
+              "required": false,
+              "embedding": "否",
+              "default_value": "",
+              "notes": "root form_data 中必须是逗号分隔字符串；运行时才会转成 string array。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "ranges",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Ranges to highlight with shading"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "0,50,100"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "ranges",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Ranges to highlight with shading",
+            "data_type": "string",
+            "sample_data": "0,50,100",
+            "original_field": {
+              "field_name": "ranges",
+              "description": "Ranges to highlight with shading",
+              "data_type": "string",
+              "runtime_parsed_type": "array[number] | null",
+              "sample_data": "0,50,100",
+              "required": false,
+              "embedding": "否",
+              "default_value": "",
+              "notes": "root form_data 中必须是逗号分隔字符串。运行时用 tokenizeToNumericArray 解析；若为空则回退到 [0, data.measures * 1.1]。"
+            }
+          }
+        ]
+      }
+    ],
+    "required_field_names": [
+      "metric"
+    ],
+    "embedding_enabled_field_names": [
+      "adhoc_filters"
+    ],
+    "runtime_alias_index": {
+      "marker_labels": [
+        "markerLabels"
+      ],
+      "marker_line_labels": [
+        "markerLineLabels"
+      ],
+      "marker_lines": [
+        "markerLines"
+      ],
+      "range_labels": [
+        "rangeLabels"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "bullet",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/bullet-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/bullet-form-data-schema.json",
+      "control-schema": "form-data-schema/bullet-schema.json"
+    }
+  },
+  "fallback_online_field_categories": {
+    "Query": [],
+    "Advanced analytics": [],
+    "Annotations & Layers": [],
+    "Predictive Analytics（Forecast）": [],
+    "Chart Options": [],
+    "Chart Title": [],
+    "图表专属": [],
+    "通用图表选项": []
+  },
+  "original_control_schema": {
+    "viz_type": "bullet",
+    "display_name": "Bullet Chart",
+    "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/Bullet/controlPanel.ts",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/Bullet/controlPanel.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/Bullet/index.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/transformProps.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/NVD3Vis.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/PropTypes.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/utils/tokenize.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+      "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+      "D:/vsx/sources/superset-6.0.0/superset/views/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/utils/core.py"
+    ],
+    "notes": [
+      "Bullet Chart 位于 legacy-preset-chart-nvd3 插件中，metadata 明确声明 `useLegacyApi=true`，因此前端走 `/superset/explore_json/` 而不是 `/api/v1/chart/data`。",
+      "Bullet 的 Query 区只有两个字段：`metric` 和 `adhoc_filters`。其余专属字段全部位于 Chart Options，且都是 `TextControl`。",
+      "这些专属字段在 API root `form_data` 中都是字符串，不是数组。`ranges`、`markers`、`marker_lines` 在运行时会通过 `tokenizeToNumericArray()` 解析；`range_labels`、`marker_labels`、`marker_line_labels` 会通过 `tokenizeToStringArray()` 解析。",
+      "如果 `ranges` 为空，`transformProps.js` 会在运行时回退成 `[0, data.measures * 1.1]`。这个默认值不是 root form_data 里的静态默认值，而是前端运行时生成的。",
+      "后端 `BulletViz.query_obj()` 会在 `BaseViz.query_obj()` 的基础上把 `query_obj.metrics` 固定改成 `[metric]`，并要求 `metric` 必填，否则抛出 `Pick a metric to display`。",
+      "后端 `BulletViz.get_data()` 只返回 `{ measures: [...] }`，真正把 shading ranges、triangle markers、line markers 拼进图表的是前端 `transformProps.js` 和 `NVD3Vis.js`。",
+      "NVD3Vis.js 对 bullet 使用 `nv.models.bulletChart()`，并把解析后的 `ranges`、`rangeLabels`、`markers`、`markerLabels`、`markerLines`、`markerLineLabels` 填进运行时 data。"
+    ],
+    "legacy_api_behavior": {
+      "useLegacyApi": true,
+      "frontend_request_endpoint": "/superset/explore_json/",
+      "frontend_request_payload": {
+        "form_data": "<raw form_data>"
+      },
+      "query_builder": "Bullet 没有专属前端 buildQuery。ChartClient.ts 在 useLegacyApi=true 且未注册 buildQuery 时，会把原始 form_data 直接作为 legacy payload 发送。"
+    },
+    "query_compilation": {
+      "backend_class": "superset/viz.py::BulletViz",
+      "base_query": "继承 BaseViz.query_obj()，因此会先处理 legacy filters / extra_form_data，并构造基础 query_obj。",
+      "metrics": "query_obj['metrics'] = [metric]",
+      "validation": "如果 metric 为空，抛出 Pick a metric to display",
+      "returned_data": "get_data(df) 返回 { measures: values.tolist() }"
+    },
+    "field_categories": {
+      "Query": [
+        {
+          "field_name": "metric",
+          "description": "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+          "data_type": "string | object",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          },
+          "required": true,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "sharedControls.metric 在 6.0.0 中映射到 dndAdhocMetricControl，继承 validateNonEmpty。后端 BulletViz.query_obj() 也强制要求它存在。"
+        },
+        {
+          "field_name": "adhoc_filters",
+          "description": "字段标签为 Filters。legacy explore_json 路径会先把 legacy filters 转成 adhoc_filters，再继续处理 extra filters / extra_form_data。",
+          "data_type": "array[object]",
+          "enum_source": "datasource columns + saved metrics + 当前 metric",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "region",
+              "operator": "IN",
+              "comparator": [
+                "East"
+              ]
+            }
+          ],
+          "required": false,
+          "embedding": "extra_form_data.append",
+          "default_value": [],
+          "notes": "dndAdhocFilterControl 会把当前 metric 作为 selectedMetrics 传入筛选控件上下文。"
+        }
+      ],
+      "Chart Options": [
+        {
+          "field_name": "ranges",
+          "description": "Ranges to highlight with shading",
+          "data_type": "string",
+          "runtime_parsed_type": "array[number] | null",
+          "sample_data": "0,50,100",
+          "required": false,
+          "embedding": "否",
+          "default_value": "",
+          "notes": "root form_data 中必须是逗号分隔字符串。运行时用 tokenizeToNumericArray 解析；若为空则回退到 [0, data.measures * 1.1]。"
+        },
+        {
+          "field_name": "range_labels",
+          "runtime_alias": "rangeLabels",
+          "description": "Labels for the ranges",
+          "data_type": "string",
+          "runtime_parsed_type": "array[string] | null",
+          "sample_data": "Bad,Satisfactory,Good",
+          "required": false,
+          "embedding": "否",
+          "default_value": "",
+          "notes": "root form_data 中必须是逗号分隔字符串；运行时才会转成 string array。"
+        },
+        {
+          "field_name": "markers",
+          "description": "List of values to mark with triangles",
+          "data_type": "string",
+          "runtime_parsed_type": "array[number] | null",
+          "sample_data": "80",
+          "required": false,
+          "embedding": "否",
+          "default_value": "",
+          "notes": "root form_data 中必须是逗号分隔字符串；运行时通过 tokenizeToNumericArray 解析。"
+        },
+        {
+          "field_name": "marker_labels",
+          "runtime_alias": "markerLabels",
+          "description": "Labels for the markers",
+          "data_type": "string",
+          "runtime_parsed_type": "array[string] | null",
+          "sample_data": "Target",
+          "required": false,
+          "embedding": "否",
+          "default_value": ""
+        },
+        {
+          "field_name": "marker_lines",
+          "runtime_alias": "markerLines",
+          "description": "List of values to mark with lines",
+          "data_type": "string",
+          "runtime_parsed_type": "array[number] | null",
+          "sample_data": "90",
+          "required": false,
+          "embedding": "否",
+          "default_value": "",
+          "notes": "root form_data 中必须是逗号分隔字符串；运行时通过 tokenizeToNumericArray 解析。"
+        },
+        {
+          "field_name": "marker_line_labels",
+          "runtime_alias": "markerLineLabels",
+          "description": "Labels for the marker lines",
+          "data_type": "string",
+          "runtime_parsed_type": "array[string] | null",
+          "sample_data": "Stretch goal",
+          "required": false,
+          "embedding": "否",
+          "default_value": ""
+        }
+      ]
+    }
+  }
+}

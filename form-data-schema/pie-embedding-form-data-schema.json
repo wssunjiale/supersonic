@@ -1,0 +1,419 @@
+{
+  "viz_type": "pie",
+  "display_name": "Pie Chart",
+  "purpose": "第三方 embedding / guest token 场景下安全传输的 Pie Chart form_data 模板",
+  "base_form_data_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/pie-form-data-schema.json",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset/security/manager.py",
+    "D:/vsx/sources/superset-6.0.0/superset/charts/data/api.py",
+    "D:/vsx/sources/superset-6.0.0/superset/commands/chart/data/get_data_command.py",
+    "D:/vsx/sources/superset-6.0.0/superset/charts/schemas.py",
+    "D:/vsx/sources/superset-6.0.0/superset/constants.py",
+    "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Pie/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryContext.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryObject.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractQueryFields.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/constants.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/QueryFormData.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/processExtraFormData.ts"
+  ],
+  "notes": [
+    "embedded guest 的核心限制在后端 `security/manager.py::query_context_modified()`。报错原文是 `Guest user cannot modify chart payload`。",
+    "Pie Chart 走 chart data API 的 query context。`buildQueryContext()` 会把 raw formData 原样保存在 `query_context.form_data`，同时 `extractQueryFields()` 会把 `metric` 别名映射到 query `metrics`、把 `groupby` 映射到 query `columns`。",
+    "安全做法不是重新拼装一份新的 Pie Chart form_data，而是以已保存图表的 form_data 原样复制为 base，只把动态条件放进 `extra_form_data`。",
+    "`sort_by_metric` 会改变 buildQuery 生成的 `orderby`；guest 模式下它属于高风险 root 字段。",
+    "Pie 的 controlPanel 没有显式时间 section。虽然 `extra_form_data` 白名单允许时间 override 键，但在当前图上只有 `filters` / `adhoc_filters` 属于高置信动态入口。"
+  ],
+  "security_enforcement": {
+    "backend_check_function": "superset/security/manager.py::query_context_modified",
+    "checked_when": "ChartDataCommand.validate() -> QueryContext.raise_for_access()",
+    "error_message": "Guest user cannot modify chart payload",
+    "directly_compared_root_fields": [
+      "slice_id",
+      "metrics",
+      "columns",
+      "groupby",
+      "orderby"
+    ],
+    "pie_specific_query_sensitive_fields": [
+      "metric",
+      "groupby",
+      "sort_by_metric",
+      "row_limit",
+      "adhoc_filters"
+    ],
+    "recommended_strategy": "复制保存态 Pie Chart form_data 作为 base，仅通过 extra_form_data 追加过滤条件；不要在 guest 请求里重构 Pie 的 root 查询字段或图表定义字段。"
+  },
+  "safe_base_rule": {
+    "description": "第三方 embedding 请求中的根层 form_data，应当从已保存 Pie Chart 的 form_data 直接复制，不要重构。",
+    "must_be_copied_from_saved_chart": [
+      "slice_id",
+      "dashboardId",
+      "datasource",
+      "viz_type",
+      "metric",
+      "groupby",
+      "adhoc_filters",
+      "row_limit",
+      "sort_by_metric",
+      "color_scheme",
+      "threshold_for_other",
+      "roseType",
+      "show_legend",
+      "legendType",
+      "legendOrientation",
+      "legendMargin",
+      "show_labels_threshold",
+      "label_type",
+      "label_template",
+      "number_format",
+      "currency_format",
+      "date_format",
+      "show_labels",
+      "labels_outside",
+      "label_line",
+      "show_total",
+      "outerRadius",
+      "donut",
+      "innerRadius",
+      "all other saved chart-definition fields"
+    ],
+    "why": [
+      "`buildQueryContext()` 会把 raw formData 直接放进 `query_context.form_data`。",
+      "`extractQueryFields()` 会把 `metric` 别名转换成 query `metrics`，把 `groupby` 转换成 query `columns`；这些字段会直接影响后端 QueryContext。",
+      "`sort_by_metric` 会决定 buildQuery 是否生成 `orderby`；`query_context_modified()` 会比较 `orderby`。",
+      "Pie 的 label、legend、donut、rose、threshold 等字段虽然多数不改 SQL，但它们都是图表定义的一部分。复制保存态是最稳妥的 guest 访问策略。"
+    ]
+  },
+  "safe_embedding_form_data_template": {
+    "description": "这是 Pie Chart guest embedding 下的安全写法。根层以保存态图表为 base，仅改 extra_form_data。",
+    "template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "pie",
+      "metric": "<copied_from_saved_chart>",
+      "groupby": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "row_limit": "<copied_from_saved_chart>",
+      "sort_by_metric": "<copied_from_saved_chart>",
+      "color_scheme": "<copied_from_saved_chart>",
+      "threshold_for_other": "<copied_from_saved_chart>",
+      "roseType": "<copied_from_saved_chart>",
+      "show_legend": "<copied_from_saved_chart>",
+      "legendType": "<copied_from_saved_chart>",
+      "legendOrientation": "<copied_from_saved_chart>",
+      "legendMargin": "<copied_from_saved_chart>",
+      "show_labels_threshold": "<copied_from_saved_chart>",
+      "label_type": "<copied_from_saved_chart>",
+      "label_template": "<copied_from_saved_chart>",
+      "number_format": "<copied_from_saved_chart>",
+      "currency_format": "<copied_from_saved_chart>",
+      "date_format": "<copied_from_saved_chart>",
+      "show_labels": "<copied_from_saved_chart>",
+      "labels_outside": "<copied_from_saved_chart>",
+      "label_line": "<copied_from_saved_chart>",
+      "show_total": "<copied_from_saved_chart>",
+      "outerRadius": "<copied_from_saved_chart>",
+      "donut": "<copied_from_saved_chart>",
+      "innerRadius": "<copied_from_saved_chart>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    }
+  },
+  "preferred_dynamic_container": {
+    "field_name": "extra_form_data",
+    "description": "第三方 embedding 推荐把动态上下文放在这里；后端会在 merge_extra_form_data() 中合并它。",
+    "append_keys": [
+      "adhoc_filters",
+      "filters",
+      "interactive_groupby",
+      "interactive_highlight",
+      "interactive_drilldown",
+      "custom_form_data"
+    ],
+    "override_keys_backend_high_confidence": [
+      "granularity_sqla",
+      "granularity",
+      "time_column",
+      "time_grain",
+      "time_range",
+      "time_grain_sqla",
+      "relative_start",
+      "relative_end"
+    ],
+    "notes": "这些 override key 来自通用白名单。但 Pie 当前没有显式时间控件链路，只有 `filters` / `adhoc_filters` 属于高置信动态入口。"
+  },
+  "extra_form_data_field_schema": [
+    {
+      "field_name": "filters",
+      "data_type": "array[QueryObjectFilterClause]",
+      "behavior": "append",
+      "safe_for_pie": true,
+      "recommended": true,
+      "sample_data": [
+        {
+          "col": "region",
+          "op": "IN",
+          "val": [
+            "East",
+            "West"
+          ]
+        }
+      ],
+      "effect": "追加 simple filters；后端会把它们并入额外过滤条件。",
+      "source": "superset/constants.py + superset/utils/core.py"
+    },
+    {
+      "field_name": "adhoc_filters",
+      "data_type": "array[AdhocFilter]",
+      "behavior": "append",
+      "safe_for_pie": true,
+      "recommended": true,
+      "sample_data": [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "region",
+          "operator": "IN",
+          "comparator": [
+            "East",
+            "West"
+          ]
+        }
+      ],
+      "effect": "追加 adhoc filters；后端会把它们标记为 extra 并并入查询。",
+      "source": "superset/constants.py + superset/utils/core.py"
+    },
+    {
+      "field_name": "custom_form_data",
+      "data_type": "object",
+      "behavior": "append",
+      "safe_for_pie": true,
+      "recommended": false,
+      "sample_data": {},
+      "effect": "传递非标准附加数据；Pie 默认 buildQuery/transformProps 不直接消费它。",
+      "source": "QueryFormData.ts + superset/constants.py"
+    },
+    {
+      "field_name": "time_range",
+      "data_type": "string",
+      "behavior": "override",
+      "safe_for_pie": false,
+      "recommended": false,
+      "sample_data": "Last 30 days",
+      "effect": "通用 extra_form_data override 白名单允许该 key，但 Pie 当前没有显式时间控件链路；guest 场景下不建议依赖。",
+      "source": "superset/constants.py + QueryFormData.ts",
+      "status": "低置信，不建议在 guest embedding 中依赖"
+    },
+    {
+      "field_name": "time_grain_sqla",
+      "data_type": "string | null",
+      "behavior": "override",
+      "safe_for_pie": false,
+      "recommended": false,
+      "sample_data": "P1D",
+      "effect": "通用时间粒度 override。Pie 当前 controlPanel 没有显式暴露对应字段。",
+      "source": "superset/constants.py + QueryFormData.ts",
+      "status": "低置信，不建议在 guest embedding 中依赖"
+    },
+    {
+      "field_name": "granularity_sqla",
+      "data_type": "string | null",
+      "behavior": "override",
+      "safe_for_pie": false,
+      "recommended": false,
+      "sample_data": "order_date",
+      "effect": "通用时间列 override。Pie 当前 controlPanel 没有显式暴露对应字段。",
+      "source": "superset/constants.py + QueryFormData.ts",
+      "status": "低置信，不建议在 guest embedding 中依赖"
+    },
+    {
+      "field_name": "time_column",
+      "data_type": "string | null",
+      "behavior": "override",
+      "safe_for_pie": false,
+      "recommended": false,
+      "sample_data": "order_date",
+      "effect": "底层 QueryObject 时间列 override；当前图没有官方时间 section。",
+      "source": "superset/constants.py + QueryFormData.ts",
+      "status": "低置信，不建议在 guest embedding 中依赖"
+    },
+    {
+      "field_name": "time_grain",
+      "data_type": "string | null",
+      "behavior": "override",
+      "safe_for_pie": false,
+      "recommended": false,
+      "sample_data": "P1D",
+      "effect": "底层 QueryObject 时间粒度 override；当前图没有官方时间 section。",
+      "source": "superset/constants.py + QueryFormData.ts",
+      "status": "低置信，不建议在 guest embedding 中依赖"
+    },
+    {
+      "field_name": "relative_start",
+      "data_type": "string",
+      "behavior": "override",
+      "safe_for_pie": false,
+      "recommended": false,
+      "sample_data": "now",
+      "effect": "进入 query extras 的相对开始时间；Pie 当前没有明确时间控件闭环。",
+      "source": "superset/constants.py + superset/utils/core.py",
+      "status": "低置信，不建议在 guest embedding 中依赖"
+    },
+    {
+      "field_name": "relative_end",
+      "data_type": "string",
+      "behavior": "override",
+      "safe_for_pie": false,
+      "recommended": false,
+      "sample_data": "today",
+      "effect": "进入 query extras 的相对结束时间；Pie 当前没有明确时间控件闭环。",
+      "source": "superset/constants.py + superset/utils/core.py",
+      "status": "低置信，不建议在 guest embedding 中依赖"
+    },
+    {
+      "field_name": "interactive_groupby",
+      "data_type": "array[string]",
+      "behavior": "append",
+      "safe_for_pie": false,
+      "recommended": false,
+      "sample_data": [
+        "region"
+      ],
+      "effect": "通用交互字段；Pie 默认 buildQuery/transformProps 不直接消费它。",
+      "source": "QueryFormData.ts + query/constants.ts"
+    },
+    {
+      "field_name": "interactive_highlight",
+      "data_type": "array[string]",
+      "behavior": "append",
+      "safe_for_pie": false,
+      "recommended": false,
+      "sample_data": [
+        "region"
+      ],
+      "effect": "通用交互字段；Pie 默认不直接消费。",
+      "source": "QueryFormData.ts + query/constants.ts"
+    },
+    {
+      "field_name": "interactive_drilldown",
+      "data_type": "array[string]",
+      "behavior": "append",
+      "safe_for_pie": false,
+      "recommended": false,
+      "sample_data": [
+        "region"
+      ],
+      "effect": "通用交互字段；Pie 默认不直接消费。",
+      "source": "QueryFormData.ts + query/constants.ts"
+    }
+  ],
+  "minimal_extra_form_data_template": {
+    "filters": [
+      {
+        "col": "region",
+        "op": "IN",
+        "val": [
+          "East"
+        ]
+      }
+    ]
+  },
+  "recommended_extra_form_data_template": {
+    "filters": [
+      {
+        "col": "region",
+        "op": "IN",
+        "val": [
+          "East",
+          "West"
+        ]
+      }
+    ],
+    "adhoc_filters": [
+      {
+        "expressionType": "SIMPLE",
+        "clause": "WHERE",
+        "subject": "region",
+        "operator": "IN",
+        "comparator": [
+          "East",
+          "West"
+        ]
+      }
+    ],
+    "custom_form_data": {}
+  },
+  "unsafe_root_form_data_changes": [
+    {
+      "field_name": "slice_id",
+      "reason": "与保存态图表 id 不一致会被后端立即判定为请求了另一张图。"
+    },
+    {
+      "field_name": "datasource / viz_type",
+      "reason": "guest embedding 不应修改图表绑定的数据集或图表类型。"
+    },
+    {
+      "field_name": "metric",
+      "reason": "`extractQueryFields()` 会把它折叠成 query `metrics`；它是当前图最核心的查询定义字段。"
+    },
+    {
+      "field_name": "groupby",
+      "reason": "`extractQueryFields()` 会把它折叠成 query `columns`；属于 query_context_modified() 直接关注的查询维度。"
+    },
+    {
+      "field_name": "sort_by_metric",
+      "reason": "会改变 buildQuery 生成的 `orderby`。"
+    },
+    {
+      "field_name": "adhoc_filters",
+      "reason": "保存态 root filters 是图表定义的一部分；动态筛选应优先通过 extra_form_data 追加。"
+    },
+    {
+      "field_name": "row_limit",
+      "reason": "会改变实际查询返回的记录数量。"
+    },
+    {
+      "field_name": "color_scheme / threshold_for_other / roseType / show_legend / legendType / legendOrientation / legendMargin / show_labels_threshold / label_type / label_template / number_format / currency_format / date_format / show_labels / labels_outside / label_line / show_total / outerRadius / donut / innerRadius",
+      "reason": "这些字段虽然多数不改 SQL，但都会直接改变图表定义、可视化语义或切片聚合方式。"
+    }
+  ],
+  "practical_guidance": {
+    "best_practice": [
+      "先从保存态 Pie Chart 读取完整 form_data。",
+      "根层字段保持不变，尤其保留 `metric`、`groupby`、`sort_by_metric` 和所有图表样式字段。",
+      "只在 `extra_form_data` 中放动态 `filters` / `adhoc_filters`。",
+      "如果只是做第三方筛选联动，优先使用 `filters` / `adhoc_filters`，不要在 guest 请求里改 root 图表定义。"
+    ],
+    "avoid": [
+      "不要在 guest embedding 请求里把 Pie 的 root 指标字段改成另一套 `metric`。",
+      "不要把运行时 camelCase 字段名当成 API root 键使用。",
+      "不要在当前图上依赖 `extra_form_data` 的时间 override 键；源码缺少明确的 Pie 时间控件闭环。"
+    ]
+  }
+}

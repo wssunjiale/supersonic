@@ -125,6 +125,11 @@ public class ChatManageServiceImpl implements ChatManageService {
     }
 
     @Override
+    public ChatQueryDO getChatQueryDO(Long queryId) {
+        return chatQueryRepository.getChatQueryDO(queryId);
+    }
+
+    @Override
     public List<QueryResp> getChatQueries(Integer chatId) {
         List<QueryResp> queries = chatQueryRepository.getChatQueries(chatId);
         fillParseInfo(queries);
@@ -234,6 +239,10 @@ public class ChatManageServiceImpl implements ChatManageService {
     @Override
     public SemanticParseInfo getParseInfo(Long questionId, int parseId) {
         ChatParseDO chatParseDO = chatQueryRepository.getParseInfo(questionId, parseId);
-        return JSONObject.parseObject(chatParseDO.getParseInfo(), SemanticParseInfo.class);
+        if (chatParseDO == null) {
+            return null;
+        } else {
+            return JSONObject.parseObject(chatParseDO.getParseInfo(), SemanticParseInfo.class);
+        }
     }
 }

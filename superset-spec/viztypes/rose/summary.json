@@ -1,0 +1,121 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "rose",
+  "display_name": "Nightingale Rose Chart",
+  "normalized_summary": {
+    "category": "composition",
+    "tags": [
+      "rose",
+      "polar",
+      "composition",
+      "categorical"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "groupby",
+        "required": true,
+        "description": "分类维度字段，用于定义玫瑰图的辐条类别。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于计算每个类别的数值（柱长/面积依据）。"
+      },
+      {
+        "key": "rose_type",
+        "required": false,
+        "description": "玫瑰图类型（radius/area），控制数值的展示方式（半径/面积）。"
+      }
+    ],
+    "description_zh": "Rose Chart (Polar Bar) displays categorical data on a polar coordinate system, with each category as a spoke and bar length/area representing metric values.",
+    "visual_shape_zh": "玫瑰图（极坐标柱状型）",
+    "use_cases_zh": [
+      "类别数值的极坐标对比（如各产品销售额、各区域用户数）",
+      "周期性类别数据展示",
+      "视觉化的类别占比/数值对比"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "rose",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/rose-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/rose-form-data-schema.json",
+      "control-schema": "form-data-schema/rose-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Nightingale Rose Chart",
+    "viztype": "rose",
+    "详细描述": "Rose Chart (Polar Bar) displays categorical data on a polar coordinate system, with each category as a spoke and bar length/area representing metric values.",
+    "表现形态": "玫瑰图（极坐标柱状型）",
+    "适用场景": [
+      "类别数值的极坐标对比（如各产品销售额、各区域用户数）",
+      "周期性类别数据展示",
+      "视觉化的类别占比/数值对比"
+    ],
+    "vizKey": "Rose",
+    "pluginCategory": "Composition",
+    "pluginTags": [],
+    "category": "composition",
+    "tags": [
+      "rose",
+      "polar",
+      "composition",
+      "categorical"
+    ],
+    "关键字段": [
+      {
+        "key": "groupby",
+        "required": true,
+        "description": "分类维度字段，用于定义玫瑰图的辐条类别。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于计算每个类别的数值（柱长/面积依据）。"
+      },
+      {
+        "key": "rose_type",
+        "required": false,
+        "description": "玫瑰图类型（radius/area），控制数值的展示方式（半径/面积）。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

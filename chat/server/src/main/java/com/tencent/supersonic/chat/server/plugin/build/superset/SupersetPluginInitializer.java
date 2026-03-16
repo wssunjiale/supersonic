@@ -76,8 +76,6 @@ public class SupersetPluginInitializer implements ApplicationRunner {
         config.setEnabled(true);
         config.setAuthEnabled(properties.isAuthEnabled());
         config.setBaseUrl(properties.getBaseUrl());
-        config.setAuthStrategy(properties.getAuthStrategy());
-        config.setApiKey(properties.getApiKey());
         config.setJwtUsername(properties.getJwtUsername());
         config.setJwtPassword(properties.getJwtPassword());
         config.setJwtProvider(properties.getJwtProvider());

@@ -1,13 +1,21 @@
 package com.tencent.supersonic.chat.server.processor.execute;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.tencent.supersonic.chat.api.pojo.response.QueryResult;
 import com.tencent.supersonic.chat.server.agent.Agent;
+import com.tencent.supersonic.chat.server.persistence.dataobject.ChatQueryDO;
+import com.tencent.supersonic.chat.server.persistence.repository.ChatQueryRepository;
 import com.tencent.supersonic.chat.server.pojo.ExecuteContext;
 import com.tencent.supersonic.common.pojo.ChatApp;
 import com.tencent.supersonic.common.pojo.enums.AppModule;
 import com.tencent.supersonic.common.util.ChatAppManager;
+import com.tencent.supersonic.common.util.ContextUtils;
+import com.tencent.supersonic.headless.api.pojo.response.QueryState;
 import dev.langchain4j.data.message.AiMessage;
+import dev.langchain4j.model.StreamingResponseHandler;
 import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.chat.StreamingChatLanguageModel;
 import dev.langchain4j.model.input.Prompt;
 import dev.langchain4j.model.input.PromptTemplate;
 import dev.langchain4j.model.output.Response;
@@ -15,6 +23,7 @@ import dev.langchain4j.provider.ModelProvider;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,8 +33,10 @@ import java.util.Objects;
  * DataInterpretProcessor interprets query result to make it more readable to the users.
  */
 public class DataInterpretProcessor implements ExecuteResultProcessor {
-
+    public static String tip = "AI 回答中...\r\n";
     private static final Logger keyPipelineLog = LoggerFactory.getLogger("keyPipeline");
+
+    private static Map<Long, StringBuffer> resultCache = new HashMap<>();
 
     public static final String APP_KEY = "DATA_INTERPRETER";
     private static final String INSTRUCTION = ""
@@ -34,6 +45,9 @@ public class DataInterpretProcessor implements ExecuteResultProcessor {
             + "result data queried from the databases, please interpret the data and organize a brief answer."
             + "\n#Rules: " + "\n1.ALWAYS respond in the use the same language as the `#Question`."
             + "\n2.ALWAYS reference some key data in the `#Answer`."
+            + "\n3.If `#Data` is empty or contains no data rows, clearly state that no data was found, "
+            + "briefly explain that a summary cannot be computed, and suggest how to adjust the query. "
+            + "Do NOT output placeholder templates."
             + "\n#Question:{{question}} #Data:{{data}} #Answer:";
 
     public DataInterpretProcessor() {
@@ -41,22 +55,58 @@ public class DataInterpretProcessor implements ExecuteResultProcessor {
                 .appModule(AppModule.CHAT).description("通过大模型对结果数据做提炼总结").enable(false).build());
     }
 
+    public static String getTextSummary(Long queryId) {
+        if (resultCache.get(queryId) != null) {
+            return resultCache.get(queryId).toString();
+        }
+        return "";
+    }
+
+    public static Map<Long, StringBuffer> getResultCache() {
+        return resultCache;
+    }
 
     @Override
     public boolean accept(ExecuteContext executeContext) {
         Agent agent = executeContext.getAgent();
         ChatApp chatApp = agent.getChatAppConfig().get(APP_KEY);
-        return Objects.nonNull(chatApp) && chatApp.isEnable();
+        return Objects.nonNull(chatApp) && chatApp.isEnable()
+                && StringUtils.isNotBlank(executeContext.getResponse().getTextResult()) // 如果都没结果，则无法处理
+                && StringUtils.isBlank(executeContext.getResponse().getTextSummary()); // 如果已经有汇总的结果了，无法再次处理
     }
 
     @Override
     public void process(ExecuteContext executeContext) {
         QueryResult queryResult = executeContext.getResponse();
+        if (queryResult == null) {
+            return;
+        }
+
+        if (queryResult.getQueryState() != QueryState.SUCCESS) {
+            return;
+        }
+
+        if (CollectionUtils.isEmpty(queryResult.getQueryResults())) {
+            queryResult
+                    .setTextSummary(buildNoDataSummary(executeContext.getRequest().getQueryText()));
+            return;
+        }
+
         Agent agent = executeContext.getAgent();
         ChatApp chatApp = agent.getChatAppConfig().get(APP_KEY);
 
         Map<String, Object> variable = new HashMap<>();
-        variable.put("question", executeContext.getRequest().getQueryText());
+        String question = executeContext.getResponse().getTextResult();// 结果解析应该用改写的问题，因为改写的内容信息量更大
+        if (executeContext.getParseInfo().getProperties() != null
+                && executeContext.getParseInfo().getProperties().containsKey("CONTEXT")) {
+            Map<String, Object> context = (Map<String, Object>) executeContext.getParseInfo()
+                    .getProperties().get("CONTEXT");
+            if (context.get("queryText") != null
+                    && StringUtils.isNotBlank(context.get("queryText").toString())) {
+                question = context.get("queryText").toString();
+            }
+        }
+        variable.put("question", question);
         variable.put("data", queryResult.getTextResult());
 
         Prompt prompt = PromptTemplate.from(chatApp.getPrompt()).apply(variable);
@@ -69,5 +119,31 @@ public class DataInterpretProcessor implements ExecuteResultProcessor {
         if (StringUtils.isNotBlank(anwser)) {
             queryResult.setTextSummary(anwser);
         }
+    }
+
+    private String buildNoDataSummary(String question) {
+        if (containsCjk(question)) {
+            return "本次查询未返回任何数据行，因此无法进行统计总结。建议：放宽时间范围或筛选条件、核对维度/指标口径与取值、确认数据源是否有数据或权限。";
+        }
+        return "This query returned no data rows, so there is nothing to summarize. "
+                + "Try relaxing the time range/filters, verifying dimension/metric definitions and values, "
+                + "or checking data availability/permissions.";
+    }
+
+    private boolean containsCjk(String text) {
+        if (StringUtils.isBlank(text)) {
+            return false;
+        }
+        for (int i = 0; i < text.length(); i++) {
+            Character.UnicodeBlock block = Character.UnicodeBlock.of(text.charAt(i));
+            if (block == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS
+                    || block == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A
+                    || block == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B
+                    || block == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS
+                    || block == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS_SUPPLEMENT) {
+                return true;
+            }
+        }
+        return false;
     }
 }

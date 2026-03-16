@@ -1,0 +1,454 @@
+{
+  "viz_type": "time_pivot",
+  "display_name": "Time-series Period Pivot",
+  "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/TimePivot/controlPanel.ts",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/TimePivot/controlPanel.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/TimePivot/index.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/NVD3Controls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/transformProps.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/NVD3Vis.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/sections/sections.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/mixins.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/constants.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+    "D:/vsx/sources/superset-6.0.0/superset/views/core.py",
+    "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+    "D:/vsx/sources/superset-6.0.0/superset/viz.py"
+  ],
+  "notes": [
+    "time_pivot 位于 `legacy-preset-chart-nvd3` 插件中，metadata 明确声明 `useLegacyApi=true`，因此前端真实请求路径是 `/superset/explore_json/`，不是 `/api/v1/chart/data`。",
+    "TimePivot 的 controlPanel 有 5 个 section：Time、Query、Chart Options、X Axis、Y Axis。其中 Time section 不是本图私有定义，而是直接复用 `sections.legacyTimeseriesTime`。",
+    "`legacyTimeseriesTime` 会展开出 `granularity`、`granularity_sqla`、`time_grain_sqla`、`time_range` 四个字段。源码标签常量明确：`granularity=Time Granularity`，`granularity_sqla=Time Column`，`time_grain_sqla=Time Grain`。",
+    "`metric` 复用 dndAdhocMetricControl，底层有 `validateNonEmpty`；当前图额外 override 了 `clearable=false`，因此它是高置信必填字段。",
+    "`freq` 是 TimePivot 专属字段，默认值 `W-MON`。后端 `TimePivotViz.get_data()` 会把它传入 pandas `to_offset()`，并据此把时间序列回滚到周期起点，再生成 current / -1 / -2 等 period pivot 系列。",
+    "`TimePivotViz.query_obj()` 会强制把查询指标重写成 `[form_data.metric]`，说明当前图只接受单个 metric。",
+    "`show_legend`、`line_interpolation`、`color_picker`、轴标签/边距/格式等都只是前端 NVD3 渲染字段，不会再生成新的 root form_data 键。",
+    "当前图把 `x_axis_format` 的 default 与 choices override 成 `SMART_NUMBER + D3_FORMAT_OPTIONS`，但 `NVD3Vis.js` 仍把 TimePivot 视作 timeseries 并调用 `getTimeFormatter(xAxisFormat)`。这是 Superset 6.0.0 源码中的 legacy 不一致点，构造模板时应按源码原样记录。"
+  ],
+  "control_overrides": {
+    "metric": {
+      "clearable": false
+    },
+    "x_axis_format": {
+      "default_value": "SMART_NUMBER",
+      "choices": "D3_FORMAT_OPTIONS"
+    }
+  },
+  "form_data_overrides": {
+    "metric": "getStandardizedControls().shiftMetric",
+    "notes": "源码这里传入的是函数引用而不是调用结果；它属于 standardized controls 切换图表时的迁移逻辑，不是常规保存/导出 time_pivot form_data 的主路径。"
+  },
+  "legacy_api_behavior": {
+    "useLegacyApi": true,
+    "frontend_request_endpoint": "/superset/explore_json/",
+    "frontend_request_payload": {
+      "form_data": "<raw form_data>"
+    },
+    "query_builder": "TimePivot 没有专属前端 buildQuery。ChartClient.ts 在 `useLegacyApi=true` 且未注册 buildQuery 时，会把原始 form_data 直接包装进 legacy payload。"
+  },
+  "query_compilation": {
+    "backend_class": "superset/viz.py::TimePivotViz",
+    "base_query": "继承 BaseViz.query_obj()，因此会先处理 legacy filters / extra_form_data，并构造基础 query_obj。",
+    "granularity": "BaseViz.query_obj() 读取 `form_data.granularity_sqla` 写入 `query_obj.granularity`，同时把 `time_grain_sqla` 放进 `query_obj.extras.time_grain_sqla`。",
+    "metrics": "TimePivotViz.query_obj() 强制改写为 `query_obj['metrics'] = [form_data.metric]`。",
+    "returned_data": "TimePivotViz.get_data() 会按 `freq` 回滚周期起点、计算 ranked / series / perc，再 pivot 成 NVD3 line chart 所需的 series 数组。"
+  },
+  "field_categories": {
+    "Time": [
+      {
+        "field_name": "granularity",
+        "description": "The time granularity for the visualization. Note that you can type and use simple natural language as in `10 seconds`, `1 day` or `56 weeks`.",
+        "data_type": "string | null",
+        "enum_values": [
+          null,
+          "PT5S",
+          "PT30S",
+          "PT1M",
+          "PT5M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "P1D",
+          "P7D",
+          "P1W",
+          "week_starting_sunday",
+          "week_ending_saturday",
+          "P1M",
+          "P3M",
+          "P1Y"
+        ],
+        "sample_data": "P1D",
+        "required": false,
+        "embedding": "否",
+        "default_value": "one day",
+        "notes": "这是 legacy Time section 保留的 `Time Granularity` 字段。当前 `BaseViz.query_obj()` 主路径直接读取的是 `granularity_sqla` 而不是它，因此它更像 datasource-specific 的兼容字段。"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "description": "The time column for the visualization. Note that you can define arbitrary expression that return a DATETIME column in the table. Also note that the filter below is applied against this column or expression",
+        "data_type": "string | object | null",
+        "enum_source": "datasource temporal columns；temporalColumnMixin 会把 datasource.defaultTemporalColumn 作为默认值",
+        "sample_data": "order_date",
+        "required": false,
+        "embedding": "extra_form_data.override",
+        "default_value": "datasource.defaultTemporalColumn",
+        "notes": "对 SQLA / temporal dataset 的 time_pivot 来说，这是高重要字段。源码没有显式 `validateNonEmpty`，但当前图属于时序图，通常需要它。"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "description": "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart.",
+        "data_type": "string | null",
+        "enum_source": "datasource.time_grain_sqla",
+        "sample_data": "P1D",
+        "required": false,
+        "embedding": "extra_form_data.override",
+        "default_value": "P1D",
+        "notes": "新建未保存图表时，shared control 会默认回填 `P1D`；已保存图表则保留原值。"
+      },
+      {
+        "field_name": "time_range",
+        "description": "This control filters the whole chart based on the selected time range. All relative times, e.g. \"Last month\", \"Last 7 days\", \"now\", etc. are evaluated on the server using the server's local time (sans timezone).",
+        "data_type": "string",
+        "sample_data": "Last 90 days",
+        "required": false,
+        "embedding": "extra_form_data.override",
+        "default_value": "No filter",
+        "notes": "`legacyTimeseriesTime` 明确保留 root `time_range`。同时 datePickerInAdhocFilterMixin 也说明：legacy 图存在 time_range 控件时，不再自动把默认时间过滤复制进 adhoc_filters。"
+      }
+    ],
+    "Query": [
+      {
+        "field_name": "metric",
+        "description": "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+        "data_type": "string | object",
+        "enum_source": "saved metrics + adhoc metrics",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        },
+        "required": true,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "底层复用 dndAdhocMetricControl，自带 `validateNonEmpty`；当前图还 override 了 `clearable=false`。"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "description": "字段标签为 Filters。",
+        "data_type": "array[object]",
+        "enum_source": "datasource columns + saved metrics + 当前 metric",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "APAC"
+            ]
+          }
+        ],
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "default_value": [],
+        "notes": "dndAdhocFilterControl 会把当前 `metric` 放进 selectedMetrics 上下文。"
+      },
+      {
+        "field_name": "freq",
+        "description": "The periodicity over which to pivot time. Users can provide Pandas offset alias.",
+        "data_type": "string",
+        "enum_values": [
+          "AS",
+          "52W-MON",
+          "W-SUN",
+          "W-MON",
+          "D",
+          "4W-MON"
+        ],
+        "sample_data": "W-MON",
+        "required": false,
+        "embedding": "否",
+        "default_value": "W-MON",
+        "notes": "虽然控件给了默认值，因此 UI 新图通常会带上它；但后端 `to_offset(self.form_data.get('freq'))` 直接依赖该字段，手工 API 创建时建议显式传。"
+      }
+    ],
+    "Chart Options": [
+      {
+        "field_name": "show_legend",
+        "runtime_alias": "showLegend",
+        "description": "Whether to display the legend (toggles)",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true
+      },
+      {
+        "field_name": "line_interpolation",
+        "runtime_alias": "lineInterpolation",
+        "description": "Line interpolation as defined by d3.js",
+        "data_type": "string",
+        "enum_values": [
+          "linear",
+          "basis",
+          "cardinal",
+          "monotone",
+          "step-before",
+          "step-after"
+        ],
+        "sample_data": "linear",
+        "required": false,
+        "embedding": "否",
+        "default_value": "linear"
+      },
+      {
+        "field_name": "color_picker",
+        "runtime_alias": "colorPicker -> baseColor",
+        "description": "Use this to define a static color for all circles",
+        "data_type": "object",
+        "sample_data": {
+          "r": 0,
+          "g": 122,
+          "b": 135,
+          "a": 1
+        },
+        "required": false,
+        "embedding": "否",
+        "default_value": {
+          "r": 0,
+          "g": 122,
+          "b": 135,
+          "a": 1
+        },
+        "notes": "legacy 文案仍写着 `all circles`，但 TimePivot 实际会在 NVD3Vis 中把它作为 baseColor，并按 `rank/perc` 生成同色不同透明度的 period pivot 系列。"
+      }
+    ],
+    "X Axis": [
+      {
+        "field_name": "x_axis_label",
+        "runtime_alias": "xAxisLabel",
+        "description": "源码未提供额外描述；字段标签为 X Axis Label。",
+        "data_type": "string",
+        "sample_data": "Time",
+        "required": false,
+        "embedding": "否",
+        "default_value": ""
+      },
+      {
+        "field_name": "bottom_margin",
+        "runtime_alias": "bottomMargin",
+        "description": "Bottom margin, in pixels, allowing for more room for axis labels",
+        "data_type": "string | integer",
+        "enum_values": [
+          "auto",
+          50,
+          75,
+          100,
+          125,
+          150,
+          200
+        ],
+        "sample_data": "auto",
+        "required": false,
+        "embedding": "否",
+        "default_value": "auto"
+      },
+      {
+        "field_name": "x_axis_showminmax",
+        "runtime_alias": "xAxisShowminmax -> xAxisShowMinMax",
+        "description": "Whether to display the min and max values of the X-axis",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      },
+      {
+        "field_name": "x_axis_format",
+        "runtime_alias": "xAxisFormat",
+        "description": "D3 format syntax: https://github.com/d3/d3-format",
+        "data_type": "string",
+        "enum_source": "D3_FORMAT_OPTIONS",
+        "sample_data": "SMART_NUMBER",
+        "required": false,
+        "embedding": "否",
+        "default_value": "SMART_NUMBER",
+        "notes": "TimePivot controlPanel 明确 override 成 `D3_FORMAT_OPTIONS + SMART_NUMBER`；但 NVD3Vis 仍把它走 `getTimeFormatter(xAxisFormat)`。这是当前源码中的 legacy 不一致点。"
+      }
+    ],
+    "Y Axis": [
+      {
+        "field_name": "y_axis_label",
+        "runtime_alias": "yAxisLabel",
+        "description": "源码未提供额外描述；字段标签为 Y Axis Label。",
+        "data_type": "string",
+        "sample_data": "Sales",
+        "required": false,
+        "embedding": "否",
+        "default_value": ""
+      },
+      {
+        "field_name": "left_margin",
+        "runtime_alias": "leftMargin",
+        "description": "Left margin, in pixels, allowing for more room for axis labels",
+        "data_type": "string | integer",
+        "enum_values": [
+          "auto",
+          50,
+          75,
+          100,
+          125,
+          150,
+          200
+        ],
+        "sample_data": "auto",
+        "required": false,
+        "embedding": "否",
+        "default_value": "auto"
+      },
+      {
+        "field_name": "y_axis_showminmax",
+        "runtime_alias": "yAxisShowminmax -> yAxisShowMinMax",
+        "description": "Whether to display the min and max values of the Y-axis",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      },
+      {
+        "field_name": "y_log_scale",
+        "runtime_alias": "yLogScale",
+        "description": "Use a log scale for the Y-axis",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      },
+      {
+        "field_name": "y_axis_format",
+        "runtime_alias": "yAxisFormat",
+        "description": "D3 format syntax: https://github.com/d3/d3-format",
+        "data_type": "string",
+        "enum_source": "D3_FORMAT_OPTIONS",
+        "sample_data": "SMART_NUMBER",
+        "required": false,
+        "embedding": "否",
+        "default_value": "SMART_NUMBER"
+      },
+      {
+        "field_name": "y_axis_bounds",
+        "runtime_alias": "yAxisBounds",
+        "description": "Bounds for the Y-axis. When left empty, the bounds are dynamically defined based on the min/max of the data. Note that this feature will only expand the axis range. It won't narrow the data's extent.",
+        "data_type": "array[number | null, number | null]",
+        "sample_data": [
+          null,
+          null
+        ],
+        "required": false,
+        "embedding": "否",
+        "default_value": [
+          null,
+          null
+        ]
+      }
+    ]
+  },
+  "runtime_only_or_non_template_fields": {
+    "viz_switch_only": [
+      {
+        "field_name": "formDataOverrides.metric",
+        "reason": "只在 standardized controls 切换 viz_type 时参与迁移，不是常规导出/保存 time_pivot form_data 的必经步骤。"
+      }
+    ],
+    "runtime_prop_aliases": [
+      {
+        "field_name": "showLegend / lineInterpolation / xAxisFormat / yAxisFormat / colorPicker / baseColor",
+        "reason": "这些是 transformProps.js / NVD3Vis.js 里的运行时 prop 名，不是 API root form_data 键名。"
+      },
+      {
+        "field_name": "xAxisShowMinMax / yAxisShowMinMax",
+        "reason": "它们由 `x_axis_showminmax`、`y_axis_showminmax` 派生，不是 root form_data 键名。"
+      }
+    ],
+    "backend_response_only_fields": [
+      {
+        "field_name": "series.rank",
+        "reason": "TimePivotViz.get_data() 在返回结果里为每条透视序列附加的排序等级，不是 root form_data 字段。"
+      },
+      {
+        "field_name": "series.perc",
+        "reason": "TimePivotViz.get_data() 为每条透视序列计算的透明度比例，不是 root form_data 字段。"
+      },
+      {
+        "field_name": "payload.form_data",
+        "reason": "这是 legacy `/superset/explore_json/` 请求外层包裹字段，不是图表内部 root form_data 字段。"
+      }
+    ]
+  },
+  "api_usage_guidance": {
+    "high_confidence_required_fields": [
+      "datasource",
+      "viz_type",
+      "metric",
+      "freq"
+    ],
+    "conditional_required_fields": [
+      "granularity_sqla（SQLA / temporal dataset 场景）",
+      "time_range（如果你希望显式复现 UI 保存态时间条件）",
+      "time_grain_sqla（如果你希望显式复现 UI 保存态粒度）"
+    ],
+    "recommended_always_set": [
+      "granularity_sqla",
+      "time_grain_sqla",
+      "time_range",
+      "adhoc_filters",
+      "show_legend",
+      "line_interpolation",
+      "color_picker",
+      "x_axis_format",
+      "y_axis_format"
+    ],
+    "api_field_examples": [
+      "granularity_sqla",
+      "time_grain_sqla",
+      "time_range",
+      "metric",
+      "freq",
+      "show_legend",
+      "line_interpolation",
+      "color_picker"
+    ],
+    "avoid_confusion": [
+      "不要把 `time_pivot` 当成标准 chart data API 图表去套 `/api/v1/chart/data` 的 `query_context` 模板。",
+      "不要把运行时 camelCase 字段名 `showLegend`、`lineInterpolation`、`colorPicker`、`baseColor` 写回 root form_data。",
+      "不要忽略 `freq`；后端 period pivot 直接依赖它。",
+      "对于 SQLA 场景，`granularity_sqla` 才是源码里高重要的 Time Column 字段。"
+    ]
+  }
+}

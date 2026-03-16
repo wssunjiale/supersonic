@@ -1,0 +1,536 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "heatmap_v2",
+  "display_name": "Heatmap",
+  "selection_summary": {
+    "category": "distribution",
+    "tags": [
+      "heatmap",
+      "distribution",
+      "2d",
+      "color_intensity"
+    ],
+    "description_zh": "Heatmap displays two-dimensional numerical data using color intensity, with X/Y axes as categorical dimensions and color representing metric values.",
+    "visual_shape_zh": "热力图（二维分布型）",
+    "use_cases_zh": [
+      "二维维度的数值分布（如时间×区域、产品×渠道）",
+      "热点/冷点分析",
+      "多维度交叉分析"
+    ],
+    "required_slots": [
+      {
+        "field_name": "groupby",
+        "required": true,
+        "slot_kind": "dimension_list",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [
+          "<dimension_column>"
+        ],
+        "source_categories": [
+          "Query / Axes & Metric"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Dimension to use on y-axis."
+        ]
+      },
+      {
+        "field_name": "metric",
+        "required": true,
+        "slot_kind": "metric",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1",
+        "placeholder": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        },
+        "source_categories": [
+          "Query / Axes & Metric"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+        ]
+      },
+      {
+        "field_name": "x_axis",
+        "required": true,
+        "slot_kind": "x_axis",
+        "accepted_dataset_roles": [
+          "time_dimension",
+          "dimension"
+        ],
+        "cardinality": "1",
+        "placeholder": "<x_axis_column>",
+        "source_categories": [
+          "Query / Axes & Metric",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Dimension to use on x-axis.",
+          "X轴分类维度字段，用于定义热力图的横向维度。"
+        ]
+      },
+      {
+        "field_name": "y_axis",
+        "required": true,
+        "slot_kind": "y_axis",
+        "accepted_dataset_roles": [
+          "metric",
+          "dimension"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<y_axis_column_or_metric>",
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Y轴分类维度字段，用于定义热力图的纵向维度。"
+        ]
+      },
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "聚合指标，用于计算每个交叉点的数值（颜色依据）。"
+        ]
+      }
+    ],
+    "optional_slots": [
+      {
+        "field_name": "adhoc_filters",
+        "required": false,
+        "slot_kind": "filter_list",
+        "accepted_dataset_roles": [
+          "filter_context"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [],
+        "source_categories": [
+          "Query / Filters, Limit & Time Context"
+        ],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "源码未提供额外描述；字段标签为 Filters。"
+        ]
+      },
+      {
+        "field_name": "granularity_sqla",
+        "required": false,
+        "slot_kind": "time_column",
+        "accepted_dataset_roles": [
+          "time_dimension"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<time_column>",
+        "source_categories": [
+          "Query / Filters, Limit & Time Context"
+        ],
+        "embedding_modes": [
+          "extra_form_data.override"
+        ],
+        "descriptions": [
+          "The time column for the visualization. Note that you can define arbitrary expression that return a DATETIME column in the table. Also note that the filter below is applied against this column or expression"
+        ]
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "required": false,
+        "slot_kind": "time_grain",
+        "accepted_dataset_roles": [
+          "time_grain"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "P1D",
+        "source_categories": [
+          "Query / Filters, Limit & Time Context"
+        ],
+        "embedding_modes": [
+          "extra_form_data.override"
+        ],
+        "descriptions": [
+          "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart."
+        ]
+      },
+      {
+        "field_name": "time_range",
+        "required": false,
+        "slot_kind": "time_or_axis",
+        "accepted_dataset_roles": [
+          "time_dimension",
+          "dimension"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<time_or_axis_column>",
+        "source_categories": [
+          "Query / Filters, Limit & Time Context"
+        ],
+        "embedding_modes": [
+          "extra_form_data.override"
+        ],
+        "descriptions": [
+          "This control filters the whole chart based on the selected time range. All relative times, e.g. \"Last month\", \"Last 7 days\", \"now\", etc. are evaluated on the server using the server's local time (sans timezone). All tooltips and placeholder times are expressed in UTC (sans timezone). The timestamps are then evaluated by the database using the engine's local timezone. Note one can explicitly set the timezone per the ISO 8601 format if specifying either the start and/or end time."
+        ]
+      }
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "category_dimension",
+      "dimension",
+      "metric",
+      "saved_metric",
+      "time_dimension"
+    ],
+    "optional_dataset_roles": [
+      "dimension",
+      "filter_context",
+      "time_dimension",
+      "time_grain"
+    ],
+    "dataset_role_inventory": {
+      "adhoc_metric": [
+        "metric",
+        "metrics"
+      ],
+      "category_dimension": [
+        "groupby"
+      ],
+      "dimension": [
+        "groupby",
+        "time_range",
+        "x_axis",
+        "y_axis"
+      ],
+      "filter_context": [
+        "adhoc_filters"
+      ],
+      "metric": [
+        "metric",
+        "metrics",
+        "y_axis"
+      ],
+      "saved_metric": [
+        "metric",
+        "metrics"
+      ],
+      "time_dimension": [
+        "granularity_sqla",
+        "time_range",
+        "x_axis"
+      ],
+      "time_grain": [
+        "time_grain_sqla"
+      ]
+    },
+    "non_binding_control_names": [
+      "border_color",
+      "border_width",
+      "bottom_margin",
+      "currency_format",
+      "left_margin",
+      "legend_type",
+      "linear_color_scheme",
+      "normalize_across",
+      "normalized",
+      "row_limit",
+      "show_legend",
+      "show_percentage",
+      "show_values",
+      "sort_x_axis",
+      "sort_y_axis",
+      "value_bounds",
+      "xAxisLabelRotation",
+      "x_axis_time_format",
+      "xscale_interval",
+      "y_axis_format",
+      "yscale_interval"
+    ],
+    "embedding_runtime_field_names": [
+      "adhoc_filters",
+      "custom_form_data",
+      "filters",
+      "granularity_sqla",
+      "interactive_groupby",
+      "time_grain_sqla",
+      "time_range"
+    ],
+    "minimal_template_keys": [
+      "datasource",
+      "groupby",
+      "metric",
+      "viz_type",
+      "x_axis"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "border_color",
+      "border_width",
+      "bottom_margin",
+      "datasource",
+      "groupby",
+      "left_margin",
+      "legend_type",
+      "linear_color_scheme",
+      "metric",
+      "normalize_across",
+      "normalized",
+      "row_limit",
+      "show_legend",
+      "show_percentage",
+      "show_values",
+      "time_range",
+      "value_bounds",
+      "viz_type",
+      "xAxisLabelRotation",
+      "x_axis",
+      "x_axis_time_format",
+      "xscale_interval",
+      "y_axis_format",
+      "yscale_interval"
+    ],
+    "structural_flags": {
+      "time_series": true,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": true,
+      "flow_like": false,
+      "distribution_like": true,
+      "supports_breakdown": true,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": true,
+      "needs_dimension": true
+    },
+    "selection_hints": [
+      "优先用于趋势、演化、时间对比类问题。",
+      "至少需要 1 个可聚合指标字段。",
+      "需要时间字段，通常还应结合时间粒度或时间范围。",
+      "需要至少 1 个维度字段用于分组、拆分或定位。",
+      "需要地理信息字段；点位地图优先经纬度，区域地图优先行政区维度。",
+      "支持按维度拆分多序列或子组。",
+      "可结合时间粒度控制趋势聚合窗口。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：二维维度的数值分布（如时间×区域、产品×渠道）；热点/冷点分析；多维度交叉分析"
+    ]
+  },
+  "selection_prompt_card": {
+    "viz_type": "heatmap_v2",
+    "display_name": "Heatmap",
+    "category": "distribution",
+    "description_zh": "Heatmap displays two-dimensional numerical data using color intensity, with X/Y axes as categorical dimensions and color representing metric values.",
+    "visual_shape_zh": "热力图（二维分布型）",
+    "best_for": [
+      "二维维度的数值分布（如时间×区域、产品×渠道）",
+      "热点/冷点分析",
+      "多维度交叉分析"
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "category_dimension",
+      "dimension",
+      "metric",
+      "saved_metric",
+      "time_dimension"
+    ],
+    "optional_dataset_roles": [
+      "dimension",
+      "filter_context",
+      "time_dimension",
+      "time_grain"
+    ],
+    "required_slots": [
+      {
+        "field_name": "groupby",
+        "required": true,
+        "slot_kind": "dimension_list",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [
+          "<dimension_column>"
+        ],
+        "source_categories": [
+          "Query / Axes & Metric"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Dimension to use on y-axis."
+        ]
+      },
+      {
+        "field_name": "metric",
+        "required": true,
+        "slot_kind": "metric",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1",
+        "placeholder": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        },
+        "source_categories": [
+          "Query / Axes & Metric"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+        ]
+      },
+      {
+        "field_name": "x_axis",
+        "required": true,
+        "slot_kind": "x_axis",
+        "accepted_dataset_roles": [
+          "time_dimension",
+          "dimension"
+        ],
+        "cardinality": "1",
+        "placeholder": "<x_axis_column>",
+        "source_categories": [
+          "Query / Axes & Metric",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Dimension to use on x-axis.",
+          "X轴分类维度字段，用于定义热力图的横向维度。"
+        ]
+      },
+      {
+        "field_name": "y_axis",
+        "required": true,
+        "slot_kind": "y_axis",
+        "accepted_dataset_roles": [
+          "metric",
+          "dimension"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<y_axis_column_or_metric>",
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Y轴分类维度字段，用于定义热力图的纵向维度。"
+        ]
+      },
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "聚合指标，用于计算每个交叉点的数值（颜色依据）。"
+        ]
+      }
+    ],
+    "optional_slot_names": [
+      "adhoc_filters",
+      "granularity_sqla",
+      "time_grain_sqla",
+      "time_range"
+    ],
+    "structural_flags": {
+      "time_series": true,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": true,
+      "flow_like": false,
+      "distribution_like": true,
+      "supports_breakdown": true,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": true,
+      "needs_dimension": true
+    },
+    "selection_hints": [
+      "优先用于趋势、演化、时间对比类问题。",
+      "至少需要 1 个可聚合指标字段。",
+      "需要时间字段，通常还应结合时间粒度或时间范围。",
+      "需要至少 1 个维度字段用于分组、拆分或定位。",
+      "需要地理信息字段；点位地图优先经纬度，区域地图优先行政区维度。",
+      "支持按维度拆分多序列或子组。",
+      "可结合时间粒度控制趋势聚合窗口。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：二维维度的数值分布（如时间×区域、产品×渠道）；热点/冷点分析；多维度交叉分析"
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "heatmap_v2",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/heatmap_v2-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/heatmap_v2-form-data-schema.json",
+      "control-schema": "form-data-schema/heatmap_v2-schema.json"
+    }
+  }
+}

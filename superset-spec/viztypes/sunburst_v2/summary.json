@@ -1,0 +1,121 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "sunburst_v2",
+  "display_name": "Sunburst Chart",
+  "normalized_summary": {
+    "category": "hierarchy",
+    "tags": [
+      "sunburst",
+      "hierarchy",
+      "ring",
+      "proportion"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "groupby",
+        "required": true,
+        "description": "分类维度字段（多层级），定义旭日图的环形层级（如region、country、city）。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于计算每个层级分段的大小（面积依据）。"
+      },
+      {
+        "key": "secondary_metric",
+        "required": false,
+        "description": "次要指标，用于辅助分析层级分段的补充维度数值。"
+      }
+    ],
+    "description_zh": "Sunburst Chart displays hierarchical data as concentric circles, with each level of the hierarchy represented by a ring and segment size proportional to metric values.",
+    "visual_shape_zh": "旭日图（层级环形型）",
+    "use_cases_zh": [
+      "层级化数据占比分析（如地区-品类-产品的销售额分布）",
+      "多维度层级的钻取分析",
+      "核心节点的层级贡献度展示"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "sunburst_v2",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/sunburst_v2-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/sunburst_v2-form-data-schema.json",
+      "control-schema": "form-data-schema/sunburst_v2-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Sunburst Chart",
+    "viztype": "sunburst_v2",
+    "详细描述": "Sunburst Chart displays hierarchical data as concentric circles, with each level of the hierarchy represented by a ring and segment size proportional to metric values.",
+    "表现形态": "旭日图（层级环形型）",
+    "适用场景": [
+      "层级化数据占比分析（如地区-品类-产品的销售额分布）",
+      "多维度层级的钻取分析",
+      "核心节点的层级贡献度展示"
+    ],
+    "vizKey": "Sunburst",
+    "pluginCategory": "Hierarchy",
+    "pluginTags": [],
+    "category": "hierarchy",
+    "tags": [
+      "sunburst",
+      "hierarchy",
+      "ring",
+      "proportion"
+    ],
+    "关键字段": [
+      {
+        "key": "groupby",
+        "required": true,
+        "description": "分类维度字段（多层级），定义旭日图的环形层级（如region、country、city）。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于计算每个层级分段的大小（面积依据）。"
+      },
+      {
+        "key": "secondary_metric",
+        "required": false,
+        "description": "次要指标，用于辅助分析层级分段的补充维度数值。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

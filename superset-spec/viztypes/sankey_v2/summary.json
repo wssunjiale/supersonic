@@ -1,0 +1,131 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "sankey_v2",
+  "display_name": "Sankey Chart",
+  "normalized_summary": {
+    "category": "flow",
+    "tags": [
+      "sankey",
+      "flow",
+      "relationship",
+      "hierarchy"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "groupby",
+        "required": true,
+        "description": "分类维度字段，需包含source（源节点）、target（目标节点）两个维度，定义桑基图的节点与流向。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于计算节点间的流量值（线条宽度依据）。"
+      },
+      {
+        "key": "node_width",
+        "required": false,
+        "description": "节点宽度（像素），控制桑基图节点的显示宽度。"
+      },
+      {
+        "key": "node_gap",
+        "required": false,
+        "description": "节点间距（像素），控制同层级节点间的间距。"
+      }
+    ],
+    "description_zh": "Sankey Diagram displays flow relationships between entities, with line width representing the volume of flow between source and target nodes.",
+    "visual_shape_zh": "桑基图（流向型）",
+    "use_cases_zh": [
+      "实体间流向/流量关系展示（如用户行为路径、资金流转）",
+      "层级间的流量占比分析",
+      "多维度的流转链路可视化"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "sankey_v2",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/sankey_v2-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/sankey_v2-form-data-schema.json",
+      "control-schema": "form-data-schema/sankey_v2-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Sankey Chart",
+    "viztype": "sankey_v2",
+    "详细描述": "Sankey Diagram displays flow relationships between entities, with line width representing the volume of flow between source and target nodes.",
+    "表现形态": "桑基图（流向型）",
+    "适用场景": [
+      "实体间流向/流量关系展示（如用户行为路径、资金流转）",
+      "层级间的流量占比分析",
+      "多维度的流转链路可视化"
+    ],
+    "vizKey": "Sankey",
+    "pluginCategory": "Flow",
+    "pluginTags": [],
+    "category": "flow",
+    "tags": [
+      "sankey",
+      "flow",
+      "relationship",
+      "hierarchy"
+    ],
+    "关键字段": [
+      {
+        "key": "groupby",
+        "required": true,
+        "description": "分类维度字段，需包含source（源节点）、target（目标节点）两个维度，定义桑基图的节点与流向。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于计算节点间的流量值（线条宽度依据）。"
+      },
+      {
+        "key": "node_width",
+        "required": false,
+        "description": "节点宽度（像素），控制桑基图节点的显示宽度。"
+      },
+      {
+        "key": "node_gap",
+        "required": false,
+        "description": "节点间距（像素），控制同层级节点间的间距。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

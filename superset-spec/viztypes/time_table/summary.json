@@ -1,0 +1,141 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "time_table",
+  "display_name": "Time-series Table",
+  "normalized_summary": {
+    "category": "table",
+    "tags": [
+      "time_table",
+      "sparkline",
+      "time_series",
+      "comparison"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "granularity_sqla",
+        "required": true,
+        "description": "时间粒度字段，定义时间表的时间轴维度（如小时、天、月）。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于时间表中数值列的计算。"
+      },
+      {
+        "key": "spark_type",
+        "required": false,
+        "description": "迷你图类型（line/bar/area），控制单元格内迷你图的展示形态。"
+      },
+      {
+        "key": "comparison_type",
+        "required": false,
+        "description": "对比类型（同比/环比），用于展示指标的时间对比结果。"
+      },
+      {
+        "key": "date_format",
+        "required": false,
+        "description": "日期格式，定义时间列的显示格式（如YYYY-MM-DD）。"
+      }
+    ],
+    "description_zh": "Time Table displays time-series data in a tabular format with support for sparklines and time-based comparisons (e.g., period-over-period).",
+    "visual_shape_zh": "时间表（带迷你图的时间列表示）",
+    "use_cases_zh": [
+      "带趋势的时间数据展示（如每日指标+迷你折线图）",
+      "多指标的时间对比（同比/环比）",
+      "紧凑的时间序列报表"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "time_table",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/time_table-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/time_table-form-data-schema.json",
+      "control-schema": "form-data-schema/time_table-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Time-series Table",
+    "viztype": "time_table",
+    "详细描述": "Time Table displays time-series data in a tabular format with support for sparklines and time-based comparisons (e.g., period-over-period).",
+    "表现形态": "时间表（带迷你图的时间列表示）",
+    "适用场景": [
+      "带趋势的时间数据展示（如每日指标+迷你折线图）",
+      "多指标的时间对比（同比/环比）",
+      "紧凑的时间序列报表"
+    ],
+    "vizKey": "TimeTable",
+    "pluginCategory": "Table",
+    "pluginTags": [],
+    "category": "table",
+    "tags": [
+      "time_table",
+      "sparkline",
+      "time_series",
+      "comparison"
+    ],
+    "关键字段": [
+      {
+        "key": "granularity_sqla",
+        "required": true,
+        "description": "时间粒度字段，定义时间表的时间轴维度（如小时、天、月）。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于时间表中数值列的计算。"
+      },
+      {
+        "key": "spark_type",
+        "required": false,
+        "description": "迷你图类型（line/bar/area），控制单元格内迷你图的展示形态。"
+      },
+      {
+        "key": "comparison_type",
+        "required": false,
+        "description": "对比类型（同比/环比），用于展示指标的时间对比结果。"
+      },
+      {
+        "key": "date_format",
+        "required": false,
+        "description": "日期格式，定义时间列的显示格式（如YYYY-MM-DD）。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

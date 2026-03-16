@@ -11,6 +11,8 @@ import com.tencent.supersonic.common.pojo.QueryColumn;
 import com.tencent.supersonic.common.service.ChatModelService;
 import com.tencent.supersonic.common.util.ContextUtils;
 import com.tencent.supersonic.common.util.JsonUtil;
+import com.tencent.supersonic.headless.api.pojo.SemanticParseInfo;
+import com.tencent.supersonic.headless.server.sync.superset.SupersetDatasetInfo;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.input.Prompt;
@@ -27,6 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.DoubleSummaryStatistics;
@@ -46,22 +49,24 @@ import java.util.stream.Stream;
 public class SupersetVizTypeSelector {
 
     private static final String DEFAULT_VIZ_TYPE = "table";
-    private static final String VIZTYPE_RESOURCE = "docs/viztype.json";
+    private static final List<String> VIZTYPE_RESOURCES = Arrays
+            .asList("superset-spec/catalog/viztypes.json", "viztype.json", "docs/viztype.json");
     private static final VizTypeCatalog VIZTYPE_CATALOG = VizTypeCatalog.load();
     private static final String LLM_PROMPT = "" + "#Role: You are a Superset chart type selector.\n"
-            + "#Task: Choose the best Superset viz_type from the available list.\n" + "#Rules:\n"
-            + "1. ONLY select from #AvailableVizTypes.\n"
-            + "2. Consider #UserInstruction, #DataProfile, and #Signals.\n"
-            + "3. Use Signals.metricCount/timeCount/dimensionCount/rowCount to infer chart shape.\n"
-            + "4. If timeCount>=1 and metricCount>=1, prefer Line/Smooth/Area/Generic (or Mixed when metricCount>1).\n"
-            + "5. If dimensionCount>=1 and metricCount==1, prefer Bar; allow Pie/Partition only when rowCount<=10.\n"
-            + "6. Avoid table-type charts (Table/Time-series Table/Pivot Table) unless no other candidate fits.\n"
-            + "7. Return JSON only, no extra text.\n"
-            + "8. Output fields: viz_type, chart_name, alternatives (array of {viz_type, chart_name}), reason.\n"
-            + "9. alternatives length should be {{top_n}} and ordered by preference.\n"
-            + "10. chart_name should be a concise Chinese title (no extra explanation).\n"
-            + "#UserInstruction: {{instruction}}\n" + "#DataProfile: {{data_profile}}\n"
-            + "#Signals: {{signals}}\n" + "#AvailableVizTypes: {{candidates}}\n" + "#Response:";
+            + "#Task: Rank the most suitable Superset viz_type candidates for this chart request.\n"
+            + "#Rules:\n" + "1. ONLY choose from selection_payload.candidate_viztypes.\n"
+            + "2. Local prefilter already removed obviously impossible types, but you must still rank by fitness.\n"
+            + "3. Consider user_question, executed_sql, sql_summary, query_result, data_profile, dataset_context, semantic_context, intent_profile and signals together.\n"
+            + "4. Prioritize candidates whose required_dataset_roles and required_slots can be satisfied by the dataset and the query intent.\n"
+            + "5. Penalize candidates that require unavailable roles such as time, metric, latitude/longitude, source/target.\n"
+            + "6. Treat selection_payload.intent_profile.preferred_table_viz_type as a strong local intent signal when it is present.\n"
+            + "7. For explicit detail/list/raw-row requests, prefer plain `table`. Use `pivot_table_v2` only for cross-dimensional aggregated tables. Use `time_table` or `time_pivot` only for time-series report/comparison intent, not merely because a time column exists.\n"
+            + "8. Prefer charts that directly express the question intent. Plain table is allowed to be the best answer; do not demote it just because it is table-like.\n"
+            + "9. Return JSON only, no extra text.\n"
+            + "10. Output fields: ranked_candidates (array, max {{top_n}} items).\n"
+            + "11. Each ranked candidate object should include: viz_type, chart_name, score, reason, matched_signals, missing_signals.\n"
+            + "12. Also include backward-compatible fields: viz_type, chart_name, alternatives.\n"
+            + "#SelectionPayload: {{selection_payload}}\n" + "#Response:";
     private static final Set<String> NUMBER_TYPES =
             Stream.of("INT", "INTEGER", "BIGINT", "LONG", "FLOAT", "DOUBLE", "DECIMAL", "NUMBER")
                     .collect(Collectors.toSet());
@@ -83,7 +88,8 @@ public class SupersetVizTypeSelector {
 
     public static String select(SupersetPluginConfig config, QueryResult queryResult,
             String queryText, Agent agent) {
-        List<VizTypeItem> candidates = selectCandidates(config, queryResult, queryText, agent);
+        List<VizTypeItem> candidates =
+                selectCandidates(config, queryResult, queryText, agent, null, null, null);
         if (candidates.isEmpty()) {
             return DEFAULT_VIZ_TYPE;
         }
@@ -92,6 +98,12 @@ public class SupersetVizTypeSelector {
 
     public static List<VizTypeItem> selectCandidates(SupersetPluginConfig config,
             QueryResult queryResult, String queryText, Agent agent) {
+        return selectCandidates(config, queryResult, queryText, agent, null, null, null);
+    }
+
+    public static List<VizTypeItem> selectCandidates(SupersetPluginConfig config,
+            QueryResult queryResult, String queryText, Agent agent, String executedSql,
+            SemanticParseInfo parseInfo, SupersetDatasetInfo datasetInfo) {
         if (queryResult == null || queryResult.getQueryColumns() == null) {
             return Collections.singletonList(resolveFallbackItem(DEFAULT_VIZ_TYPE, null));
         }
@@ -101,20 +113,29 @@ public class SupersetVizTypeSelector {
             return Collections.singletonList(resolveFallbackItem(DEFAULT_VIZ_TYPE, null));
         }
         SupersetPluginConfig safeConfig = config == null ? new SupersetPluginConfig() : config;
-        List<VizTypeItem> candidates = filterCandidates(safeConfig, VIZTYPE_CATALOG.getItems());
+        List<VizTypeItem> candidates =
+                ensurePlainTableCandidate(filterCandidates(safeConfig, VIZTYPE_CATALOG.getItems()));
 
         DecisionContext decisionContext = buildDecisionContext(columns, results);
+        SupersetVizSelectionPromptBuilder.SelectionSignals selectionSignals =
+                toSelectionSignals(decisionContext);
+        SupersetVizSelectionPromptBuilder.IntentProfile intentProfile =
+                SupersetVizSelectionPromptBuilder.buildIntentProfile(queryText, executedSql,
+                        parseInfo, selectionSignals);
+        candidates = prefilterCandidates(queryResult, decisionContext, datasetInfo, candidates);
         int topN = resolveTopN(safeConfig);
         List<String> ordered = new ArrayList<>();
 
         Map<String, String> nameOverrides = Collections.emptyMap();
         if (safeConfig.isVizTypeLlmEnabled()) {
-            Optional<LlmSelection> llmSelection = selectByLlmCandidates(safeConfig, queryResult,
-                    queryText, candidates, decisionContext, agent);
+            Optional<LlmSelection> llmSelection =
+                    selectByLlmCandidates(safeConfig, queryResult, queryText, candidates,
+                            decisionContext, agent, executedSql, parseInfo, datasetInfo);
             if (llmSelection.isPresent()) {
                 LlmSelection selection = llmSelection.get();
                 List<String> guarded =
                         guardLlmCandidates(selection.getOrdered(), decisionContext, candidates);
+                guarded = applyIntentOverrides(guarded, intentProfile, candidates, topN);
                 addOrderedCandidates(ordered, guarded, topN);
                 if (!selection.getNames().isEmpty()) {
                     nameOverrides = selection.getNames();
@@ -135,6 +156,7 @@ public class SupersetVizTypeSelector {
 
         List<String> expanded = expandCandidates(ordered, decisionContext, candidates);
         List<String> diversified = diversifyCandidates(expanded, candidates, topN);
+        diversified = applyIntentOverrides(diversified, intentProfile, candidates, topN);
         if (diversified.isEmpty()) {
             String fallback = resolveFallback(candidates, decisionContext);
             addOrderedCandidate(diversified, fallback, topN);
@@ -365,7 +387,8 @@ public class SupersetVizTypeSelector {
 
     private static Optional<LlmSelection> selectByLlmCandidates(SupersetPluginConfig config,
             QueryResult queryResult, String queryText, List<VizTypeItem> candidates,
-            DecisionContext decisionContext, Agent agent) {
+            DecisionContext decisionContext, Agent agent, String executedSql,
+            SemanticParseInfo parseInfo, SupersetDatasetInfo datasetInfo) {
         Integer chatModelId = resolveChatModelId(config, agent);
         if (chatModelId == null) {
             throw new IllegalStateException("superset viztype llm chat model id missing");
@@ -379,14 +402,11 @@ public class SupersetVizTypeSelector {
         }
         int topN = resolveTopN(config);
         String promptText = StringUtils.defaultIfBlank(config.getVizTypeLlmPrompt(), LLM_PROMPT);
-        String dataProfile = buildDataProfile(queryResult);
-        String candidateSummary = buildCandidateSummary(candidates);
-        String signals = buildDecisionSignals(decisionContext);
+        String selectionPayload = SupersetVizSelectionPromptBuilder.buildJsonPayload(queryText,
+                executedSql, queryResult, parseInfo, datasetInfo,
+                toSelectionSignals(decisionContext), candidates);
         Map<String, Object> variables = new HashMap<>();
-        variables.put("instruction", StringUtils.defaultString(queryText));
-        variables.put("data_profile", dataProfile);
-        variables.put("signals", signals);
-        variables.put("candidates", candidateSummary);
+        variables.put("selection_payload", selectionPayload);
         variables.put("top_n", topN);
 
         Prompt prompt = PromptTemplate.from(promptText).apply(variables);
@@ -395,7 +415,8 @@ public class SupersetVizTypeSelector {
         String answer =
                 response == null || response.content() == null ? null : response.content().text();
         log.info("superset viztype llm req:\n{} \nresp:\n{}", prompt.text(), answer);
-        LlmSelection resolved = resolveLlmSelectionFromModelResponse(answer, candidates);
+        LlmSelection resolved =
+                resolveLlmSelectionFromModelResponse(answer, candidates, resolveTopN(config));
         return resolved == null || resolved.getOrdered().isEmpty() ? Optional.empty()
                 : Optional.of(resolved);
     }
@@ -462,19 +483,27 @@ public class SupersetVizTypeSelector {
     }
 
     static String resolveFromModelResponse(String response, List<VizTypeItem> candidates) {
-        LlmSelection resolved = resolveLlmSelectionFromModelResponse(response, candidates);
+        LlmSelection resolved =
+                resolveLlmSelectionFromModelResponse(response, candidates, resolveTopN(null));
         return resolved == null || resolved.getOrdered().isEmpty() ? null
                 : resolved.getOrdered().get(0);
     }
 
     static List<String> resolveCandidatesFromModelResponse(String response,
             List<VizTypeItem> candidates) {
-        LlmSelection resolved = resolveLlmSelectionFromModelResponse(response, candidates);
+        LlmSelection resolved =
+                resolveLlmSelectionFromModelResponse(response, candidates, resolveTopN(null));
         return resolved == null ? Collections.emptyList() : resolved.getOrdered();
     }
 
     private static LlmSelection resolveLlmSelectionFromModelResponse(String response,
             List<VizTypeItem> candidates) {
+        return resolveLlmSelectionFromModelResponse(response, candidates, resolveTopN(null));
+    }
+
+    private static LlmSelection resolveLlmSelectionFromModelResponse(String response,
+            List<VizTypeItem> candidates, int maxCandidates) {
+        int resolvedMaxCandidates = maxCandidates <= 0 ? resolveTopN(null) : maxCandidates;
         if (StringUtils.isBlank(response) || candidates == null || candidates.isEmpty()) {
             return null;
         }
@@ -490,6 +519,13 @@ public class SupersetVizTypeSelector {
             return null;
         }
         List<LlmChoice> ordered = new ArrayList<>();
+        JSONArray rankedCandidates = json.getJSONArray("ranked_candidates");
+        if (rankedCandidates == null) {
+            rankedCandidates = json.getJSONArray("rankedCandidates");
+        }
+        if (rankedCandidates != null) {
+            ordered.addAll(resolveChoices(rankedCandidates));
+        }
         String primary =
                 StringUtils.defaultIfBlank(json.getString("viz_type"), json.getString("vizType"));
         String primaryName = resolveChartName(json);
@@ -497,29 +533,36 @@ public class SupersetVizTypeSelector {
             ordered.add(new LlmChoice(primary, primaryName));
         }
         JSONArray alternatives = json.getJSONArray("alternatives");
-        if (alternatives != null) {
-            for (int i = 0; i < alternatives.size(); i++) {
-                Object value = alternatives.get(i);
-                if (value == null) {
-                    continue;
+        ordered.addAll(resolveChoices(alternatives));
+        return resolveLlmSelection(ordered, candidates, resolvedMaxCandidates);
+    }
+
+    private static List<LlmChoice> resolveChoices(JSONArray values) {
+        if (values == null || values.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<LlmChoice> ordered = new ArrayList<>();
+        for (int i = 0; i < values.size(); i++) {
+            Object value = values.get(i);
+            if (value == null) {
+                continue;
+            }
+            if (value instanceof JSONObject) {
+                JSONObject item = (JSONObject) value;
+                String vizType = StringUtils.defaultIfBlank(item.getString("viz_type"),
+                        item.getString("vizType"));
+                String name = resolveChartName(item);
+                if (StringUtils.isNotBlank(vizType)) {
+                    ordered.add(new LlmChoice(vizType, name));
                 }
-                if (value instanceof JSONObject) {
-                    JSONObject item = (JSONObject) value;
-                    String vizType = StringUtils.defaultIfBlank(item.getString("viz_type"),
-                            item.getString("vizType"));
-                    String name = resolveChartName(item);
-                    if (StringUtils.isNotBlank(vizType)) {
-                        ordered.add(new LlmChoice(vizType, name));
-                    }
-                } else {
-                    String vizType = String.valueOf(value);
-                    if (StringUtils.isNotBlank(vizType)) {
-                        ordered.add(new LlmChoice(vizType, null));
-                    }
+            } else {
+                String vizType = String.valueOf(value);
+                if (StringUtils.isNotBlank(vizType)) {
+                    ordered.add(new LlmChoice(vizType, null));
                 }
             }
         }
-        return resolveLlmSelection(ordered, candidates);
+        return ordered;
     }
 
     private static String resolveChartName(JSONObject json) {
@@ -541,9 +584,15 @@ public class SupersetVizTypeSelector {
 
     private static LlmSelection resolveLlmSelection(List<LlmChoice> ordered,
             List<VizTypeItem> candidates) {
+        return resolveLlmSelection(ordered, candidates, resolveTopN(null));
+    }
+
+    private static LlmSelection resolveLlmSelection(List<LlmChoice> ordered,
+            List<VizTypeItem> candidates, int maxCandidates) {
         if (ordered == null || ordered.isEmpty()) {
             return null;
         }
+        int resolvedMaxCandidates = maxCandidates <= 0 ? resolveTopN(null) : maxCandidates;
         Map<String, String> lookup = buildLookup(candidates);
         List<String> resolved = new ArrayList<>();
         Map<String, String> names = new HashMap<>();
@@ -559,6 +608,9 @@ public class SupersetVizTypeSelector {
             if (StringUtils.isNotBlank(choice.getChartName())
                     && !names.containsKey(resolvedValue)) {
                 names.put(resolvedValue, choice.getChartName());
+            }
+            if (resolved.size() >= resolvedMaxCandidates) {
+                break;
             }
         }
         if (resolved.isEmpty()) {
@@ -775,6 +827,147 @@ public class SupersetVizTypeSelector {
         return JsonUtil.toString(signals);
     }
 
+    private static SupersetVizSelectionPromptBuilder.SelectionSignals toSelectionSignals(
+            DecisionContext context) {
+        SupersetVizSelectionPromptBuilder.SelectionSignals signals =
+                new SupersetVizSelectionPromptBuilder.SelectionSignals();
+        if (context == null) {
+            return signals;
+        }
+        signals.setColumnCount(context.getColumnCount());
+        signals.setRowCount(context.getRowCount());
+        signals.setMetricCount(context.getMetricCount());
+        signals.setTimeCount(context.getTimeCount());
+        signals.setDimensionCount(context.getDimensionCount());
+        signals.setInferredFromValues(context.isInferredFromValues());
+        signals.setTimeGrainDetected(context.isTimeGrainDetected());
+        return signals;
+    }
+
+    private static List<VizTypeItem> prefilterCandidates(QueryResult queryResult,
+            DecisionContext context, SupersetDatasetInfo datasetInfo,
+            List<VizTypeItem> candidates) {
+        if (candidates == null || candidates.isEmpty()) {
+            return Collections.emptyList();
+        }
+        SelectionAvailability availability =
+                buildSelectionAvailability(queryResult, context, datasetInfo);
+        List<VizTypeItem> filtered =
+                candidates.stream().filter(item -> isCandidateFeasible(item, availability))
+                        .collect(Collectors.toList());
+        return filtered.isEmpty() ? candidates : filtered;
+    }
+
+    private static boolean isCandidateFeasible(VizTypeItem item,
+            SelectionAvailability availability) {
+        if (item == null || isTableCandidate(item) || item.getSelectionSummary() == null) {
+            return true;
+        }
+        List<SelectionSlot> requiredSlots = item.getSelectionSummary().getRequiredSlots();
+        if (requiredSlots == null || requiredSlots.isEmpty()) {
+            return true;
+        }
+        for (SelectionSlot slot : requiredSlots) {
+            if (slot == null || !slot.isRequired()) {
+                continue;
+            }
+            List<String> acceptedRoles = slot.getAcceptedDatasetRoles();
+            if (acceptedRoles == null || acceptedRoles.isEmpty()) {
+                continue;
+            }
+            boolean hasStrongRole =
+                    acceptedRoles.stream().anyMatch(SelectionAvailability::isStrongRole);
+            if (!hasStrongRole) {
+                continue;
+            }
+            boolean matched = acceptedRoles.stream().anyMatch(availability::supportsRole);
+            if (!matched) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static SelectionAvailability buildSelectionAvailability(QueryResult queryResult,
+            DecisionContext context, SupersetDatasetInfo datasetInfo) {
+        SelectionAvailability availability = new SelectionAvailability();
+        availability
+                .setHasMetric(context != null && context.getMetricCount() > 0 || datasetInfo != null
+                        && datasetInfo.getMetrics() != null && !datasetInfo.getMetrics().isEmpty());
+        availability.setHasTime(context != null && context.getTimeCount() > 0 || datasetInfo != null
+                && (StringUtils.isNotBlank(datasetInfo.getMainDttmCol()) || hasDatasetColumn(
+                        datasetInfo, name -> Boolean.TRUE.equals(name.getIsDttm()))));
+        availability.setHasDimension(context != null && context.getDimensionCount() > 0
+                || datasetInfo != null && hasDatasetColumn(datasetInfo,
+                        column -> Boolean.TRUE.equals(column.getGroupby())));
+        List<String> names = collectFieldNames(queryResult, datasetInfo);
+        availability.setHasLatitude(matchesAny(names, "latitude", "lat"));
+        availability.setHasLongitude(matchesAny(names, "longitude", "lng", "lon"));
+        availability.setHasRegion(matchesAny(names, "region", "country", "province", "state",
+                "city", "area", "district"));
+        availability.setHasSource(matchesAny(names, "source", "from", "src"));
+        availability.setHasTarget(matchesAny(names, "target", "to", "dst", "dest"));
+        availability.setHasStart(matchesAny(names, "start", "begin"));
+        availability.setHasEnd(matchesAny(names, "end", "finish"));
+        return availability;
+    }
+
+    private static List<String> collectFieldNames(QueryResult queryResult,
+            SupersetDatasetInfo datasetInfo) {
+        List<String> names = new ArrayList<>();
+        if (queryResult != null && queryResult.getQueryColumns() != null) {
+            for (QueryColumn column : queryResult.getQueryColumns()) {
+                if (column == null) {
+                    continue;
+                }
+                if (StringUtils.isNotBlank(column.getName())) {
+                    names.add(normalize(column.getName()));
+                }
+                if (StringUtils.isNotBlank(column.getBizName())) {
+                    names.add(normalize(column.getBizName()));
+                }
+            }
+        }
+        if (datasetInfo != null && datasetInfo.getColumns() != null) {
+            for (com.tencent.supersonic.headless.server.sync.superset.SupersetDatasetColumn column : datasetInfo
+                    .getColumns()) {
+                if (column != null && StringUtils.isNotBlank(column.getColumnName())) {
+                    names.add(normalize(column.getColumnName()));
+                }
+            }
+        }
+        return names;
+    }
+
+    private static boolean matchesAny(List<String> names, String... tokens) {
+        if (names == null || names.isEmpty() || tokens == null) {
+            return false;
+        }
+        for (String name : names) {
+            for (String token : tokens) {
+                if (StringUtils.isNotBlank(name) && StringUtils.isNotBlank(token)
+                        && name.contains(token)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static boolean hasDatasetColumn(SupersetDatasetInfo datasetInfo,
+            java.util.function.Predicate<com.tencent.supersonic.headless.server.sync.superset.SupersetDatasetColumn> predicate) {
+        if (datasetInfo == null || datasetInfo.getColumns() == null || predicate == null) {
+            return false;
+        }
+        for (com.tencent.supersonic.headless.server.sync.superset.SupersetDatasetColumn column : datasetInfo
+                .getColumns()) {
+            if (column != null && predicate.test(column)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static String guardLlmChoice(String llmChoice, DecisionContext context,
             List<VizTypeItem> candidates) {
         if (StringUtils.isBlank(llmChoice)) {
@@ -826,7 +1019,8 @@ public class SupersetVizTypeSelector {
     }
 
     private static int resolveTopN(SupersetPluginConfig config) {
-        int topN = config.getVizTypeLlmTopN() == null ? 3 : config.getVizTypeLlmTopN();
+        int topN = config == null || config.getVizTypeLlmTopN() == null ? 3
+                : config.getVizTypeLlmTopN();
         if (topN <= 0) {
             topN = 1;
         }
@@ -888,6 +1082,8 @@ public class SupersetVizTypeSelector {
         clone.setDescription(item.getDescription());
         clone.setSourcePath(item.getSourcePath());
         clone.setFormDataRules(item.getFormDataRules());
+        clone.setSelectionSummary(item.getSelectionSummary());
+        clone.setSelectionPromptCard(item.getSelectionPromptCard());
         return clone;
     }
 
@@ -897,7 +1093,7 @@ public class SupersetVizTypeSelector {
             return resolved;
         }
         for (VizTypeItem item : resolved) {
-            if (isTableCandidate(item)) {
+            if (item != null && StringUtils.equalsIgnoreCase(DEFAULT_VIZ_TYPE, item.getVizType())) {
                 return resolved;
             }
         }
@@ -907,6 +1103,41 @@ public class SupersetVizTypeSelector {
             withTable.add(table);
         }
         return withTable;
+    }
+
+    private static List<VizTypeItem> ensurePlainTableCandidate(List<VizTypeItem> candidates) {
+        List<VizTypeItem> safeCandidates =
+                candidates == null ? new ArrayList<>() : new ArrayList<>(candidates);
+        for (VizTypeItem item : safeCandidates) {
+            if (item != null && StringUtils.equalsIgnoreCase(DEFAULT_VIZ_TYPE, item.getVizType())) {
+                return safeCandidates;
+            }
+        }
+        VizTypeItem table = resolveFallbackItem(DEFAULT_VIZ_TYPE, null);
+        if (table != null) {
+            safeCandidates.add(table);
+        }
+        return safeCandidates;
+    }
+
+    private static List<String> applyIntentOverrides(List<String> ordered,
+            SupersetVizSelectionPromptBuilder.IntentProfile intentProfile,
+            List<VizTypeItem> candidates, int limit) {
+        if (ordered == null) {
+            return Collections.emptyList();
+        }
+        if (intentProfile == null || !StringUtils.equalsIgnoreCase(DEFAULT_VIZ_TYPE,
+                intentProfile.getPreferredTableVizType())) {
+            return ordered;
+        }
+        String table = resolveCandidate(Collections.singletonList(DEFAULT_VIZ_TYPE), candidates);
+        if (StringUtils.isBlank(table)) {
+            return ordered;
+        }
+        List<String> overridden = new ArrayList<>();
+        addOrderedCandidate(overridden, table, limit);
+        addOrderedCandidates(overridden, ordered, limit);
+        return overridden;
     }
 
     public static VizTypeItem resolveItemByVizType(String vizType, List<VizTypeItem> candidates) {
@@ -960,10 +1191,20 @@ public class SupersetVizTypeSelector {
         if (context == null || !hasNonTableCandidate(candidates)) {
             return false;
         }
+        if (isDetailLikeContext(context)) {
+            return false;
+        }
         if (context.getTimeCount() >= 1 && context.getMetricCount() >= 1) {
             return true;
         }
         return context.getMetricCount() == 1 && context.getDimensionCount() >= 1;
+    }
+
+    private static boolean isDetailLikeContext(DecisionContext context) {
+        if (context == null) {
+            return false;
+        }
+        return context.getColumnCount() >= 4 || context.getDimensionCount() >= 2;
     }
 
     private static boolean hasNonTableCandidate(List<VizTypeItem> candidates) {
@@ -1289,6 +1530,69 @@ public class SupersetVizTypeSelector {
         private boolean timeGrainDetected;
     }
 
+    @Data
+    private static class SelectionAvailability {
+        private boolean hasMetric;
+        private boolean hasTime;
+        private boolean hasDimension;
+        private boolean hasLatitude;
+        private boolean hasLongitude;
+        private boolean hasRegion;
+        private boolean hasSource;
+        private boolean hasTarget;
+        private boolean hasStart;
+        private boolean hasEnd;
+
+        private boolean supportsRole(String role) {
+            String normalized = normalize(role);
+            switch (normalized) {
+                case "metric":
+                case "saved_metric":
+                case "adhoc_metric":
+                    return hasMetric;
+                case "time_dimension":
+                case "time_grain":
+                case "start_time":
+                case "end_time":
+                    return hasTime;
+                case "dimension":
+                case "category_dimension":
+                case "series_dimension":
+                case "entity_dimension":
+                    return hasDimension;
+                case "latitude":
+                    return hasLatitude;
+                case "longitude":
+                    return hasLongitude;
+                case "region_dimension":
+                    return hasRegion;
+                case "source":
+                case "source_dimension":
+                    return hasSource;
+                case "target":
+                case "target_dimension":
+                    return hasTarget;
+                case "start":
+                    return hasStart;
+                case "end":
+                    return hasEnd;
+                case "filter_context":
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        private static boolean isStrongRole(String role) {
+            String normalized = normalize(role);
+            return Arrays.asList("metric", "saved_metric", "adhoc_metric", "time_dimension",
+                    "time_grain", "dimension", "category_dimension", "series_dimension",
+                    "entity_dimension", "latitude", "longitude", "region_dimension", "source",
+                    "source_dimension", "target", "target_dimension", "start", "end", "start_time",
+                    "end_time").contains(normalized);
+        }
+    }
+
     private static class LlmChoice {
         private final String vizType;
         private final String chartName;
@@ -1335,6 +1639,8 @@ public class SupersetVizTypeSelector {
         private String description;
         private String sourcePath;
         private FormDataRules formDataRules;
+        private SelectionSummary selectionSummary;
+        private Map<String, Object> selectionPromptCard = Collections.emptyMap();
     }
 
     @Data
@@ -1364,6 +1670,39 @@ public class SupersetVizTypeSelector {
     }
 
     @Data
+    public static class SelectionSummary {
+        private String category;
+        private List<String> tags = Collections.emptyList();
+        private String descriptionZh;
+        private String visualShapeZh;
+        private List<String> useCasesZh = Collections.emptyList();
+        private List<SelectionSlot> requiredSlots = Collections.emptyList();
+        private List<SelectionSlot> optionalSlots = Collections.emptyList();
+        private List<String> requiredDatasetRoles = Collections.emptyList();
+        private List<String> optionalDatasetRoles = Collections.emptyList();
+        private Map<String, List<String>> datasetRoleInventory = Collections.emptyMap();
+        private List<String> nonBindingControlNames = Collections.emptyList();
+        private List<String> embeddingRuntimeFieldNames = Collections.emptyList();
+        private List<String> minimalTemplateKeys = Collections.emptyList();
+        private List<String> recommendedTemplateKeys = Collections.emptyList();
+        private Map<String, Object> structuralFlags = Collections.emptyMap();
+        private List<String> selectionHints = Collections.emptyList();
+    }
+
+    @Data
+    public static class SelectionSlot {
+        private String fieldName;
+        private boolean required;
+        private String slotKind;
+        private List<String> acceptedDatasetRoles = Collections.emptyList();
+        private String cardinality;
+        private Object placeholder;
+        private List<String> sourceCategories = Collections.emptyList();
+        private List<String> embeddingModes = Collections.emptyList();
+        private List<String> descriptions = Collections.emptyList();
+    }
+
+    @Data
     public static class VizTypeCatalog {
         private String source;
         private String generatedAt;
@@ -1387,33 +1726,324 @@ public class SupersetVizTypeSelector {
                 return new VizTypeCatalog();
             }
             try {
-                return JsonUtil.toObject(payload, VizTypeCatalog.class);
+                return parsePayload(payload);
             } catch (Exception ex) {
                 log.warn("superset viztype catalog load failed", ex);
                 return new VizTypeCatalog();
             }
         }
 
-        private static String readPayload() {
-            try (InputStream stream = SupersetVizTypeSelector.class.getClassLoader()
-                    .getResourceAsStream(VIZTYPE_RESOURCE)) {
-                if (stream != null) {
-                    return new String(stream.readAllBytes(), StandardCharsets.UTF_8);
+        private static VizTypeCatalog parsePayload(String payload) {
+            JSONObject root = JSONObject.parseObject(payload);
+            if (root == null) {
+                return new VizTypeCatalog();
+            }
+            JSONArray itemsArray = root.getJSONArray("items");
+            if (itemsArray != null) {
+                return JsonUtil.toObject(payload, VizTypeCatalog.class);
+            }
+            JSONArray viztypesArray = root.getJSONArray("viztypes");
+            if (viztypesArray == null) {
+                viztypesArray = root.getJSONArray("pairs");
+            }
+            if (viztypesArray == null) {
+                return new VizTypeCatalog();
+            }
+            VizTypeCatalog catalog = new VizTypeCatalog();
+            catalog.setSource(StringUtils.defaultIfBlank(root.getString("source"),
+                    "superset-spec/catalog/viztypes.json"));
+            catalog.setGeneratedAt(StringUtils.defaultIfBlank(root.getString("generatedAt"),
+                    root.getString("generated_at")));
+            List<VizTypeItem> items = new ArrayList<>();
+            for (int i = 0; i < viztypesArray.size(); i++) {
+                JSONObject item = viztypesArray.getJSONObject(i);
+                VizTypeItem resolved = resolveCatalogItem(item);
+                if (resolved != null && StringUtils.isNotBlank(resolved.getVizType())) {
+                    items.add(resolved);
                 }
-            } catch (IOException ex) {
-                log.warn("superset viztype resource read failed", ex);
             }
-            Path fallback = Path.of(VIZTYPE_RESOURCE);
-            if (!Files.exists(fallback)) {
-                log.warn("superset viztype resource missing: {}", VIZTYPE_RESOURCE);
+            catalog.setItems(items);
+            return catalog;
+        }
+
+        private static VizTypeItem resolveCatalogItem(JSONObject item) {
+            if (item == null) {
                 return null;
             }
-            try {
-                return Files.readString(fallback, StandardCharsets.UTF_8);
-            } catch (IOException ex) {
-                log.warn("superset viztype file read failed: {}", fallback, ex);
+            JSONObject originalOnlineEntry = item.getJSONObject("original_online_entry");
+            JSONObject selectionSummary = item.getJSONObject("selection_summary");
+            JSONObject formDataRules = item.getJSONObject("form_data_rules");
+            VizTypeItem resolved = new VizTypeItem();
+            String vizType = StringUtils.defaultIfBlank(item.getString("vizType"),
+                    item.getString("viztype"));
+            resolved.setVizType(vizType);
+            resolved.setName(firstNonBlank(item.getString("name"),
+                    originalOnlineEntry == null ? null : originalOnlineEntry.getString("name"),
+                    vizType));
+            resolved.setLlmName(firstNonBlank(item.getString("llmName"), resolved.getName()));
+            resolved.setVizKey(firstNonBlank(item.getString("vizKey"),
+                    originalOnlineEntry == null ? null : originalOnlineEntry.getString("vizKey"),
+                    resolved.getName()));
+            resolved.setCategory(firstNonBlank(item.getString("category"),
+                    originalOnlineEntry == null ? null : originalOnlineEntry.getString("category"),
+                    originalOnlineEntry == null ? null
+                            : originalOnlineEntry.getString("pluginCategory")));
+            resolved.setDescription(firstNonBlank(item.getString("description"),
+                    item.getString("详细描述"),
+                    selectionSummary == null ? null : selectionSummary.getString("description_zh"),
+                    originalOnlineEntry == null ? null : originalOnlineEntry.getString("详细描述"),
+                    originalOnlineEntry == null ? null
+                            : originalOnlineEntry.getString("description")));
+            resolved.setSourcePath(firstNonBlank(item.getString("sourcePath"),
+                    item.getString("summary"), originalOnlineEntry == null ? null
+                            : originalOnlineEntry.getString("sourcePath")));
+            resolved.setFormDataRules(resolveFormDataRules(formDataRules));
+            resolved.setSelectionSummary(resolveSelectionSummary(selectionSummary));
+            resolved.setSelectionPromptCard(
+                    toObjectMap(item.getJSONObject("selection_prompt_card")));
+            return resolved;
+        }
+
+        private static FormDataRules resolveFormDataRules(JSONObject json) {
+            if (json == null || json.isEmpty()) {
                 return null;
             }
+            FormDataRules rules = new FormDataRules();
+            rules.setProfile(firstNonBlank(json.getString("profile"), json.getString("type")));
+            rules.setRequired(toStringList(json.getJSONArray("required")));
+            JSONArray requiredAnyOf = json.getJSONArray("requiredAnyOf");
+            if (requiredAnyOf == null) {
+                requiredAnyOf = json.getJSONArray("required_any_of");
+            }
+            rules.setRequiredAnyOf(resolveFormDataFieldGroups(requiredAnyOf));
+            rules.setFields(resolveFormDataFields(json.getJSONArray("fields")));
+            rules.setSources(resolveFormDataSources(json.getJSONArray("sources")));
+            return rules;
+        }
+
+        private static List<List<FormDataField>> resolveFormDataFieldGroups(JSONArray array) {
+            if (array == null || array.isEmpty()) {
+                return Collections.emptyList();
+            }
+            List<List<FormDataField>> groups = new ArrayList<>();
+            for (int i = 0; i < array.size(); i++) {
+                Object value = array.get(i);
+                List<FormDataField> group = new ArrayList<>();
+                if (value instanceof JSONArray) {
+                    group.addAll(resolveFormDataFields((JSONArray) value));
+                } else if (value instanceof JSONObject) {
+                    FormDataField field = resolveFormDataField((JSONObject) value);
+                    if (field != null) {
+                        group.add(field);
+                    }
+                } else if (value instanceof String && StringUtils.isNotBlank((String) value)) {
+                    FormDataField field = new FormDataField();
+                    field.setKey((String) value);
+                    group.add(field);
+                }
+                if (!group.isEmpty()) {
+                    groups.add(group);
+                }
+            }
+            return groups;
+        }
+
+        private static List<FormDataField> resolveFormDataFields(JSONArray array) {
+            if (array == null || array.isEmpty()) {
+                return Collections.emptyList();
+            }
+            List<FormDataField> fields = new ArrayList<>();
+            for (int i = 0; i < array.size(); i++) {
+                Object value = array.get(i);
+                if (value instanceof JSONObject) {
+                    FormDataField field = resolveFormDataField((JSONObject) value);
+                    if (field != null) {
+                        fields.add(field);
+                    }
+                } else if (value instanceof String && StringUtils.isNotBlank((String) value)) {
+                    FormDataField field = new FormDataField();
+                    field.setKey((String) value);
+                    fields.add(field);
+                }
+            }
+            return fields;
+        }
+
+        private static FormDataField resolveFormDataField(JSONObject json) {
+            if (json == null || json.isEmpty()) {
+                return null;
+            }
+            FormDataField field = new FormDataField();
+            field.setKey(firstNonBlank(json.getString("key"), json.getString("field_name")));
+            field.setType(firstNonBlank(json.getString("type"), json.getString("slot_kind")));
+            field.setDescription(
+                    firstNonBlank(json.getString("description"), json.getString("note")));
+            field.setSource(json.getString("source"));
+            return StringUtils.isBlank(field.getKey()) ? null : field;
+        }
+
+        private static List<FormDataSource> resolveFormDataSources(JSONArray array) {
+            if (array == null || array.isEmpty()) {
+                return Collections.emptyList();
+            }
+            List<FormDataSource> sources = new ArrayList<>();
+            for (int i = 0; i < array.size(); i++) {
+                JSONObject item = array.getJSONObject(i);
+                if (item == null) {
+                    continue;
+                }
+                FormDataSource source = new FormDataSource();
+                source.setType(item.getString("type"));
+                source.setName(item.getString("name"));
+                source.setUrl(item.getString("url"));
+                source.setPath(item.getString("path"));
+                source.setNote(item.getString("note"));
+                sources.add(source);
+            }
+            return sources;
+        }
+
+        private static SelectionSummary resolveSelectionSummary(JSONObject json) {
+            if (json == null) {
+                return null;
+            }
+            SelectionSummary summary = new SelectionSummary();
+            summary.setCategory(json.getString("category"));
+            summary.setTags(toStringList(json.getJSONArray("tags")));
+            summary.setDescriptionZh(json.getString("description_zh"));
+            summary.setVisualShapeZh(json.getString("visual_shape_zh"));
+            summary.setUseCasesZh(toStringList(json.getJSONArray("use_cases_zh")));
+            summary.setRequiredSlots(resolveSelectionSlots(json.getJSONArray("required_slots")));
+            summary.setOptionalSlots(resolveSelectionSlots(json.getJSONArray("optional_slots")));
+            summary.setRequiredDatasetRoles(
+                    toStringList(json.getJSONArray("required_dataset_roles")));
+            summary.setOptionalDatasetRoles(
+                    toStringList(json.getJSONArray("optional_dataset_roles")));
+            summary.setDatasetRoleInventory(
+                    toStringListMap(json.getJSONObject("dataset_role_inventory")));
+            summary.setNonBindingControlNames(
+                    toStringList(json.getJSONArray("non_binding_control_names")));
+            summary.setEmbeddingRuntimeFieldNames(
+                    toStringList(json.getJSONArray("embedding_runtime_field_names")));
+            summary.setMinimalTemplateKeys(
+                    toStringList(json.getJSONArray("minimal_template_keys")));
+            summary.setRecommendedTemplateKeys(
+                    toStringList(json.getJSONArray("recommended_template_keys")));
+            summary.setStructuralFlags(toObjectMap(json.getJSONObject("structural_flags")));
+            summary.setSelectionHints(toStringList(json.getJSONArray("selection_hints")));
+            return summary;
+        }
+
+        private static List<SelectionSlot> resolveSelectionSlots(JSONArray array) {
+            if (array == null || array.isEmpty()) {
+                return Collections.emptyList();
+            }
+            List<SelectionSlot> slots = new ArrayList<>();
+            for (int i = 0; i < array.size(); i++) {
+                JSONObject item = array.getJSONObject(i);
+                if (item == null) {
+                    continue;
+                }
+                SelectionSlot slot = new SelectionSlot();
+                slot.setFieldName(item.getString("field_name"));
+                slot.setRequired(Boolean.TRUE.equals(item.getBoolean("required")));
+                slot.setSlotKind(item.getString("slot_kind"));
+                slot.setAcceptedDatasetRoles(
+                        toStringList(item.getJSONArray("accepted_dataset_roles")));
+                slot.setCardinality(item.getString("cardinality"));
+                slot.setPlaceholder(item.get("placeholder"));
+                slot.setSourceCategories(toStringList(item.getJSONArray("source_categories")));
+                slot.setEmbeddingModes(toStringList(item.getJSONArray("embedding_modes")));
+                slot.setDescriptions(toStringList(item.getJSONArray("descriptions")));
+                slots.add(slot);
+            }
+            return slots;
+        }
+
+        private static List<String> toStringList(JSONArray array) {
+            if (array == null || array.isEmpty()) {
+                return Collections.emptyList();
+            }
+            List<String> values = new ArrayList<>();
+            for (int i = 0; i < array.size(); i++) {
+                String value = array.getString(i);
+                if (StringUtils.isNotBlank(value)) {
+                    values.add(value);
+                }
+            }
+            return values;
+        }
+
+        private static Map<String, Object> toObjectMap(JSONObject json) {
+            if (json == null || json.isEmpty()) {
+                return Collections.emptyMap();
+            }
+            Map<String, Object> resolved = new LinkedHashMap<>();
+            for (Map.Entry<String, Object> entry : json.entrySet()) {
+                resolved.put(entry.getKey(), entry.getValue());
+            }
+            return resolved;
+        }
+
+        private static Map<String, List<String>> toStringListMap(JSONObject json) {
+            if (json == null || json.isEmpty()) {
+                return Collections.emptyMap();
+            }
+            Map<String, List<String>> resolved = new LinkedHashMap<>();
+            for (Map.Entry<String, Object> entry : json.entrySet()) {
+                if (entry.getValue() instanceof JSONArray) {
+                    resolved.put(entry.getKey(), toStringList((JSONArray) entry.getValue()));
+                }
+            }
+            return resolved;
+        }
+
+        private static String firstNonBlank(String... values) {
+            if (values == null) {
+                return null;
+            }
+            for (String value : values) {
+                if (StringUtils.isNotBlank(value)) {
+                    return value;
+                }
+            }
+            return null;
+        }
+
+        private static String readPayload() {
+            for (String resource : VIZTYPE_RESOURCES) {
+                try (InputStream stream = SupersetVizTypeSelector.class.getClassLoader()
+                        .getResourceAsStream(resource)) {
+                    if (stream != null) {
+                        return new String(stream.readAllBytes(), StandardCharsets.UTF_8);
+                    }
+                } catch (IOException ex) {
+                    log.warn("superset viztype resource read failed: {}", resource, ex);
+                }
+                Path fallback = resolveFallbackPath(resource);
+                if (fallback == null) {
+                    continue;
+                }
+                try {
+                    return Files.readString(fallback, StandardCharsets.UTF_8);
+                } catch (IOException ex) {
+                    log.warn("superset viztype file read failed: {}", fallback, ex);
+                }
+            }
+            log.warn("superset viztype resource missing: {}", VIZTYPE_RESOURCES);
+            return null;
+        }
+
+        private static Path resolveFallbackPath(String resource) {
+            Path current = Path.of("").toAbsolutePath().normalize();
+            while (current != null) {
+                Path candidate = current.resolve(resource);
+                if (Files.exists(candidate)) {
+                    return candidate;
+                }
+                current = current.getParent();
+            }
+            return null;
         }
     }
 }

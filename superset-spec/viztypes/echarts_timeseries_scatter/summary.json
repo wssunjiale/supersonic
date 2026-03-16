@@ -1,0 +1,131 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "echarts_timeseries_scatter",
+  "display_name": "Scatter Plot",
+  "normalized_summary": {
+    "category": "time_series",
+    "tags": [
+      "scatter",
+      "time_series",
+      "distribution",
+      "anomaly"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "granularity_sqla",
+        "required": true,
+        "description": "时间粒度字段，定义散点图的时间轴维度（如小时、天、月）。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于确定每个时间点的散点数值。"
+      },
+      {
+        "key": "symbol_size",
+        "required": false,
+        "description": "散点符号大小（像素），控制散点的显示尺寸。"
+      },
+      {
+        "key": "show_legend",
+        "required": false,
+        "description": "是否展示图例（true/false），控制系列图例的显示。"
+      }
+    ],
+    "description_zh": "Time Series Scatter Chart plots individual data points over a time axis, showing the distribution and trend of metric values over time.",
+    "visual_shape_zh": "时序散点图（时间轴分布型）",
+    "use_cases_zh": [
+      "时间维度下的数值分布分析（如每小时用户访问量分布）",
+      "异常值识别（离散点检测）",
+      "多指标的时序相关性分析"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "echarts_timeseries_scatter",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/echarts_timeseries_scatter-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/echarts_timeseries_scatter-form-data-schema.json",
+      "control-schema": "form-data-schema/echarts_timeseries_scatter-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Scatter Plot",
+    "viztype": "echarts_timeseries_scatter",
+    "详细描述": "Time Series Scatter Chart plots individual data points over a time axis, showing the distribution and trend of metric values over time.",
+    "表现形态": "时序散点图（时间轴分布型）",
+    "适用场景": [
+      "时间维度下的数值分布分析（如每小时用户访问量分布）",
+      "异常值识别（离散点检测）",
+      "多指标的时序相关性分析"
+    ],
+    "vizKey": "Scatter",
+    "pluginCategory": "Time Series",
+    "pluginTags": [],
+    "category": "time_series",
+    "tags": [
+      "scatter",
+      "time_series",
+      "distribution",
+      "anomaly"
+    ],
+    "关键字段": [
+      {
+        "key": "granularity_sqla",
+        "required": true,
+        "description": "时间粒度字段，定义散点图的时间轴维度（如小时、天、月）。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于确定每个时间点的散点数值。"
+      },
+      {
+        "key": "symbol_size",
+        "required": false,
+        "description": "散点符号大小（像素），控制散点的显示尺寸。"
+      },
+      {
+        "key": "show_legend",
+        "required": false,
+        "description": "是否展示图例（true/false），控制系列图例的显示。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

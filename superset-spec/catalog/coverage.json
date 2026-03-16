@@ -1,0 +1,1019 @@
+{
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "total_viztypes": 56,
+  "coverage_summary": {
+    "control_schema": 56,
+    "chart_form_data": 56,
+    "embedding_form_data": 56
+  },
+  "viztypes": [
+    {
+      "viz_type": "big_number",
+      "display_name": "Big Number with Trendline",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "big_number_total",
+      "display_name": "Big Number",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "box_plot",
+      "display_name": "Box Plot",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "bubble",
+      "display_name": "Bubble Chart (legacy)",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "bubble_v2",
+      "display_name": "Bubble Chart",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "bullet",
+      "display_name": "Bullet Chart",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "cal_heatmap",
+      "display_name": "Calendar Heatmap",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "cartodiagram",
+      "display_name": "Cartodiagram",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "chord",
+      "display_name": "Chord Diagram",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "compare",
+      "display_name": "Time-series Percent Change",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "country_map",
+      "display_name": "Country Map",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "deck_arc",
+      "display_name": "deck.gl Arc",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "deck_contour",
+      "display_name": "deck.gl Contour",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "deck_geojson",
+      "display_name": "deck.gl Geojson",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "deck_grid",
+      "display_name": "deck.gl Grid",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "deck_heatmap",
+      "display_name": "deck.gl Heatmap",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "deck_hex",
+      "display_name": "deck.gl 3D Hexagon",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "deck_multi",
+      "display_name": "deck.gl Multiple Layers",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "deck_path",
+      "display_name": "deck.gl Path",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "deck_polygon",
+      "display_name": "deck.gl Polygon",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "deck_scatter",
+      "display_name": "deck.gl Scatterplot",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "deck_screengrid",
+      "display_name": "deck.gl Screen Grid",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "echarts_area",
+      "display_name": "Area Chart",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "echarts_timeseries",
+      "display_name": "Generic Chart",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "echarts_timeseries_bar",
+      "display_name": "Bar Chart",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "echarts_timeseries_line",
+      "display_name": "Line Chart",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "echarts_timeseries_scatter",
+      "display_name": "Scatter Plot",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "echarts_timeseries_smooth",
+      "display_name": "Smooth Line",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "echarts_timeseries_step",
+      "display_name": "Stepped Line",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "funnel",
+      "display_name": "Funnel Chart",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "gantt_chart",
+      "display_name": "Gantt Chart",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "gauge_chart",
+      "display_name": "Gauge Chart",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "graph_chart",
+      "display_name": "Graph Chart",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "handlebars",
+      "display_name": "Handlebars",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "heatmap_v2",
+      "display_name": "Heatmap",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "histogram_v2",
+      "display_name": "Histogram",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "horizon",
+      "display_name": "Horizon Chart",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "mapbox",
+      "display_name": "MapBox",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "mixed_timeseries",
+      "display_name": "Mixed Chart",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "paired_ttest",
+      "display_name": "Paired t-test Table",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "para",
+      "display_name": "Parallel Coordinates",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "partition",
+      "display_name": "Partition Chart",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "pie",
+      "display_name": "Pie Chart",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "pivot_table_v2",
+      "display_name": "Pivot Table",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "radar",
+      "display_name": "Radar Chart",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "rose",
+      "display_name": "Nightingale Rose Chart",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "sankey_v2",
+      "display_name": "Sankey Chart",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "sunburst_v2",
+      "display_name": "Sunburst Chart",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "table",
+      "display_name": "Table",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "time_pivot",
+      "display_name": "Time-series Period Pivot",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "time_table",
+      "display_name": "Time-series Table",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "tree_chart",
+      "display_name": "Tree Chart",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "treemap_v2",
+      "display_name": "Treemap",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "waterfall",
+      "display_name": "Waterfall Chart",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "word_cloud",
+      "display_name": "Word Cloud",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    },
+    {
+      "viz_type": "world_map",
+      "display_name": "World Map",
+      "capability": {
+        "selection": true,
+        "chartBuild": true,
+        "embedding": true,
+        "datasetBinding": true
+      },
+      "maturity": {
+        "summary": "ready",
+        "controlSchema": "ready",
+        "chartFormData": "ready",
+        "embeddingFormData": "ready",
+        "datasetBinding": "heuristic_seed",
+        "examples": "derived"
+      }
+    }
+  ]
+}

@@ -1,0 +1,350 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "bullet",
+  "display_name": "Bullet Chart",
+  "source_kind": "schema_file",
+  "normalized_chart_form_data": {
+    "required_root_fields": [
+      "datasource",
+      "metric",
+      "viz_type"
+    ],
+    "optional_root_fields": [
+      "adhoc_filters",
+      "cache_timeout",
+      "custom_params",
+      "extra_form_data",
+      "marker_labels",
+      "marker_line_labels",
+      "marker_lines",
+      "markers",
+      "range_labels",
+      "ranges",
+      "slice_id",
+      "url_params"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "metric",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "marker_labels",
+      "marker_line_labels",
+      "marker_lines",
+      "markers",
+      "metric",
+      "range_labels",
+      "ranges",
+      "viz_type"
+    ],
+    "fallback_template_seed": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "bullet",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "adhoc_filters": [],
+      "time_range": "No filter"
+    }
+  },
+  "original_chart_form_data_schema": {
+    "viz_type": "bullet",
+    "display_name": "Bullet Chart",
+    "purpose": "用于调用 API 创建或保存 Bullet Chart 时填写的 form_data 模板",
+    "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/bullet-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/Bullet/controlPanel.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/Bullet/index.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/transformProps.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/NVD3Vis.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/PropTypes.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/utils/tokenize.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+      "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+      "D:/vsx/sources/superset-6.0.0/superset/views/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/utils/core.py"
+    ],
+    "notes": [
+      "Bullet 是 legacy 图，前端真实请求路径是 `/superset/explore_json/`，而不是 `/api/v1/chart/data`。",
+      "Explore 导出 form_data 时走 `getFormDataFromControls()`，它按 control name 原样写入 root form_data，因此 `range_labels`、`marker_lines`、`marker_line_labels` 这些 snake_case 键会被原样保存。",
+      "Bullet 没有专属前端 buildQuery，ChartClient.ts 对它会退回 `() => formData`。也就是说，API 层真正应该构造的是原始 root `form_data`。",
+      "root `form_data` 中的 `ranges`、`range_labels`、`markers`、`marker_labels`、`marker_lines`、`marker_line_labels` 都是文本字段，不是数组。只有运行时 `transformProps.js` 才会把它们解析成数组。",
+      "如果 `ranges` 为空，运行时会回退成 `[0, data.measures * 1.1]`。因此你可以不传 `ranges`，但传了就必须是合法的 numeric CSV 字符串。",
+      "后端 `BulletViz.query_obj()` 的核心只关心 `metric`。`adhoc_filters` 仍会通过 legacy filter merge 流程进入查询，但 shading / markers 相关字段完全不参与 SQL 查询。"
+    ],
+    "naming_and_pipeline": {
+      "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写成 form_data[name]，因此保存态 root 字段保持 controlPanel 的原始 snake_case 命名。",
+      "api_form_data_to_backend_request": "ChartClient.ts 在 `useLegacyApi=true` 时，把 `buildQuery(formData)` 包装成 `{ form_data }` POST 到 `/superset/explore_json/`；Bullet 没有专属 buildQuery，因此等价于直接发送原始 form_data。",
+      "backend_form_data_normalization": "`explore_json()` 会先补 `datasource`，再执行 `convert_legacy_filters_into_adhoc(form_data)` 与 `merge_extra_filters(form_data)`。",
+      "backend_form_data_to_query_obj": "`BulletViz.query_obj()` 在 `BaseViz.query_obj()` 的基础上，把 `query_obj.metrics` 固定改成 `[metric]`。"
+    },
+    "global_required_fields": {
+      "datasource": {
+        "data_type": "string",
+        "required": true,
+        "sample_data": "<dataset_id>__table",
+        "source": "explore_json() + datasourceAndVizType hidden control"
+      },
+      "viz_type": {
+        "data_type": "string",
+        "required": true,
+        "fixed_value": "bullet",
+        "source": "BulletViz.viz_type + Bullet/index.js"
+      },
+      "metric": {
+        "data_type": "string | object",
+        "required": true,
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        },
+        "source": "Bullet Query section + BulletViz.query_obj()"
+      }
+    },
+    "global_optional_fields": {
+      "adhoc_filters": {
+        "data_type": "array[object]",
+        "required": false,
+        "sample_data": [],
+        "source": "Bullet Query section"
+      },
+      "ranges": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "0,50,100",
+        "source": "Bullet Chart Options section",
+        "notes": "root form_data 中保持字符串；运行时才会转成 number array。"
+      },
+      "range_labels": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "Bad,Satisfactory,Good",
+        "source": "Bullet Chart Options section"
+      },
+      "markers": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "80",
+        "source": "Bullet Chart Options section"
+      },
+      "marker_labels": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "Target",
+        "source": "Bullet Chart Options section"
+      },
+      "marker_lines": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "90",
+        "source": "Bullet Chart Options section"
+      },
+      "marker_line_labels": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "Stretch goal",
+        "source": "Bullet Chart Options section"
+      },
+      "slice_id": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 0,
+        "source": "datasourceAndVizType hidden control",
+        "notes": "新建图表时通常省略；编辑已存在图表时由服务端或上层调用方提供。"
+      },
+      "cache_timeout": {
+        "data_type": "integer | null",
+        "required": false,
+        "sample_data": null,
+        "source": "datasourceAndVizType hidden control"
+      },
+      "url_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "QueryFormData"
+      },
+      "custom_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "QueryFormData"
+      },
+      "extra_form_data": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "utils.merge_extra_form_data()",
+        "notes": "虽然不属于 controlPanel 字段，但 legacy explore_json 路径会消费它。"
+      }
+    },
+    "minimal_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "bullet",
+      "metric": "<metric_or_saved_metric>",
+      "adhoc_filters": []
+    },
+    "recommended_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "bullet",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "sales"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(sales)"
+      },
+      "adhoc_filters": [],
+      "ranges": "",
+      "range_labels": "",
+      "markers": "",
+      "marker_labels": "",
+      "marker_lines": "",
+      "marker_line_labels": ""
+    },
+    "conditional_blocks": {
+      "shaded_ranges": {
+        "condition": "需要定义定性区间并显示 shading 时",
+        "fields": {
+          "ranges": "0,50,100",
+          "range_labels": "Bad,Satisfactory,Good"
+        }
+      },
+      "triangle_markers": {
+        "condition": "需要用三角形标出目标值时",
+        "fields": {
+          "markers": "80",
+          "marker_labels": "Target"
+        }
+      },
+      "marker_lines": {
+        "condition": "需要用竖线标出额外阈值时",
+        "fields": {
+          "marker_lines": "90",
+          "marker_line_labels": "Stretch goal"
+        }
+      },
+      "filters": {
+        "condition": "需要限制参与计算的底层数据时",
+        "fields": {
+          "adhoc_filters": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "region",
+              "operator": "IN",
+              "comparator": [
+                "East"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "runtime_only_or_non_template_fields": {
+      "runtime_aliases_generated_by_transformProps": [
+        {
+          "field_name": "rangeLabels",
+          "reason": "由 raw form_data.range_labels 派生的运行时别名，不是 API root 键。"
+        },
+        {
+          "field_name": "markerLabels",
+          "reason": "由 raw form_data.marker_labels 派生的运行时别名，不是 API root 键。"
+        },
+        {
+          "field_name": "markerLines",
+          "reason": "由 raw form_data.marker_lines 派生的运行时别名，不是 API root 键。"
+        },
+        {
+          "field_name": "markerLineLabels",
+          "reason": "由 raw form_data.marker_line_labels 派生的运行时别名，不是 API root 键。"
+        }
+      ],
+      "runtime_parsed_values": [
+        {
+          "field_name": "ranges",
+          "reason": "root form_data 中是 CSV 字符串；运行时会被 tokenizeToNumericArray 解析成 number array，空值时还会生成默认区间。"
+        },
+        {
+          "field_name": "markers",
+          "reason": "root form_data 中是 CSV 字符串；运行时才会解析成 number array。"
+        },
+        {
+          "field_name": "marker_lines",
+          "reason": "root form_data 中是 CSV 字符串；运行时才会解析成 number array。"
+        }
+      ],
+      "backend_derived_payload_fields": [
+        {
+          "field_name": "data.measures",
+          "reason": "这是 BulletViz.get_data() 生成的查询结果负载字段，不是 root form_data 字段。"
+        }
+      ],
+      "legacy_request_wrapper": [
+        {
+          "field_name": "payload.form_data",
+          "reason": "这是 legacy `/superset/explore_json/` 请求外层包裹字段，不是图表保存态内部的 root form_data 字段。"
+        }
+      ]
+    },
+    "api_usage_guidance": {
+      "high_confidence_required_fields": [
+        "datasource",
+        "viz_type",
+        "metric"
+      ],
+      "recommended_always_set": [
+        "adhoc_filters",
+        "ranges",
+        "range_labels",
+        "markers",
+        "marker_labels",
+        "marker_lines",
+        "marker_line_labels"
+      ],
+      "api_field_examples": [
+        "metric",
+        "ranges",
+        "range_labels",
+        "markers",
+        "marker_labels",
+        "marker_lines",
+        "marker_line_labels"
+      ],
+      "avoid_confusion": [
+        "不要把 `ranges`、`markers`、`marker_lines` 写成 JSON 数组；当前 API root 字段是逗号分隔字符串。",
+        "不要把运行时别名 `rangeLabels`、`markerLabels`、`markerLines`、`markerLineLabels` 写回 root form_data。",
+        "不要指望 bullet 从 root form_data 里自动生成排序、分组或多指标结构；当前后端查询核心只有 `metric`。",
+        "如果 `ranges` 留空，前端会在运行时自动生成默认 shading 区间；这不是保存态里可见的静态默认值。"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "bullet",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/bullet-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/bullet-form-data-schema.json",
+      "control-schema": "form-data-schema/bullet-schema.json"
+    }
+  }
+}

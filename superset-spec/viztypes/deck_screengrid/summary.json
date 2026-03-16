@@ -1,0 +1,134 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "deck_screengrid",
+  "display_name": "deck.gl Screen Grid",
+  "normalized_summary": {
+    "category": "geospatial",
+    "tags": [
+      "geo",
+      "deckgl",
+      "deckGL",
+      "Comparison",
+      "Intensity",
+      "Density",
+      "geospatial",
+      "aggregate"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "groupby",
+        "required": true,
+        "description": "维度字段列表（列名）。用于分组/系列/分类轴，把明细数据按维度聚合到可视化需要的粒度。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "指标列表（聚合/度量）。用于计算数值（如 sum(sales)、count(*)），通常至少提供 1 个。"
+      },
+      {
+        "key": "percent_metrics",
+        "required": true,
+        "description": "百分比指标列表。用于把指标转换为百分比/占比列（具体展示随图表而定）；通常与 metrics 搭配使用。"
+      }
+    ],
+    "description_zh": "Aggregates data within the boundary of grid cells and maps the aggregated values to a dynamic color scale",
+    "visual_shape_zh": "地图/空间可视化（deck.gl）",
+    "use_cases_zh": [
+      "空间点/面/轨迹数据展示",
+      "地理分布密度（网格/六边形/热力）",
+      "地图交互（缩放/旋转/视角）"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "deck_screengrid",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/deck_screengrid-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/deck_screengrid-form-data-schema.json",
+      "control-schema": "form-data-schema/deck_screengrid-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "deck.gl Screen Grid",
+    "viztype": "deck_screengrid",
+    "详细描述": "Aggregates data within the boundary of grid cells and maps the aggregated values to a dynamic color scale",
+    "表现形态": "地图/空间可视化（deck.gl）",
+    "适用场景": [
+      "空间点/面/轨迹数据展示",
+      "地理分布密度（网格/六边形/热力）",
+      "地图交互（缩放/旋转/视角）"
+    ],
+    "vizKey": null,
+    "pluginCategory": "Geospatial",
+    "pluginTags": [
+      "deckGL",
+      "Comparison",
+      "Intensity",
+      "Density"
+    ],
+    "category": "geospatial",
+    "tags": [
+      "geo",
+      "deckgl",
+      "deckGL",
+      "Comparison",
+      "Intensity",
+      "Density",
+      "geospatial",
+      "aggregate"
+    ],
+    "关键字段": [
+      {
+        "key": "groupby",
+        "required": true,
+        "description": "维度字段列表（列名）。用于分组/系列/分类轴，把明细数据按维度聚合到可视化需要的粒度。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "指标列表（聚合/度量）。用于计算数值（如 sum(sales)、count(*)），通常至少提供 1 个。"
+      },
+      {
+        "key": "percent_metrics",
+        "required": true,
+        "description": "百分比指标列表。用于把指标转换为百分比/占比列（具体展示随图表而定）；通常与 metrics 搭配使用。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

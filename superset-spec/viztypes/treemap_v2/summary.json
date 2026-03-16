@@ -1,0 +1,121 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "treemap_v2",
+  "display_name": "Treemap",
+  "normalized_summary": {
+    "category": "hierarchy",
+    "tags": [
+      "treemap",
+      "hierarchy",
+      "rectangle",
+      "nested"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "groupby",
+        "required": true,
+        "description": "分类维度字段（多层级），定义矩形树图的嵌套层级（如region、country、city）。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于计算每个矩形的大小（面积依据）。"
+      },
+      {
+        "key": "drilldown",
+        "required": false,
+        "description": "是否启用钻取（true/false），支持点击矩形展开下一层级。"
+      }
+    ],
+    "description_zh": "Treemap Chart displays hierarchical data as nested rectangles, with rectangle size/color proportional to metric values of each node.",
+    "visual_shape_zh": "矩形树图（层级嵌套型）",
+    "use_cases_zh": [
+      "层级化数据的占比展示（如品类-产品的销售额分布）",
+      "大体积层级数据的紧凑可视化",
+      "核心节点的快速识别（大矩形为高价值节点）"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "treemap_v2",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/treemap_v2-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/treemap_v2-form-data-schema.json",
+      "control-schema": "form-data-schema/treemap_v2-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Treemap",
+    "viztype": "treemap_v2",
+    "详细描述": "Treemap Chart displays hierarchical data as nested rectangles, with rectangle size/color proportional to metric values of each node.",
+    "表现形态": "矩形树图（层级嵌套型）",
+    "适用场景": [
+      "层级化数据的占比展示（如品类-产品的销售额分布）",
+      "大体积层级数据的紧凑可视化",
+      "核心节点的快速识别（大矩形为高价值节点）"
+    ],
+    "vizKey": "Treemap",
+    "pluginCategory": "Hierarchy",
+    "pluginTags": [],
+    "category": "hierarchy",
+    "tags": [
+      "treemap",
+      "hierarchy",
+      "rectangle",
+      "nested"
+    ],
+    "关键字段": [
+      {
+        "key": "groupby",
+        "required": true,
+        "description": "分类维度字段（多层级），定义矩形树图的嵌套层级（如region、country、city）。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于计算每个矩形的大小（面积依据）。"
+      },
+      {
+        "key": "drilldown",
+        "required": false,
+        "description": "是否启用钻取（true/false），支持点击矩形展开下一层级。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

@@ -1,0 +1,319 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "funnel",
+  "display_name": "Funnel Chart",
+  "generation_mode": "heuristic_seed",
+  "slot_candidates": [
+    {
+      "field_name": "adhoc_filters",
+      "required": false,
+      "slot_kind": "filter_list",
+      "accepted_dataset_roles": [
+        "filter_context"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [],
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [
+        "extra_form_data.append"
+      ],
+      "descriptions": [
+        "源码未提供额外描述；字段标签为 Filters。"
+      ]
+    },
+    {
+      "field_name": "groupby",
+      "required": true,
+      "slot_kind": "dimension_list",
+      "accepted_dataset_roles": [
+        "dimension",
+        "category_dimension"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [
+        "<dimension_column>"
+      ],
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Dimensions contain qualitative values such as names, dates, or geographical data. Use dimensions to categorize, segment, and reveal the details in your data. Dimensions affect the level of detail in the view."
+      ]
+    },
+    {
+      "field_name": "metric",
+      "required": true,
+      "slot_kind": "metric",
+      "accepted_dataset_roles": [
+        "metric",
+        "saved_metric",
+        "adhoc_metric"
+      ],
+      "cardinality": "1",
+      "placeholder": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+      ]
+    },
+    {
+      "field_name": "percent_calculation_type",
+      "required": false,
+      "slot_kind": "latitude",
+      "accepted_dataset_roles": [
+        "geo_latitude"
+      ],
+      "cardinality": "0..1",
+      "placeholder": "<latitude_column>",
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Display percents in the label and tooltip as the percent of the total value, from the first step of the funnel, or from the previous step in the funnel."
+      ]
+    }
+  ],
+  "non_binding_form_controls": [
+    {
+      "field_name": "color_scheme",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The color scheme for rendering chart"
+      ]
+    },
+    {
+      "field_name": "currency_format",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Currency format"
+      ]
+    },
+    {
+      "field_name": "label_type",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "What should be shown as the label"
+      ]
+    },
+    {
+      "field_name": "legendMargin",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Additional padding for legend."
+      ]
+    },
+    {
+      "field_name": "legendOrientation",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Legend Orientation"
+      ]
+    },
+    {
+      "field_name": "number_format",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "D3 number format. See the linked docs for supported syntax."
+      ]
+    },
+    {
+      "field_name": "row_limit",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Limits the number of the rows that are computed in the query that is the source of the data used for this chart."
+      ]
+    },
+    {
+      "field_name": "show_labels",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to display the labels."
+      ]
+    },
+    {
+      "field_name": "show_legend",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to display a legend for the chart"
+      ]
+    },
+    {
+      "field_name": "show_tooltip_labels",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to display the tooltip labels."
+      ]
+    },
+    {
+      "field_name": "sort_by_metric",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to sort results by the selected metric in descending order."
+      ]
+    },
+    {
+      "field_name": "tooltip_label_type",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "What should be shown as the tooltip label"
+      ]
+    }
+  ],
+  "dataset_role_inventory": {
+    "adhoc_metric": [
+      "metric"
+    ],
+    "category_dimension": [
+      "groupby"
+    ],
+    "dimension": [
+      "groupby"
+    ],
+    "filter_context": [
+      "adhoc_filters"
+    ],
+    "geo_latitude": [
+      "percent_calculation_type"
+    ],
+    "metric": [
+      "metric"
+    ],
+    "saved_metric": [
+      "metric"
+    ]
+  },
+  "binding_seed_example": {
+    "groupby": [
+      "<dimension_column>"
+    ],
+    "metric": {
+      "expressionType": "SIMPLE",
+      "column": {
+        "column_name": "<metric_column>"
+      },
+      "aggregate": "SUM",
+      "label": "SUM(<metric_column>)"
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "funnel",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/funnel-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/funnel-form-data-schema.json",
+      "control-schema": "form-data-schema/funnel-schema.json"
+    }
+  }
+}

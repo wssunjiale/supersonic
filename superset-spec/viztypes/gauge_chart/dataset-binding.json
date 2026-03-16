@@ -1,0 +1,431 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "gauge_chart",
+  "display_name": "Gauge Chart",
+  "generation_mode": "heuristic_seed",
+  "slot_candidates": [
+    {
+      "field_name": "adhoc_filters",
+      "required": false,
+      "slot_kind": "filter_list",
+      "accepted_dataset_roles": [
+        "filter_context"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [],
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [
+        "extra_form_data.append"
+      ],
+      "descriptions": [
+        "源码未提供额外描述；字段标签为 Filters。"
+      ]
+    },
+    {
+      "field_name": "groupby",
+      "required": false,
+      "slot_kind": "dimension_list",
+      "accepted_dataset_roles": [
+        "dimension",
+        "category_dimension"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [
+        "<dimension_column>"
+      ],
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Columns to group by"
+      ]
+    },
+    {
+      "field_name": "metric",
+      "required": true,
+      "slot_kind": "metric",
+      "accepted_dataset_roles": [
+        "metric",
+        "saved_metric",
+        "adhoc_metric"
+      ],
+      "cardinality": "1",
+      "placeholder": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+      ]
+    }
+  ],
+  "non_binding_form_controls": [
+    {
+      "field_name": "animation",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "通用图表选项"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to animate the progress and the value or just display them"
+      ]
+    },
+    {
+      "field_name": "color_scheme",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "通用图表选项"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The color scheme for rendering chart"
+      ]
+    },
+    {
+      "field_name": "currency_format",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "通用图表选项"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Currency format"
+      ]
+    },
+    {
+      "field_name": "end_angle",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Angle at which to end progress axis"
+      ]
+    },
+    {
+      "field_name": "font_size",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "通用图表选项"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Font size for axis labels, detail value and other text elements"
+      ]
+    },
+    {
+      "field_name": "interval_color_indices",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "图表专属"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Comma-separated color picks for the intervals, e.g. 1,2,4. Integers denote colors from the chosen color scheme and are 1-indexed. Length must be matching that of interval bounds."
+      ]
+    },
+    {
+      "field_name": "intervals",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "图表专属"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Comma-separated interval bounds, e.g. 2,4,5 for intervals 0-2, 2-4 and 4-5. Last number should match the value provided for MAX."
+      ]
+    },
+    {
+      "field_name": "max_val",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Maximum value on the gauge axis"
+      ]
+    },
+    {
+      "field_name": "min_val",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Minimum value on the gauge axis"
+      ]
+    },
+    {
+      "field_name": "number_format",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "通用图表选项"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "D3 format syntax: https://github.com/d3/d3-format"
+      ]
+    },
+    {
+      "field_name": "overlap",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether the progress bar overlaps when there are multiple groups of data"
+      ]
+    },
+    {
+      "field_name": "round_cap",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Style the ends of the progress bar with a round cap"
+      ]
+    },
+    {
+      "field_name": "row_limit",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Limits the number of the rows that are computed in the query that is the source of the data used for this chart."
+      ]
+    },
+    {
+      "field_name": "show_axis_tick",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to show minor ticks on the axis"
+      ]
+    },
+    {
+      "field_name": "show_pointer",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to show the pointer"
+      ]
+    },
+    {
+      "field_name": "show_progress",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to show the progress of gauge chart"
+      ]
+    },
+    {
+      "field_name": "show_split_line",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to show the split lines on the axis"
+      ]
+    },
+    {
+      "field_name": "sort_by_metric",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to sort results by the selected metric in descending order."
+      ]
+    },
+    {
+      "field_name": "split_number",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Number of split segments on the axis"
+      ]
+    },
+    {
+      "field_name": "start_angle",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Angle at which to start progress axis"
+      ]
+    },
+    {
+      "field_name": "value_formatter",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "通用图表选项"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Additional text to add before or after the value, e.g. unit"
+      ]
+    }
+  ],
+  "dataset_role_inventory": {
+    "adhoc_metric": [
+      "metric"
+    ],
+    "category_dimension": [
+      "groupby"
+    ],
+    "dimension": [
+      "groupby"
+    ],
+    "filter_context": [
+      "adhoc_filters"
+    ],
+    "metric": [
+      "metric"
+    ],
+    "saved_metric": [
+      "metric"
+    ]
+  },
+  "binding_seed_example": {
+    "metric": {
+      "expressionType": "SIMPLE",
+      "column": {
+        "column_name": "<metric_column>"
+      },
+      "aggregate": "SUM",
+      "label": "SUM(<metric_column>)"
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "gauge_chart",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/gauge_chart-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/gauge_chart-form-data-schema.json",
+      "control-schema": "form-data-schema/gauge_chart-schema.json"
+    }
+  }
+}

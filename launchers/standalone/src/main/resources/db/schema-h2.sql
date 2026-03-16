@@ -123,6 +123,7 @@ CREATE TABLE IF NOT EXISTS `s2_chat_model`
    `updated_by` varchar(100) NOT  NULL,
    `admin` varchar(500) NOT  NULL,
    `viewer` varchar(500) DEFAULT  NULL,
+   `is_open` TINYINT DEFAULT NULL  , -- whether public
     PRIMARY KEY (`id`)
 ); COMMENT ON TABLE s2_chat_model IS 'chat model table';
 
@@ -135,6 +136,7 @@ create table IF NOT EXISTS s2_user
     salt varchar(256)  NULL,
     email varchar(100) null,
     is_admin INT null,
+    last_login TIMESTAMP NULL,
     PRIMARY KEY (`id`)
 );
 COMMENT ON TABLE s2_user IS 'user information table';
@@ -204,6 +206,7 @@ CREATE TABLE IF NOT EXISTS `s2_database` (
    `updated_by` varchar(100) NOT  NULL,
    `admin` varchar(500) NOT  NULL,
    `viewer` varchar(500) DEFAULT  NULL,
+   `is_open` TINYINT DEFAULT NULL  , -- whether public
    PRIMARY KEY (`id`)
 );
 COMMENT ON TABLE s2_database IS 'database instance table';
@@ -275,7 +278,7 @@ CREATE TABLE IF NOT EXISTS s2_model_rela
     from_model_id    BIGINT,
     to_model_id      BIGINT,
     join_type       VARCHAR(255),
-    join_condition  VARCHAR(255),
+    join_condition  TEXT,
     PRIMARY KEY (`id`)
 );
 
@@ -386,7 +389,7 @@ CREATE TABLE IF NOT EXISTS s2_agent
     enable_feedback int null,
     `admin` varchar(3000) DEFAULT NULL  , -- administrator
     `admin_org` varchar(3000) DEFAULT NULL  , -- administrators organization
-    `is_open` TINYINT DEFAULT NULL  , -- whether the public
+    `is_open` TINYINT DEFAULT NULL  , -- whether public
     `viewer` varchar(3000) DEFAULT NULL  , -- available users
     `view_org` varchar(3000) DEFAULT NULL  , -- available organization
     PRIMARY KEY (`id`)
@@ -501,6 +504,13 @@ CREATE TABLE IF NOT EXISTS `s2_superset_dataset` (
     `superset_dataset_id` BIGINT DEFAULT NULL,
     `columns` LONGVARCHAR DEFAULT NULL,
     `metrics` LONGVARCHAR DEFAULT NULL,
+    `source_type` varchar(50) DEFAULT NULL,
+    `sync_state` varchar(20) DEFAULT NULL,
+    `sync_attempt_at` TIMESTAMP DEFAULT NULL,
+    `next_retry_at` TIMESTAMP DEFAULT NULL,
+    `retry_count` INT DEFAULT 0,
+    `sync_error_type` varchar(20) DEFAULT NULL,
+    `sync_error_msg` LONGVARCHAR DEFAULT NULL,
     `created_at` TIMESTAMP DEFAULT NULL,
     `created_by` varchar(100) DEFAULT NULL,
     `updated_at` TIMESTAMP DEFAULT NULL,

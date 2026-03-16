@@ -1,0 +1,3020 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "deck_polygon",
+  "display_name": "deck.gl Polygon",
+  "source_kind": "schema_file",
+  "normalized_control_schema": {
+    "field_category_order": [
+      "Query",
+      "Map",
+      "Polygon Settings",
+      "Advanced"
+    ],
+    "field_occurrences": [
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "line_column",
+        "runtime_alias": null,
+        "required": true,
+        "embedding": "否",
+        "description": "The database columns that contains lines information",
+        "data_type": "string | object",
+        "sample_data": "contour",
+        "original_field": {
+          "field_name": "line_column",
+          "description": "The database columns that contains lines information",
+          "data_type": "string | object",
+          "enum_source": "datasource columns；底层共享控件是 `dndEntityControl` 单选列控件",
+          "sample_data": "contour",
+          "required": true,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "当前图标签覆写为 `Polygon Column`。后端直接按这个列名读取 polygon 编码文本。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "line_type",
+        "runtime_alias": null,
+        "required": true,
+        "embedding": "否",
+        "description": "The encoding format of the lines",
+        "data_type": "string",
+        "sample_data": "json",
+        "original_field": {
+          "field_name": "line_type",
+          "description": "The encoding format of the lines",
+          "data_type": "string",
+          "enum_values": [
+            "polyline",
+            "json",
+            "geohash"
+          ],
+          "sample_data": "json",
+          "required": true,
+          "embedding": "否",
+          "default_value": "json",
+          "notes": "当前图标签覆写为 `Polygon Encoding`。tooltip 分支源码还兼容 `zipcode`，但 controlPanel 没正式暴露该值。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "adhoc_filters",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "description": "字段标签为 Filters。legacy `/superset/explore_json/` 路径会先把 legacy filters 归并进 `adhoc_filters`，再继续 merge `extra_form_data`。",
+        "data_type": "array[object]",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "contour",
+            "operator": "IS NOT NULL",
+            "comparator": ""
+          }
+        ],
+        "original_field": {
+          "field_name": "adhoc_filters",
+          "description": "字段标签为 Filters。legacy `/superset/explore_json/` 路径会先把 legacy filters 归并进 `adhoc_filters`，再继续 merge `extra_form_data`。",
+          "data_type": "array[object]",
+          "enum_source": "datasource columns",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "contour",
+              "operator": "IS NOT NULL",
+              "comparator": ""
+            }
+          ],
+          "required": false,
+          "embedding": "extra_form_data.append",
+          "default_value": [],
+          "notes": "即便 root 不显式提供，若 `filter_nulls=true`，后端也会在查询前自动把 `line_column` 的 `IS NOT NULL` 过滤补进来。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "metric",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+        "data_type": "string | object | null",
+        "sample_data": "count",
+        "original_field": {
+          "field_name": "metric",
+          "description": "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+          "data_type": "string | object | null",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": "count",
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "当前图显式移除了 `metric` 的非空校验。若 `color_scheme_type` 使用 `linear_palette` 或 `color_breakpoints` 且需要真正按指标着色、显示 legend 或默认 tooltip，则该字段变成条件必填。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "point_radius_fixed",
+        "runtime_alias": null,
+        "required": true,
+        "embedding": "否",
+        "description": "Fixed point radius",
+        "data_type": "object",
+        "sample_data": {
+          "type": "fix",
+          "value": 1000
+        },
+        "original_field": {
+          "field_name": "point_radius_fixed",
+          "description": "Fixed point radius",
+          "data_type": "object",
+          "enum_values": [
+            "fix",
+            "metric"
+          ],
+          "sample_data": {
+            "type": "fix",
+            "value": 1000
+          },
+          "required": true,
+          "embedding": "否",
+          "default_value": {
+            "type": "fix",
+            "value": 1000
+          },
+          "notes": "当前图标签覆写为 `Elevation`。当 `type='metric'` 时，`value` 是另一个指标；当 `type='fix'` 时，`value` 是固定高度数值。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "row_limit",
+        "runtime_alias": "rowLimit",
+        "required": false,
+        "embedding": "否",
+        "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+        "data_type": "integer",
+        "sample_data": 10000,
+        "original_field": {
+          "field_name": "row_limit",
+          "runtime_alias": "rowLimit",
+          "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+          "data_type": "integer",
+          "enum_values": [
+            10,
+            50,
+            100,
+            250,
+            500,
+            1000,
+            5000,
+            10000,
+            50000
+          ],
+          "sample_data": 10000,
+          "required": false,
+          "embedding": "否",
+          "default_value": 10000
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "reverse_long_lat",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "字段标签为 Reverse Lat & Long。",
+        "data_type": "boolean",
+        "sample_data": false,
+        "original_field": {
+          "field_name": "reverse_long_lat",
+          "description": "字段标签为 Reverse Lat & Long。",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false,
+          "notes": "后端 `DeckPathViz.get_properties()` 会在反序列化 polygon 后逐点交换经纬度顺序。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "filter_nulls",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Whether to ignore locations that are null",
+        "data_type": "boolean",
+        "sample_data": true,
+        "original_field": {
+          "field_name": "filter_nulls",
+          "description": "Whether to ignore locations that are null",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true,
+          "notes": "为 true 时，`BaseDeckGLViz.add_null_filters()` 会自动补 `line_column IS NOT NULL`。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Map",
+        "field_name": "mapbox_style",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/ or tile server URL.",
+        "data_type": "string",
+        "sample_data": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+        "original_field": {
+          "field_name": "mapbox_style",
+          "description": "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/ or tile server URL.",
+          "data_type": "string",
+          "enum_source": "bootstrap common.deckgl_tiles or DEFAULT_DECKGL_TILES",
+          "sample_data": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+          "required": false,
+          "embedding": "否",
+          "default_value": "getDeckGLTiles()[0][0]"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Map",
+        "field_name": "viewport",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Parameters related to the view and perspective on the map",
+        "data_type": "object",
+        "sample_data": {
+          "longitude": 6.85236157047845,
+          "latitude": 31.222656842808707,
+          "zoom": 1,
+          "bearing": 0,
+          "pitch": 0
+        },
+        "original_field": {
+          "field_name": "viewport",
+          "description": "Parameters related to the view and perspective on the map",
+          "data_type": "object",
+          "sample_data": {
+            "longitude": 6.85236157047845,
+            "latitude": 31.222656842808707,
+            "zoom": 1,
+            "bearing": 0,
+            "pitch": 0
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": {
+            "longitude": 6.85236157047845,
+            "latitude": 31.222656842808707,
+            "zoom": 1,
+            "bearing": 0,
+            "pitch": 0
+          },
+          "notes": "运行时 `transformProps.ts` 会把当前图表的 `width`/`height` 合并进 viewport，但 root form_data 不需要自己提供宽高。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Map",
+        "field_name": "autozoom",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "When checked, the map will zoom to your data after each query",
+        "data_type": "boolean",
+        "sample_data": true,
+        "original_field": {
+          "field_name": "autozoom",
+          "description": "When checked, the map will zoom to your data after each query",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Polygon Settings",
+        "field_name": "color_scheme_type",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Select the type of color scheme to use.",
+        "data_type": "string",
+        "sample_data": "linear_palette",
+        "original_field": {
+          "field_name": "color_scheme_type",
+          "description": "Select the type of color scheme to use.",
+          "data_type": "string",
+          "enum_values": [
+            "fixed_color",
+            "linear_palette",
+            "color_breakpoints"
+          ],
+          "sample_data": "linear_palette",
+          "required": false,
+          "embedding": "否",
+          "default_value": "linear_palette",
+          "notes": "当前图覆写了共享配色类型选项，不允许 `categorical_palette`。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Polygon Settings",
+        "field_name": "fill_color_picker",
+        "runtime_alias": null,
+        "required": true,
+        "embedding": "否",
+        "description": "Set the opacity to 0 if you do not want to override the color specified in the GeoJSON",
+        "data_type": "object",
+        "sample_data": {
+          "r": 0,
+          "g": 122,
+          "b": 135,
+          "a": 1
+        },
+        "original_field": {
+          "field_name": "fill_color_picker",
+          "description": "Set the opacity to 0 if you do not want to override the color specified in the GeoJSON",
+          "data_type": "object",
+          "sample_data": {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          },
+          "required": true,
+          "embedding": "否",
+          "default_value": {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          },
+          "notes": "仅当 `color_scheme_type='fixed_color'` 时在 UI 中可见，但 `Polygon.tsx` 会直接读取它作为 fixed-color 模式颜色和 metric 为空时的 fallback。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Polygon Settings",
+        "field_name": "stroke_color_picker",
+        "runtime_alias": null,
+        "required": true,
+        "embedding": "否",
+        "description": "Set the opacity to 0 if you do not want to override the color specified in the GeoJSON",
+        "data_type": "object",
+        "sample_data": {
+          "r": 0,
+          "g": 122,
+          "b": 135,
+          "a": 1
+        },
+        "original_field": {
+          "field_name": "stroke_color_picker",
+          "description": "Set the opacity to 0 if you do not want to override the color specified in the GeoJSON",
+          "data_type": "object",
+          "sample_data": {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          },
+          "required": true,
+          "embedding": "否",
+          "default_value": {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          },
+          "notes": "`Polygon.tsx` 会直接把它传给 `PolygonLayer.getLineColor`。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Polygon Settings",
+        "field_name": "linear_color_scheme",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Select a linear color scheme",
+        "data_type": "string | array[string]",
+        "sample_data": "blue_white_yellow",
+        "original_field": {
+          "field_name": "linear_color_scheme",
+          "description": "Select a linear color scheme",
+          "data_type": "string | array[string]",
+          "enum_source": "sequentialSchemeRegistry.values()",
+          "sample_data": "blue_white_yellow",
+          "required": false,
+          "embedding": "否",
+          "default_value": "sequentialSchemeRegistry.getDefaultKey()",
+          "notes": "仅当 `color_scheme_type='linear_palette'` 时可见。若提供数组，自定义顺序色带也会被运行时接受。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Polygon Settings",
+        "field_name": "deafult_breakpoint_color",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "The color used when a value doesn't match any defined breakpoints.",
+        "data_type": "object",
+        "sample_data": {
+          "r": 158,
+          "g": 158,
+          "b": 158,
+          "a": 1
+        },
+        "original_field": {
+          "field_name": "deafult_breakpoint_color",
+          "description": "The color used when a value doesn't match any defined breakpoints.",
+          "data_type": "object",
+          "sample_data": {
+            "r": 158,
+            "g": 158,
+            "b": 158,
+            "a": 1
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": {
+            "r": 158,
+            "g": 158,
+            "b": 158,
+            "a": 1
+          },
+          "notes": "字段名拼写来自源码，必须保持 `deafult_breakpoint_color` 原样。仅当 `color_scheme_type='color_breakpoints'` 时可见。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Polygon Settings",
+        "field_name": "color_breakpoints",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Define color breakpoints for the data",
+        "data_type": "array[ColorBreakpointType]",
+        "sample_data": [
+          {
+            "minValue": 0,
+            "maxValue": 100,
+            "color": {
+              "r": 255,
+              "g": 0,
+              "b": 0,
+              "a": 1
+            }
+          }
+        ],
+        "original_field": {
+          "field_name": "color_breakpoints",
+          "description": "Define color breakpoints for the data",
+          "data_type": "array[ColorBreakpointType]",
+          "sample_data": [
+            {
+              "minValue": 0,
+              "maxValue": 100,
+              "color": {
+                "r": 255,
+                "g": 0,
+                "b": 0,
+                "a": 1
+              }
+            }
+          ],
+          "required": false,
+          "embedding": "否",
+          "default_value": [],
+          "notes": "元素结构来自 `src/types.ts::ColorBreakpointType`。仅当 `color_scheme_type='color_breakpoints'` 时可见。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Polygon Settings",
+        "field_name": "filled",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Whether to fill the objects",
+        "data_type": "boolean",
+        "sample_data": true,
+        "original_field": {
+          "field_name": "filled",
+          "description": "Whether to fill the objects",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Polygon Settings",
+        "field_name": "stroked",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Whether to display the stroke",
+        "data_type": "boolean",
+        "sample_data": false,
+        "original_field": {
+          "field_name": "stroked",
+          "description": "Whether to display the stroke",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Polygon Settings",
+        "field_name": "extruded",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Whether to make the grid 3D",
+        "data_type": "boolean",
+        "sample_data": true,
+        "original_field": {
+          "field_name": "extruded",
+          "description": "Whether to make the grid 3D",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true,
+          "notes": "虽然描述文案仍写着 grid 3D，但当前图实际作用是 polygon 是否挤出成立体。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Polygon Settings",
+        "field_name": "multiplier",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Factor to multiply the metric by",
+        "data_type": "number | string",
+        "sample_data": 1,
+        "original_field": {
+          "field_name": "multiplier",
+          "description": "Factor to multiply the metric by",
+          "data_type": "number | string",
+          "sample_data": 1,
+          "required": false,
+          "embedding": "否",
+          "default_value": 1,
+          "notes": "`Polygon.tsx` 运行时把它传给 `PolygonLayer.elevationScale`。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Polygon Settings",
+        "field_name": "line_width",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "The width of the lines",
+        "data_type": "integer | string",
+        "sample_data": 10,
+        "original_field": {
+          "field_name": "line_width",
+          "description": "The width of the lines",
+          "data_type": "integer | string",
+          "sample_data": 10,
+          "required": false,
+          "embedding": "否",
+          "default_value": 1
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Polygon Settings",
+        "field_name": "line_width_unit",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "字段标签为 Line width unit。",
+        "data_type": "string",
+        "sample_data": "pixels",
+        "original_field": {
+          "field_name": "line_width_unit",
+          "description": "字段标签为 Line width unit。",
+          "data_type": "string",
+          "enum_values": [
+            "meters",
+            "pixels"
+          ],
+          "sample_data": "pixels",
+          "required": false,
+          "embedding": "否",
+          "default_value": "pixels"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Polygon Settings",
+        "field_name": "opacity",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Opacity, expects values between 0 and 100",
+        "data_type": "integer",
+        "sample_data": 80,
+        "original_field": {
+          "field_name": "opacity",
+          "description": "Opacity, expects values between 0 and 100",
+          "data_type": "integer",
+          "enum_values": [
+            0,
+            100
+          ],
+          "sample_data": 80,
+          "required": false,
+          "embedding": "否",
+          "default_value": 80,
+          "notes": "`Polygon.tsx` 会把它换算成 `opacity / 100`。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Polygon Settings",
+        "field_name": "num_buckets",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "How many buckets should the data be grouped in.",
+        "data_type": "string | integer",
+        "sample_data": 5,
+        "original_field": {
+          "field_name": "num_buckets",
+          "description": "How many buckets should the data be grouped in.",
+          "data_type": "string | integer",
+          "enum_values": [
+            2,
+            3,
+            5,
+            10
+          ],
+          "sample_data": 5,
+          "required": false,
+          "embedding": "否",
+          "default_value": 5,
+          "notes": "控件是 freeForm 单选。若 `break_points` 为空，`getBreakPoints()` 会按 `num_buckets` 自动生成分桶。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Polygon Settings",
+        "field_name": "break_points",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "List of n+1 values for bucketing metric into n buckets.",
+        "data_type": "array[string]",
+        "sample_data": [
+          "0",
+          "100",
+          "200"
+        ],
+        "original_field": {
+          "field_name": "break_points",
+          "description": "List of n+1 values for bucketing metric into n buckets.",
+          "data_type": "array[string]",
+          "sample_data": [
+            "0",
+            "100",
+            "200"
+          ],
+          "required": false,
+          "embedding": "否",
+          "default_value": [],
+          "notes": "控件是 freeForm 多选。源码没有显式默认值；这里用空数组表示“未手工指定，由 `num_buckets` 自动推导”。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Polygon Settings",
+        "field_name": "legend_position",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Choose the position of the legend",
+        "data_type": "string | null",
+        "sample_data": "tr",
+        "original_field": {
+          "field_name": "legend_position",
+          "description": "Choose the position of the legend",
+          "data_type": "string | null",
+          "enum_values": [
+            null,
+            "tl",
+            "tr",
+            "bl",
+            "br"
+          ],
+          "sample_data": "tr",
+          "required": false,
+          "embedding": "否",
+          "default_value": "tr",
+          "notes": "只有 `metric !== null` 时 legend 才真正显示。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Polygon Settings",
+        "field_name": "legend_format",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Choose the format for legend values",
+        "data_type": "string | null",
+        "sample_data": null,
+        "original_field": {
+          "field_name": "legend_format",
+          "description": "Choose the format for legend values",
+          "data_type": "string | null",
+          "enum_source": "D3_FORMAT_OPTIONS",
+          "sample_data": null,
+          "required": false,
+          "embedding": "否",
+          "default_value": "D3_FORMAT_OPTIONS[0][0]"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Advanced",
+        "field_name": "js_columns",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "List of extra columns made available in JavaScript functions",
+        "data_type": "array[string | object]",
+        "sample_data": [
+          "population",
+          "area"
+        ],
+        "original_field": {
+          "field_name": "js_columns",
+          "description": "List of extra columns made available in JavaScript functions",
+          "data_type": "array[string | object]",
+          "enum_source": "datasource columns",
+          "sample_data": [
+            "population",
+            "area"
+          ],
+          "required": false,
+          "embedding": "否",
+          "default_value": [],
+          "notes": "`BaseDeckGLViz.query_obj()` 会把它们并入 query columns/groupby，并在返回特征中以 `extraProps` 暴露给自定义 JS。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Advanced",
+        "field_name": "js_data_mutator",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Define a javascript function that receives the data array used in the visualization and is expected to return a modified version of that array.",
+        "data_type": "string",
+        "sample_data": "data => data",
+        "original_field": {
+          "field_name": "js_data_mutator",
+          "description": "Define a javascript function that receives the data array used in the visualization and is expected to return a modified version of that array.",
+          "data_type": "string",
+          "sample_data": "data => data",
+          "required": false,
+          "embedding": "否",
+          "default_value": "",
+          "notes": "如果功能开关 `EnableJavascriptControls` 关闭，该控件会变成只读并显示安全提示。`Polygon.tsx` 会在绘图前执行它。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Advanced",
+        "field_name": "js_tooltip",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Define a function that receives the input and outputs the content for a tooltip",
+        "data_type": "string",
+        "sample_data": "o => `<div>${o.object.elevation}</div>`",
+        "original_field": {
+          "field_name": "js_tooltip",
+          "description": "Define a function that receives the input and outputs the content for a tooltip",
+          "data_type": "string",
+          "sample_data": "o => `<div>${o.object.elevation}</div>`",
+          "required": false,
+          "embedding": "否",
+          "default_value": "",
+          "notes": "若提供，会覆写默认 tooltip 生成逻辑。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Advanced",
+        "field_name": "js_onclick_href",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Define a function that returns a URL to navigate to when user clicks",
+        "data_type": "string",
+        "sample_data": "o => `https://example.com/?name=${o.object.name}`",
+        "original_field": {
+          "field_name": "js_onclick_href",
+          "description": "Define a function that returns a URL to navigate to when user clicks",
+          "data_type": "string",
+          "sample_data": "o => `https://example.com/?name=${o.object.name}`",
+          "required": false,
+          "embedding": "否",
+          "default_value": "",
+          "notes": "若提供，`commonLayerProps()` 会在点击 polygon 时打开该 URL。"
+        }
+      }
+    ],
+    "field_inventory": [
+      {
+        "field_name": "adhoc_filters",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "字段标签为 Filters。legacy `/superset/explore_json/` 路径会先把 legacy filters 归并进 `adhoc_filters`，再继续 merge `extra_form_data`。"
+        ],
+        "data_types": [
+          "array[object]"
+        ],
+        "sample_data_examples": [
+          [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "contour",
+              "operator": "IS NOT NULL",
+              "comparator": ""
+            }
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "adhoc_filters",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "extra_form_data.append",
+            "description": "字段标签为 Filters。legacy `/superset/explore_json/` 路径会先把 legacy filters 归并进 `adhoc_filters`，再继续 merge `extra_form_data`。",
+            "data_type": "array[object]",
+            "sample_data": [
+              {
+                "expressionType": "SIMPLE",
+                "clause": "WHERE",
+                "subject": "contour",
+                "operator": "IS NOT NULL",
+                "comparator": ""
+              }
+            ],
+            "original_field": {
+              "field_name": "adhoc_filters",
+              "description": "字段标签为 Filters。legacy `/superset/explore_json/` 路径会先把 legacy filters 归并进 `adhoc_filters`，再继续 merge `extra_form_data`。",
+              "data_type": "array[object]",
+              "enum_source": "datasource columns",
+              "sample_data": [
+                {
+                  "expressionType": "SIMPLE",
+                  "clause": "WHERE",
+                  "subject": "contour",
+                  "operator": "IS NOT NULL",
+                  "comparator": ""
+                }
+              ],
+              "required": false,
+              "embedding": "extra_form_data.append",
+              "default_value": [],
+              "notes": "即便 root 不显式提供，若 `filter_nulls=true`，后端也会在查询前自动把 `line_column` 的 `IS NOT NULL` 过滤补进来。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "autozoom",
+        "required": false,
+        "categories": [
+          "Map"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "When checked, the map will zoom to your data after each query"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          true
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Map",
+            "field_name": "autozoom",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "When checked, the map will zoom to your data after each query",
+            "data_type": "boolean",
+            "sample_data": true,
+            "original_field": {
+              "field_name": "autozoom",
+              "description": "When checked, the map will zoom to your data after each query",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": true,
+              "required": false,
+              "embedding": "否",
+              "default_value": true
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "break_points",
+        "required": false,
+        "categories": [
+          "Polygon Settings"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "List of n+1 values for bucketing metric into n buckets."
+        ],
+        "data_types": [
+          "array[string]"
+        ],
+        "sample_data_examples": [
+          [
+            "0",
+            "100",
+            "200"
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Polygon Settings",
+            "field_name": "break_points",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "List of n+1 values for bucketing metric into n buckets.",
+            "data_type": "array[string]",
+            "sample_data": [
+              "0",
+              "100",
+              "200"
+            ],
+            "original_field": {
+              "field_name": "break_points",
+              "description": "List of n+1 values for bucketing metric into n buckets.",
+              "data_type": "array[string]",
+              "sample_data": [
+                "0",
+                "100",
+                "200"
+              ],
+              "required": false,
+              "embedding": "否",
+              "default_value": [],
+              "notes": "控件是 freeForm 多选。源码没有显式默认值；这里用空数组表示“未手工指定，由 `num_buckets` 自动推导”。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "color_breakpoints",
+        "required": false,
+        "categories": [
+          "Polygon Settings"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Define color breakpoints for the data"
+        ],
+        "data_types": [
+          "array[ColorBreakpointType]"
+        ],
+        "sample_data_examples": [
+          [
+            {
+              "minValue": 0,
+              "maxValue": 100,
+              "color": {
+                "r": 255,
+                "g": 0,
+                "b": 0,
+                "a": 1
+              }
+            }
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Polygon Settings",
+            "field_name": "color_breakpoints",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Define color breakpoints for the data",
+            "data_type": "array[ColorBreakpointType]",
+            "sample_data": [
+              {
+                "minValue": 0,
+                "maxValue": 100,
+                "color": {
+                  "r": 255,
+                  "g": 0,
+                  "b": 0,
+                  "a": 1
+                }
+              }
+            ],
+            "original_field": {
+              "field_name": "color_breakpoints",
+              "description": "Define color breakpoints for the data",
+              "data_type": "array[ColorBreakpointType]",
+              "sample_data": [
+                {
+                  "minValue": 0,
+                  "maxValue": 100,
+                  "color": {
+                    "r": 255,
+                    "g": 0,
+                    "b": 0,
+                    "a": 1
+                  }
+                }
+              ],
+              "required": false,
+              "embedding": "否",
+              "default_value": [],
+              "notes": "元素结构来自 `src/types.ts::ColorBreakpointType`。仅当 `color_scheme_type='color_breakpoints'` 时可见。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "color_scheme_type",
+        "required": false,
+        "categories": [
+          "Polygon Settings"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select the type of color scheme to use."
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "linear_palette"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Polygon Settings",
+            "field_name": "color_scheme_type",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Select the type of color scheme to use.",
+            "data_type": "string",
+            "sample_data": "linear_palette",
+            "original_field": {
+              "field_name": "color_scheme_type",
+              "description": "Select the type of color scheme to use.",
+              "data_type": "string",
+              "enum_values": [
+                "fixed_color",
+                "linear_palette",
+                "color_breakpoints"
+              ],
+              "sample_data": "linear_palette",
+              "required": false,
+              "embedding": "否",
+              "default_value": "linear_palette",
+              "notes": "当前图覆写了共享配色类型选项，不允许 `categorical_palette`。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "deafult_breakpoint_color",
+        "required": false,
+        "categories": [
+          "Polygon Settings"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "The color used when a value doesn't match any defined breakpoints."
+        ],
+        "data_types": [
+          "object"
+        ],
+        "sample_data_examples": [
+          {
+            "r": 158,
+            "g": 158,
+            "b": 158,
+            "a": 1
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Polygon Settings",
+            "field_name": "deafult_breakpoint_color",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "The color used when a value doesn't match any defined breakpoints.",
+            "data_type": "object",
+            "sample_data": {
+              "r": 158,
+              "g": 158,
+              "b": 158,
+              "a": 1
+            },
+            "original_field": {
+              "field_name": "deafult_breakpoint_color",
+              "description": "The color used when a value doesn't match any defined breakpoints.",
+              "data_type": "object",
+              "sample_data": {
+                "r": 158,
+                "g": 158,
+                "b": 158,
+                "a": 1
+              },
+              "required": false,
+              "embedding": "否",
+              "default_value": {
+                "r": 158,
+                "g": 158,
+                "b": 158,
+                "a": 1
+              },
+              "notes": "字段名拼写来自源码，必须保持 `deafult_breakpoint_color` 原样。仅当 `color_scheme_type='color_breakpoints'` 时可见。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "extruded",
+        "required": false,
+        "categories": [
+          "Polygon Settings"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Whether to make the grid 3D"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          true
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Polygon Settings",
+            "field_name": "extruded",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Whether to make the grid 3D",
+            "data_type": "boolean",
+            "sample_data": true,
+            "original_field": {
+              "field_name": "extruded",
+              "description": "Whether to make the grid 3D",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": true,
+              "required": false,
+              "embedding": "否",
+              "default_value": true,
+              "notes": "虽然描述文案仍写着 grid 3D，但当前图实际作用是 polygon 是否挤出成立体。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "fill_color_picker",
+        "required": true,
+        "categories": [
+          "Polygon Settings"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Set the opacity to 0 if you do not want to override the color specified in the GeoJSON"
+        ],
+        "data_types": [
+          "object"
+        ],
+        "sample_data_examples": [
+          {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Polygon Settings",
+            "field_name": "fill_color_picker",
+            "runtime_alias": null,
+            "required": true,
+            "embedding": "否",
+            "description": "Set the opacity to 0 if you do not want to override the color specified in the GeoJSON",
+            "data_type": "object",
+            "sample_data": {
+              "r": 0,
+              "g": 122,
+              "b": 135,
+              "a": 1
+            },
+            "original_field": {
+              "field_name": "fill_color_picker",
+              "description": "Set the opacity to 0 if you do not want to override the color specified in the GeoJSON",
+              "data_type": "object",
+              "sample_data": {
+                "r": 0,
+                "g": 122,
+                "b": 135,
+                "a": 1
+              },
+              "required": true,
+              "embedding": "否",
+              "default_value": {
+                "r": 0,
+                "g": 122,
+                "b": 135,
+                "a": 1
+              },
+              "notes": "仅当 `color_scheme_type='fixed_color'` 时在 UI 中可见，但 `Polygon.tsx` 会直接读取它作为 fixed-color 模式颜色和 metric 为空时的 fallback。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "filled",
+        "required": false,
+        "categories": [
+          "Polygon Settings"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Whether to fill the objects"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          true
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Polygon Settings",
+            "field_name": "filled",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Whether to fill the objects",
+            "data_type": "boolean",
+            "sample_data": true,
+            "original_field": {
+              "field_name": "filled",
+              "description": "Whether to fill the objects",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": true,
+              "required": false,
+              "embedding": "否",
+              "default_value": true
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "filter_nulls",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Whether to ignore locations that are null"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          true
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "filter_nulls",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Whether to ignore locations that are null",
+            "data_type": "boolean",
+            "sample_data": true,
+            "original_field": {
+              "field_name": "filter_nulls",
+              "description": "Whether to ignore locations that are null",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": true,
+              "required": false,
+              "embedding": "否",
+              "default_value": true,
+              "notes": "为 true 时，`BaseDeckGLViz.add_null_filters()` 会自动补 `line_column IS NOT NULL`。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "js_columns",
+        "required": false,
+        "categories": [
+          "Advanced"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "List of extra columns made available in JavaScript functions"
+        ],
+        "data_types": [
+          "array[string | object]"
+        ],
+        "sample_data_examples": [
+          [
+            "population",
+            "area"
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Advanced",
+            "field_name": "js_columns",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "List of extra columns made available in JavaScript functions",
+            "data_type": "array[string | object]",
+            "sample_data": [
+              "population",
+              "area"
+            ],
+            "original_field": {
+              "field_name": "js_columns",
+              "description": "List of extra columns made available in JavaScript functions",
+              "data_type": "array[string | object]",
+              "enum_source": "datasource columns",
+              "sample_data": [
+                "population",
+                "area"
+              ],
+              "required": false,
+              "embedding": "否",
+              "default_value": [],
+              "notes": "`BaseDeckGLViz.query_obj()` 会把它们并入 query columns/groupby，并在返回特征中以 `extraProps` 暴露给自定义 JS。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "js_data_mutator",
+        "required": false,
+        "categories": [
+          "Advanced"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Define a javascript function that receives the data array used in the visualization and is expected to return a modified version of that array."
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "data => data"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Advanced",
+            "field_name": "js_data_mutator",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Define a javascript function that receives the data array used in the visualization and is expected to return a modified version of that array.",
+            "data_type": "string",
+            "sample_data": "data => data",
+            "original_field": {
+              "field_name": "js_data_mutator",
+              "description": "Define a javascript function that receives the data array used in the visualization and is expected to return a modified version of that array.",
+              "data_type": "string",
+              "sample_data": "data => data",
+              "required": false,
+              "embedding": "否",
+              "default_value": "",
+              "notes": "如果功能开关 `EnableJavascriptControls` 关闭，该控件会变成只读并显示安全提示。`Polygon.tsx` 会在绘图前执行它。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "js_onclick_href",
+        "required": false,
+        "categories": [
+          "Advanced"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Define a function that returns a URL to navigate to when user clicks"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "o => `https://example.com/?name=${o.object.name}`"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Advanced",
+            "field_name": "js_onclick_href",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Define a function that returns a URL to navigate to when user clicks",
+            "data_type": "string",
+            "sample_data": "o => `https://example.com/?name=${o.object.name}`",
+            "original_field": {
+              "field_name": "js_onclick_href",
+              "description": "Define a function that returns a URL to navigate to when user clicks",
+              "data_type": "string",
+              "sample_data": "o => `https://example.com/?name=${o.object.name}`",
+              "required": false,
+              "embedding": "否",
+              "default_value": "",
+              "notes": "若提供，`commonLayerProps()` 会在点击 polygon 时打开该 URL。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "js_tooltip",
+        "required": false,
+        "categories": [
+          "Advanced"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Define a function that receives the input and outputs the content for a tooltip"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "o => `<div>${o.object.elevation}</div>`"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Advanced",
+            "field_name": "js_tooltip",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Define a function that receives the input and outputs the content for a tooltip",
+            "data_type": "string",
+            "sample_data": "o => `<div>${o.object.elevation}</div>`",
+            "original_field": {
+              "field_name": "js_tooltip",
+              "description": "Define a function that receives the input and outputs the content for a tooltip",
+              "data_type": "string",
+              "sample_data": "o => `<div>${o.object.elevation}</div>`",
+              "required": false,
+              "embedding": "否",
+              "default_value": "",
+              "notes": "若提供，会覆写默认 tooltip 生成逻辑。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "legend_format",
+        "required": false,
+        "categories": [
+          "Polygon Settings"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Choose the format for legend values"
+        ],
+        "data_types": [
+          "string | null"
+        ],
+        "sample_data_examples": [],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Polygon Settings",
+            "field_name": "legend_format",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Choose the format for legend values",
+            "data_type": "string | null",
+            "sample_data": null,
+            "original_field": {
+              "field_name": "legend_format",
+              "description": "Choose the format for legend values",
+              "data_type": "string | null",
+              "enum_source": "D3_FORMAT_OPTIONS",
+              "sample_data": null,
+              "required": false,
+              "embedding": "否",
+              "default_value": "D3_FORMAT_OPTIONS[0][0]"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "legend_position",
+        "required": false,
+        "categories": [
+          "Polygon Settings"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Choose the position of the legend"
+        ],
+        "data_types": [
+          "string | null"
+        ],
+        "sample_data_examples": [
+          "tr"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Polygon Settings",
+            "field_name": "legend_position",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Choose the position of the legend",
+            "data_type": "string | null",
+            "sample_data": "tr",
+            "original_field": {
+              "field_name": "legend_position",
+              "description": "Choose the position of the legend",
+              "data_type": "string | null",
+              "enum_values": [
+                null,
+                "tl",
+                "tr",
+                "bl",
+                "br"
+              ],
+              "sample_data": "tr",
+              "required": false,
+              "embedding": "否",
+              "default_value": "tr",
+              "notes": "只有 `metric !== null` 时 legend 才真正显示。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "line_column",
+        "required": true,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "The database columns that contains lines information"
+        ],
+        "data_types": [
+          "string | object"
+        ],
+        "sample_data_examples": [
+          "contour"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "line_column",
+            "runtime_alias": null,
+            "required": true,
+            "embedding": "否",
+            "description": "The database columns that contains lines information",
+            "data_type": "string | object",
+            "sample_data": "contour",
+            "original_field": {
+              "field_name": "line_column",
+              "description": "The database columns that contains lines information",
+              "data_type": "string | object",
+              "enum_source": "datasource columns；底层共享控件是 `dndEntityControl` 单选列控件",
+              "sample_data": "contour",
+              "required": true,
+              "embedding": "否",
+              "default_value": null,
+              "notes": "当前图标签覆写为 `Polygon Column`。后端直接按这个列名读取 polygon 编码文本。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "line_type",
+        "required": true,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "The encoding format of the lines"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "json"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "line_type",
+            "runtime_alias": null,
+            "required": true,
+            "embedding": "否",
+            "description": "The encoding format of the lines",
+            "data_type": "string",
+            "sample_data": "json",
+            "original_field": {
+              "field_name": "line_type",
+              "description": "The encoding format of the lines",
+              "data_type": "string",
+              "enum_values": [
+                "polyline",
+                "json",
+                "geohash"
+              ],
+              "sample_data": "json",
+              "required": true,
+              "embedding": "否",
+              "default_value": "json",
+              "notes": "当前图标签覆写为 `Polygon Encoding`。tooltip 分支源码还兼容 `zipcode`，但 controlPanel 没正式暴露该值。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "line_width",
+        "required": false,
+        "categories": [
+          "Polygon Settings"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "The width of the lines"
+        ],
+        "data_types": [
+          "integer | string"
+        ],
+        "sample_data_examples": [
+          10
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Polygon Settings",
+            "field_name": "line_width",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "The width of the lines",
+            "data_type": "integer | string",
+            "sample_data": 10,
+            "original_field": {
+              "field_name": "line_width",
+              "description": "The width of the lines",
+              "data_type": "integer | string",
+              "sample_data": 10,
+              "required": false,
+              "embedding": "否",
+              "default_value": 1
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "line_width_unit",
+        "required": false,
+        "categories": [
+          "Polygon Settings"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "字段标签为 Line width unit。"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "pixels"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Polygon Settings",
+            "field_name": "line_width_unit",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "字段标签为 Line width unit。",
+            "data_type": "string",
+            "sample_data": "pixels",
+            "original_field": {
+              "field_name": "line_width_unit",
+              "description": "字段标签为 Line width unit。",
+              "data_type": "string",
+              "enum_values": [
+                "meters",
+                "pixels"
+              ],
+              "sample_data": "pixels",
+              "required": false,
+              "embedding": "否",
+              "default_value": "pixels"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "linear_color_scheme",
+        "required": false,
+        "categories": [
+          "Polygon Settings"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select a linear color scheme"
+        ],
+        "data_types": [
+          "string | array[string]"
+        ],
+        "sample_data_examples": [
+          "blue_white_yellow"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Polygon Settings",
+            "field_name": "linear_color_scheme",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Select a linear color scheme",
+            "data_type": "string | array[string]",
+            "sample_data": "blue_white_yellow",
+            "original_field": {
+              "field_name": "linear_color_scheme",
+              "description": "Select a linear color scheme",
+              "data_type": "string | array[string]",
+              "enum_source": "sequentialSchemeRegistry.values()",
+              "sample_data": "blue_white_yellow",
+              "required": false,
+              "embedding": "否",
+              "default_value": "sequentialSchemeRegistry.getDefaultKey()",
+              "notes": "仅当 `color_scheme_type='linear_palette'` 时可见。若提供数组，自定义顺序色带也会被运行时接受。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "mapbox_style",
+        "required": false,
+        "categories": [
+          "Map"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/ or tile server URL."
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Map",
+            "field_name": "mapbox_style",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/ or tile server URL.",
+            "data_type": "string",
+            "sample_data": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+            "original_field": {
+              "field_name": "mapbox_style",
+              "description": "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/ or tile server URL.",
+              "data_type": "string",
+              "enum_source": "bootstrap common.deckgl_tiles or DEFAULT_DECKGL_TILES",
+              "sample_data": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+              "required": false,
+              "embedding": "否",
+              "default_value": "getDeckGLTiles()[0][0]"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "metric",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+        ],
+        "data_types": [
+          "string | object | null"
+        ],
+        "sample_data_examples": [
+          "count"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "metric",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+            "data_type": "string | object | null",
+            "sample_data": "count",
+            "original_field": {
+              "field_name": "metric",
+              "description": "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+              "data_type": "string | object | null",
+              "enum_source": "saved metrics + adhoc metrics",
+              "sample_data": "count",
+              "required": false,
+              "embedding": "否",
+              "default_value": null,
+              "notes": "当前图显式移除了 `metric` 的非空校验。若 `color_scheme_type` 使用 `linear_palette` 或 `color_breakpoints` 且需要真正按指标着色、显示 legend 或默认 tooltip，则该字段变成条件必填。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "multiplier",
+        "required": false,
+        "categories": [
+          "Polygon Settings"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Factor to multiply the metric by"
+        ],
+        "data_types": [
+          "number | string"
+        ],
+        "sample_data_examples": [
+          1
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Polygon Settings",
+            "field_name": "multiplier",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Factor to multiply the metric by",
+            "data_type": "number | string",
+            "sample_data": 1,
+            "original_field": {
+              "field_name": "multiplier",
+              "description": "Factor to multiply the metric by",
+              "data_type": "number | string",
+              "sample_data": 1,
+              "required": false,
+              "embedding": "否",
+              "default_value": 1,
+              "notes": "`Polygon.tsx` 运行时把它传给 `PolygonLayer.elevationScale`。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "num_buckets",
+        "required": false,
+        "categories": [
+          "Polygon Settings"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "How many buckets should the data be grouped in."
+        ],
+        "data_types": [
+          "string | integer"
+        ],
+        "sample_data_examples": [
+          5
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Polygon Settings",
+            "field_name": "num_buckets",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "How many buckets should the data be grouped in.",
+            "data_type": "string | integer",
+            "sample_data": 5,
+            "original_field": {
+              "field_name": "num_buckets",
+              "description": "How many buckets should the data be grouped in.",
+              "data_type": "string | integer",
+              "enum_values": [
+                2,
+                3,
+                5,
+                10
+              ],
+              "sample_data": 5,
+              "required": false,
+              "embedding": "否",
+              "default_value": 5,
+              "notes": "控件是 freeForm 单选。若 `break_points` 为空，`getBreakPoints()` 会按 `num_buckets` 自动生成分桶。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "opacity",
+        "required": false,
+        "categories": [
+          "Polygon Settings"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Opacity, expects values between 0 and 100"
+        ],
+        "data_types": [
+          "integer"
+        ],
+        "sample_data_examples": [
+          80
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Polygon Settings",
+            "field_name": "opacity",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Opacity, expects values between 0 and 100",
+            "data_type": "integer",
+            "sample_data": 80,
+            "original_field": {
+              "field_name": "opacity",
+              "description": "Opacity, expects values between 0 and 100",
+              "data_type": "integer",
+              "enum_values": [
+                0,
+                100
+              ],
+              "sample_data": 80,
+              "required": false,
+              "embedding": "否",
+              "default_value": 80,
+              "notes": "`Polygon.tsx` 会把它换算成 `opacity / 100`。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "point_radius_fixed",
+        "required": true,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Fixed point radius"
+        ],
+        "data_types": [
+          "object"
+        ],
+        "sample_data_examples": [
+          {
+            "type": "fix",
+            "value": 1000
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "point_radius_fixed",
+            "runtime_alias": null,
+            "required": true,
+            "embedding": "否",
+            "description": "Fixed point radius",
+            "data_type": "object",
+            "sample_data": {
+              "type": "fix",
+              "value": 1000
+            },
+            "original_field": {
+              "field_name": "point_radius_fixed",
+              "description": "Fixed point radius",
+              "data_type": "object",
+              "enum_values": [
+                "fix",
+                "metric"
+              ],
+              "sample_data": {
+                "type": "fix",
+                "value": 1000
+              },
+              "required": true,
+              "embedding": "否",
+              "default_value": {
+                "type": "fix",
+                "value": 1000
+              },
+              "notes": "当前图标签覆写为 `Elevation`。当 `type='metric'` 时，`value` 是另一个指标；当 `type='fix'` 时，`value` 是固定高度数值。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "reverse_long_lat",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "字段标签为 Reverse Lat & Long。"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          false
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "reverse_long_lat",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "字段标签为 Reverse Lat & Long。",
+            "data_type": "boolean",
+            "sample_data": false,
+            "original_field": {
+              "field_name": "reverse_long_lat",
+              "description": "字段标签为 Reverse Lat & Long。",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": false,
+              "required": false,
+              "embedding": "否",
+              "default_value": false,
+              "notes": "后端 `DeckPathViz.get_properties()` 会在反序列化 polygon 后逐点交换经纬度顺序。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "row_limit",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [
+          "rowLimit"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Limits the number of the rows that are computed in the query that is the source of the data used for this chart."
+        ],
+        "data_types": [
+          "integer"
+        ],
+        "sample_data_examples": [
+          10000
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "row_limit",
+            "runtime_alias": "rowLimit",
+            "required": false,
+            "embedding": "否",
+            "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+            "data_type": "integer",
+            "sample_data": 10000,
+            "original_field": {
+              "field_name": "row_limit",
+              "runtime_alias": "rowLimit",
+              "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+              "data_type": "integer",
+              "enum_values": [
+                10,
+                50,
+                100,
+                250,
+                500,
+                1000,
+                5000,
+                10000,
+                50000
+              ],
+              "sample_data": 10000,
+              "required": false,
+              "embedding": "否",
+              "default_value": 10000
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "stroke_color_picker",
+        "required": true,
+        "categories": [
+          "Polygon Settings"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Set the opacity to 0 if you do not want to override the color specified in the GeoJSON"
+        ],
+        "data_types": [
+          "object"
+        ],
+        "sample_data_examples": [
+          {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Polygon Settings",
+            "field_name": "stroke_color_picker",
+            "runtime_alias": null,
+            "required": true,
+            "embedding": "否",
+            "description": "Set the opacity to 0 if you do not want to override the color specified in the GeoJSON",
+            "data_type": "object",
+            "sample_data": {
+              "r": 0,
+              "g": 122,
+              "b": 135,
+              "a": 1
+            },
+            "original_field": {
+              "field_name": "stroke_color_picker",
+              "description": "Set the opacity to 0 if you do not want to override the color specified in the GeoJSON",
+              "data_type": "object",
+              "sample_data": {
+                "r": 0,
+                "g": 122,
+                "b": 135,
+                "a": 1
+              },
+              "required": true,
+              "embedding": "否",
+              "default_value": {
+                "r": 0,
+                "g": 122,
+                "b": 135,
+                "a": 1
+              },
+              "notes": "`Polygon.tsx` 会直接把它传给 `PolygonLayer.getLineColor`。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "stroked",
+        "required": false,
+        "categories": [
+          "Polygon Settings"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Whether to display the stroke"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          false
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Polygon Settings",
+            "field_name": "stroked",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Whether to display the stroke",
+            "data_type": "boolean",
+            "sample_data": false,
+            "original_field": {
+              "field_name": "stroked",
+              "description": "Whether to display the stroke",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": false,
+              "required": false,
+              "embedding": "否",
+              "default_value": false
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "viewport",
+        "required": false,
+        "categories": [
+          "Map"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Parameters related to the view and perspective on the map"
+        ],
+        "data_types": [
+          "object"
+        ],
+        "sample_data_examples": [
+          {
+            "longitude": 6.85236157047845,
+            "latitude": 31.222656842808707,
+            "zoom": 1,
+            "bearing": 0,
+            "pitch": 0
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Map",
+            "field_name": "viewport",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Parameters related to the view and perspective on the map",
+            "data_type": "object",
+            "sample_data": {
+              "longitude": 6.85236157047845,
+              "latitude": 31.222656842808707,
+              "zoom": 1,
+              "bearing": 0,
+              "pitch": 0
+            },
+            "original_field": {
+              "field_name": "viewport",
+              "description": "Parameters related to the view and perspective on the map",
+              "data_type": "object",
+              "sample_data": {
+                "longitude": 6.85236157047845,
+                "latitude": 31.222656842808707,
+                "zoom": 1,
+                "bearing": 0,
+                "pitch": 0
+              },
+              "required": false,
+              "embedding": "否",
+              "default_value": {
+                "longitude": 6.85236157047845,
+                "latitude": 31.222656842808707,
+                "zoom": 1,
+                "bearing": 0,
+                "pitch": 0
+              },
+              "notes": "运行时 `transformProps.ts` 会把当前图表的 `width`/`height` 合并进 viewport，但 root form_data 不需要自己提供宽高。"
+            }
+          }
+        ]
+      }
+    ],
+    "required_field_names": [
+      "fill_color_picker",
+      "line_column",
+      "line_type",
+      "point_radius_fixed",
+      "stroke_color_picker"
+    ],
+    "embedding_enabled_field_names": [
+      "adhoc_filters"
+    ],
+    "runtime_alias_index": {
+      "row_limit": [
+        "rowLimit"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "deck_polygon",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/deck_polygon-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/deck_polygon-form-data-schema.json",
+      "control-schema": "form-data-schema/deck_polygon-schema.json"
+    }
+  },
+  "fallback_online_field_categories": {
+    "Query": [],
+    "Advanced analytics": [],
+    "Annotations & Layers": [],
+    "Predictive Analytics（Forecast）": [],
+    "Chart Options": [],
+    "Chart Title": [],
+    "图表专属": [],
+    "通用图表选项": []
+  },
+  "original_control_schema": {
+    "viz_type": "deck_polygon",
+    "display_name": "deck.gl Polygon",
+    "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Polygon/controlPanel.ts",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Polygon/controlPanel.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Polygon/index.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Polygon/Polygon.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/factory.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/common.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/Shared_DeckGL.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/sharedDndControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/controls.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/utils.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utils.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utils/crossFiltersDataMask.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/types.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-demo/storybook/stories/plugins/legacy-preset-chart-deckgl/Polygon/payload.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-demo/storybook/stories/plugins/legacy-preset-chart-deckgl/Polygon/Polygon.stories.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+      "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+      "D:/vsx/sources/superset-6.0.0/superset/views/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/utils/core.py"
+    ],
+    "notes": [
+      "deck_polygon 位于 `legacy-preset-chart-deckgl/src/layers/Polygon`，metadata 明确声明 `useLegacyApi=true`，因此真实请求路径是 `/superset/explore_json/`。",
+      "前端展示名是 `deck.gl Polygon`，后端类名是 `superset/viz.py::DeckPolygon`。构造模板时应以 `viz_type='deck_polygon'` 为准。",
+      "`line_column` 底层复用 `dndLineColumn -> dndEntityControl`。该共享控件是单选、默认值为 `null`、并带 `validateNonEmpty`，因此规范创建模板应把 `line_column` 视为高置信必填。",
+      "`metric` 在当前图被显式覆写为 `validators: []`，并且 `formDataOverrides.metric = getStandardizedControls().shiftMetric()`。因此它不是全局必填，但在按指标着色、显示 legend、默认 tooltip 需要指标值时会变成条件必填。",
+      "`point_radius_fixed` 在当前图被改名为 `Elevation`。后端 `DeckPolygon.get_properties()` 会直接索引 `form_data['point_radius_fixed']` 写入每个 feature 的 `elevation`，因此规范模板应显式提供它。",
+      "`color_scheme_type` 在当前图被覆写为仅允许 `fixed_color`、`linear_palette`、`color_breakpoints`，并把默认值改成 `linear_palette`。Polygon 没有 `categorical_palette` 选项。",
+      "`line_type` 共享基础控件和后端反序列化器都支持 `polyline`、`json`、`geohash`。`Polygon.tsx` 的默认 tooltip 逻辑还兼容 `zipcode`，但 controlPanel 没有正式暴露该值，规范模板不应主动使用。",
+      "`crossFiltersDataMask.ts` 对 `deck_polygon` 和 `deck_path` 共用 `getLineColumnFilters()`：会把被点击 polygon 序列化为 JSON 字符串，并构造 SQL 表达式列 `REPLACE(<line_column>, ' ', '')` 作为交互筛选条件。",
+      "storybook `payload.js` 与 `Polygon.stories.tsx` 证明保存态 root form_data 还可能携带 `granularity_sqla`、`time_grain_sqla`、`time_range`、`table_filter`、`toggle_polygons`、`filters`、`where`、`having` 等 legacy 字段；但它们不属于当前 controlPanel 的正式字段。"
+    ],
+    "control_overrides": {
+      "metric": {
+        "validators": []
+      },
+      "time_grain_sqla": {
+        "source": "timeGrainSqlaAnimationOverrides"
+      }
+    },
+    "form_data_overrides": {
+      "metric": "getStandardizedControls().shiftMetric()"
+    },
+    "legacy_api_behavior": {
+      "useLegacyApi": true,
+      "frontend_request_endpoint": "/superset/explore_json/",
+      "frontend_request_payload": {
+        "form_data": "<raw form_data>"
+      },
+      "query_builder": "deck_polygon 没有专属前端 buildQuery。ChartClient.ts 在 `useLegacyApi=true` 且未注册 buildQuery 时，会把原始 form_data 直接包装进 legacy payload。"
+    },
+    "query_compilation": {
+      "backend_class": "superset/viz.py::DeckPolygon",
+      "base_query": "继承 `DeckPathViz.query_obj()` -> `BaseDeckGLViz.query_obj()` -> `BaseViz.query_obj()`，因此会先执行 `convert_legacy_filters_into_adhoc(form_data)` 与 `merge_extra_filters(form_data)`。",
+      "null_filter_injection": "当 `filter_nulls=true`（默认值）时，`BaseDeckGLViz.add_null_filters()` 会自动向 `adhoc_filters` 追加 `line_column IS NOT NULL`。",
+      "metrics": "`DeckPolygon.get_metrics()` 会先读取 `metric`；若 `point_radius_fixed.type='metric'`，还会把 `point_radius_fixed.value` 追加到 metrics。也就是说，polygon 的查询指标既可能来自颜色指标，也可能来自 elevation 指标。",
+      "columns_and_groupby": "`DeckPathViz.query_obj()` 会根据是否存在 metrics 决定查询形状：有 metrics 时，把 `line_column` 追加到 `groupby`；无 metrics 时，把 `line_column` 追加到 `columns`。`BaseDeckGLViz.query_obj()` 还会把可选 `js_columns` 合并到同一路径中。",
+      "returned_data": "`DeckPathViz.get_properties()` 会按 `line_type` 选择 `json.loads`、`polyline.decode` 或 `geohash_to_json` 把 `line_column` 反序列化到 `polygon`，可选执行 `reverse_long_lat`，并补入 `__timestamp`。随后 `DeckPolygon.get_properties()` 再根据 `point_radius_fixed` 计算并写入 `elevation`。",
+      "runtime_rendering": "`Polygon.tsx` 运行时直接读取 `fill_color_picker`、`stroke_color_picker`、`color_scheme_type`、`metric`、`color_breakpoints`、`linear_color_scheme`、`deafult_breakpoint_color`、`filled`、`stroked`、`extruded`、`multiplier`、`line_width`、`line_width_unit`、`opacity`、`legend_position`、`legend_format`、`line_column`、`line_type`、`mapbox_style`、`viewport` 和 `autozoom`。",
+      "tooltip_and_legend": "默认 tooltip 只在 `line_column && metric && line_type in ['json', 'geohash', 'zipcode']` 时启用；legend 只在 `formData.metric !== null` 时渲染。`getBuckets()` 会综合 `break_points`、`num_buckets`、`linear_color_scheme`、`opacity` 生成 legend bucket。"
+    },
+    "field_categories": {
+      "Query": [
+        {
+          "field_name": "line_column",
+          "description": "The database columns that contains lines information",
+          "data_type": "string | object",
+          "enum_source": "datasource columns；底层共享控件是 `dndEntityControl` 单选列控件",
+          "sample_data": "contour",
+          "required": true,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "当前图标签覆写为 `Polygon Column`。后端直接按这个列名读取 polygon 编码文本。"
+        },
+        {
+          "field_name": "line_type",
+          "description": "The encoding format of the lines",
+          "data_type": "string",
+          "enum_values": [
+            "polyline",
+            "json",
+            "geohash"
+          ],
+          "sample_data": "json",
+          "required": true,
+          "embedding": "否",
+          "default_value": "json",
+          "notes": "当前图标签覆写为 `Polygon Encoding`。tooltip 分支源码还兼容 `zipcode`，但 controlPanel 没正式暴露该值。"
+        },
+        {
+          "field_name": "adhoc_filters",
+          "description": "字段标签为 Filters。legacy `/superset/explore_json/` 路径会先把 legacy filters 归并进 `adhoc_filters`，再继续 merge `extra_form_data`。",
+          "data_type": "array[object]",
+          "enum_source": "datasource columns",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "contour",
+              "operator": "IS NOT NULL",
+              "comparator": ""
+            }
+          ],
+          "required": false,
+          "embedding": "extra_form_data.append",
+          "default_value": [],
+          "notes": "即便 root 不显式提供，若 `filter_nulls=true`，后端也会在查询前自动把 `line_column` 的 `IS NOT NULL` 过滤补进来。"
+        },
+        {
+          "field_name": "metric",
+          "description": "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+          "data_type": "string | object | null",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": "count",
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "当前图显式移除了 `metric` 的非空校验。若 `color_scheme_type` 使用 `linear_palette` 或 `color_breakpoints` 且需要真正按指标着色、显示 legend 或默认 tooltip，则该字段变成条件必填。"
+        },
+        {
+          "field_name": "point_radius_fixed",
+          "description": "Fixed point radius",
+          "data_type": "object",
+          "enum_values": [
+            "fix",
+            "metric"
+          ],
+          "sample_data": {
+            "type": "fix",
+            "value": 1000
+          },
+          "required": true,
+          "embedding": "否",
+          "default_value": {
+            "type": "fix",
+            "value": 1000
+          },
+          "notes": "当前图标签覆写为 `Elevation`。当 `type='metric'` 时，`value` 是另一个指标；当 `type='fix'` 时，`value` 是固定高度数值。"
+        },
+        {
+          "field_name": "row_limit",
+          "runtime_alias": "rowLimit",
+          "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+          "data_type": "integer",
+          "enum_values": [
+            10,
+            50,
+            100,
+            250,
+            500,
+            1000,
+            5000,
+            10000,
+            50000
+          ],
+          "sample_data": 10000,
+          "required": false,
+          "embedding": "否",
+          "default_value": 10000
+        },
+        {
+          "field_name": "reverse_long_lat",
+          "description": "字段标签为 Reverse Lat & Long。",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false,
+          "notes": "后端 `DeckPathViz.get_properties()` 会在反序列化 polygon 后逐点交换经纬度顺序。"
+        },
+        {
+          "field_name": "filter_nulls",
+          "description": "Whether to ignore locations that are null",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true,
+          "notes": "为 true 时，`BaseDeckGLViz.add_null_filters()` 会自动补 `line_column IS NOT NULL`。"
+        }
+      ],
+      "Map": [
+        {
+          "field_name": "mapbox_style",
+          "description": "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/ or tile server URL.",
+          "data_type": "string",
+          "enum_source": "bootstrap common.deckgl_tiles or DEFAULT_DECKGL_TILES",
+          "sample_data": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+          "required": false,
+          "embedding": "否",
+          "default_value": "getDeckGLTiles()[0][0]"
+        },
+        {
+          "field_name": "viewport",
+          "description": "Parameters related to the view and perspective on the map",
+          "data_type": "object",
+          "sample_data": {
+            "longitude": 6.85236157047845,
+            "latitude": 31.222656842808707,
+            "zoom": 1,
+            "bearing": 0,
+            "pitch": 0
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": {
+            "longitude": 6.85236157047845,
+            "latitude": 31.222656842808707,
+            "zoom": 1,
+            "bearing": 0,
+            "pitch": 0
+          },
+          "notes": "运行时 `transformProps.ts` 会把当前图表的 `width`/`height` 合并进 viewport，但 root form_data 不需要自己提供宽高。"
+        },
+        {
+          "field_name": "autozoom",
+          "description": "When checked, the map will zoom to your data after each query",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true
+        }
+      ],
+      "Polygon Settings": [
+        {
+          "field_name": "color_scheme_type",
+          "description": "Select the type of color scheme to use.",
+          "data_type": "string",
+          "enum_values": [
+            "fixed_color",
+            "linear_palette",
+            "color_breakpoints"
+          ],
+          "sample_data": "linear_palette",
+          "required": false,
+          "embedding": "否",
+          "default_value": "linear_palette",
+          "notes": "当前图覆写了共享配色类型选项，不允许 `categorical_palette`。"
+        },
+        {
+          "field_name": "fill_color_picker",
+          "description": "Set the opacity to 0 if you do not want to override the color specified in the GeoJSON",
+          "data_type": "object",
+          "sample_data": {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          },
+          "required": true,
+          "embedding": "否",
+          "default_value": {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          },
+          "notes": "仅当 `color_scheme_type='fixed_color'` 时在 UI 中可见，但 `Polygon.tsx` 会直接读取它作为 fixed-color 模式颜色和 metric 为空时的 fallback。"
+        },
+        {
+          "field_name": "stroke_color_picker",
+          "description": "Set the opacity to 0 if you do not want to override the color specified in the GeoJSON",
+          "data_type": "object",
+          "sample_data": {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          },
+          "required": true,
+          "embedding": "否",
+          "default_value": {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          },
+          "notes": "`Polygon.tsx` 会直接把它传给 `PolygonLayer.getLineColor`。"
+        },
+        {
+          "field_name": "linear_color_scheme",
+          "description": "Select a linear color scheme",
+          "data_type": "string | array[string]",
+          "enum_source": "sequentialSchemeRegistry.values()",
+          "sample_data": "blue_white_yellow",
+          "required": false,
+          "embedding": "否",
+          "default_value": "sequentialSchemeRegistry.getDefaultKey()",
+          "notes": "仅当 `color_scheme_type='linear_palette'` 时可见。若提供数组，自定义顺序色带也会被运行时接受。"
+        },
+        {
+          "field_name": "deafult_breakpoint_color",
+          "description": "The color used when a value doesn't match any defined breakpoints.",
+          "data_type": "object",
+          "sample_data": {
+            "r": 158,
+            "g": 158,
+            "b": 158,
+            "a": 1
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": {
+            "r": 158,
+            "g": 158,
+            "b": 158,
+            "a": 1
+          },
+          "notes": "字段名拼写来自源码，必须保持 `deafult_breakpoint_color` 原样。仅当 `color_scheme_type='color_breakpoints'` 时可见。"
+        },
+        {
+          "field_name": "color_breakpoints",
+          "description": "Define color breakpoints for the data",
+          "data_type": "array[ColorBreakpointType]",
+          "sample_data": [
+            {
+              "minValue": 0,
+              "maxValue": 100,
+              "color": {
+                "r": 255,
+                "g": 0,
+                "b": 0,
+                "a": 1
+              }
+            }
+          ],
+          "required": false,
+          "embedding": "否",
+          "default_value": [],
+          "notes": "元素结构来自 `src/types.ts::ColorBreakpointType`。仅当 `color_scheme_type='color_breakpoints'` 时可见。"
+        },
+        {
+          "field_name": "filled",
+          "description": "Whether to fill the objects",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true
+        },
+        {
+          "field_name": "stroked",
+          "description": "Whether to display the stroke",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false
+        },
+        {
+          "field_name": "extruded",
+          "description": "Whether to make the grid 3D",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true,
+          "notes": "虽然描述文案仍写着 grid 3D，但当前图实际作用是 polygon 是否挤出成立体。"
+        },
+        {
+          "field_name": "multiplier",
+          "description": "Factor to multiply the metric by",
+          "data_type": "number | string",
+          "sample_data": 1,
+          "required": false,
+          "embedding": "否",
+          "default_value": 1,
+          "notes": "`Polygon.tsx` 运行时把它传给 `PolygonLayer.elevationScale`。"
+        },
+        {
+          "field_name": "line_width",
+          "description": "The width of the lines",
+          "data_type": "integer | string",
+          "sample_data": 10,
+          "required": false,
+          "embedding": "否",
+          "default_value": 1
+        },
+        {
+          "field_name": "line_width_unit",
+          "description": "字段标签为 Line width unit。",
+          "data_type": "string",
+          "enum_values": [
+            "meters",
+            "pixels"
+          ],
+          "sample_data": "pixels",
+          "required": false,
+          "embedding": "否",
+          "default_value": "pixels"
+        },
+        {
+          "field_name": "opacity",
+          "description": "Opacity, expects values between 0 and 100",
+          "data_type": "integer",
+          "enum_values": [
+            0,
+            100
+          ],
+          "sample_data": 80,
+          "required": false,
+          "embedding": "否",
+          "default_value": 80,
+          "notes": "`Polygon.tsx` 会把它换算成 `opacity / 100`。"
+        },
+        {
+          "field_name": "num_buckets",
+          "description": "How many buckets should the data be grouped in.",
+          "data_type": "string | integer",
+          "enum_values": [
+            2,
+            3,
+            5,
+            10
+          ],
+          "sample_data": 5,
+          "required": false,
+          "embedding": "否",
+          "default_value": 5,
+          "notes": "控件是 freeForm 单选。若 `break_points` 为空，`getBreakPoints()` 会按 `num_buckets` 自动生成分桶。"
+        },
+        {
+          "field_name": "break_points",
+          "description": "List of n+1 values for bucketing metric into n buckets.",
+          "data_type": "array[string]",
+          "sample_data": [
+            "0",
+            "100",
+            "200"
+          ],
+          "required": false,
+          "embedding": "否",
+          "default_value": [],
+          "notes": "控件是 freeForm 多选。源码没有显式默认值；这里用空数组表示“未手工指定，由 `num_buckets` 自动推导”。"
+        },
+        {
+          "field_name": "legend_position",
+          "description": "Choose the position of the legend",
+          "data_type": "string | null",
+          "enum_values": [
+            null,
+            "tl",
+            "tr",
+            "bl",
+            "br"
+          ],
+          "sample_data": "tr",
+          "required": false,
+          "embedding": "否",
+          "default_value": "tr",
+          "notes": "只有 `metric !== null` 时 legend 才真正显示。"
+        },
+        {
+          "field_name": "legend_format",
+          "description": "Choose the format for legend values",
+          "data_type": "string | null",
+          "enum_source": "D3_FORMAT_OPTIONS",
+          "sample_data": null,
+          "required": false,
+          "embedding": "否",
+          "default_value": "D3_FORMAT_OPTIONS[0][0]"
+        }
+      ],
+      "Advanced": [
+        {
+          "field_name": "js_columns",
+          "description": "List of extra columns made available in JavaScript functions",
+          "data_type": "array[string | object]",
+          "enum_source": "datasource columns",
+          "sample_data": [
+            "population",
+            "area"
+          ],
+          "required": false,
+          "embedding": "否",
+          "default_value": [],
+          "notes": "`BaseDeckGLViz.query_obj()` 会把它们并入 query columns/groupby，并在返回特征中以 `extraProps` 暴露给自定义 JS。"
+        },
+        {
+          "field_name": "js_data_mutator",
+          "description": "Define a javascript function that receives the data array used in the visualization and is expected to return a modified version of that array.",
+          "data_type": "string",
+          "sample_data": "data => data",
+          "required": false,
+          "embedding": "否",
+          "default_value": "",
+          "notes": "如果功能开关 `EnableJavascriptControls` 关闭，该控件会变成只读并显示安全提示。`Polygon.tsx` 会在绘图前执行它。"
+        },
+        {
+          "field_name": "js_tooltip",
+          "description": "Define a function that receives the input and outputs the content for a tooltip",
+          "data_type": "string",
+          "sample_data": "o => `<div>${o.object.elevation}</div>`",
+          "required": false,
+          "embedding": "否",
+          "default_value": "",
+          "notes": "若提供，会覆写默认 tooltip 生成逻辑。"
+        },
+        {
+          "field_name": "js_onclick_href",
+          "description": "Define a function that returns a URL to navigate to when user clicks",
+          "data_type": "string",
+          "sample_data": "o => `https://example.com/?name=${o.object.name}`",
+          "required": false,
+          "embedding": "否",
+          "default_value": "",
+          "notes": "若提供，`commonLayerProps()` 会在点击 polygon 时打开该 URL。"
+        }
+      ]
+    }
+  }
+}

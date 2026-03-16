@@ -1,0 +1,429 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "gantt_chart",
+  "display_name": "Gantt Chart",
+  "selection_summary": {
+    "category": "planning",
+    "tags": [
+      "gantt",
+      "project",
+      "time",
+      "planning"
+    ],
+    "description_zh": "Gantt Chart displays tasks/projects over time, with horizontal bars representing task duration (start/end time) and optional categorization by resource/owner.",
+    "visual_shape_zh": "甘特图（时间规划型）",
+    "use_cases_zh": [
+      "项目/任务时间规划（如任务开始/结束时间、时长）",
+      "资源分配与进度监控",
+      "多任务时间重叠分析"
+    ],
+    "required_slots": [
+      {
+        "field_name": "end_time",
+        "required": true,
+        "slot_kind": "time_or_axis",
+        "accepted_dataset_roles": [
+          "time_dimension",
+          "dimension"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<time_or_axis_column>",
+        "source_categories": [
+          "Query",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "End timestamp column for each gantt bar. The control reuses `sharedControls.entity` and restricts choices to Temporal columns.",
+          "任务结束时间字段，用于定义甘特条的结束位置。"
+        ]
+      },
+      {
+        "field_name": "start_time",
+        "required": true,
+        "slot_kind": "time_or_axis",
+        "accepted_dataset_roles": [
+          "time_dimension",
+          "dimension"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<time_or_axis_column>",
+        "source_categories": [
+          "Query",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Start timestamp column for each gantt bar. The control reuses `sharedControls.entity` and restricts choices to Temporal columns.",
+          "任务开始时间字段，用于定义甘特条的起始位置。"
+        ]
+      },
+      {
+        "field_name": "y_axis",
+        "required": true,
+        "slot_kind": "y_axis",
+        "accepted_dataset_roles": [
+          "metric",
+          "dimension"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<y_axis_column_or_metric>",
+        "source_categories": [
+          "Query",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Dimension to use on y-axis.",
+          "Y轴分类字段（如任务名称、资源、负责人），用于分组展示任务。"
+        ]
+      }
+    ],
+    "optional_slots": [
+      {
+        "field_name": "adhoc_filters",
+        "required": false,
+        "slot_kind": "filter_list",
+        "accepted_dataset_roles": [
+          "filter_context"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [],
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "源码未提供额外描述；字段标签为 Filters。"
+        ]
+      },
+      {
+        "field_name": "series",
+        "required": false,
+        "slot_kind": "dimension",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "1",
+        "placeholder": "<dimension_column>",
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Defines the grouping of entities. Each series is represented by a specific color in the chart."
+        ]
+      },
+      {
+        "field_name": "tooltip_metrics",
+        "required": false,
+        "slot_kind": "tooltip_metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<tooltip_metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<tooltip_metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Metrics to show in the tooltip."
+        ]
+      },
+      {
+        "field_name": "x_axis_time_format",
+        "required": false,
+        "slot_kind": "time_or_axis",
+        "accepted_dataset_roles": [
+          "time_dimension",
+          "dimension"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<time_or_axis_column>",
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "X轴时间格式（如 YYYY-MM-DD），控制时间轴的展示格式。"
+        ]
+      }
+    ],
+    "required_dataset_roles": [
+      "dimension",
+      "metric",
+      "time_dimension"
+    ],
+    "optional_dataset_roles": [
+      "adhoc_metric",
+      "category_dimension",
+      "dimension",
+      "filter_context",
+      "metric",
+      "saved_metric",
+      "time_dimension"
+    ],
+    "dataset_role_inventory": {
+      "adhoc_metric": [
+        "tooltip_metrics"
+      ],
+      "category_dimension": [
+        "series"
+      ],
+      "dimension": [
+        "end_time",
+        "series",
+        "start_time",
+        "x_axis_time_format",
+        "y_axis"
+      ],
+      "filter_context": [
+        "adhoc_filters"
+      ],
+      "metric": [
+        "tooltip_metrics",
+        "y_axis"
+      ],
+      "saved_metric": [
+        "tooltip_metrics"
+      ],
+      "time_dimension": [
+        "end_time",
+        "start_time",
+        "x_axis_time_format"
+      ]
+    },
+    "non_binding_control_names": [
+      "color_scheme",
+      "legendMargin",
+      "legendOrientation",
+      "legendType",
+      "order_by_cols",
+      "row_limit",
+      "show_extra_controls",
+      "show_legend",
+      "subcategories",
+      "tooltipTimeFormat",
+      "tooltipValuesFormat",
+      "tooltip_columns",
+      "x_axis_time_bounds",
+      "x_axis_time_format",
+      "x_axis_title",
+      "x_axis_title_margin",
+      "y_axis_title",
+      "y_axis_title_margin",
+      "zoomable"
+    ],
+    "embedding_runtime_field_names": [
+      "adhoc_filters",
+      "custom_form_data",
+      "filters",
+      "time_range"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "end_time",
+      "order_by_cols",
+      "row_limit",
+      "start_time",
+      "tooltip_columns",
+      "tooltip_metrics",
+      "viz_type",
+      "y_axis"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "color_scheme",
+      "datasource",
+      "end_time",
+      "legendMargin",
+      "legendOrientation",
+      "legendType",
+      "order_by_cols",
+      "row_limit",
+      "series",
+      "show_extra_controls",
+      "show_legend",
+      "start_time",
+      "subcategories",
+      "tooltipTimeFormat",
+      "tooltipValuesFormat",
+      "tooltip_columns",
+      "tooltip_metrics",
+      "viz_type",
+      "x_axis_time_bounds",
+      "x_axis_time_format",
+      "x_axis_title",
+      "x_axis_title_margin",
+      "y_axis",
+      "y_axis_title",
+      "y_axis_title_margin",
+      "zoomable"
+    ],
+    "structural_flags": {
+      "time_series": true,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": false,
+      "flow_like": false,
+      "distribution_like": false,
+      "supports_breakdown": false,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": true,
+      "needs_dimension": true
+    },
+    "selection_hints": [
+      "优先用于趋势、演化、时间对比类问题。",
+      "至少需要 1 个可聚合指标字段。",
+      "需要时间字段，通常还应结合时间粒度或时间范围。",
+      "需要至少 1 个维度字段用于分组、拆分或定位。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：项目/任务时间规划（如任务开始/结束时间、时长）；资源分配与进度监控；多任务时间重叠分析"
+    ]
+  },
+  "selection_prompt_card": {
+    "viz_type": "gantt_chart",
+    "display_name": "Gantt Chart",
+    "category": "planning",
+    "description_zh": "Gantt Chart displays tasks/projects over time, with horizontal bars representing task duration (start/end time) and optional categorization by resource/owner.",
+    "visual_shape_zh": "甘特图（时间规划型）",
+    "best_for": [
+      "项目/任务时间规划（如任务开始/结束时间、时长）",
+      "资源分配与进度监控",
+      "多任务时间重叠分析"
+    ],
+    "required_dataset_roles": [
+      "dimension",
+      "metric",
+      "time_dimension"
+    ],
+    "optional_dataset_roles": [
+      "adhoc_metric",
+      "category_dimension",
+      "dimension",
+      "filter_context",
+      "metric",
+      "saved_metric",
+      "time_dimension"
+    ],
+    "required_slots": [
+      {
+        "field_name": "end_time",
+        "required": true,
+        "slot_kind": "time_or_axis",
+        "accepted_dataset_roles": [
+          "time_dimension",
+          "dimension"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<time_or_axis_column>",
+        "source_categories": [
+          "Query",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "End timestamp column for each gantt bar. The control reuses `sharedControls.entity` and restricts choices to Temporal columns.",
+          "任务结束时间字段，用于定义甘特条的结束位置。"
+        ]
+      },
+      {
+        "field_name": "start_time",
+        "required": true,
+        "slot_kind": "time_or_axis",
+        "accepted_dataset_roles": [
+          "time_dimension",
+          "dimension"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<time_or_axis_column>",
+        "source_categories": [
+          "Query",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Start timestamp column for each gantt bar. The control reuses `sharedControls.entity` and restricts choices to Temporal columns.",
+          "任务开始时间字段，用于定义甘特条的起始位置。"
+        ]
+      },
+      {
+        "field_name": "y_axis",
+        "required": true,
+        "slot_kind": "y_axis",
+        "accepted_dataset_roles": [
+          "metric",
+          "dimension"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<y_axis_column_or_metric>",
+        "source_categories": [
+          "Query",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Dimension to use on y-axis.",
+          "Y轴分类字段（如任务名称、资源、负责人），用于分组展示任务。"
+        ]
+      }
+    ],
+    "optional_slot_names": [
+      "adhoc_filters",
+      "series",
+      "tooltip_metrics",
+      "x_axis_time_format"
+    ],
+    "structural_flags": {
+      "time_series": true,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": false,
+      "flow_like": false,
+      "distribution_like": false,
+      "supports_breakdown": false,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": true,
+      "needs_dimension": true
+    },
+    "selection_hints": [
+      "优先用于趋势、演化、时间对比类问题。",
+      "至少需要 1 个可聚合指标字段。",
+      "需要时间字段，通常还应结合时间粒度或时间范围。",
+      "需要至少 1 个维度字段用于分组、拆分或定位。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：项目/任务时间规划（如任务开始/结束时间、时长）；资源分配与进度监控；多任务时间重叠分析"
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "gantt_chart",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/gantt_chart-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/gantt_chart-form-data-schema.json",
+      "control-schema": "form-data-schema/gantt_chart-schema.json"
+    }
+  }
+}

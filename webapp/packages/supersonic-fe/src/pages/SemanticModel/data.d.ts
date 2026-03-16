@@ -195,6 +195,13 @@ export declare namespace ISemantic {
     tableName: string;
     mainDttmCol: string;
     supersetDatasetId: number;
+    sourceType?: string;
+    syncState?: string;
+    syncAttemptAt?: string;
+    nextRetryAt?: string;
+    retryCount?: number;
+    syncErrorType?: string;
+    syncErrorMsg?: string;
     createdAt: string;
     createdBy: string;
     updatedAt: string;

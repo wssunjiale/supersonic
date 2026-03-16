@@ -1,0 +1,121 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "cal_heatmap",
+  "display_name": "Calendar Heatmap",
+  "normalized_summary": {
+    "category": "timeseries",
+    "tags": [
+      "timeseries",
+      "calendar",
+      "heatmap",
+      "time_based"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于计算每日/每周的数值（热力图颜色依据）。"
+      },
+      {
+        "key": "time_grain_sqla",
+        "required": true,
+        "description": "时间粒度（如 day/week），用于日历的聚合单位。"
+      },
+      {
+        "key": "number_format",
+        "required": false,
+        "description": "数字格式化，控制tooltip中数值的展示格式。"
+      }
+    ],
+    "description_zh": "Calendar Heatmap displays numerical data aggregated by date (day/week/month) using color intensity, ideal for time-based pattern analysis.",
+    "visual_shape_zh": "日历热力图（时间维度）",
+    "use_cases_zh": [
+      "按日期的指标分布（如每日销售额、用户活跃度）",
+      "时间维度的热点分析",
+      "周期性（周/月）规律识别"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "cal_heatmap",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/cal_heatmap-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/cal_heatmap-form-data-schema.json",
+      "control-schema": "form-data-schema/cal_heatmap-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Calendar Heatmap",
+    "viztype": "cal_heatmap",
+    "详细描述": "Calendar Heatmap displays numerical data aggregated by date (day/week/month) using color intensity, ideal for time-based pattern analysis.",
+    "表现形态": "日历热力图（时间维度）",
+    "适用场景": [
+      "按日期的指标分布（如每日销售额、用户活跃度）",
+      "时间维度的热点分析",
+      "周期性（周/月）规律识别"
+    ],
+    "vizKey": "Calendar",
+    "pluginCategory": "Evolution",
+    "pluginTags": [],
+    "category": "timeseries",
+    "tags": [
+      "timeseries",
+      "calendar",
+      "heatmap",
+      "time_based"
+    ],
+    "关键字段": [
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于计算每日/每周的数值（热力图颜色依据）。"
+      },
+      {
+        "key": "time_grain_sqla",
+        "required": true,
+        "description": "时间粒度（如 day/week），用于日历的聚合单位。"
+      },
+      {
+        "key": "number_format",
+        "required": false,
+        "description": "数字格式化，控制tooltip中数值的展示格式。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

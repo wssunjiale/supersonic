@@ -1,0 +1,642 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "table",
+  "display_name": "Table",
+  "source_kind": "schema_file",
+  "normalized_embedding_policy": {
+    "immutable_root_keys": [
+      "slice_id",
+      "datasource",
+      "viz_type",
+      "all_saved_chart_definition_fields"
+    ],
+    "allowed_runtime_fields": [
+      {
+        "field_name": "adhoc_filters",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "all_columns",
+        "behavior": "否（guest 下不应动态修改）",
+        "source": "field-categories"
+      },
+      {
+        "field_name": "custom_form_data",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "filters",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "groupby",
+        "behavior": "否（guest 下不应动态修改）",
+        "source": "field-categories"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "metrics",
+        "behavior": "否（guest 下不应动态修改）",
+        "source": "field-categories"
+      },
+      {
+        "field_name": "order_by_cols",
+        "behavior": "否（guest 下不应动态修改）",
+        "source": "field-categories"
+      },
+      {
+        "field_name": "order_desc",
+        "behavior": "否（guest 下不应动态修改）",
+        "source": "field-categories"
+      },
+      {
+        "field_name": "percent_metric_calculation",
+        "behavior": "否（guest 下不应动态修改）",
+        "source": "field-categories"
+      },
+      {
+        "field_name": "percent_metrics",
+        "behavior": "否（guest 下不应动态修改）",
+        "source": "field-categories"
+      },
+      {
+        "field_name": "query_mode",
+        "behavior": "否（guest 下不应动态修改）",
+        "source": "field-categories"
+      },
+      {
+        "field_name": "relative_end",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "relative_start",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "row_limit",
+        "behavior": "否（guest 下不应动态修改）",
+        "source": "field-categories"
+      },
+      {
+        "field_name": "server_page_length",
+        "behavior": "否（guest 下不应动态修改）",
+        "source": "field-categories"
+      },
+      {
+        "field_name": "server_pagination",
+        "behavior": "否（guest 下不应动态修改）",
+        "source": "field-categories"
+      },
+      {
+        "field_name": "show_totals",
+        "behavior": "否（guest 下不应动态修改）",
+        "source": "field-categories"
+      },
+      {
+        "field_name": "start_date_offset",
+        "behavior": "extra_form_data.override（guest 下不建议）",
+        "source": "field-categories"
+      },
+      {
+        "field_name": "time_column",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_compare",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_grain",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_range",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "timeseries_limit_metric",
+        "behavior": "否（guest 下不应动态修改）",
+        "source": "field-categories"
+      }
+    ],
+    "safe_embedding_form_data_seed": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "table",
+      "extra_form_data": {
+        "filters": [],
+        "adhoc_filters": []
+      }
+    }
+  },
+  "original_embedding_form_data_schema": {
+    "viz_type": "table",
+    "display_name": "Table",
+    "purpose": "第三方 embedding / guest token 场景下安全传输的 Table form_data 模板",
+    "base_form_data_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/table-form-data-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset/security/manager.py",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/constants.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractQueryFields.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-table/src/buildQuery.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-table/src/controlPanel.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-table/src/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-table/src/types.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-table/test/buildQuery.test.ts"
+    ],
+    "notes": [
+      "embedded guest 的关键限制在后端 `security/manager.py::query_context_modified()`。一旦判定请求修改了图表 payload，就会报 `Guest user cannot modify chart payload`。",
+      "这个比较器不只检查 root `form_data.metrics/groupby/orderby`，还会检查 query_context.queries[*].metrics / columns / orderby 是否仍是保存态图表的子集。",
+      "对 Table 而言，哪怕 root 没有直接出现 `columns` / `orderby`，`all_columns`、`groupby`、`order_by_cols`、`timeseries_limit_metric`、`order_desc`、`time_grain_sqla`、`interactive_groupby` 也都会通过 buildQuery 改写 `queries[*].columns/orderby`。",
+      "因此 guest embedding 最稳妥的策略不是重新拼装 Table form_data，而是完整复制保存态 Table 的 root form_data，只把动态过滤条件放进 `extra_form_data.filters` / `extra_form_data.adhoc_filters`。"
+    ],
+    "security_enforcement": {
+      "backend_check_function": "superset/security/manager.py::query_context_modified",
+      "error_message": "Guest user cannot modify chart payload",
+      "directly_compared_root_fields": [
+        "slice_id",
+        "metrics",
+        "columns",
+        "groupby",
+        "orderby"
+      ],
+      "table_specific_query_sensitive_fields": [
+        "query_mode",
+        "all_columns",
+        "groupby",
+        "metrics",
+        "percent_metrics",
+        "time_grain_sqla",
+        "temporal_columns_lookup",
+        "order_by_cols",
+        "timeseries_limit_metric",
+        "order_desc",
+        "server_pagination",
+        "server_page_length",
+        "row_limit",
+        "percent_metric_calculation",
+        "show_totals",
+        "time_compare",
+        "start_date_offset",
+        "comparison_type"
+      ],
+      "why_table_is_sensitive": [
+        "`all_columns` 通过 `extractQueryFields()` 归并成 query.columns，raw 模式下会被 `query_context_modified()` 的 queries[*].columns 比较器命中。",
+        "`groupby` 也会归并成 query.columns；aggregate 模式修改分组列会改变 queries[*].columns。",
+        "`order_by_cols` 会归并成 query.orderby；`timeseries_limit_metric + order_desc` 也会在 aggregate 模式改写 query.orderby。",
+        "`time_grain_sqla` 与 `temporal_columns_lookup` 会把 physical temporal column 改写成带 `timeGrain` 的 AdhocColumn。",
+        "`interactive_groupby` 虽然来自 extra_form_data.append 白名单，但 Table/buildQuery 会把它直接 append 到 query.columns，因此 guest 下也不应动态修改。"
+      ],
+      "recommended_strategy": "复制保存态 Table 的完整 root form_data 作为 base，只通过 extra_form_data 追加 filters / adhoc_filters / custom_form_data。"
+    },
+    "safe_base_rule": {
+      "description": "第三方 embedding 请求中的根层 form_data，应从已保存 Table 图表的 form_data 直接复制，不要重构。",
+      "must_be_copied_from_saved_chart": [
+        "slice_id",
+        "dashboardId",
+        "datasource",
+        "viz_type",
+        "query_mode",
+        "groupby",
+        "metrics",
+        "all_columns",
+        "percent_metrics",
+        "adhoc_filters",
+        "time_grain_sqla",
+        "temporal_columns_lookup",
+        "timeseries_limit_metric",
+        "order_by_cols",
+        "order_desc",
+        "server_pagination",
+        "server_page_length",
+        "row_limit",
+        "percent_metric_calculation",
+        "show_totals",
+        "table_timestamp_format",
+        "page_length",
+        "include_search",
+        "allow_rearrange_columns",
+        "allow_render_html",
+        "column_config",
+        "show_cell_bars",
+        "align_pn",
+        "color_pn",
+        "comparison_color_enabled",
+        "comparison_color_scheme",
+        "conditional_formatting",
+        "time_compare",
+        "start_date_offset",
+        "comparison_type",
+        "all other saved chart-definition fields"
+      ],
+      "why": [
+        "`buildQueryContext()` 会把 raw formData 原样保存在 query_context.form_data 中。",
+        "`query_context_modified()` 同时比较 root form_data 与 query_context.queries[*] 子集；只改 root 的一小部分，也可能因为派生 query 改动而报错。",
+        "Table 的 UI/展示字段也很多，例如 `column_config`、`comparison_color_enabled`、`conditional_formatting`；它们不一定触发安全错误，但会改变嵌入图表表现，因此 guest 场景也应保持保存态一致。"
+      ]
+    },
+    "safe_embedding_form_data_template": {
+      "description": "这是 Table guest embedding 下的保守安全写法。根层以保存态图表为 base，仅改 extra_form_data。",
+      "template": {
+        "slice_id": "<saved_chart_id>",
+        "dashboardId": "<dashboard_id>",
+        "datasource": "<copied_from_saved_chart>",
+        "viz_type": "table",
+        "query_mode": "<copied_from_saved_chart>",
+        "groupby": "<copied_from_saved_chart>",
+        "metrics": "<copied_from_saved_chart>",
+        "all_columns": "<copied_from_saved_chart>",
+        "percent_metrics": "<copied_from_saved_chart>",
+        "adhoc_filters": "<copied_from_saved_chart>",
+        "time_grain_sqla": "<copied_from_saved_chart>",
+        "temporal_columns_lookup": "<copied_from_saved_chart>",
+        "timeseries_limit_metric": "<copied_from_saved_chart>",
+        "order_by_cols": "<copied_from_saved_chart>",
+        "order_desc": "<copied_from_saved_chart>",
+        "server_pagination": "<copied_from_saved_chart>",
+        "server_page_length": "<copied_from_saved_chart>",
+        "row_limit": "<copied_from_saved_chart>",
+        "percent_metric_calculation": "<copied_from_saved_chart>",
+        "show_totals": "<copied_from_saved_chart>",
+        "table_timestamp_format": "<copied_from_saved_chart>",
+        "page_length": "<copied_from_saved_chart>",
+        "include_search": "<copied_from_saved_chart>",
+        "allow_rearrange_columns": "<copied_from_saved_chart>",
+        "allow_render_html": "<copied_from_saved_chart>",
+        "column_config": "<copied_from_saved_chart>",
+        "show_cell_bars": "<copied_from_saved_chart>",
+        "align_pn": "<copied_from_saved_chart>",
+        "color_pn": "<copied_from_saved_chart>",
+        "comparison_color_enabled": "<copied_from_saved_chart>",
+        "comparison_color_scheme": "<copied_from_saved_chart>",
+        "conditional_formatting": "<copied_from_saved_chart>",
+        "time_compare": "<copied_from_saved_chart>",
+        "start_date_offset": "<copied_from_saved_chart>",
+        "comparison_type": "<copied_from_saved_chart>",
+        "extra_form_data": {
+          "filters": [
+            {
+              "col": "region",
+              "op": "IN",
+              "val": [
+                "East",
+                "West"
+              ]
+            }
+          ],
+          "adhoc_filters": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "region",
+              "operator": "IN",
+              "comparator": [
+                "East",
+                "West"
+              ]
+            }
+          ],
+          "custom_form_data": {}
+        }
+      }
+    },
+    "preferred_dynamic_container": {
+      "field_name": "extra_form_data",
+      "description": "第三方 embedding 推荐把动态上下文放在这里；后端会在 merge_extra_form_data() 中合并它。",
+      "append_keys": [
+        "adhoc_filters",
+        "filters",
+        "interactive_groupby",
+        "interactive_highlight",
+        "interactive_drilldown",
+        "custom_form_data"
+      ],
+      "override_keys_backend_high_confidence": [
+        "granularity",
+        "granularity_sqla",
+        "time_column",
+        "time_grain",
+        "time_range",
+        "time_compare",
+        "relative_start",
+        "relative_end",
+        "time_grain_sqla"
+      ],
+      "notes": "这些 override/append key 来自通用白名单，不等于对 Table guest 场景都安全。当前图只把 `filters` / `adhoc_filters` 视为高置信动态入口。"
+    },
+    "extra_form_data_field_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_table": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "effect": "追加简单过滤条件；这是最稳妥的 guest 动态入口之一。",
+        "source": "query constants + backend merge_extra_form_data"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[object]",
+        "behavior": "append",
+        "safe_for_table": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会把它们标记为 extra 并并入查询。",
+        "source": "query constants + backend merge_extra_form_data"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_table": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；当前 Table buildQuery / transformProps 默认不直接消费它。",
+        "source": "query constants"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "data_type": "array[string | object]",
+        "behavior": "append",
+        "safe_for_table": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "Table/buildQuery 会把它直接 append 到 query.columns。",
+        "source": "query constants + Table/buildQuery.ts",
+        "status": "guest 下不建议动态修改"
+      },
+      {
+        "field_name": "time_compare",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_table": false,
+        "recommended": false,
+        "sample_data": "1 year ago",
+        "effect": "通用 override 白名单允许该 key，但 Table/buildQuery 会据此生成 comparison post_processing 与 time_offsets。",
+        "source": "query constants + Table/buildQuery.ts",
+        "status": "guest 下不建议动态修改"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_table": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "会改写 aggregate 模式的 temporal column 编译结果，并影响 queries[*].columns。",
+        "source": "query constants + Table/buildQuery.ts",
+        "status": "guest 下不建议动态修改"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_table": false,
+        "recommended": false,
+        "sample_data": "Last 30 days",
+        "effect": "这是通用 override 白名单，但 Table 当前 controlPanel 没有显式时间范围控件闭环；guest 下不建议依赖。",
+        "source": "query constants",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_table": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "通用时间列 override；当前 Table 插件并未以它作为 primary control key。",
+        "source": "query constants",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_column",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_table": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "底层 QueryObject 时间列 override；当前 Table 插件没有对应 controlPanel 闭环。",
+        "source": "query constants",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_grain",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_table": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "底层 QueryObject 时间粒度 override；当前 Table 插件没有对应 controlPanel 闭环。",
+        "source": "query constants",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "relative_start",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_table": false,
+        "recommended": false,
+        "sample_data": "now",
+        "effect": "进入 query extras 的相对开始时间；当前 Table 插件没有显式时间过滤控件闭环。",
+        "source": "query constants",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "relative_end",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_table": false,
+        "recommended": false,
+        "sample_data": "today",
+        "effect": "进入 query extras 的相对结束时间；当前 Table 插件没有显式时间过滤控件闭环。",
+        "source": "query constants",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_table": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用交互字段；当前 Table buildQuery/transformProps 默认不直接消费。",
+        "source": "query constants"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_table": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用交互字段；当前 Table buildQuery/transformProps 默认不直接消费。",
+        "source": "query constants"
+      }
+    ],
+    "minimal_extra_form_data_template": {
+      "filters": [
+        {
+          "col": "region",
+          "op": "IN",
+          "val": [
+            "East"
+          ]
+        }
+      ]
+    },
+    "recommended_extra_form_data_template": {
+      "filters": [
+        {
+          "col": "region",
+          "op": "IN",
+          "val": [
+            "East",
+            "West"
+          ]
+        }
+      ],
+      "adhoc_filters": [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "region",
+          "operator": "IN",
+          "comparator": [
+            "East",
+            "West"
+          ]
+        }
+      ],
+      "custom_form_data": {}
+    },
+    "unsafe_root_form_data_changes": [
+      {
+        "field_name": "slice_id",
+        "reason": "与保存态图表 id 不一致会被后端直接判定为请求了另一张图。"
+      },
+      {
+        "field_name": "groupby / metrics",
+        "reason": "这是 `query_context_modified()` 直接比较的 root 字段。"
+      },
+      {
+        "field_name": "all_columns",
+        "reason": "raw 模式下它会编译成 queries[*].columns，并被安全比较器命中。"
+      },
+      {
+        "field_name": "order_by_cols",
+        "reason": "raw 模式下它会编译成 queries[*].orderby。"
+      },
+      {
+        "field_name": "timeseries_limit_metric / order_desc",
+        "reason": "aggregate 模式下它们会改写 queries[*].orderby。"
+      },
+      {
+        "field_name": "time_grain_sqla / temporal_columns_lookup",
+        "reason": "会改变 temporal column 如何被编译进 queries[*].columns。"
+      },
+      {
+        "field_name": "percent_metrics / percent_metric_calculation / show_totals",
+        "reason": "会改变额外 queries 与 post_processing 结构。"
+      },
+      {
+        "field_name": "server_pagination / server_page_length / row_limit",
+        "reason": "会改变查询分页方式、row_limit、row_offset 和 rowcount query。"
+      },
+      {
+        "field_name": "time_compare / start_date_offset / comparison_type",
+        "reason": "会改变 comparison 查询与 runtime column shape。"
+      },
+      {
+        "field_name": "table_timestamp_format / page_length / include_search / allow_rearrange_columns / allow_render_html / column_config / show_cell_bars / align_pn / color_pn / comparison_color_enabled / comparison_color_scheme / conditional_formatting",
+        "reason": "这些字段虽然多数不改 SQL，但都会改变嵌入表格的展示语义，guest 场景也应保持保存态一致。"
+      }
+    ],
+    "practical_guidance": {
+      "best_practice": [
+        "先从保存态 Table 图表读取完整 form_data。",
+        "根层字段保持不变，尤其保留 `query_mode`、`groupby`、`metrics`、`all_columns`、`order_by_cols`、`timeseries_limit_metric`、`order_desc`、`time_grain_sqla` 与所有展示字段。",
+        "只在 `extra_form_data` 中放动态 `filters` / `adhoc_filters`。",
+        "如果只是做第三方筛选联动，优先使用 `extra_form_data.filters`。"
+      ],
+      "avoid": [
+        "不要在 guest embedding 请求里切换 raw / aggregate 模式。",
+        "不要在 guest 请求里动态追加 `interactive_groupby`；Table 会把它直接并到 query.columns。",
+        "不要把 runtime 字段 `allowRenderHtml`、`includeSearch`、`showCellBars`、`comparisonColorEnabled` 写成 root 键。",
+        "不要把 `all_columns` 误写成 `columns`，或把 `order_by_cols` 误写成 `orderby`。"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "table",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/table-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/table-form-data-schema.json",
+      "control-schema": "form-data-schema/table-schema.json"
+    }
+  }
+}

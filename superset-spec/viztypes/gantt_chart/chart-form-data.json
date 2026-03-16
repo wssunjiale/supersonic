@@ -1,0 +1,556 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "gantt_chart",
+  "display_name": "Gantt Chart",
+  "source_kind": "schema_file",
+  "normalized_chart_form_data": {
+    "required_root_fields": [
+      "datasource",
+      "end_time",
+      "start_time",
+      "viz_type",
+      "y_axis"
+    ],
+    "optional_root_fields": [
+      "adhoc_filters",
+      "cache_timeout",
+      "color_scheme",
+      "custom_params",
+      "legendMargin",
+      "legendOrientation",
+      "legendType",
+      "order_by_cols",
+      "row_limit",
+      "series",
+      "show_extra_controls",
+      "show_legend",
+      "slice_id",
+      "subcategories",
+      "tooltipTimeFormat",
+      "tooltipValuesFormat",
+      "tooltip_columns",
+      "tooltip_metrics",
+      "url_params",
+      "x_axis_time_bounds",
+      "x_axis_time_format",
+      "x_axis_title",
+      "x_axis_title_margin",
+      "y_axis_title",
+      "y_axis_title_margin",
+      "zoomable"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "end_time",
+      "order_by_cols",
+      "row_limit",
+      "start_time",
+      "tooltip_columns",
+      "tooltip_metrics",
+      "viz_type",
+      "y_axis"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "color_scheme",
+      "datasource",
+      "end_time",
+      "legendMargin",
+      "legendOrientation",
+      "legendType",
+      "order_by_cols",
+      "row_limit",
+      "series",
+      "show_extra_controls",
+      "show_legend",
+      "start_time",
+      "subcategories",
+      "tooltipTimeFormat",
+      "tooltipValuesFormat",
+      "tooltip_columns",
+      "tooltip_metrics",
+      "viz_type",
+      "x_axis_time_bounds",
+      "x_axis_time_format",
+      "x_axis_title",
+      "x_axis_title_margin",
+      "y_axis",
+      "y_axis_title",
+      "y_axis_title_margin",
+      "zoomable"
+    ],
+    "fallback_template_seed": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "gantt_chart",
+      "end_time": "<time_or_axis_column>",
+      "start_time": "<time_or_axis_column>",
+      "y_axis": "<y_axis_column_or_metric>",
+      "adhoc_filters": [],
+      "time_range": "No filter"
+    }
+  },
+  "original_chart_form_data_schema": {
+    "viz_type": "gantt_chart",
+    "display_name": "Gantt Chart",
+    "purpose": "用于调用 API 创建或保存 Gantt Chart 时填写的 form_data 模板",
+    "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/gantt_chart-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Gantt/controlPanel.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Gantt/index.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Gantt/buildQuery.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Gantt/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Gantt/EchartsGantt.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Gantt/types.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/controls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/constants.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Timeseries/constants.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/mixins.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/sections/chartTitle.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/test/Gantt/buildQuery.test.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/test/Gantt/transformProps.test.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryContext.ts"
+    ],
+    "notes": [
+      "gantt_chart 走标准 `/api/v1/chart/data`，不是 legacy `/superset/explore_json/`。",
+      "API root form_data 必须直接使用 controlPanel 原始键名，不要把 `startTime`、`tooltipMetrics`、`showExtraControls`、`colorScheme` 这类 runtime camelCase 别名当成 root 键名。",
+      "`start_time`、`end_time`、`y_axis` 是源码级高置信必填字段：前两者来自 `sharedControls.entity` 的 `validateNonEmpty`，后者来自 `xAxisMixin` 的 `validateNonEmpty`。",
+      "`tooltip_metrics` 和 `tooltip_columns` 看起来像纯 tooltip 配置，但它们会进入真实 `query_context`。尤其 `tooltip_metrics` 直接进入 `query.metrics`，`tooltip_columns` 进入 `query.columns`。",
+      "`order_by_cols` 必须传字符串数组，每一项都是 JSON 字符串化后的 `[column_name, is_ascending]`。不要直接把数组元组塞到 root form_data。",
+      "`show_extra_controls` 不影响查询，只影响图表顶部是否显示 `Plain/Subcategories` 的运行时开关。",
+      "`x_axis_title_margin` 与 `y_axis_title_margin` 的 UI 默认值分别是 15 和 30，但若这些字段在 root form_data 中完全缺失，`DEFAULT_FORM_DATA` 的 runtime fallback 实际是 0。"
+    ],
+    "naming_and_pipeline": {
+      "control_to_api_form_data": "Explore control state 会按 control name 原样输出 root form_data。",
+      "api_form_data_to_query_context": "`Gantt/buildQuery.ts` 使用 `buildQueryContext(formData, ...)` 生成 query_context，并把 `tooltip_metrics` / `tooltip_columns` / `order_by_cols` 等重新编译到 query 对象。",
+      "api_form_data_to_runtime_form_data": "运行时 `ChartProps` 会把部分 root 字段转换成 camelCase 别名，例如 `start_time -> startTime`、`tooltip_metrics -> tooltipMetrics`、`show_extra_controls -> showExtraControls`、`color_scheme -> colorScheme`。这些别名不是 API root 键名。"
+    },
+    "global_required_fields": {
+      "datasource": {
+        "data_type": "string",
+        "required": true,
+        "sample_data": "<dataset_id>__table",
+        "source": "datasourceAndVizType hidden control"
+      },
+      "viz_type": {
+        "data_type": "string",
+        "required": true,
+        "fixed_value": "gantt_chart",
+        "source": "Gantt/index.ts"
+      },
+      "start_time": {
+        "data_type": "string | object",
+        "required": true,
+        "sample_data": "start_time",
+        "source": "Gantt Query section + sharedControls.entity + buildQuery.ts"
+      },
+      "end_time": {
+        "data_type": "string | object",
+        "required": true,
+        "sample_data": "end_time",
+        "source": "Gantt Query section + sharedControls.entity + buildQuery.ts"
+      },
+      "y_axis": {
+        "data_type": "string | object",
+        "required": true,
+        "sample_data": "task_name",
+        "source": "Gantt Query section + sharedControls.x_axis + buildQuery.ts"
+      }
+    },
+    "global_optional_fields": {
+      "series": {
+        "data_type": "string | object | null",
+        "required": false,
+        "sample_data": "owner",
+        "source": "Query section"
+      },
+      "subcategories": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": false,
+        "source": "Query section"
+      },
+      "tooltip_metrics": {
+        "data_type": "array[string | object]",
+        "required": false,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "duration_sec"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(duration_sec)"
+          }
+        ],
+        "source": "Query section"
+      },
+      "tooltip_columns": {
+        "data_type": "array[string | object]",
+        "required": false,
+        "sample_data": [
+          "status"
+        ],
+        "source": "Query section"
+      },
+      "adhoc_filters": {
+        "data_type": "array[object]",
+        "required": false,
+        "sample_data": [],
+        "source": "Query section"
+      },
+      "order_by_cols": {
+        "data_type": "array[string]",
+        "required": false,
+        "sample_data": [
+          "[\"start_time\",true]"
+        ],
+        "source": "Query section"
+      },
+      "row_limit": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 10000,
+        "source": "Query section"
+      },
+      "color_scheme": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "supersetColors",
+        "source": "通用图表选项"
+      },
+      "show_legend": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": true,
+        "source": "通用图表选项"
+      },
+      "legendType": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "scroll",
+        "source": "通用图表选项"
+      },
+      "legendOrientation": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "top",
+        "source": "通用图表选项"
+      },
+      "legendMargin": {
+        "data_type": "integer | null",
+        "required": false,
+        "sample_data": 0,
+        "source": "通用图表选项"
+      },
+      "zoomable": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": true,
+        "source": "通用图表选项"
+      },
+      "show_extra_controls": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": false,
+        "source": "图表专属"
+      },
+      "x_axis_time_bounds": {
+        "data_type": "array[string | null, string | null] | null",
+        "required": false,
+        "sample_data": [
+          null,
+          "19:00:00"
+        ],
+        "source": "Chart Options"
+      },
+      "x_axis_time_format": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "smart_date",
+        "source": "Chart Options"
+      },
+      "tooltipTimeFormat": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "smart_date",
+        "source": "Chart Options"
+      },
+      "tooltipValuesFormat": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "SMART_NUMBER",
+        "source": "Chart Options"
+      },
+      "x_axis_title": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "Time",
+        "source": "Chart Title"
+      },
+      "x_axis_title_margin": {
+        "data_type": "number | null",
+        "required": false,
+        "sample_data": 15,
+        "source": "Chart Title"
+      },
+      "y_axis_title": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "Task",
+        "source": "Chart Title"
+      },
+      "y_axis_title_margin": {
+        "data_type": "number | null",
+        "required": false,
+        "sample_data": 30,
+        "source": "Chart Title"
+      },
+      "slice_id": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 0,
+        "source": "datasourceAndVizType hidden control"
+      },
+      "cache_timeout": {
+        "data_type": "integer | null",
+        "required": false,
+        "sample_data": null,
+        "source": "datasourceAndVizType hidden control"
+      },
+      "url_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "datasourceAndVizType hidden control"
+      },
+      "custom_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "datasourceAndVizType hidden control"
+      }
+    },
+    "minimal_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "gantt_chart",
+      "start_time": "<start_time_column>",
+      "end_time": "<end_time_column>",
+      "y_axis": "<category_column>",
+      "tooltip_metrics": [],
+      "tooltip_columns": [],
+      "adhoc_filters": [],
+      "order_by_cols": [],
+      "row_limit": 10000
+    },
+    "recommended_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "gantt_chart",
+      "start_time": "<start_time_column>",
+      "end_time": "<end_time_column>",
+      "y_axis": "<category_column>",
+      "series": "<series_dimension>",
+      "subcategories": false,
+      "tooltip_metrics": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<duration_metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<duration_metric_column>)"
+        }
+      ],
+      "tooltip_columns": [
+        "<status_column>"
+      ],
+      "adhoc_filters": [],
+      "order_by_cols": [
+        "[\"<start_time_column>\",true]"
+      ],
+      "row_limit": 10000,
+      "color_scheme": "supersetColors",
+      "show_legend": true,
+      "legendType": "scroll",
+      "legendOrientation": "top",
+      "legendMargin": null,
+      "zoomable": true,
+      "show_extra_controls": false,
+      "x_axis_time_bounds": [
+        null,
+        "19:00:00"
+      ],
+      "x_axis_time_format": "smart_date",
+      "tooltipTimeFormat": "smart_date",
+      "tooltipValuesFormat": "SMART_NUMBER",
+      "x_axis_title": "Time",
+      "x_axis_title_margin": 15,
+      "y_axis_title": "Task",
+      "y_axis_title_margin": 30
+    },
+    "conditional_blocks": {
+      "series_grouping": {
+        "condition": "需要把每个 gantt 条按某个维度着色分组时",
+        "fields": {
+          "series": "owner",
+          "show_legend": true,
+          "legendType": "scroll"
+        },
+        "notes": "`series` 同时影响 query.series_columns、颜色映射和 legend 内容。"
+      },
+      "split_category_into_subrows": {
+        "condition": "需要把同一 y 轴类别下的不同 series 拆成子行时",
+        "fields": {
+          "series": "owner",
+          "subcategories": true
+        },
+        "notes": "`subcategories=true` 时，`transformProps.ts` 会在每个 category 下为不同 series 分配独立索引。"
+      },
+      "show_runtime_toggle": {
+        "condition": "希望图表顶部允许终端用户在 Plain/Subcategories 间切换时",
+        "fields": {
+          "show_extra_controls": true,
+          "subcategories": false
+        },
+        "notes": "这个开关只影响前端 UI，不改变 buildQuery。"
+      },
+      "custom_tooltip_payload": {
+        "condition": "需要在 tooltip 中展示额外列和数值时",
+        "fields": {
+          "tooltip_metrics": [
+            {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "duration_sec"
+              },
+              "aggregate": "SUM",
+              "label": "SUM(duration_sec)"
+            }
+          ],
+          "tooltip_columns": [
+            "status",
+            "priority"
+          ]
+        },
+        "notes": "`tooltip_metrics` 会进入 query.metrics；`tooltip_columns` 会进入 query.columns。"
+      },
+      "explicit_ordering": {
+        "condition": "需要在查询层明确排序 gantt 记录时",
+        "fields": {
+          "order_by_cols": [
+            "[\"start_time\",true]",
+            "[\"task_name\",true]"
+          ]
+        },
+        "notes": "每一项都必须是字符串化 JSON，而不是数组对象。"
+      },
+      "x_axis_window": {
+        "condition": "需要限制 gantt 图的日内显示窗口时",
+        "fields": {
+          "x_axis_time_bounds": [
+            "08:00:00",
+            "19:00:00"
+          ],
+          "x_axis_time_format": "smart_date"
+        },
+        "notes": "当前源码按 `HH:mm:ss` 解析。上界实现存在 `Math.min(...end_time)` 的源码行为。"
+      }
+    },
+    "runtime_only_or_non_template_fields": {
+      "runtime_camel_case_aliases": [
+        {
+          "field_name": "startTime / endTime / yAxis",
+          "reason": "分别对应 root `start_time`、`end_time`、`y_axis`。"
+        },
+        {
+          "field_name": "tooltipMetrics / tooltipColumns",
+          "reason": "分别对应 root `tooltip_metrics`、`tooltip_columns`。"
+        },
+        {
+          "field_name": "xAxisTimeBounds / xAxisTimeFormat / showExtraControls / colorScheme / showLegend",
+          "reason": "这些是 root 对应字段的运行时别名，不是创建 API root form_data 的正式键名。"
+        }
+      ],
+      "query_context_generated_fields": [
+        {
+          "field_name": "query_context.queries[*].columns",
+          "reason": "由 `start_time`、`end_time`、`y_axis`、`series`、`tooltip_columns` 和 `order_by_cols` 编译生成。"
+        },
+        {
+          "field_name": "query_context.queries[*].metrics",
+          "reason": "由 root `tooltip_metrics` 编译生成。"
+        },
+        {
+          "field_name": "query_context.queries[*].orderby",
+          "reason": "由 root `order_by_cols` 解析生成。"
+        },
+        {
+          "field_name": "query_context.queries[*].series_columns",
+          "reason": "由 root `series` 生成。"
+        }
+      ],
+      "removed_shared_title_field": [
+        {
+          "field_name": "y_axis_title_position",
+          "reason": "公共 `chartTitle.tsx` 定义了它，但 Gantt controlPanel 已显式移除，且 `transformProps.ts` 不使用它。"
+        }
+      ]
+    },
+    "api_usage_guidance": {
+      "high_confidence_required_fields": [
+        "datasource",
+        "viz_type",
+        "start_time",
+        "end_time",
+        "y_axis"
+      ],
+      "recommended_always_set": [
+        "tooltip_metrics",
+        "tooltip_columns",
+        "adhoc_filters",
+        "order_by_cols",
+        "row_limit",
+        "color_scheme",
+        "show_legend",
+        "legendType",
+        "legendOrientation",
+        "zoomable"
+      ],
+      "mixed_case_examples": [
+        "start_time",
+        "end_time",
+        "y_axis",
+        "tooltip_metrics",
+        "tooltip_columns",
+        "x_axis_time_bounds",
+        "x_axis_time_format",
+        "show_extra_controls",
+        "legendType",
+        "legendOrientation",
+        "legendMargin",
+        "tooltipTimeFormat",
+        "tooltipValuesFormat"
+      ],
+      "avoid_confusion": [
+        "不要把 `startTime`、`endTime`、`tooltipMetrics`、`showExtraControls` 当成 API root 键名。",
+        "`order_by_cols` 不是数组元组，而是字符串数组；每个字符串内部才是 `[column_name, is_ascending]` JSON。",
+        "`tooltip_metrics` 不是纯样式字段，它会直接改变 query.metrics。",
+        "`y_axis_title_position` 虽然属于公共 title controls，但 Gantt 当前并未正式暴露。"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "gantt_chart",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/gantt_chart-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/gantt_chart-form-data-schema.json",
+      "control-schema": "form-data-schema/gantt_chart-schema.json"
+    }
+  }
+}

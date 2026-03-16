@@ -1,26 +1,35 @@
 // https://umijs.org/config/
 import { defineConfig } from '@umijs/max';
+import fs from 'fs';
 import path from 'path';
 import defaultSettings, { publicPath, basePath } from './defaultSettings';
 import proxy from './proxy';
 import routes from './routes';
 import dayjs from 'dayjs';
-const { REACT_APP_ENV = 'dev', RUN_TYPE } = process.env;
+const { REACT_APP_ENV = 'dev', RUN_TYPE, NODE_ENV, APP_TARGET } = process.env;
 
 import ENV_CONFIG from './envConfig';
 
+const runtimeEnv = {
+  NODE_ENV: NODE_ENV ?? 'production',
+  REACT_APP_ENV,
+  APP_TARGET: APP_TARGET ?? 'opensource',
+  API_BASE_URL: '/api/semantic/',
+  CHAT_API_BASE_URL: '/api/chat/',
+  AUTH_API_BASE_URL: '/api/auth/',
+  SHOW_TAG: false,
+  ...ENV_CONFIG,
+};
+
+const chatSdkDistEntry = path.resolve(__dirname, '../../chat-sdk/dist/index.es.js');
+const chatSdkSourceEntry = path.resolve(__dirname, '../../chat-sdk/src/');
+const chatSdkAliasEntry =
+  NODE_ENV === 'production' && fs.existsSync(chatSdkDistEntry) ? chatSdkDistEntry : chatSdkSourceEntry;
+
 export default defineConfig({
   define: {
-    // 添加这个自定义的环境变量
-    // 'process.env.REACT_APP_ENV': process.env.REACT_APP_ENV, // * REACT_APP_ENV 本地开发环境：dev，测试服：test，正式服：prod
-    'process.env': {
-      ...process.env,
-      API_BASE_URL: '/api/semantic/', // 直接在define中挂载裸露的全局变量还需要配置eslint，ts相关配置才能导致在使用中不会飘红，冗余较高，这里挂在进程环境下
-      CHAT_API_BASE_URL: '/api/chat/',
-      AUTH_API_BASE_URL: '/api/auth/',
-      SHOW_TAG: false,
-      ...ENV_CONFIG,
-    },
+    // 只暴露前端运行时确实依赖的环境变量，避免把宿主机环境整体注入构建结果。
+    'process.env': runtimeEnv,
   },
   metas: [
     {
@@ -155,13 +164,11 @@ export default defineConfig({
 
   //================ pro 插件配置 =================
   presets: ['umi-presets-pro'],
-  mfsu: {
-    strategy: 'normal',
-  },
+  mfsu: NODE_ENV === 'development' ? { strategy: 'normal' } : false,
   requestRecord: {},
   exportStatic: {},
   alias: {
-    'supersonic-chat-sdk': path.resolve(__dirname, '../../chat-sdk/src/'),
+    'supersonic-chat-sdk': chatSdkAliasEntry,
   },
   // esbuildMinifyIIFE: true,
 });

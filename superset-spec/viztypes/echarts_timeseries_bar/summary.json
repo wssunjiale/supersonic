@@ -1,0 +1,129 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "echarts_timeseries_bar",
+  "display_name": "Bar Chart",
+  "normalized_summary": {
+    "category": "timeseries",
+    "tags": [
+      "timeseries",
+      "bar",
+      "categorical"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "groupby",
+        "required": true,
+        "description": "维度字段列表，用于分组/系列/分类轴（通常为时间维度）。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标列表（可多个），用于绘制多系列柱状对比。"
+      },
+      {
+        "key": "time_grain_sqla",
+        "required": false,
+        "description": "时间粒度（如 day/week/month），用于时间聚合桶。"
+      },
+      {
+        "key": "orientation",
+        "required": false,
+        "description": "柱状图方向（horizontal/vertical），控制横向/纵向展示。"
+      }
+    ],
+    "description_zh": "Time-series bar charts display categorical data with rectangular bars with heights or lengths proportional to the values that they represent, ordered by time dimension.",
+    "visual_shape_zh": "时间序列（柱状）",
+    "use_cases_zh": [
+      "时间维度的数值对比",
+      "离散时间点的指标差异",
+      "多维度分组柱状对比"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "echarts_timeseries_bar",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/echarts_timeseries_bar-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/echarts_timeseries_bar-form-data-schema.json",
+      "control-schema": "form-data-schema/echarts_timeseries_bar-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Bar Chart",
+    "viztype": "echarts_timeseries_bar",
+    "详细描述": "Time-series bar charts display categorical data with rectangular bars with heights or lengths proportional to the values that they represent, ordered by time dimension.",
+    "表现形态": "时间序列（柱状）",
+    "适用场景": [
+      "时间维度的数值对比",
+      "离散时间点的指标差异",
+      "多维度分组柱状对比"
+    ],
+    "vizKey": "Bar",
+    "pluginCategory": "Evolution",
+    "pluginTags": [],
+    "category": "timeseries",
+    "tags": [
+      "timeseries",
+      "bar",
+      "categorical"
+    ],
+    "关键字段": [
+      {
+        "key": "groupby",
+        "required": true,
+        "description": "维度字段列表，用于分组/系列/分类轴（通常为时间维度）。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标列表（可多个），用于绘制多系列柱状对比。"
+      },
+      {
+        "key": "time_grain_sqla",
+        "required": false,
+        "description": "时间粒度（如 day/week/month），用于时间聚合桶。"
+      },
+      {
+        "key": "orientation",
+        "required": false,
+        "description": "柱状图方向（horizontal/vertical），控制横向/纵向展示。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

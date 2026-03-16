@@ -1,0 +1,395 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "pie",
+  "display_name": "Pie Chart",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "region",
+          "operator": "IN",
+          "comparator": [
+            "East",
+            "West"
+          ]
+        }
+      ]
+    ],
+    "color_scheme": [
+      "supersetColors"
+    ],
+    "currency_format": [
+      {
+        "symbol": "$",
+        "symbolPosition": "prefix"
+      }
+    ],
+    "date_format": [
+      "smart_date"
+    ],
+    "donut": [
+      false
+    ],
+    "groupby": [
+      [
+        "region"
+      ]
+    ],
+    "innerRadius": [
+      30
+    ],
+    "label_line": [
+      false
+    ],
+    "label_template": [
+      "{name}: {value} ({percent})"
+    ],
+    "label_type": [
+      "key_value_percent"
+    ],
+    "labels_outside": [
+      true
+    ],
+    "legendMargin": [],
+    "legendOrientation": [
+      "top"
+    ],
+    "legendType": [
+      "scroll"
+    ],
+    "metric": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "sales"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(sales)"
+      }
+    ],
+    "number_format": [
+      "SMART_NUMBER"
+    ],
+    "outerRadius": [
+      70
+    ],
+    "roseType": [
+      "area"
+    ],
+    "row_limit": [
+      100
+    ],
+    "show_labels": [
+      true
+    ],
+    "show_labels_threshold": [
+      5
+    ],
+    "show_legend": [
+      true
+    ],
+    "show_total": [
+      false
+    ],
+    "sort_by_metric": [
+      true
+    ],
+    "threshold_for_other": [
+      2.5
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "pie",
+      "groupby": [
+        "<dimension_column>"
+      ],
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "adhoc_filters": [],
+      "row_limit": 100,
+      "sort_by_metric": true
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "pie",
+      "groupby": [
+        "<dimension_column>"
+      ],
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "adhoc_filters": [],
+      "row_limit": 100,
+      "sort_by_metric": true,
+      "color_scheme": "<categoricalSchemeRegistry.defaultKey>",
+      "threshold_for_other": 0,
+      "roseType": null,
+      "show_legend": true,
+      "legendType": "scroll",
+      "legendOrientation": "top",
+      "legendMargin": null,
+      "show_labels_threshold": 5,
+      "label_type": "key",
+      "label_template": null,
+      "number_format": "SMART_NUMBER",
+      "currency_format": null,
+      "date_format": "smart_date",
+      "show_labels": true,
+      "labels_outside": true,
+      "label_line": false,
+      "show_total": false,
+      "outerRadius": 70,
+      "donut": false,
+      "innerRadius": 30
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "pie",
+      "metric": "<copied_from_saved_chart>",
+      "groupby": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "row_limit": "<copied_from_saved_chart>",
+      "sort_by_metric": "<copied_from_saved_chart>",
+      "color_scheme": "<copied_from_saved_chart>",
+      "threshold_for_other": "<copied_from_saved_chart>",
+      "roseType": "<copied_from_saved_chart>",
+      "show_legend": "<copied_from_saved_chart>",
+      "legendType": "<copied_from_saved_chart>",
+      "legendOrientation": "<copied_from_saved_chart>",
+      "legendMargin": "<copied_from_saved_chart>",
+      "show_labels_threshold": "<copied_from_saved_chart>",
+      "label_type": "<copied_from_saved_chart>",
+      "label_template": "<copied_from_saved_chart>",
+      "number_format": "<copied_from_saved_chart>",
+      "currency_format": "<copied_from_saved_chart>",
+      "date_format": "<copied_from_saved_chart>",
+      "show_labels": "<copied_from_saved_chart>",
+      "labels_outside": "<copied_from_saved_chart>",
+      "label_line": "<copied_from_saved_chart>",
+      "show_total": "<copied_from_saved_chart>",
+      "outerRadius": "<copied_from_saved_chart>",
+      "donut": "<copied_from_saved_chart>",
+      "innerRadius": "<copied_from_saved_chart>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_pie": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters；后端会把它们并入额外过滤条件。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_pie": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会把它们标记为 extra 并并入查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_pie": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；Pie 默认 buildQuery/transformProps 不直接消费它。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_pie": false,
+        "recommended": false,
+        "sample_data": "Last 30 days",
+        "effect": "通用 extra_form_data override 白名单允许该 key，但 Pie 当前没有显式时间控件链路；guest 场景下不建议依赖。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_pie": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "通用时间粒度 override。Pie 当前 controlPanel 没有显式暴露对应字段。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_pie": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "通用时间列 override。Pie 当前 controlPanel 没有显式暴露对应字段。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_column",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_pie": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "底层 QueryObject 时间列 override；当前图没有官方时间 section。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_grain",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_pie": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "底层 QueryObject 时间粒度 override；当前图没有官方时间 section。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "relative_start",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_pie": false,
+        "recommended": false,
+        "sample_data": "now",
+        "effect": "进入 query extras 的相对开始时间；Pie 当前没有明确时间控件闭环。",
+        "source": "superset/constants.py + superset/utils/core.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "relative_end",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_pie": false,
+        "recommended": false,
+        "sample_data": "today",
+        "effect": "进入 query extras 的相对结束时间；Pie 当前没有明确时间控件闭环。",
+        "source": "superset/constants.py + superset/utils/core.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_pie": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用交互字段；Pie 默认 buildQuery/transformProps 不直接消费它。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_pie": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用交互字段；Pie 默认不直接消费。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_pie": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用交互字段；Pie 默认不直接消费。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "pie",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/pie-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/pie-form-data-schema.json",
+      "control-schema": "form-data-schema/pie-schema.json"
+    }
+  }
+}

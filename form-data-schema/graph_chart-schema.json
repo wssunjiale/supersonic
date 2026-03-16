@@ -1,0 +1,362 @@
+{
+  "viz_type": "graph_chart",
+  "display_name": "Graph Chart",
+  "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Graph/controlPanel.tsx",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Graph/index.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Graph/controlPanel.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Graph/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Graph/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Graph/types.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Graph/constants.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/controls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/constants.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/test/Graph/buildQuery.test.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/test/Graph/transformProps.test.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryContext.ts"
+  ],
+  "notes": [
+    "graph_chart 位于 `plugin-chart-echarts/src/Graph`，metadata 没有声明 `useLegacyApi=true`，因此走标准 `/api/v1/chart/data`。",
+    "Graph Chart 的 root form_data 是 mixed-case：既有 `source_category`、`target_category`、`color_scheme`、`show_legend` 这类 snake_case 字段，也有 `edgeSymbol`、`selectedMode`、`showSymbolThreshold`、`baseNodeSize` 这类 camelCase 字段。",
+    "`source` 和 `target` 都基于 `sharedControls.entity`，当前 controlPanel 把它们改成 `clearable=false`，并保留 `validateNonEmpty`，因此是源码级必填字段。",
+    "`source_category` 和 `target_category` 复用同一个 entity 控件，但显式移除了 validators，因此它们是可选字段。",
+    "`buildQuery.ts` 通过 `queryFields` 显式把 `source`、`target`、`source_category`、`target_category` 编译到 `query.columns`。`metric` 仍通过标准 query builder 进入 `query.metrics`。",
+    "`transformProps.ts` 会跳过所有 `metric` 值为 falsy 的边（`if (!value) return`），因此值为 0 的关系不会出现在最终图上。",
+    "`transformProps.ts` 会把 source/target 节点的 value 按边权累加，再根据 `baseNodeSize`/`baseEdgeWidth` 做归一化；最大节点约为最小节点的 4 倍，最粗边约为最细边的 4 倍。",
+    "如果同一个节点命中了多个 category，`transformProps.ts` 只保留第一次写入的 category；布尔值和 null 会被标准化为 `col: true` / `col: false` / `N/A`。"
+  ],
+  "form_data_overrides": {
+    "metric": "getStandardizedControls().popAllMetrics()"
+  },
+  "chart_data_api_behavior": {
+    "useLegacyApi": false,
+    "frontend_request_endpoint": "/api/v1/chart/data",
+    "frontend_request_payload": {
+      "query_context": "<buildQuery(form_data)>"
+    },
+    "query_builder": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Graph/buildQuery.ts"
+  },
+  "query_compilation": {
+    "query_context_builder": "`buildQuery(formData)` 调用 `buildQueryContext(formData, { queryFields })`，没有额外的 post_processing。",
+    "columns_mapping": "`source`、`target`、`source_category`、`target_category` 通过 `queryFields` 编译进 `query.columns`。tests 已验证：category 缺失时不会被写入 columns。",
+    "metrics_mapping": "`metric` 经标准 query builder 进入 `query.metrics`。",
+    "filters_mapping": "`adhoc_filters` 和 `row_limit` 通过标准 query builder 进入 query。",
+    "runtime_rendering": "`transformProps.ts` 把查询结果转换成 ECharts graph 的 `nodes` 和 `links`。`layout`、`roam`、`draggable`、`selectedMode`、`edgeSymbol`、`baseNodeSize`、`baseEdgeWidth`、`edgeLength`、`gravity`、`repulsion`、`friction` 只影响前端布局和交互。"
+  },
+  "field_categories": {
+    "Query": [
+      {
+        "field_name": "source",
+        "description": "Name of the source nodes",
+        "data_type": "string | object",
+        "enum_source": "datasource columns；共享控件底层来自 dndEntityControl",
+        "sample_data": "source_name",
+        "required": true,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "target",
+        "description": "Name of the target nodes",
+        "data_type": "string | object",
+        "enum_source": "datasource columns；共享控件底层来自 dndEntityControl",
+        "sample_data": "target_name",
+        "required": true,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "metric",
+        "description": "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+        "data_type": "string | object",
+        "enum_source": "saved metrics + adhoc metrics",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "weight"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(weight)"
+        },
+        "required": true,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "source_category",
+        "runtime_alias": "sourceCategory",
+        "description": "The category of source nodes used to assign colors. If a node is associated with more than one category, only the first will be used.",
+        "data_type": "string | object | null",
+        "enum_source": "datasource columns；共享控件底层来自 dndEntityControl，但 validators 已被移除",
+        "sample_data": "source_type",
+        "required": false,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "target_category",
+        "runtime_alias": "targetCategory",
+        "description": "Category of target nodes",
+        "data_type": "string | object | null",
+        "enum_source": "datasource columns；共享控件底层来自 dndEntityControl，但 validators 已被移除",
+        "sample_data": "target_type",
+        "required": false,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "adhoc_filters",
+        "description": "字段标签为 Filters。",
+        "data_type": "array[object]",
+        "enum_source": "dataset columns + saved metrics + 当前 metric",
+        "sample_data": [],
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "default_value": []
+      },
+      {
+        "field_name": "row_limit",
+        "runtime_alias": "rowLimit",
+        "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+        "data_type": "integer",
+        "enum_values": [
+          10,
+          50,
+          100,
+          250,
+          500,
+          1000,
+          5000,
+          10000,
+          50000
+        ],
+        "sample_data": 10000,
+        "required": false,
+        "embedding": "否",
+        "default_value": 10000
+      }
+    ],
+    "Chart Options / Legend": [
+      {
+        "field_name": "color_scheme",
+        "runtime_alias": "colorScheme",
+        "description": "The color scheme for rendering chart",
+        "data_type": "string",
+        "enum_source": "categoricalSchemeRegistry.keys()",
+        "sample_data": "supersetColors",
+        "required": false,
+        "embedding": "否",
+        "default_value": "categoricalSchemeRegistry.getDefaultKey()"
+      },
+      {
+        "field_name": "show_legend",
+        "runtime_alias": "showLegend",
+        "description": "Whether to display a legend for the chart",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true
+      },
+      {
+        "field_name": "legendType",
+        "description": "Legend type",
+        "data_type": "string",
+        "enum_values": [
+          "scroll",
+          "plain"
+        ],
+        "sample_data": "scroll",
+        "required": false,
+        "embedding": "否",
+        "default_value": "scroll"
+      },
+      {
+        "field_name": "legendOrientation",
+        "description": "Legend Orientation",
+        "data_type": "string",
+        "enum_values": [
+          "top",
+          "bottom",
+          "left",
+          "right"
+        ],
+        "sample_data": "top",
+        "required": false,
+        "embedding": "否",
+        "default_value": "top"
+      },
+      {
+        "field_name": "legendMargin",
+        "description": "Additional padding for legend.",
+        "data_type": "integer | null",
+        "sample_data": 12,
+        "required": false,
+        "embedding": "否",
+        "default_value": null
+      }
+    ],
+    "Chart Options / Layout & Interaction": [
+      {
+        "field_name": "layout",
+        "description": "Layout type of graph",
+        "data_type": "string",
+        "enum_values": [
+          "force",
+          "circular"
+        ],
+        "sample_data": "force",
+        "required": false,
+        "embedding": "否",
+        "default_value": "force"
+      },
+      {
+        "field_name": "edgeSymbol",
+        "description": "Symbol of two ends of edge line",
+        "data_type": "string",
+        "enum_values": [
+          "none,none",
+          "none,arrow",
+          "circle,arrow",
+          "circle,circle"
+        ],
+        "sample_data": "none,arrow",
+        "required": false,
+        "embedding": "否",
+        "default_value": "none,arrow"
+      },
+      {
+        "field_name": "draggable",
+        "description": "Whether to enable node dragging in force layout mode.",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false,
+        "notes": "仅在 layout='force' 时显示。"
+      },
+      {
+        "field_name": "roam",
+        "description": "Whether to enable changing graph position and scaling.",
+        "data_type": "boolean | string",
+        "enum_values": [
+          false,
+          "scale",
+          "move",
+          true
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true
+      },
+      {
+        "field_name": "selectedMode",
+        "description": "Allow node selections",
+        "data_type": "boolean | string",
+        "enum_values": [
+          false,
+          "single",
+          "multiple"
+        ],
+        "sample_data": "single",
+        "required": false,
+        "embedding": "否",
+        "default_value": "single"
+      }
+    ],
+    "Chart Options / Nodes & Edges": [
+      {
+        "field_name": "showSymbolThreshold",
+        "description": "Minimum value for label to be displayed on graph.",
+        "data_type": "integer",
+        "sample_data": 0,
+        "required": false,
+        "embedding": "否",
+        "default_value": 0
+      },
+      {
+        "field_name": "baseNodeSize",
+        "description": "Median node size, the largest node will be 4 times larger than the smallest",
+        "data_type": "number",
+        "sample_data": 20,
+        "required": false,
+        "embedding": "否",
+        "default_value": 20
+      },
+      {
+        "field_name": "baseEdgeWidth",
+        "description": "Median edge width, the thickest edge will be 4 times thicker than the thinnest.",
+        "data_type": "number",
+        "sample_data": 3,
+        "required": false,
+        "embedding": "否",
+        "default_value": 3
+      },
+      {
+        "field_name": "edgeLength",
+        "description": "Edge length between nodes",
+        "data_type": "number",
+        "sample_data": 400,
+        "required": false,
+        "embedding": "否",
+        "default_value": 400,
+        "notes": "仅在 layout='force' 时显示；Slider 范围 100..1000，step=50。"
+      },
+      {
+        "field_name": "gravity",
+        "description": "Strength to pull the graph toward center",
+        "data_type": "number",
+        "sample_data": 0.3,
+        "required": false,
+        "embedding": "否",
+        "default_value": 0.3,
+        "notes": "仅在 layout='force' 时显示；Slider 范围 0.1..1，step=0.1。"
+      },
+      {
+        "field_name": "repulsion",
+        "description": "Repulsion strength between nodes",
+        "data_type": "number",
+        "sample_data": 1000,
+        "required": false,
+        "embedding": "否",
+        "default_value": 1000,
+        "notes": "仅在 layout='force' 时显示；Slider 范围 100..3000，step=50。"
+      },
+      {
+        "field_name": "friction",
+        "description": "Friction between nodes",
+        "data_type": "number",
+        "sample_data": 0.2,
+        "required": false,
+        "embedding": "否",
+        "default_value": 0.2,
+        "notes": "仅在 layout='force' 时显示；Slider 范围 0.1..1，step=0.1。"
+      }
+    ]
+  },
+  "runtime_only_or_removed_fields": [
+    {
+      "field_name": "query_context.queries[*].columns / metrics",
+      "reason": "这些字段由 Graph/buildQuery.ts 从 root form_data 编译生成，不是额外 root form_data 字段。"
+    },
+    {
+      "field_name": "sourceCategory / targetCategory / colorScheme / rowLimit / showLegend",
+      "reason": "这些是运行时 camelCase 别名，不是全部 API root form_data 的 canonical 键名。"
+    },
+    {
+      "field_name": "formDataOverrides(metric remap)",
+      "reason": "只在 standardized controls 切换图表时触发，不是常规创建 Graph Chart 时必须手工传入的 root 字段。"
+    }
+  ]
+}

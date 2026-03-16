@@ -1,0 +1,457 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "bubble_v2",
+  "display_name": "Bubble Chart",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      [
+        {
+          "clause": "WHERE",
+          "subject": "order_date",
+          "operator": "TEMPORAL_RANGE",
+          "comparator": "No filter",
+          "expressionType": "SIMPLE"
+        }
+      ]
+    ],
+    "color_scheme": [
+      "supersetColors"
+    ],
+    "entity": [
+      "deal_size"
+    ],
+    "legendMargin": [
+      12
+    ],
+    "legendOrientation": [
+      "top"
+    ],
+    "legendType": [
+      "scroll"
+    ],
+    "logXAxis": [
+      false
+    ],
+    "logYAxis": [
+      false
+    ],
+    "max_bubble_size": [
+      "25"
+    ],
+    "opacity": [
+      0.6
+    ],
+    "order_desc": [
+      true
+    ],
+    "orderby": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "quantity_ordered"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(quantity_ordered)"
+      }
+    ],
+    "row_limit": [
+      10000
+    ],
+    "series": [
+      "product_line"
+    ],
+    "show_legend": [
+      true
+    ],
+    "size": [
+      "count"
+    ],
+    "tooltipSizeFormat": [
+      "SMART_NUMBER"
+    ],
+    "truncateXAxis": [
+      false
+    ],
+    "truncateYAxis": [
+      false
+    ],
+    "x": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "quantity_ordered"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(quantity_ordered)"
+      }
+    ],
+    "xAxisBounds": [
+      [
+        0,
+        5000
+      ]
+    ],
+    "xAxisFormat": [
+      "SMART_NUMBER"
+    ],
+    "xAxisLabelInterval": [
+      "auto"
+    ],
+    "xAxisLabelRotation": [
+      45
+    ],
+    "x_axis_label": [
+      "Quantity Ordered"
+    ],
+    "x_axis_title_margin": [
+      30
+    ],
+    "y": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "country"
+        },
+        "aggregate": "COUNT_DISTINCT",
+        "label": "COUNT_DISTINCT(country)"
+      }
+    ],
+    "yAxisLabelRotation": [
+      45
+    ],
+    "y_axis_bounds": [
+      [
+        0,
+        100
+      ]
+    ],
+    "y_axis_format": [
+      "SMART_NUMBER"
+    ],
+    "y_axis_label": [
+      "Distinct Countries"
+    ],
+    "y_axis_title_margin": [
+      30
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "bubble_v2",
+      "entity": "<entity_dimension>",
+      "x": "<x_metric_or_saved_metric>",
+      "y": "<y_metric_or_saved_metric>",
+      "size": "<size_metric_or_saved_metric>",
+      "adhoc_filters": []
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "bubble_v2",
+      "series": null,
+      "entity": "deal_size",
+      "x": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "quantity_ordered"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(quantity_ordered)"
+      },
+      "y": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "country"
+        },
+        "aggregate": "COUNT_DISTINCT",
+        "label": "COUNT_DISTINCT(country)"
+      },
+      "adhoc_filters": [],
+      "size": "count",
+      "orderby": null,
+      "order_desc": true,
+      "row_limit": 10000,
+      "color_scheme": "supersetColors",
+      "show_legend": true,
+      "legendType": "scroll",
+      "legendOrientation": "top",
+      "legendMargin": null,
+      "max_bubble_size": "25",
+      "tooltipSizeFormat": "SMART_NUMBER",
+      "opacity": 0.6,
+      "x_axis_label": "",
+      "xAxisLabelRotation": 0,
+      "xAxisLabelInterval": "auto",
+      "x_axis_title_margin": 30,
+      "xAxisFormat": "SMART_NUMBER",
+      "y_axis_label": "",
+      "yAxisLabelRotation": 0,
+      "y_axis_title_margin": 30,
+      "y_axis_format": "SMART_NUMBER",
+      "truncateXAxis": false,
+      "xAxisBounds": [
+        null,
+        null
+      ],
+      "truncateYAxis": false,
+      "y_axis_bounds": [
+        null,
+        null
+      ],
+      "extra_form_data": {}
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "bubble_v2",
+      "series": "<copied_from_saved_chart_if_present>",
+      "entity": "<copied_from_saved_chart>",
+      "x": "<copied_from_saved_chart>",
+      "y": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "size": "<copied_from_saved_chart>",
+      "orderby": "<copied_from_saved_chart_if_present>",
+      "order_desc": "<copied_from_saved_chart_if_present>",
+      "row_limit": "<copied_from_saved_chart>",
+      "color_scheme": "<copied_from_saved_chart_if_present>",
+      "show_legend": "<copied_from_saved_chart_if_present>",
+      "legendType": "<copied_from_saved_chart_if_present>",
+      "legendOrientation": "<copied_from_saved_chart_if_present>",
+      "legendMargin": "<copied_from_saved_chart_if_present>",
+      "max_bubble_size": "<copied_from_saved_chart_if_present>",
+      "tooltipSizeFormat": "<copied_from_saved_chart_if_present>",
+      "opacity": "<copied_from_saved_chart_if_present>",
+      "x_axis_label": "<copied_from_saved_chart_if_present>",
+      "xAxisLabelRotation": "<copied_from_saved_chart_if_present>",
+      "xAxisLabelInterval": "<copied_from_saved_chart_if_present>",
+      "x_axis_title_margin": "<copied_from_saved_chart_if_present>",
+      "xAxisFormat": "<copied_from_saved_chart_if_present>",
+      "logXAxis": "<copied_from_saved_chart_if_present>",
+      "y_axis_label": "<copied_from_saved_chart_if_present>",
+      "yAxisLabelRotation": "<copied_from_saved_chart_if_present>",
+      "y_axis_title_margin": "<copied_from_saved_chart_if_present>",
+      "y_axis_format": "<copied_from_saved_chart_if_present>",
+      "logYAxis": "<copied_from_saved_chart_if_present>",
+      "truncateXAxis": "<copied_from_saved_chart_if_present>",
+      "xAxisBounds": "<copied_from_saved_chart_if_present>",
+      "truncateYAxis": "<copied_from_saved_chart_if_present>",
+      "y_axis_bounds": "<copied_from_saved_chart_if_present>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "product_line",
+            "op": "IN",
+            "val": [
+              "Classic Cars"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "product_line",
+            "operator": "IN",
+            "comparator": [
+              "Classic Cars"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_bubble_v2": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "product_line",
+            "op": "IN",
+            "val": [
+              "Classic Cars"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters；后端会把它们转换成额外过滤条件。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_bubble_v2": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "product_line",
+            "operator": "IN",
+            "comparator": [
+              "Classic Cars"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会标记为 isExtra 并并入查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_bubble_v2": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；Bubble/buildQuery.ts 和 transformProps.ts 默认不直接消费它。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_bubble_v2": true,
+        "recommended": false,
+        "sample_data": "Last 30 days",
+        "effect": "覆盖时间范围。Bubble 本身没有时间控件，是否生效取决于该图的底层查询是否实际绑定了时间列。",
+        "source": "QueryFormData.ts + query/constants.ts + superset/constants.py"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_bubble_v2": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "前后端都支持该 override，但 Bubble controlPanel 没有时间粒度控件，通常不应在 guest embedding 中临时改写。",
+        "source": "QueryFormData.ts + query/constants.ts + superset/constants.py"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_bubble_v2": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "后端支持 override，但 Bubble controlPanel 没有这个正式字段；guest embedding 中不建议依赖它重构时间列。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "granularity",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_bubble_v2": false,
+        "recommended": false,
+        "sample_data": "__time",
+        "effect": "底层 QueryObject 时间列 override，Bubble 常规场景不应在 guest 请求里临时改它。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "time_column",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_bubble_v2": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "底层 QueryObject 时间列 override；Bubble 默认并不暴露这类根字段。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "time_grain",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_bubble_v2": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "底层 QueryObject 的时间粒度 override；Bubble 常规场景通常不需要手动传。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "relative_start",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_bubble_v2": true,
+        "recommended": false,
+        "sample_data": "now",
+        "effect": "写入 query.extras.relative_start。后端 schema 对取值做了 today / now 校验。",
+        "source": "superset/constants.py + superset/charts/schemas.py"
+      },
+      {
+        "field_name": "relative_end",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_bubble_v2": true,
+        "recommended": false,
+        "sample_data": "today",
+        "effect": "写入 query.extras.relative_end。后端 schema 对取值做了 today / now 校验。",
+        "source": "superset/constants.py + superset/charts/schemas.py"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_bubble_v2": false,
+        "recommended": false,
+        "sample_data": [
+          "product_line"
+        ],
+        "effect": "通用 ExtraFormData 字段。Bubble/buildQuery.ts 不直接消费它，通常没有实际效果。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_bubble_v2": false,
+        "recommended": false,
+        "sample_data": [
+          "product_line"
+        ],
+        "effect": "通用交互字段；Bubble 默认不直接消费。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_bubble_v2": false,
+        "recommended": false,
+        "sample_data": [
+          "product_line"
+        ],
+        "effect": "通用交互字段；Bubble 默认不直接消费。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "time_compare",
+        "data_type": "string | array[string]",
+        "behavior": "override",
+        "safe_for_bubble_v2": false,
+        "recommended": false,
+        "sample_data": [
+          "1 year ago"
+        ],
+        "effect": "frontend 类型和 query/constants.ts 里都声明了它，但 Superset 6.0.0 后端 constants.py merge whitelist 没把它列为高置信 override，guest embedding 下不建议依赖。",
+        "source": "QueryFormData.ts + query/constants.ts + superset/constants.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "bubble_v2",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/bubble_v2-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/bubble_v2-form-data-schema.json",
+      "control-schema": "form-data-schema/bubble_v2-schema.json"
+    }
+  }
+}

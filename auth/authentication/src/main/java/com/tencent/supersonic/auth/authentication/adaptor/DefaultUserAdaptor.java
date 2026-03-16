@@ -18,6 +18,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -91,6 +93,12 @@ public class DefaultUserAdaptor implements UserAdaptor {
     }
 
     @Override
+    public void deleteUser(long userId) {
+        UserRepository userRepository = ContextUtils.getBean(UserRepository.class);
+        userRepository.deleteUser(userId);
+    }
+
+    @Override
     public String login(UserReq userReq, HttpServletRequest request) {
         TokenService tokenService = ContextUtils.getBean(TokenService.class);
         String appKey = tokenService.getAppKey(request);
@@ -102,7 +110,9 @@ public class DefaultUserAdaptor implements UserAdaptor {
         TokenService tokenService = ContextUtils.getBean(TokenService.class);
         try {
             UserWithPassword user = getUserWithPassword(userReq);
-            return tokenService.generateToken(UserWithPassword.convert(user), appKey);
+            String token = tokenService.generateToken(UserWithPassword.convert(user), appKey);
+            updateLastLogin(userReq.getName());
+            return token;
         } catch (Exception e) {
             log.error("", e);
             throw new RuntimeException("password encrypt error, please try again");
@@ -213,8 +223,9 @@ public class DefaultUserAdaptor implements UserAdaptor {
                 new UserWithPassword(userDO.getId(), userDO.getName(), userDO.getDisplayName(),
                         userDO.getEmail(), userDO.getPassword(), userDO.getIsAdmin());
 
-        String token =
-                tokenService.generateToken(UserWithPassword.convert(userWithPassword), expireTime);
+        // 使用令牌名称作为生成key ，这样可以区分正常请求和api 请求，api 的令牌失效时间很长，需考虑令牌泄露的情况
+        String token = tokenService.generateToken(UserWithPassword.convert(userWithPassword),
+                "SysDbToken:" + name, (new Date().getTime() + expireTime));
         UserTokenDO userTokenDO = saveUserToken(name, userName, token, expireTime);
         return convertUserToken(userTokenDO);
     }
@@ -266,5 +277,12 @@ public class DefaultUserAdaptor implements UserAdaptor {
         userToken.setCreateDate(userTokenDO.getCreateTime());
         userToken.setExpireDate(userTokenDO.getExpireDateTime());
         return userToken;
+    }
+
+    private void updateLastLogin(String userName) {
+        UserRepository userRepository = ContextUtils.getBean(UserRepository.class);
+        UserDO userDO = userRepository.getUser(userName);
+        userDO.setLastLogin(new Timestamp(System.currentTimeMillis()));
+        userRepository.updateUser(userDO);
     }
 }

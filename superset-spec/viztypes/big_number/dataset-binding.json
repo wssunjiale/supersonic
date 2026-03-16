@@ -1,0 +1,482 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "big_number",
+  "display_name": "Big Number with Trendline",
+  "generation_mode": "heuristic_seed",
+  "slot_candidates": [
+    {
+      "field_name": "adhoc_filters",
+      "required": false,
+      "slot_kind": "filter_list",
+      "accepted_dataset_roles": [
+        "filter_context"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [],
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [
+        "extra_form_data.append"
+      ],
+      "descriptions": [
+        "字段标签为 Filters。当前图表没有独立 time_range 控件，时间过滤通常通过此字段中的 TEMPORAL_RANGE 过滤条件表达。"
+      ]
+    },
+    {
+      "field_name": "metric",
+      "required": true,
+      "slot_kind": "metric",
+      "accepted_dataset_roles": [
+        "metric",
+        "saved_metric",
+        "adhoc_metric"
+      ],
+      "cardinality": "1",
+      "placeholder": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+      ]
+    },
+    {
+      "field_name": "time_grain_sqla",
+      "required": false,
+      "slot_kind": "time_grain",
+      "accepted_dataset_roles": [
+        "time_grain"
+      ],
+      "cardinality": "0..1",
+      "placeholder": "P1D",
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [
+        "extra_form_data.override"
+      ],
+      "descriptions": [
+        "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart."
+      ]
+    },
+    {
+      "field_name": "x_axis",
+      "required": true,
+      "slot_kind": "x_axis",
+      "accepted_dataset_roles": [
+        "time_dimension",
+        "dimension"
+      ],
+      "cardinality": "1",
+      "placeholder": "<x_axis_column>",
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Dimension to use on x-axis. 在 big_number 中此控件显示名被重写为 Temporal X-Axis，并限制只能选时间列。"
+      ]
+    }
+  ],
+  "non_binding_form_controls": [
+    {
+      "field_name": "aggregation",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Method to compute the displayed value. \"Overall value\" calculates a single metric across the entire filtered time period, ideal for non-additive metrics like ratios, averages, or distinct counts. Other methods operate over the time series data points."
+      ]
+    },
+    {
+      "field_name": "color_picker",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Color"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Use this to define a static color for all circles"
+      ]
+    },
+    {
+      "field_name": "compare_lag",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Based on granularity, number of time periods to compare against"
+      ]
+    },
+    {
+      "field_name": "compare_suffix",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Suffix to apply after the percentage display"
+      ]
+    },
+    {
+      "field_name": "currency_format",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Number & Date Formatting"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Currency format"
+      ]
+    },
+    {
+      "field_name": "force_timestamp_formatting",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Number & Date Formatting"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Use date formatting even when metric value is not a timestamp"
+      ]
+    },
+    {
+      "field_name": "header_font_size",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Typography"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Big Number Font Size"
+      ]
+    },
+    {
+      "field_name": "metric_name_font_size",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Typography"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Metric Name Font Size"
+      ]
+    },
+    {
+      "field_name": "min_periods",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Advanced Analytics"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The minimum number of rolling periods required to show a value. For instance if you do a cumulative sum on 7 days you may want your \"Min Period\" to be 7, so that all data points shown are the total of 7 periods. This will hide the \"ramp up\" taking place over the first 7 periods"
+      ]
+    },
+    {
+      "field_name": "resample_method",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Advanced Analytics"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Pandas resample method"
+      ]
+    },
+    {
+      "field_name": "resample_rule",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Advanced Analytics"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Pandas resample rule"
+      ]
+    },
+    {
+      "field_name": "rolling_periods",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Advanced Analytics"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Defines the size of the rolling window function, relative to the time granularity selected"
+      ]
+    },
+    {
+      "field_name": "rolling_type",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Advanced Analytics"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Defines a rolling window function to apply, works along with the [Periods] text box"
+      ]
+    },
+    {
+      "field_name": "show_metric_name",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Typography"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to display the metric name"
+      ]
+    },
+    {
+      "field_name": "show_timestamp",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to display the timestamp"
+      ]
+    },
+    {
+      "field_name": "show_trend_line",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to display the trend line"
+      ]
+    },
+    {
+      "field_name": "start_y_axis_at_zero",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Start y-axis at zero. Uncheck to start y-axis at minimum value in the data."
+      ]
+    },
+    {
+      "field_name": "subheader_font_size",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Typography"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Subheader Font Size"
+      ]
+    },
+    {
+      "field_name": "subtitle",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Display Text"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Description text that shows up below your Big Number"
+      ]
+    },
+    {
+      "field_name": "subtitle_font_size",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Typography"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Subtitle Font Size"
+      ]
+    },
+    {
+      "field_name": "time_format",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Number & Date Formatting"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "D3 format syntax: https://github.com/d3/d3-format"
+      ]
+    },
+    {
+      "field_name": "time_range_fixed",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Fix the trend line to the full time range specified in case filtered results do not include the start or end dates"
+      ]
+    },
+    {
+      "field_name": "y_axis_format",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Number & Date Formatting"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "D3 format syntax: https://github.com/d3/d3-format"
+      ]
+    }
+  ],
+  "dataset_role_inventory": {
+    "adhoc_metric": [
+      "metric"
+    ],
+    "dimension": [
+      "x_axis"
+    ],
+    "filter_context": [
+      "adhoc_filters"
+    ],
+    "metric": [
+      "metric"
+    ],
+    "saved_metric": [
+      "metric"
+    ],
+    "time_dimension": [
+      "x_axis"
+    ],
+    "time_grain": [
+      "time_grain_sqla"
+    ]
+  },
+  "binding_seed_example": {
+    "metric": {
+      "expressionType": "SIMPLE",
+      "column": {
+        "column_name": "<metric_column>"
+      },
+      "aggregate": "SUM",
+      "label": "SUM(<metric_column>)"
+    },
+    "x_axis": "<x_axis_column>"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "big_number",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/big_number-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/big_number-form-data-schema.json",
+      "control-schema": "form-data-schema/big_number-schema.json"
+    }
+  }
+}

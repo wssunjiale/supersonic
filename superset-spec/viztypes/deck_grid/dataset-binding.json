@@ -1,0 +1,373 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "deck_grid",
+  "display_name": "deck.gl Grid",
+  "generation_mode": "heuristic_seed",
+  "slot_candidates": [
+    {
+      "field_name": "adhoc_filters",
+      "required": false,
+      "slot_kind": "filter_list",
+      "accepted_dataset_roles": [
+        "filter_context"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [],
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [
+        "extra_form_data.append"
+      ],
+      "descriptions": [
+        "字段标签为 Filters。legacy `/superset/explore_json/` 路径会先把 legacy filters 归并进 `adhoc_filters`，再继续 merge `extra_form_data`。"
+      ]
+    },
+    {
+      "field_name": "filter_nulls",
+      "required": false,
+      "slot_kind": "filter_list",
+      "accepted_dataset_roles": [
+        "filter_context"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [],
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to ignore locations that are null"
+      ]
+    },
+    {
+      "field_name": "size",
+      "required": true,
+      "slot_kind": "metric",
+      "accepted_dataset_roles": [
+        "metric",
+        "saved_metric",
+        "adhoc_metric"
+      ],
+      "cardinality": "1",
+      "placeholder": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Metric used to control height"
+      ]
+    },
+    {
+      "field_name": "spatial",
+      "required": true,
+      "slot_kind": "geo_spatial",
+      "accepted_dataset_roles": [
+        "geo_point",
+        "geo_geometry"
+      ],
+      "cardinality": "1",
+      "placeholder": "<spatial_column_or_expression>",
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Point to your spatial columns"
+      ]
+    }
+  ],
+  "non_binding_form_controls": [
+    {
+      "field_name": "autozoom",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Map"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "When checked, the map will zoom to your data after each query"
+      ]
+    },
+    {
+      "field_name": "color_breakpoints",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Map"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Define color breakpoints for the data"
+      ]
+    },
+    {
+      "field_name": "color_picker",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Map"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Select the fixed color"
+      ]
+    },
+    {
+      "field_name": "color_scheme",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Map"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The color scheme for rendering chart"
+      ]
+    },
+    {
+      "field_name": "color_scheme_type",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Map"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Select the type of color scheme to use."
+      ]
+    },
+    {
+      "field_name": "deafult_breakpoint_color",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Map"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The color used when a value doesn't match any defined breakpoints."
+      ]
+    },
+    {
+      "field_name": "extruded",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Map"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to make the grid 3D"
+      ]
+    },
+    {
+      "field_name": "grid_size",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Map"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Defines the grid size in pixels"
+      ]
+    },
+    {
+      "field_name": "js_columns",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Advanced"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "List of extra columns made available in JavaScript functions"
+      ]
+    },
+    {
+      "field_name": "js_data_mutator",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Advanced"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Define a javascript function that receives the data array used in the visualization and is expected to return a modified version of that array."
+      ]
+    },
+    {
+      "field_name": "js_onclick_href",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Advanced"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Define a function that returns a URL to navigate to when user clicks"
+      ]
+    },
+    {
+      "field_name": "js_tooltip",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Advanced"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Define a function that receives the input and outputs the content for a tooltip"
+      ]
+    },
+    {
+      "field_name": "legend_position",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Map"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Choose the position of the legend"
+      ]
+    },
+    {
+      "field_name": "mapbox_style",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Map"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/ or tile server URL."
+      ]
+    },
+    {
+      "field_name": "row_limit",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Limits the number of the rows that are computed in the query that is the source of the data used for this chart."
+      ]
+    },
+    {
+      "field_name": "viewport",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Map"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Parameters related to the view and perspective on the map"
+      ]
+    }
+  ],
+  "dataset_role_inventory": {
+    "adhoc_metric": [
+      "size"
+    ],
+    "filter_context": [
+      "adhoc_filters",
+      "filter_nulls"
+    ],
+    "geo_geometry": [
+      "spatial"
+    ],
+    "geo_point": [
+      "spatial"
+    ],
+    "metric": [
+      "size"
+    ],
+    "saved_metric": [
+      "size"
+    ]
+  },
+  "binding_seed_example": {
+    "size": {
+      "expressionType": "SIMPLE",
+      "column": {
+        "column_name": "<metric_column>"
+      },
+      "aggregate": "SUM",
+      "label": "SUM(<metric_column>)"
+    },
+    "spatial": "<spatial_column_or_expression>"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "deck_grid",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/deck_grid-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/deck_grid-form-data-schema.json",
+      "control-schema": "form-data-schema/deck_grid-schema.json"
+    }
+  }
+}

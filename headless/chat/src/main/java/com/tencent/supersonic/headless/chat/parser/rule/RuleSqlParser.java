@@ -1,10 +1,12 @@
 package com.tencent.supersonic.headless.chat.parser.rule;
 
 import com.google.common.collect.Lists;
+import com.tencent.supersonic.common.util.ContextUtils;
 import com.tencent.supersonic.headless.api.pojo.SchemaElementMatch;
 import com.tencent.supersonic.headless.api.pojo.SchemaMapInfo;
 import com.tencent.supersonic.headless.chat.ChatQueryContext;
 import com.tencent.supersonic.headless.chat.parser.SemanticParser;
+import com.tencent.supersonic.headless.chat.parser.llm.LLMResponseService;
 import com.tencent.supersonic.headless.chat.query.SemanticQuery;
 import com.tencent.supersonic.headless.chat.query.rule.RuleSemanticQuery;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +42,10 @@ public class RuleSqlParser implements SemanticParser {
 
         auxiliaryParsers.forEach(p -> p.parse(chatQueryContext));
 
+        LLMResponseService responseService = ContextUtils.getBean(LLMResponseService.class);
         candidateQueries.forEach(query -> query.buildS2Sql(
                 chatQueryContext.getDataSetSchema(query.getParseInfo().getDataSetId())));
+        candidateQueries.forEach(query -> responseService.addParseContext(chatQueryContext,
+                query.getParseInfo()));
     }
 }

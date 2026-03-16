@@ -1,5 +1,6 @@
 package com.tencent.supersonic.chat.server.service.impl;
 
+import com.alibaba.fastjson2.JSON;
 import com.google.common.collect.Lists;
 import com.tencent.supersonic.chat.api.pojo.request.ChatExecuteReq;
 import com.tencent.supersonic.chat.api.pojo.request.ChatParseReq;
@@ -10,9 +11,11 @@ import com.tencent.supersonic.chat.server.agent.Agent;
 import com.tencent.supersonic.chat.server.executor.ChatQueryExecutor;
 import com.tencent.supersonic.chat.server.parser.ChatQueryParser;
 import com.tencent.supersonic.chat.server.persistence.dataobject.ChatParseDO;
+import com.tencent.supersonic.chat.server.persistence.dataobject.ChatQueryDO;
 import com.tencent.supersonic.chat.server.persistence.repository.ChatQueryRepository;
 import com.tencent.supersonic.chat.server.pojo.ExecuteContext;
 import com.tencent.supersonic.chat.server.pojo.ParseContext;
+import com.tencent.supersonic.chat.server.processor.execute.DataInterpretProcessor;
 import com.tencent.supersonic.chat.server.processor.execute.ExecuteResultProcessor;
 import com.tencent.supersonic.chat.server.processor.parse.ParseResultProcessor;
 import com.tencent.supersonic.chat.server.service.AgentService;
@@ -20,8 +23,13 @@ import com.tencent.supersonic.chat.server.service.ChatManageService;
 import com.tencent.supersonic.chat.server.service.ChatQueryService;
 import com.tencent.supersonic.chat.server.util.ComponentFactory;
 import com.tencent.supersonic.chat.server.util.QueryReqConverter;
-import com.tencent.supersonic.common.jsqlparser.*;
+import com.tencent.supersonic.common.jsqlparser.FieldExpression;
+import com.tencent.supersonic.common.jsqlparser.SqlAddHelper;
+import com.tencent.supersonic.common.jsqlparser.SqlRemoveHelper;
+import com.tencent.supersonic.common.jsqlparser.SqlReplaceHelper;
+import com.tencent.supersonic.common.jsqlparser.SqlSelectHelper;
 import com.tencent.supersonic.common.pojo.User;
+import com.tencent.supersonic.common.pojo.exception.InvalidArgumentException;
 import com.tencent.supersonic.common.pojo.enums.FilterOperatorEnum;
 import com.tencent.supersonic.common.util.DateUtils;
 import com.tencent.supersonic.common.util.JsonUtil;
@@ -46,15 +54,28 @@ import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.StringValue;
-import net.sf.jsqlparser.expression.operators.relational.*;
+import net.sf.jsqlparser.expression.operators.relational.ComparisonOperator;
+import net.sf.jsqlparser.expression.operators.relational.GreaterThanEquals;
+import net.sf.jsqlparser.expression.operators.relational.InExpression;
+import net.sf.jsqlparser.expression.operators.relational.MinorThanEquals;
+import net.sf.jsqlparser.expression.operators.relational.ParenthesedExpressionList;
 import net.sf.jsqlparser.schema.Column;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -68,6 +89,7 @@ public class ChatQueryServiceImpl implements ChatQueryService {
     @Autowired
     private SemanticLayerService semanticLayerService;
     @Autowired
+    @Lazy
     private AgentService agentService;
     @Autowired
     private ChatQueryRepository chatQueryRepository;
@@ -99,7 +121,11 @@ public class ChatQueryServiceImpl implements ChatQueryService {
         }
 
         ParseContext parseContext = buildParseContext(chatParseReq, new ChatParseResp(queryId));
-        chatQueryParsers.forEach(p -> p.parse(parseContext));
+        for (ChatQueryParser parser : chatQueryParsers) {
+            if (parser.accept(parseContext)) {
+                parser.parse(parseContext);
+            }
+        }
 
         for (ParseResultProcessor processor : parseResultProcessors) {
             if (processor.accept(parseContext)) {
@@ -108,6 +134,8 @@ public class ChatQueryServiceImpl implements ChatQueryService {
         }
 
         if (!parseContext.needFeedback()) {
+            parseContext.getResponse().getParseTimeCost().setParseTime(System.currentTimeMillis()
+                    - parseContext.getResponse().getParseTimeCost().getParseStartTime());
             chatManageService.batchAddParse(chatParseReq, parseContext.getResponse());
             chatManageService.updateParseCostTime(parseContext.getResponse());
         }
@@ -123,12 +151,14 @@ public class ChatQueryServiceImpl implements ChatQueryService {
                 chatExecuteReq.getQueryId(), chatExecuteReq.getParseId(),
                 chatExecuteReq.getAgentId(), chatExecuteReq.getChatId());
         for (ChatQueryExecutor chatQueryExecutor : chatQueryExecutors) {
-            queryResult = chatQueryExecutor.execute(executeContext);
-            if (queryResult != null) {
-                log.debug("executor selected: {}, queryState={}, queryMode={}",
-                        chatQueryExecutor.getClass().getSimpleName(), queryResult.getQueryState(),
-                        queryResult.getQueryMode());
-                break;
+            if (chatQueryExecutor.accept(executeContext)) {
+                queryResult = chatQueryExecutor.execute(executeContext);
+                if (queryResult != null) {
+                    log.debug("executor selected: {}, queryState={}, queryMode={}",
+                            chatQueryExecutor.getClass().getSimpleName(),
+                            queryResult.getQueryState(), queryResult.getQueryMode());
+                    break;
+                }
             }
         }
 
@@ -145,6 +175,21 @@ public class ChatQueryServiceImpl implements ChatQueryService {
         }
 
         return queryResult;
+    }
+
+    @Override
+    public QueryResult getTextSummary(ChatExecuteReq chatExecuteReq) {
+        String text = DataInterpretProcessor.getTextSummary(chatExecuteReq.getQueryId());
+        if (StringUtils.isNotBlank(text)) {
+            QueryResult res = new QueryResult();
+            res.setTextSummary(text);
+            res.setQueryId(chatExecuteReq.getQueryId());
+            return res;
+        } else {
+            ChatQueryDO chatQueryDo = chatManageService.getChatQueryDO(chatExecuteReq.getQueryId());
+            QueryResult res = JSON.parseObject(chatQueryDo.getQueryResult(), QueryResult.class);
+            return res;
+        }
     }
 
     @Override
@@ -176,8 +221,11 @@ public class ChatQueryServiceImpl implements ChatQueryService {
 
     private ExecuteContext buildExecuteContext(ChatExecuteReq chatExecuteReq) {
         ExecuteContext executeContext = new ExecuteContext(chatExecuteReq);
-        SemanticParseInfo parseInfo = chatManageService.getParseInfo(chatExecuteReq.getQueryId(),
-                chatExecuteReq.getParseId());
+        SemanticParseInfo parseInfo = resolveParseInfo(chatExecuteReq.getQueryId(),
+                chatExecuteReq.getParseId() > 0 ? chatExecuteReq.getParseId() : null, "execute");
+        if (Objects.nonNull(parseInfo)) {
+            chatExecuteReq.setParseId(parseInfo.getId());
+        }
         Agent agent = agentService.getAgent(chatExecuteReq.getAgentId());
         executeContext.setAgent(agent);
         executeContext.setParseInfo(parseInfo);
@@ -204,33 +252,60 @@ public class ChatQueryServiceImpl implements ChatQueryService {
     }
 
     private SemanticParseInfo resolveParseInfo(ChatQueryDataReq chatQueryDataReq) {
-        Integer parseId = chatQueryDataReq.getParseId();
-        Long queryId = chatQueryDataReq.getQueryId();
-        if (Objects.nonNull(parseId)) {
-            return chatManageService.getParseInfo(queryId, parseId);
+        SemanticParseInfo parseInfo = resolveParseInfo(chatQueryDataReq.getQueryId(),
+                chatQueryDataReq.getParseId(), "queryData");
+        if (Objects.nonNull(parseInfo)) {
+            chatQueryDataReq.setParseId(parseInfo.getId());
         }
+        return parseInfo;
+    }
+
+    private SemanticParseInfo resolveParseInfo(Long queryId, Integer parseId, String scene) {
         if (Objects.isNull(queryId)) {
-            throw new IllegalArgumentException("queryId is required when parseId is missing");
+            throw new InvalidArgumentException("queryId is required");
         }
-        List<ChatParseDO> parseDOs =
-                chatQueryRepository.getParseInfoList(Lists.newArrayList(queryId));
+        if (Objects.nonNull(parseId)) {
+            SemanticParseInfo parseInfo = chatManageService.getParseInfo(queryId, parseId);
+            if (Objects.nonNull(parseInfo)) {
+                return parseInfo;
+            }
+            log.warn("Missing parseId {} for queryId {} in {}, fallback to best scored parse",
+                    parseId, queryId, scene);
+        }
+
+        List<SemanticParseInfo> parseInfos = getSortedParseInfos(queryId);
+        if (CollectionUtils.isEmpty(parseInfos)) {
+            String message = Objects.nonNull(parseId)
+                    ? String.format("parseId %s is invalid for queryId %s", parseId, queryId)
+                    : String.format("No parse info exists for queryId %s", queryId);
+            throw new InvalidArgumentException(message);
+        }
+        if (Objects.isNull(parseId)) {
+            log.warn("Missing parseId for queryId {}, fallback to best scored parse", queryId);
+        }
+        return parseInfos.get(0);
+    }
+
+    private List<SemanticParseInfo> getSortedParseInfos(Long queryId) {
+        List<ChatParseDO> parseDOs = chatQueryRepository.getParseInfoList(Lists.newArrayList(queryId));
         if (CollectionUtils.isEmpty(parseDOs)) {
-            throw new IllegalArgumentException("parseId is required when no parse info exists");
+            return new ArrayList<>();
         }
-        List<SemanticParseInfo> parseInfos = parseDOs.stream()
+        return parseDOs.stream()
                 .map(parseDO -> JsonUtil.toObject(parseDO.getParseInfo(), SemanticParseInfo.class))
                 .sorted(Comparator.comparingDouble(SemanticParseInfo::getScore).reversed())
                 .collect(Collectors.toList());
-        log.warn("Missing parseId for queryId {}, fallback to best scored parse", queryId);
-        return parseInfos.get(0);
     }
 
     private List<String> getFieldsFromSql(SemanticParseInfo parseInfo) {
         SqlInfo sqlInfo = parseInfo.getSqlInfo();
-        if (Objects.isNull(sqlInfo) || StringUtils.isNotBlank(sqlInfo.getCorrectedS2SQL())) {
+        String s2Sql = Objects.isNull(sqlInfo) ? null
+                : StringUtils.defaultIfBlank(sqlInfo.getCorrectedS2SQL(),
+                        sqlInfo.getParsedS2SQL());
+        if (StringUtils.isBlank(s2Sql)) {
             return new ArrayList<>();
         }
-        return SqlSelectHelper.getAllSelectFields(sqlInfo.getCorrectedS2SQL());
+        return SqlSelectHelper.getAllSelectFields(s2Sql);
     }
 
     private void handleLLMQueryMode(ChatQueryDataReq chatQueryDataReq, SemanticQuery semanticQuery,
@@ -561,10 +636,6 @@ public class ChatQueryServiceImpl implements ChatQueryService {
     }
 
     public void saveQueryResult(ChatExecuteReq chatExecuteReq, QueryResult queryResult) {
-        // The history record only retains the query result of the first parse
-        if (chatExecuteReq.getParseId() > 1) {
-            return;
-        }
         chatManageService.saveQueryResult(chatExecuteReq, queryResult);
     }
 }

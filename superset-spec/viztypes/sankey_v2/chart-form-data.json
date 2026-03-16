@@ -1,0 +1,338 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "sankey_v2",
+  "display_name": "Sankey Chart",
+  "source_kind": "schema_file",
+  "normalized_chart_form_data": {
+    "required_root_fields": [
+      "datasource",
+      "metric",
+      "source",
+      "target",
+      "viz_type"
+    ],
+    "optional_root_fields": [
+      "adhoc_filters",
+      "cache_timeout",
+      "color_scheme",
+      "custom_params",
+      "metric",
+      "row_limit",
+      "slice_id",
+      "sort_by_metric",
+      "source",
+      "target",
+      "url_params"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "metric",
+      "row_limit",
+      "source",
+      "target",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "color_scheme",
+      "datasource",
+      "metric",
+      "row_limit",
+      "sort_by_metric",
+      "source",
+      "target",
+      "viz_type"
+    ],
+    "fallback_template_seed": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "sankey_v2",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "source": "<source_column>",
+      "target": "<target_column>",
+      "adhoc_filters": [],
+      "time_range": "No filter"
+    }
+  },
+  "original_chart_form_data_schema": {
+    "viz_type": "sankey_v2",
+    "display_name": "Sankey Chart",
+    "purpose": "用于调用 API 创建或保存 Sankey Chart 时填写的 form_data 模板",
+    "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/sankey_v2-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Sankey/controlPanel.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Sankey/buildQuery.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Sankey/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Sankey/types.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Sankey/index.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryContext.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryObject.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractQueryFields.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts"
+    ],
+    "notes": [
+      "Explore 导出 form_data 时走 `getFormDataFromControls()`，因此 Sankey 的 API root 应使用 control name 原样键名：`source`、`target`、`metric`、`adhoc_filters`、`row_limit`、`sort_by_metric`、`color_scheme`。",
+      "当前图 root form_data 里没有显式 `groupby` 字段；`buildQuery.ts` 会用 `source` 和 `target` 临时构造 query `groupby=[source, target]`。",
+      "`metric` 是单值指标，不是 `metrics` 数组。`extractQueryFields()` 会把 `metric` 别名映射到 query `metrics`。",
+      "`sort_by_metric=true` 时，`buildQuery.ts` 才会生成 `orderby=[[metric, false]]`。"
+    ],
+    "naming_and_pipeline": {
+      "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写成 form_data[name]。",
+      "api_form_data_to_query_context": "Sankey/buildQuery.ts 调用 buildQueryContext(formData, ...)，raw formData 会原样保存在 query_context.form_data 中。",
+      "api_form_data_to_query_object": "buildQueryObject() 会把 `metric` 提取为 query `metrics`；随后 Sankey/buildQuery.ts 再把 `source`、`target` 组装成 query `groupby`，并在 `sort_by_metric=true` 时追加 `orderby`。",
+      "api_form_data_to_runtime_form_data": "ChartProps 会把 raw form_data 转成 runtime alias；`color_scheme -> colorScheme`，其他核心字段大体保持原名。"
+    },
+    "global_required_fields": {
+      "datasource": {
+        "data_type": "string",
+        "required": true,
+        "sample_data": "<dataset_id>__table",
+        "source": "datasourceAndVizType hidden control"
+      },
+      "viz_type": {
+        "data_type": "string",
+        "required": true,
+        "fixed_value": "sankey_v2",
+        "source": "plugin registration key"
+      },
+      "source": {
+        "data_type": "string | object",
+        "required": true,
+        "sample_data": "<source_column>",
+        "source": "Query section validators"
+      },
+      "target": {
+        "data_type": "string | object",
+        "required": true,
+        "sample_data": "<target_column>",
+        "source": "Query section validators"
+      },
+      "metric": {
+        "data_type": "string | object",
+        "required": true,
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        },
+        "source": "shared metric control"
+      }
+    },
+    "global_optional_fields": {
+      "slice_id": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 0,
+        "source": "datasourceAndVizType hidden control"
+      },
+      "cache_timeout": {
+        "data_type": "integer | null",
+        "required": false,
+        "sample_data": null,
+        "source": "QueryFormData"
+      },
+      "url_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "QueryFormData"
+      },
+      "custom_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "QueryFormData"
+      },
+      "source": {
+        "data_type": "string | object",
+        "required": true,
+        "sample_data": "<source_column>",
+        "source": "Query section"
+      },
+      "target": {
+        "data_type": "string | object",
+        "required": true,
+        "sample_data": "<target_column>",
+        "source": "Query section"
+      },
+      "metric": {
+        "data_type": "string | object",
+        "required": true,
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        },
+        "source": "Query section"
+      },
+      "adhoc_filters": {
+        "data_type": "array[object]",
+        "required": false,
+        "sample_data": [],
+        "source": "Query section"
+      },
+      "row_limit": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 10000,
+        "source": "Query section"
+      },
+      "sort_by_metric": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": false,
+        "source": "Query section",
+        "default_value": null,
+        "ui_default_state": "unchecked",
+        "notes": "shared control 没有显式 `default`；`getControlState.ts` 只有在 `state.default` 为 truthy 时才会把默认值写入 control.value，因此 untouched root form_data 的缺省态通常是未设置。与此同时，`CheckboxControl.jsx` 的 `defaultProps.value=false` 且 `checked={!!value}`，所以 UI 会以未勾选状态展示。"
+      },
+      "color_scheme": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "supersetColors",
+        "source": "Chart Options"
+      }
+    },
+    "minimal_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "sankey_v2",
+      "source": "<source_column>",
+      "target": "<target_column>",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "adhoc_filters": [],
+      "row_limit": 10000
+    },
+    "recommended_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "sankey_v2",
+      "source": "<source_column>",
+      "target": "<target_column>",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "adhoc_filters": [],
+      "row_limit": 10000,
+      "sort_by_metric": false,
+      "color_scheme": "<categoricalSchemeRegistry.defaultKey>"
+    },
+    "conditional_blocks": {
+      "metric_sorting": {
+        "condition": "需要按当前 metric 对 link 结果集降序排序时",
+        "fields": {
+          "sort_by_metric": true
+        },
+        "notes": "`buildQuery.ts` 会写入 `orderby=[[metric, false]]`。"
+      },
+      "datasource_filtering": {
+        "condition": "需要在源数据层过滤 edge 记录时",
+        "fields": {
+          "adhoc_filters": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "country",
+              "operator": "IN",
+              "comparator": [
+                "CN",
+                "US"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "runtime_only_or_non_template_fields": {
+      "runtime_aliases_generated_by_transformProps": [
+        {
+          "field_name": "colorScheme",
+          "reason": "由 raw form_data.color_scheme 派生的 runtime 别名，不是 API root 键。"
+        },
+        {
+          "field_name": "sliceId",
+          "reason": "这是隐藏字段 `slice_id` 的 runtime camelCase 别名，不是 API root 键。"
+        }
+      ],
+      "query_object_only_fields": [
+        {
+          "field_name": "queries[*].groupby",
+          "reason": "这是 `buildQuery.ts` 用 `source + target` 动态构造出的 query 字段，不是 root form_data 自身的键。"
+        },
+        {
+          "field_name": "queries[*].orderby",
+          "reason": "只有 `sort_by_metric=true` 时才由 `buildQuery.ts` 追加。"
+        }
+      ],
+      "non_template_fields": [
+        {
+          "field_name": "links / nodeValues / refs / echartOptions",
+          "reason": "这些是 `transformProps.ts` 在运行时生成的图形数据与组件 props，不是 root form_data。"
+        }
+      ]
+    },
+    "api_usage_guidance": {
+      "high_confidence_required_fields": [
+        "datasource",
+        "viz_type",
+        "source",
+        "target",
+        "metric"
+      ],
+      "recommended_always_set": [
+        "adhoc_filters",
+        "row_limit",
+        "sort_by_metric",
+        "color_scheme"
+      ],
+      "api_field_examples": [
+        "source",
+        "target",
+        "metric",
+        "sort_by_metric",
+        "color_scheme"
+      ],
+      "avoid_confusion": [
+        "不要给 Sankey root form_data 额外塞 `groupby`；当前图的分组是由 `source` 与 `target` 在 buildQuery 阶段组装出来的。",
+        "不要把 root 指标字段写成 `metrics`；当前图用的是单值 `metric`。",
+        "不要把 runtime 别名 `colorScheme` 写回 root form_data。"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "sankey_v2",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/sankey_v2-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/sankey_v2-form-data-schema.json",
+      "control-schema": "form-data-schema/sankey_v2-schema.json"
+    }
+  }
+}

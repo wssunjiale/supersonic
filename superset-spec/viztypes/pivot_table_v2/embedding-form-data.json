@@ -1,0 +1,530 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "pivot_table_v2",
+  "display_name": "Pivot Table",
+  "source_kind": "schema_file",
+  "normalized_embedding_policy": {
+    "immutable_root_keys": [
+      "slice_id",
+      "datasource",
+      "viz_type",
+      "all_saved_chart_definition_fields"
+    ],
+    "allowed_runtime_fields": [
+      {
+        "field_name": "adhoc_filters",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "custom_form_data",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "filters",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "relative_end",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "relative_start",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_column",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_grain",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_range",
+        "behavior": "override",
+        "source": "embedding-schema"
+      }
+    ],
+    "safe_embedding_form_data_seed": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "pivot_table_v2",
+      "extra_form_data": {
+        "filters": [],
+        "adhoc_filters": []
+      }
+    }
+  },
+  "original_embedding_form_data_schema": {
+    "viz_type": "pivot_table_v2",
+    "display_name": "Pivot Table",
+    "purpose": "第三方 embedding / guest token 场景下安全传输的 Pivot Table form_data 模板",
+    "base_form_data_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/pivot_table_v2-form-data-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset/security/manager.py",
+      "D:/vsx/sources/superset-6.0.0/superset/charts/data/api.py",
+      "D:/vsx/sources/superset-6.0.0/superset/commands/chart/data/get_data_command.py",
+      "D:/vsx/sources/superset-6.0.0/superset/charts/schemas.py",
+      "D:/vsx/sources/superset-6.0.0/superset/constants.py",
+      "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-pivot-table/src/plugin/buildQuery.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-pivot-table/src/plugin/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-pivot-table/src/PivotTableChart.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryContext.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryObject.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/QueryFormData.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/processExtraFormData.ts"
+    ],
+    "notes": [
+      "embedded guest 的关键限制在后端 `security/manager.py::query_context_modified()`。一旦判定请求改写了图表 payload，就会报 `Guest user cannot modify chart payload`。",
+      "Pivot Table 的危险点在于：root form_data 虽然没有直接暴露 `columns` / `orderby`，但 `buildQuery.ts` 会把 `groupbyRows`、`groupbyColumns`、`time_grain_sqla`、`series_limit_metric`、`metrics`、`order_desc` 编译进 query `columns` / `orderby`。",
+      "最稳妥的 embedding 策略不是重新拼装 Pivot Table form_data，而是完整复制保存态图表的 form_data 作为 base，只把动态过滤条件放到 `extra_form_data`。",
+      "PivotTableChart 的交互筛选会通过 `setDataMask({ extraFormData: { filters: ... } })` 发出，因此 `extra_form_data.filters` 是当前图高置信的动态入口。",
+      "`time_grain_sqla` 虽然属于通用 extra_form_data override 白名单，但对 Pivot Table 来说它会改写 query `columns`；guest 场景不建议在运行时动态修改。"
+    ],
+    "security_enforcement": {
+      "backend_check_function": "superset/security/manager.py::query_context_modified",
+      "checked_when": "ChartDataCommand.validate() -> QueryContext.raise_for_access()",
+      "error_message": "Guest user cannot modify chart payload",
+      "directly_compared_root_fields": [
+        "slice_id",
+        "metrics",
+        "columns",
+        "groupby",
+        "orderby"
+      ],
+      "pivot_specific_query_sensitive_fields": [
+        "groupbyRows",
+        "groupbyColumns",
+        "metrics",
+        "time_grain_sqla",
+        "temporal_columns_lookup",
+        "series_limit_metric",
+        "order_desc",
+        "series_limit",
+        "row_limit",
+        "adhoc_filters"
+      ],
+      "recommended_strategy": "复制保存态 Pivot Table 的完整 form_data 作为 base，只通过 extra_form_data 追加过滤条件；不要在 guest 请求里重构 query 定义字段或图表布局字段。"
+    },
+    "safe_base_rule": {
+      "description": "第三方 embedding 请求中的根层 form_data，应从已保存 Pivot Table 的 form_data 直接复制，不要重构。",
+      "must_be_copied_from_saved_chart": [
+        "slice_id",
+        "dashboardId",
+        "datasource",
+        "viz_type",
+        "groupbyRows",
+        "groupbyColumns",
+        "metrics",
+        "time_grain_sqla",
+        "temporal_columns_lookup",
+        "metricsLayout",
+        "adhoc_filters",
+        "series_limit",
+        "row_limit",
+        "series_limit_metric",
+        "order_desc",
+        "aggregateFunction",
+        "rowTotals",
+        "rowSubTotals",
+        "colTotals",
+        "colSubTotals",
+        "transposePivot",
+        "combineMetric",
+        "valueFormat",
+        "currency_format",
+        "date_format",
+        "rowOrder",
+        "colOrder",
+        "rowSubtotalPosition",
+        "colSubtotalPosition",
+        "conditional_formatting",
+        "allow_render_html",
+        "all other saved chart-definition fields"
+      ],
+      "why": [
+        "`buildQueryContext()` 会把 raw formData 原样放进 `query_context.form_data`。",
+        "`buildQuery.ts` 会把 `groupbyRows + groupbyColumns` 编译成 query `columns`，并基于 `series_limit_metric` / `metrics[0]` 与 `order_desc` 生成 query `orderby`。",
+        "`query_context_modified()` 不只比较 root form_data，也会比较 query_context.queries[*].metrics / columns / orderby。",
+        "复制保存态图表定义，能够避免 guest 请求在 query 或布局层面被判定为修改 payload。"
+      ]
+    },
+    "safe_embedding_form_data_template": {
+      "description": "这是 Pivot Table guest embedding 下的安全写法。根层以保存态图表为 base，仅改 extra_form_data。",
+      "template": {
+        "slice_id": "<saved_chart_id>",
+        "dashboardId": "<dashboard_id>",
+        "datasource": "<copied_from_saved_chart>",
+        "viz_type": "pivot_table_v2",
+        "groupbyRows": "<copied_from_saved_chart>",
+        "groupbyColumns": "<copied_from_saved_chart>",
+        "metrics": "<copied_from_saved_chart>",
+        "time_grain_sqla": "<copied_from_saved_chart>",
+        "temporal_columns_lookup": "<copied_from_saved_chart>",
+        "metricsLayout": "<copied_from_saved_chart>",
+        "adhoc_filters": "<copied_from_saved_chart>",
+        "series_limit": "<copied_from_saved_chart>",
+        "row_limit": "<copied_from_saved_chart>",
+        "series_limit_metric": "<copied_from_saved_chart>",
+        "order_desc": "<copied_from_saved_chart>",
+        "aggregateFunction": "<copied_from_saved_chart>",
+        "rowTotals": "<copied_from_saved_chart>",
+        "rowSubTotals": "<copied_from_saved_chart>",
+        "colTotals": "<copied_from_saved_chart>",
+        "colSubTotals": "<copied_from_saved_chart>",
+        "transposePivot": "<copied_from_saved_chart>",
+        "combineMetric": "<copied_from_saved_chart>",
+        "valueFormat": "<copied_from_saved_chart>",
+        "currency_format": "<copied_from_saved_chart>",
+        "date_format": "<copied_from_saved_chart>",
+        "rowOrder": "<copied_from_saved_chart>",
+        "colOrder": "<copied_from_saved_chart>",
+        "rowSubtotalPosition": "<copied_from_saved_chart>",
+        "colSubtotalPosition": "<copied_from_saved_chart>",
+        "conditional_formatting": "<copied_from_saved_chart>",
+        "allow_render_html": "<copied_from_saved_chart>",
+        "extra_form_data": {
+          "filters": [
+            {
+              "col": "region",
+              "op": "IN",
+              "val": [
+                "East",
+                "West"
+              ]
+            }
+          ],
+          "adhoc_filters": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "region",
+              "operator": "IN",
+              "comparator": [
+                "East",
+                "West"
+              ]
+            }
+          ],
+          "custom_form_data": {}
+        }
+      }
+    },
+    "preferred_dynamic_container": {
+      "field_name": "extra_form_data",
+      "description": "第三方 embedding 推荐把动态上下文放在这里；后端会在 merge_extra_form_data() 中合并它。",
+      "append_keys": [
+        "adhoc_filters",
+        "filters",
+        "interactive_groupby",
+        "interactive_highlight",
+        "interactive_drilldown",
+        "custom_form_data"
+      ],
+      "override_keys_backend_high_confidence": [
+        "granularity_sqla",
+        "time_column",
+        "time_grain",
+        "time_range",
+        "time_grain_sqla",
+        "relative_start",
+        "relative_end"
+      ],
+      "notes": "这些 override key 来自通用白名单。但对 Pivot Table 而言，`time_grain_sqla` / `granularity_sqla` 会改变 query `columns` 编译结果；guest 场景只把 `filters` / `adhoc_filters` 当成高置信动态入口。"
+    },
+    "extra_form_data_field_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_pivot_table_v2": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "effect": "追加普通过滤条件；也是 PivotTableChart 交互联动发出的高置信 extraFormData 结构。",
+        "source": "PivotTableChart.tsx + superset/constants.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[object]",
+        "behavior": "append",
+        "safe_for_pivot_table_v2": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会把它们标记为 extra 并并入查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_pivot_table_v2": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；Pivot Table 默认 buildQuery/transformProps 不直接消费它。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_pivot_table_v2": false,
+        "recommended": false,
+        "sample_data": "Last 30 days",
+        "effect": "通用 extra_form_data override 白名单允许该 key，但当前图没有显式 time_range control；guest 场景不建议依赖。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_pivot_table_v2": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "通用时间粒度 override，但 Pivot Table 会据此重写 query `columns`；guest 运行时修改风险很高。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "不建议在 guest embedding 中动态修改"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_pivot_table_v2": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "通用时间列 override；在 Pivot Table 中也可能改变 temporal column 的识别与 query 编译结果。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "不建议在 guest embedding 中动态修改"
+      },
+      {
+        "field_name": "time_column",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_pivot_table_v2": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "底层 QueryObject 时间列 override；当前图没有对应 controlPanel 闭环。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_grain",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_pivot_table_v2": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "底层 QueryObject 时间粒度 override；当前图没有对应 controlPanel 闭环。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "relative_start",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_pivot_table_v2": false,
+        "recommended": false,
+        "sample_data": "now",
+        "effect": "进入 query extras 的相对开始时间；当前图没有显式时间过滤控件。",
+        "source": "superset/constants.py + superset/utils/core.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "relative_end",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_pivot_table_v2": false,
+        "recommended": false,
+        "sample_data": "today",
+        "effect": "进入 query extras 的相对结束时间；当前图没有显式时间过滤控件。",
+        "source": "superset/constants.py + superset/utils/core.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_pivot_table_v2": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用交互字段；当前 Pivot Table 默认 buildQuery/transformProps 不直接消费它。",
+        "source": "QueryFormData.ts + query constants"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_pivot_table_v2": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用交互字段；当前 Pivot Table 默认不直接消费。",
+        "source": "QueryFormData.ts + query constants"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_pivot_table_v2": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用交互字段；当前 Pivot Table 默认不直接消费。",
+        "source": "QueryFormData.ts + query constants"
+      }
+    ],
+    "minimal_extra_form_data_template": {
+      "filters": [
+        {
+          "col": "region",
+          "op": "IN",
+          "val": [
+            "East"
+          ]
+        }
+      ]
+    },
+    "recommended_extra_form_data_template": {
+      "filters": [
+        {
+          "col": "region",
+          "op": "IN",
+          "val": [
+            "East",
+            "West"
+          ]
+        }
+      ],
+      "adhoc_filters": [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "region",
+          "operator": "IN",
+          "comparator": [
+            "East",
+            "West"
+          ]
+        }
+      ],
+      "custom_form_data": {}
+    },
+    "unsafe_root_form_data_changes": [
+      {
+        "field_name": "slice_id",
+        "reason": "与保存态图表 id 不一致会被后端直接判定为请求了另一张图。"
+      },
+      {
+        "field_name": "datasource / viz_type",
+        "reason": "guest embedding 不应修改图表绑定的数据集或图表类型。"
+      },
+      {
+        "field_name": "metrics",
+        "reason": "这是当前图最核心的查询字段；同时会被 `query_context_modified()` 比较。"
+      },
+      {
+        "field_name": "groupbyRows / groupbyColumns",
+        "reason": "它们会被 `buildQuery.ts` 编译成 query `columns`。运行时改动会改变 query payload。"
+      },
+      {
+        "field_name": "time_grain_sqla / temporal_columns_lookup",
+        "reason": "它们会影响 temporal column 如何被改写进 query `columns`。"
+      },
+      {
+        "field_name": "series_limit_metric / order_desc",
+        "reason": "会改变 `buildQuery.ts` 生成的 query `orderby`。"
+      },
+      {
+        "field_name": "series_limit / row_limit / adhoc_filters",
+        "reason": "会改变实际查询返回的结果集和筛选条件。"
+      },
+      {
+        "field_name": "metricsLayout / aggregateFunction / rowTotals / rowSubTotals / colTotals / colSubTotals / transposePivot / combineMetric / valueFormat / currency_format / date_format / rowOrder / colOrder / rowSubtotalPosition / colSubtotalPosition / conditional_formatting / allow_render_html",
+        "reason": "这些字段虽然多数不改 SQL，但都会改变透视表布局、聚合方式、格式化和显示语义，guest 场景应保持保存态一致。"
+      }
+    ],
+    "practical_guidance": {
+      "best_practice": [
+        "先从保存态 Pivot Table 读取完整 form_data。",
+        "根层字段保持不变，尤其保留 `groupbyRows`、`groupbyColumns`、`metrics`、`time_grain_sqla`、`series_limit_metric`、`order_desc` 和所有布局字段。",
+        "只在 `extra_form_data` 中放动态 `filters` / `adhoc_filters`。",
+        "如果只是做第三方筛选联动，优先使用 `extra_form_data.filters`，因为当前图的交互链路就是这么发送的。"
+      ],
+      "avoid": [
+        "不要在 guest embedding 请求里改 Pivot Table 的 rows/columns/metrics 结构。",
+        "不要在 guest 请求里动态修改 `time_grain_sqla`；它会改变 query 编译结果。",
+        "不要把 runtime 字段 `conditionalFormatting`、`dateFormat`、`currencyFormat`、`allowRenderHtml`、`timeGrainSqla` 当成 root 键。",
+        "不要把 `tableRenderer` 当成 guest 可调字段；它不是当前 controlPanel 的正式配置项。"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "pivot_table_v2",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/pivot_table_v2-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/pivot_table_v2-form-data-schema.json",
+      "control-schema": "form-data-schema/pivot_table_v2-schema.json"
+    }
+  }
+}

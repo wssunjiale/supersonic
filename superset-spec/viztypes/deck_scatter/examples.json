@@ -1,0 +1,345 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "deck_scatter",
+  "display_name": "deck.gl Scatterplot",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "LAT",
+          "operator": "IS NOT NULL",
+          "comparator": ""
+        }
+      ]
+    ],
+    "autozoom": [
+      true
+    ],
+    "color_breakpoints": [
+      [
+        {
+          "minValue": 0,
+          "maxValue": 100,
+          "color": {
+            "r": 255,
+            "g": 0,
+            "b": 0,
+            "a": 1
+          }
+        }
+      ]
+    ],
+    "color_picker": [
+      {
+        "r": 205,
+        "g": 0,
+        "b": 3,
+        "a": 0.82
+      }
+    ],
+    "color_scheme": [
+      "bnbColors"
+    ],
+    "color_scheme_type": [
+      "categorical_palette"
+    ],
+    "deafult_breakpoint_color": [
+      {
+        "r": 158,
+        "g": 158,
+        "b": 158,
+        "a": 1
+      }
+    ],
+    "dimension": [
+      "category"
+    ],
+    "filter_nulls": [
+      true
+    ],
+    "js_columns": [
+      [
+        "category"
+      ]
+    ],
+    "js_data_mutator": [
+      "data => data"
+    ],
+    "js_onclick_href": [
+      "o => `https://example.com/?lon=${o.object.position[0]}&lat=${o.object.position[1]}`"
+    ],
+    "js_tooltip": [
+      "o => `<div>${o.object.metric}</div>`"
+    ],
+    "legend_format": [],
+    "legend_position": [
+      "tr"
+    ],
+    "mapbox_style": [
+      "mapbox://styles/mapbox/light-v9"
+    ],
+    "max_radius": [
+      250
+    ],
+    "min_radius": [
+      2
+    ],
+    "multiplier": [
+      10
+    ],
+    "point_radius_fixed": [
+      {
+        "type": "metric",
+        "value": "count"
+      }
+    ],
+    "point_unit": [
+      "square_m"
+    ],
+    "row_limit": [
+      5000
+    ],
+    "spatial": [
+      {
+        "type": "latlong",
+        "lonCol": "LON",
+        "latCol": "LAT"
+      }
+    ],
+    "viewport": [
+      {
+        "bearing": -4.952916738791771,
+        "latitude": 37.78926922909199,
+        "longitude": -122.42613341901688,
+        "pitch": 4.750411100577438,
+        "zoom": 12.729132798697304
+      }
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "deck_scatter",
+      "spatial": {
+        "type": "latlong",
+        "lonCol": "LON",
+        "latCol": "LAT"
+      },
+      "adhoc_filters": [],
+      "point_radius_fixed": {
+        "type": "fix",
+        "value": 1000
+      },
+      "point_unit": "square_m",
+      "min_radius": 2,
+      "max_radius": 250,
+      "mapbox_style": "mapbox://styles/mapbox/light-v9",
+      "autozoom": true,
+      "viewport": {
+        "longitude": 6.85236157047845,
+        "latitude": 31.222656842808707,
+        "zoom": 1,
+        "bearing": 0,
+        "pitch": 0
+      },
+      "color_scheme_type": "fixed_color",
+      "color_picker": {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      }
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "deck_scatter",
+      "spatial": {
+        "type": "latlong",
+        "lonCol": "LON",
+        "latCol": "LAT"
+      },
+      "row_limit": 5000,
+      "filter_nulls": true,
+      "adhoc_filters": [],
+      "mapbox_style": "mapbox://styles/mapbox/light-v9",
+      "autozoom": true,
+      "viewport": {
+        "longitude": 6.85236157047845,
+        "latitude": 31.222656842808707,
+        "zoom": 1,
+        "bearing": 0,
+        "pitch": 0
+      },
+      "point_radius_fixed": {
+        "type": "metric",
+        "value": "count"
+      },
+      "point_unit": "square_m",
+      "min_radius": 2,
+      "max_radius": 250,
+      "multiplier": 10,
+      "legend_position": "tr",
+      "legend_format": null,
+      "color_scheme_type": "fixed_color",
+      "color_picker": {
+        "r": 205,
+        "g": 0,
+        "b": 3,
+        "a": 0.82
+      },
+      "dimension": null,
+      "color_scheme": "bnbColors",
+      "deafult_breakpoint_color": {
+        "r": 158,
+        "g": 158,
+        "b": 158,
+        "a": 1
+      },
+      "color_breakpoints": [],
+      "js_columns": [],
+      "js_data_mutator": "",
+      "js_tooltip": "",
+      "js_onclick_href": ""
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "deck_scatter",
+      "spatial": "<copied_from_saved_chart>",
+      "point_radius_fixed": "<copied_from_saved_chart>",
+      "point_unit": "<copied_from_saved_chart_if_present>",
+      "min_radius": "<copied_from_saved_chart_if_present>",
+      "max_radius": "<copied_from_saved_chart_if_present>",
+      "multiplier": "<copied_from_saved_chart_if_present>",
+      "row_limit": "<copied_from_saved_chart_if_present>",
+      "filter_nulls": "<copied_from_saved_chart_if_present>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "mapbox_style": "<copied_from_saved_chart_if_present>",
+      "viewport": "<copied_from_saved_chart_if_present>",
+      "autozoom": "<copied_from_saved_chart_if_present>",
+      "color_scheme_type": "<copied_from_saved_chart_if_present>",
+      "color_picker": "<copied_from_saved_chart_if_present>",
+      "dimension": "<copied_from_saved_chart_if_present>",
+      "color_scheme": "<copied_from_saved_chart_if_present>",
+      "deafult_breakpoint_color": "<copied_from_saved_chart_if_present>",
+      "color_breakpoints": "<copied_from_saved_chart_if_present>",
+      "legend_position": "<copied_from_saved_chart_if_present>",
+      "legend_format": "<copied_from_saved_chart_if_present>",
+      "js_columns": "<copied_from_saved_chart_if_present>",
+      "js_data_mutator": "<copied_from_saved_chart_if_present>",
+      "js_tooltip": "<copied_from_saved_chart_if_present>",
+      "js_onclick_href": "<copied_from_saved_chart_if_present>",
+      "granularity_sqla": "<copied_from_saved_chart_if_present>",
+      "time_grain_sqla": "<copied_from_saved_chart_if_present>",
+      "time_range": "<copied_from_saved_chart_if_present>",
+      "size": "<copied_from_saved_chart_if_present>",
+      "groupby": "<copied_from_saved_chart_if_present>",
+      "label_colors": "<copied_from_saved_chart_if_present>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "LON",
+            "op": "==",
+            "val": -122.4221936
+          },
+          {
+            "col": "LAT",
+            "op": "==",
+            "val": 37.7786083
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "category",
+            "operator": "IN",
+            "comparator": [
+              "A"
+            ]
+          }
+        ]
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_deck_scatter_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "LON",
+            "op": "==",
+            "val": -122.4221936
+          },
+          {
+            "col": "LAT",
+            "op": "==",
+            "val": 37.7786083
+          }
+        ],
+        "effect": "追加 simple filters；对 `latlong` scatter 来说，这正是 `crossFiltersDataMask.ts` 生成的交互过滤形状。",
+        "source": "superset/constants.py + superset/utils/core.py + crossFiltersDataMask.ts"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_deck_scatter_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "category",
+            "operator": "IN",
+            "comparator": [
+              "A"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会标记为 `isExtra` 并并入查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_deck_scatter_legacy": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；deck_scatter 默认不直接消费它。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_deck_scatter_legacy": false,
+        "recommended": false,
+        "sample_data": "Last 30 days",
+        "effect": "scatter 后端确实存在隐藏的时间查询路径，但当前 controlPanel 的 `onInit` 会清空时间字段。guest embedding 不建议依赖 override 去动态改它。",
+        "source": "QueryFormData.ts + superset/constants.py + superset/utils/core.py + superset/viz.py",
+        "status": "有后端消费证据，但不建议在 guest embedding 中依赖"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "deck_scatter",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/deck_scatter-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/deck_scatter-form-data-schema.json",
+      "control-schema": "form-data-schema/deck_scatter-schema.json"
+    }
+  }
+}

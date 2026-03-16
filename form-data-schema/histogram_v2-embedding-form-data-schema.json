@@ -1,0 +1,285 @@
+{
+  "viz_type": "histogram_v2",
+  "display_name": "Histogram",
+  "purpose": "第三方 embedding / guest token 场景下安全传输的 Histogram form_data 模板",
+  "base_form_data_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/histogram_v2-form-data-schema.json",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset/security/manager.py",
+    "D:/vsx/sources/superset-6.0.0/superset/charts/data/api.py",
+    "D:/vsx/sources/superset-6.0.0/superset/commands/chart/data/get_data_command.py",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Histogram/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Histogram/controlPanel.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/operators/histogramOperator.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryObject.ts"
+  ],
+  "notes": [
+    "embedded guest 的核心限制仍在后端 `security/manager.py::query_context_modified()`，报错原文是 `Guest user cannot modify chart payload`。",
+    "Histogram 走标准 `/api/v1/chart/data`，因此 guest 校验入口仍是 `ChartDataCommand.validate()` -> `QueryContext.raise_for_access()`。",
+    "`query_context_modified()` 会比较 `slice_id`，以及 form_data 中的 `metrics` / `columns` / `groupby` / `orderby` 与保存态图表的子集关系。",
+    "Histogram 的 root `column` 和 `groupby` 会被编译成 query `columns`；`bins`、`normalize`、`cumulative` 会改变 `histogram` post_processing 语义，即使它们不在 hard-block 列表中，也不建议在 guest 请求里改。",
+    "`color_scheme`、`show_value`、`show_legend`、坐标轴标题和格式更偏展示层字段，但安全做法仍然是复制保存态。"
+  ],
+  "security_enforcement": {
+    "backend_check_function": "superset/security/manager.py::query_context_modified",
+    "checked_when": "ChartDataCommand.validate() -> QueryContext.raise_for_access()",
+    "error_message": "Guest user cannot modify chart payload",
+    "hard_block_fields": [
+      "slice_id",
+      "metrics",
+      "groupby",
+      "columns",
+      "orderby"
+    ],
+    "indirectly_sensitive_fields_for_histogram": [
+      "column",
+      "groupby",
+      "bins",
+      "normalize",
+      "cumulative",
+      "row_limit",
+      "adhoc_filters"
+    ],
+    "presentation_only_fields_not_compared_directly": [
+      "color_scheme",
+      "show_value",
+      "show_legend",
+      "x_axis_title",
+      "x_axis_format",
+      "y_axis_title",
+      "y_axis_format"
+    ],
+    "recommended_strategy": "复制保存态 Histogram 图表的完整 form_data 作为 base，仅通过 `extra_form_data` 追加过滤条件。"
+  },
+  "safe_base_rule": {
+    "description": "第三方 embedding 请求中的根层 form_data，应当从已保存的 Histogram 图表完整复制，不要手工重构。",
+    "must_be_copied_from_saved_chart": [
+      "slice_id",
+      "datasource",
+      "viz_type",
+      "column",
+      "groupby",
+      "row_limit",
+      "bins",
+      "normalize",
+      "cumulative",
+      "adhoc_filters",
+      "color_scheme",
+      "show_value",
+      "show_legend",
+      "x_axis_title",
+      "x_axis_format",
+      "y_axis_title",
+      "y_axis_format",
+      "all other chart-definition fields"
+    ],
+    "why": [
+      "`query_context_modified()` 会直接比较 `slice_id` 以及 form_data 里的 `columns` / `groupby` / `metrics` / `orderby`。",
+      "Histogram 的 `column` + `groupby` 会被编译成 query `columns`。",
+      "`bins`、`normalize`、`cumulative` 会改变 `histogram` post_processing 的结果语义。",
+      "展示层字段即使不一定触发 guest payload 对比，修改它们也等于改变共享图表的视觉定义。"
+    ]
+  },
+  "safe_embedding_form_data_template": {
+    "description": "这是 guest embedding 下的安全写法。根层以保存态 Histogram 图表为 base，仅把动态筛选放进 `extra_form_data`。",
+    "template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "histogram_v2",
+      "column": "<copied_from_saved_chart>",
+      "groupby": "<copied_from_saved_chart>",
+      "row_limit": "<copied_from_saved_chart>",
+      "bins": "<copied_from_saved_chart>",
+      "normalize": "<copied_from_saved_chart>",
+      "cumulative": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "color_scheme": "<copied_from_saved_chart>",
+      "show_value": "<copied_from_saved_chart>",
+      "show_legend": "<copied_from_saved_chart>",
+      "x_axis_title": "<copied_from_saved_chart>",
+      "x_axis_format": "<copied_from_saved_chart>",
+      "y_axis_title": "<copied_from_saved_chart>",
+      "y_axis_format": "<copied_from_saved_chart>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "APAC"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "APAC"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    }
+  },
+  "preferred_dynamic_container": {
+    "field_name": "extra_form_data",
+    "description": "第三方 embedding 允许动态传入的上下文容器；Histogram 最适合在这里追加筛选条件。",
+    "append_keys": [
+      "adhoc_filters",
+      "filters",
+      "custom_form_data"
+    ],
+    "override_keys_backend_high_confidence": [
+      "time_range",
+      "time_grain_sqla",
+      "granularity_sqla"
+    ],
+    "notes": "Histogram 本身不是时间型插件；时间 override 一般没有必要，最稳妥的动态输入仍是筛选条件。"
+  },
+  "extra_form_data_field_schema": [
+    {
+      "field_name": "filters",
+      "data_type": "array[QueryObjectFilterClause]",
+      "behavior": "append",
+      "safe_for_histogram": true,
+      "recommended": true,
+      "sample_data": [
+        {
+          "col": "region",
+          "op": "IN",
+          "val": [
+            "APAC"
+          ]
+        }
+      ],
+      "effect": "追加 simple filters；后端会把它们并入额外过滤条件。",
+      "source": "superset constants + backend extra form data merge"
+    },
+    {
+      "field_name": "adhoc_filters",
+      "data_type": "array[AdhocFilter]",
+      "behavior": "append",
+      "safe_for_histogram": true,
+      "recommended": true,
+      "sample_data": [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "region",
+          "operator": "IN",
+          "comparator": [
+            "APAC"
+          ]
+        }
+      ],
+      "effect": "追加 adhoc filters；后端会标记为 isExtra 并并入查询。",
+      "source": "superset constants + backend extra form data merge"
+    },
+    {
+      "field_name": "custom_form_data",
+      "data_type": "object",
+      "behavior": "append",
+      "safe_for_histogram": true,
+      "recommended": false,
+      "sample_data": {},
+      "effect": "可传非标准附加数据；Histogram 默认 buildQuery/transformProps 不直接消费它。",
+      "source": "frontend QueryFormData / backend extra form data handling"
+    }
+  ],
+  "minimal_extra_form_data_template": {
+    "filters": [
+      {
+        "col": "region",
+        "op": "IN",
+        "val": [
+          "APAC"
+        ]
+      }
+    ]
+  },
+  "recommended_extra_form_data_template": {
+    "filters": [
+      {
+        "col": "region",
+        "op": "IN",
+        "val": [
+          "APAC",
+          "EMEA"
+        ]
+      }
+    ],
+    "adhoc_filters": [
+      {
+        "expressionType": "SIMPLE",
+        "clause": "WHERE",
+        "subject": "region",
+        "operator": "IN",
+        "comparator": [
+          "APAC",
+          "EMEA"
+        ]
+      }
+    ],
+    "custom_form_data": {}
+  },
+  "unsafe_root_form_data_changes": [
+    {
+      "field_name": "slice_id",
+      "reason": "会改变请求对应的图表实体。"
+    },
+    {
+      "field_name": "datasource",
+      "reason": "会直接改变 Histogram 绑定的数据集。"
+    },
+    {
+      "field_name": "viz_type",
+      "reason": "Histogram guest 请求仍应保持 `histogram_v2`。"
+    },
+    {
+      "field_name": "column",
+      "reason": "会直接改变编译后的 `columns` 以及 histogram 计算基列。"
+    },
+    {
+      "field_name": "groupby",
+      "reason": "会直接改变编译后的 `columns` 和 series 拆分。"
+    },
+    {
+      "field_name": "bins",
+      "reason": "会改变 histogram post_processing 的分箱结果。"
+    },
+    {
+      "field_name": "normalize",
+      "reason": "会改变 histogram post_processing 的归一化语义。"
+    },
+    {
+      "field_name": "cumulative",
+      "reason": "会改变 histogram post_processing 的累计语义。"
+    },
+    {
+      "field_name": "row_limit",
+      "reason": "会改变底层取样记录数。"
+    },
+    {
+      "field_name": "adhoc_filters",
+      "reason": "动态筛选应优先放进 `extra_form_data.append`，不要覆盖保存态根字段。"
+    }
+  ],
+  "practical_guidance": {
+    "best_practice": [
+      "先从保存态 Histogram 图表读取完整 form_data。",
+      "根层字段保持不变，尤其保留 `column`、`groupby`、`bins`、`normalize`、`cumulative`、`row_limit`。",
+      "只在 `extra_form_data` 中放动态 filters / adhoc_filters。",
+      "如果 guest 只是做筛选联动，优先使用 `filters` 和 `adhoc_filters`。"
+    ],
+    "avoid": [
+      "不要在 guest 请求里改 `column`、`groupby` 或 histogram 计算参数。",
+      "不要把动态筛选直接覆盖到根层 `adhoc_filters`；优先用 `extra_form_data.append`。",
+      "不要把 runtime camelCase 名称如 `colorScheme`、`showLegend`、`xAxisFormat` 写回 guest root form_data。",
+      "不要把 Histogram 重写成 metric 型 guest 模板；它的根字段是 `column`。"
+    ]
+  }
+}

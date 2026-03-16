@@ -1,0 +1,452 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "graph_chart",
+  "display_name": "Graph Chart",
+  "generation_mode": "heuristic_seed",
+  "slot_candidates": [
+    {
+      "field_name": "adhoc_filters",
+      "required": false,
+      "slot_kind": "filter_list",
+      "accepted_dataset_roles": [
+        "filter_context"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [],
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [
+        "extra_form_data.append"
+      ],
+      "descriptions": [
+        "字段标签为 Filters。"
+      ]
+    },
+    {
+      "field_name": "metric",
+      "required": true,
+      "slot_kind": "metric",
+      "accepted_dataset_roles": [
+        "metric",
+        "saved_metric",
+        "adhoc_metric"
+      ],
+      "cardinality": "1",
+      "placeholder": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+      ]
+    },
+    {
+      "field_name": "source",
+      "required": true,
+      "slot_kind": "graph_source",
+      "accepted_dataset_roles": [
+        "entity_id",
+        "dimension"
+      ],
+      "cardinality": "1",
+      "placeholder": "<source_column>",
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Name of the source nodes"
+      ]
+    },
+    {
+      "field_name": "source_category",
+      "required": false,
+      "slot_kind": "graph_or_hierarchy",
+      "accepted_dataset_roles": [
+        "entity_id",
+        "entity",
+        "dimension"
+      ],
+      "cardinality": "0..1",
+      "placeholder": "<entity_or_relation_column>",
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The category of source nodes used to assign colors. If a node is associated with more than one category, only the first will be used."
+      ]
+    },
+    {
+      "field_name": "target",
+      "required": true,
+      "slot_kind": "graph_target",
+      "accepted_dataset_roles": [
+        "entity_id",
+        "dimension"
+      ],
+      "cardinality": "1",
+      "placeholder": "<target_column>",
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Name of the target nodes"
+      ]
+    },
+    {
+      "field_name": "target_category",
+      "required": false,
+      "slot_kind": "graph_or_hierarchy",
+      "accepted_dataset_roles": [
+        "entity_id",
+        "entity",
+        "dimension"
+      ],
+      "cardinality": "0..1",
+      "placeholder": "<entity_or_relation_column>",
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Category of target nodes"
+      ]
+    }
+  ],
+  "non_binding_form_controls": [
+    {
+      "field_name": "baseEdgeWidth",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Nodes & Edges"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Median edge width, the thickest edge will be 4 times thicker than the thinnest."
+      ]
+    },
+    {
+      "field_name": "baseNodeSize",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Nodes & Edges"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Median node size, the largest node will be 4 times larger than the smallest"
+      ]
+    },
+    {
+      "field_name": "color_scheme",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Legend"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The color scheme for rendering chart"
+      ]
+    },
+    {
+      "field_name": "draggable",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Layout & Interaction"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to enable node dragging in force layout mode."
+      ]
+    },
+    {
+      "field_name": "edgeLength",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Nodes & Edges"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Edge length between nodes"
+      ]
+    },
+    {
+      "field_name": "edgeSymbol",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Layout & Interaction"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Symbol of two ends of edge line"
+      ]
+    },
+    {
+      "field_name": "friction",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Nodes & Edges"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Friction between nodes"
+      ]
+    },
+    {
+      "field_name": "gravity",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Nodes & Edges"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Strength to pull the graph toward center"
+      ]
+    },
+    {
+      "field_name": "layout",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Layout & Interaction"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Layout type of graph"
+      ]
+    },
+    {
+      "field_name": "legendMargin",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Legend"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Additional padding for legend."
+      ]
+    },
+    {
+      "field_name": "legendOrientation",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Legend"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Legend Orientation"
+      ]
+    },
+    {
+      "field_name": "legendType",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Legend"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Legend type"
+      ]
+    },
+    {
+      "field_name": "repulsion",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Nodes & Edges"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Repulsion strength between nodes"
+      ]
+    },
+    {
+      "field_name": "roam",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Layout & Interaction"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to enable changing graph position and scaling."
+      ]
+    },
+    {
+      "field_name": "row_limit",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Limits the number of the rows that are computed in the query that is the source of the data used for this chart."
+      ]
+    },
+    {
+      "field_name": "selectedMode",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Layout & Interaction"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Allow node selections"
+      ]
+    },
+    {
+      "field_name": "showSymbolThreshold",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Nodes & Edges"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Minimum value for label to be displayed on graph."
+      ]
+    },
+    {
+      "field_name": "show_legend",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Legend"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to display a legend for the chart"
+      ]
+    }
+  ],
+  "dataset_role_inventory": {
+    "adhoc_metric": [
+      "metric"
+    ],
+    "dimension": [
+      "source",
+      "source_category",
+      "target",
+      "target_category"
+    ],
+    "entity": [
+      "source_category",
+      "target_category"
+    ],
+    "entity_id": [
+      "source",
+      "source_category",
+      "target",
+      "target_category"
+    ],
+    "filter_context": [
+      "adhoc_filters"
+    ],
+    "metric": [
+      "metric"
+    ],
+    "saved_metric": [
+      "metric"
+    ]
+  },
+  "binding_seed_example": {
+    "metric": {
+      "expressionType": "SIMPLE",
+      "column": {
+        "column_name": "<metric_column>"
+      },
+      "aggregate": "SUM",
+      "label": "SUM(<metric_column>)"
+    },
+    "source": "<source_column>",
+    "target": "<target_column>"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "graph_chart",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/graph_chart-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/graph_chart-form-data-schema.json",
+      "control-schema": "form-data-schema/graph_chart-schema.json"
+    }
+  }
+}

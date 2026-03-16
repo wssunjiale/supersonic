@@ -1,0 +1,274 @@
+{
+  "viz_type": "tree_chart",
+  "display_name": "Tree Chart",
+  "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Tree/controlPanel.tsx",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Tree/controlPanel.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Tree/index.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Tree/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Tree/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Tree/types.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Tree/constants.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/test/Tree/buildQuery.test.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/test/Tree/transformProps.test.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryContext.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryObject.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractQueryFields.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/QueryFormData.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/utils/getStandardizedControls.ts"
+  ],
+  "notes": [
+    "tree_chart 是现代 ECharts 插件，走标准 chart data API 查询链，不是 legacy `/superset/explore_json/`。",
+    "controlPanel 有 2 个 section：Query 和 Chart options。",
+    "Query 里真正用于生成 SQL / query_context 的核心字段是 `id`、`parent`、可选 `name`、可选 `metric`、`adhoc_filters`、`row_limit`。",
+    "`buildQuery.ts` 只把 `id`、`parent`、`name` 映射到 query `columns`。`metric` 虽然没在本插件的 queryFields 里声明，但 core 的 `extractQueryFields()` 预置了 `metric -> metrics` 别名，因此它仍会进入 query.metrics。",
+    "`id` 和 `parent` 基于 sharedControls.entity，底层来自 dndEntityControl，自带 `validateNonEmpty`；当前图把 clearable 设为 false，所以它们是高置信必填。",
+    "`name` 使用 optionalEntity，清空校验器后变成真正可选；运行时如果没给 `name`，`transformProps()` 会回退为 `id` 列。",
+    "`metric` 被当前图 override 成 clearable=true、validators=[]，因此它是可选字段；省略时可以只绘制层级结构，不显示节点数值。",
+    "`root_node_id`、`layout`、`orient`、`node_label_position`、`child_label_position`、`emphasis`、`symbol`、`symbolSize`、`roam` 都不会进入 query.columns / query.metrics，它们只在 `transformProps()` 里决定树的选根和 ECharts 渲染方式。",
+    "若未提供 `root_node_id`，`transformProps()` 会自动寻找“只有 1 个 child 的 parent 节点”，为每个候选 child 生成树，并选择子节点总数最多的那棵树作为最终根。"
+  ],
+  "form_data_overrides": {
+    "metric": "getStandardizedControls().shiftMetric()",
+    "notes": "这是 standardized controls 在切换图表时迁移 metric 的逻辑，不是常规导出 tree_chart form_data 的主路径。"
+  },
+  "chart_data_api_behavior": {
+    "useLegacyApi": false,
+    "frontend_request_endpoint": "/api/v1/chart/data",
+    "build_query": "Tree/buildQuery.ts -> buildQueryContext(formData, { queryFields: { id: 'columns', parent: 'columns', name: 'columns' } })",
+    "core_aliasing": "superset-ui-core/extractQueryFields.ts 预置了 `metric -> metrics`，因此 root `metric` 会自动汇入 query.metrics。"
+  },
+  "query_compilation": {
+    "query_columns": "`id`、`parent` 一定进入 query.columns；`name` 只有非空时才进入。",
+    "query_metrics": "`metric` 为非空时进入 query.metrics；为空时 query 可以只请求结构列。",
+    "query_filters": "`adhoc_filters` 由 buildQueryObject/processFilters 编译进 query。",
+    "query_limits": "`row_limit` 由 buildQueryObject 规范化为数字后写进 query.row_limit。",
+    "runtime_only_fields": "`root_node_id`、`layout`、`orient`、`node_label_position`、`child_label_position`、`emphasis`、`symbol`、`symbolSize`、`roam` 只在 transformProps 阶段消费。"
+  },
+  "field_categories": {
+    "Query": [
+      {
+        "field_name": "id",
+        "description": "Name of the id column.",
+        "data_type": "string | object",
+        "enum_source": "datasource groupby columns",
+        "sample_data": "id_column",
+        "required": true,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "sharedControls.entity + clearable=false。buildQuery 会把它映射到 query.columns。"
+      },
+      {
+        "field_name": "parent",
+        "description": "Name of the column containing the id of the parent node.",
+        "data_type": "string | object",
+        "enum_source": "datasource groupby columns",
+        "sample_data": "relation_column",
+        "required": true,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "sharedControls.entity + clearable=false。buildQuery 会把它映射到 query.columns。"
+      },
+      {
+        "field_name": "name",
+        "description": "Optional name of the data column.",
+        "data_type": "string | object | null",
+        "enum_source": "datasource groupby columns",
+        "sample_data": "name_column",
+        "required": false,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "如果为空，transformProps 会回退为使用 `id` 列作为节点展示名。"
+      },
+      {
+        "field_name": "root_node_id",
+        "runtime_alias": "rootNodeId",
+        "description": "Id of root node of the tree.",
+        "data_type": "string | number",
+        "sample_data": "1",
+        "required": false,
+        "embedding": "否",
+        "default_value": "",
+        "notes": "只影响运行时选根逻辑，不会进入 query.columns / query.metrics。"
+      },
+      {
+        "field_name": "metric",
+        "description": "Metric for node values.",
+        "data_type": "string | object | null",
+        "enum_source": "saved metrics + adhoc metrics",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "count"
+          },
+          "aggregate": "COUNT",
+          "label": "COUNT(*)"
+        },
+        "required": false,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "controlPanel 把 clearable 设为 true 并清空 validators，因此它不是必填。core `extractQueryFields()` 会把 root `metric` 归并进 query.metrics。"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "description": "Filters",
+        "data_type": "array[object]",
+        "enum_source": "datasource columns + saved metrics + 当前 metric",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "APAC"
+            ]
+          }
+        ],
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "default_value": [],
+        "notes": "直接影响查询结果，是现代 chart data API 下最稳妥的动态过滤入口。"
+      },
+      {
+        "field_name": "row_limit",
+        "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+        "data_type": "integer | string",
+        "sample_data": 10000,
+        "required": false,
+        "embedding": "否",
+        "default_value": 10000,
+        "notes": "sharedControls.row_limit 默认值为 `10000`。"
+      }
+    ],
+    "Chart options": [
+      {
+        "field_name": "layout",
+        "description": "Layout type of tree.",
+        "data_type": "string",
+        "enum_values": [
+          "orthogonal",
+          "radial"
+        ],
+        "sample_data": "orthogonal",
+        "required": false,
+        "embedding": "否",
+        "default_value": "orthogonal"
+      },
+      {
+        "field_name": "orient",
+        "description": "Orientation of tree.",
+        "data_type": "string",
+        "enum_values": [
+          "LR",
+          "RL",
+          "TB",
+          "BT"
+        ],
+        "sample_data": "LR",
+        "required": false,
+        "embedding": "否",
+        "default_value": "LR",
+        "visibility": "仅当 `layout=orthogonal` 时显示"
+      },
+      {
+        "field_name": "node_label_position",
+        "runtime_alias": "nodeLabelPosition",
+        "description": "Position of intermediate node label on tree.",
+        "data_type": "string",
+        "enum_values": [
+          "left",
+          "top",
+          "right",
+          "bottom"
+        ],
+        "sample_data": "left",
+        "required": false,
+        "embedding": "否",
+        "default_value": "left"
+      },
+      {
+        "field_name": "child_label_position",
+        "runtime_alias": "childLabelPosition",
+        "description": "Position of child node label on tree.",
+        "data_type": "string",
+        "enum_values": [
+          "left",
+          "top",
+          "right",
+          "bottom"
+        ],
+        "sample_data": "bottom",
+        "required": false,
+        "embedding": "否",
+        "default_value": "bottom"
+      },
+      {
+        "field_name": "emphasis",
+        "description": "Which relatives to highlight on hover.",
+        "data_type": "string",
+        "enum_values": [
+          "ancestor",
+          "descendant"
+        ],
+        "sample_data": "descendant",
+        "required": false,
+        "embedding": "否",
+        "default_value": "descendant",
+        "visibility": "仅当 `layout=orthogonal` 时显示",
+        "notes": "运行时类型里还声明了 `none`，但当前 controlPanel 不提供这个选项。"
+      },
+      {
+        "field_name": "symbol",
+        "description": "Layout type of tree.",
+        "data_type": "string",
+        "enum_values": [
+          "emptyCircle",
+          "circle",
+          "rect",
+          "triangle",
+          "diamond",
+          "pin",
+          "arrow",
+          "none"
+        ],
+        "sample_data": "emptyCircle",
+        "required": false,
+        "embedding": "否",
+        "default_value": "emptyCircle"
+      },
+      {
+        "field_name": "symbolSize",
+        "description": "Size of edge symbols.",
+        "data_type": "number",
+        "sample_data": 7,
+        "required": false,
+        "embedding": "否",
+        "default_value": 7,
+        "range": {
+          "min": 5,
+          "max": 30,
+          "step": 2
+        }
+      },
+      {
+        "field_name": "roam",
+        "description": "Whether to enable changing graph position and scaling.",
+        "data_type": "boolean | string",
+        "enum_values": [
+          false,
+          "scale",
+          "move",
+          true
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true
+      }
+    ]
+  }
+}

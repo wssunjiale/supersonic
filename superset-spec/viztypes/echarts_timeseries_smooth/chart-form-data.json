@@ -1,0 +1,464 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "echarts_timeseries_smooth",
+  "display_name": "Smooth Line",
+  "source_kind": "schema_file",
+  "normalized_chart_form_data": {
+    "required_root_fields": [
+      "datasource",
+      "viz_type"
+    ],
+    "optional_root_fields": [
+      "cache_timeout",
+      "custom_params",
+      "slice_id",
+      "time_range",
+      "url_params"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "groupby",
+      "metrics",
+      "order_desc",
+      "row_limit",
+      "time_range",
+      "viz_type",
+      "x_axis"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "annotation_layers",
+      "color_scheme",
+      "comparison_type",
+      "contributionMode",
+      "currency_format",
+      "datasource",
+      "forecastEnabled",
+      "forecastInterval",
+      "forecastPeriods",
+      "forecastSeasonalityDaily",
+      "forecastSeasonalityWeekly",
+      "forecastSeasonalityYearly",
+      "group_others_when_limit_reached",
+      "groupby",
+      "legendMargin",
+      "legendOrientation",
+      "legendType",
+      "limit",
+      "logAxis",
+      "markerEnabled",
+      "markerSize",
+      "metrics",
+      "min_periods",
+      "minorSplitLine",
+      "minorTicks",
+      "only_total",
+      "order_desc",
+      "resample_method",
+      "resample_rule",
+      "rich_tooltip",
+      "rolling_periods",
+      "rolling_type",
+      "row_limit",
+      "showTooltipPercentage",
+      "showTooltipTotal",
+      "show_empty_columns",
+      "show_legend",
+      "show_value",
+      "sort_series_ascending",
+      "sort_series_type",
+      "time_compare",
+      "time_grain_sqla",
+      "time_range",
+      "time_shift_color",
+      "timeseries_limit_metric",
+      "tooltipSortByMetric",
+      "tooltipTimeFormat",
+      "truncateXAxis",
+      "truncateYAxis",
+      "truncate_metric",
+      "viz_type",
+      "xAxisBounds",
+      "xAxisForceCategorical",
+      "xAxisLabelInterval",
+      "xAxisLabelRotation",
+      "x_axis",
+      "x_axis_sort",
+      "x_axis_sort_asc",
+      "x_axis_time_format",
+      "x_axis_title",
+      "x_axis_title_margin",
+      "y_axis_bounds",
+      "y_axis_format",
+      "y_axis_title",
+      "y_axis_title_margin",
+      "y_axis_title_position",
+      "zoomable"
+    ],
+    "fallback_template_seed": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "echarts_timeseries_smooth",
+      "metrics": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        }
+      ],
+      "x_axis": "<x_axis_column>",
+      "adhoc_filters": [],
+      "time_range": "No filter"
+    }
+  },
+  "original_chart_form_data_schema": {
+    "viz_type": "echarts_timeseries_smooth",
+    "display_name": "Smooth Line",
+    "purpose": "用于调用 API 创建或保存 Smooth Line 时填写的 form_data 模板",
+    "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/echarts_timeseries_smooth-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Timeseries/Regular/SmoothLine/controlPanel.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Timeseries/Regular/SmoothLine/index.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Timeseries/buildQuery.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Timeseries/constants.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Timeseries/transformers.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/sections/echartsTimeSeriesQuery.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/sections/advancedAnalytics.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/sections/annotationsAndLayers.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/sections/forecastInterval.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/sections/chartTitle.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/models/ChartProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryObject.ts"
+    ],
+    "notes": [
+      "API form_data 的键名必须保留源码中的原始 control name。Smooth Line 的根层字段是 mixed-case：既有 snake_case，也有 camelCase。",
+      "Explore 导出 form_data 时走 getFormDataFromControls()，它只会按 controlName 原样取 value，不会统一改名。",
+      "transformProps 中看到的 camelCase formData 来自 ChartProps.convertKeysToCamelCase(formData)，是运行时形态，不是构造 API form_data 时唯一可信来源。",
+      "datasource 和 viz_type 来自通用的 datasourceAndVizType section，不是 Smooth Line 专属控件，但创建图表时必须提供。",
+      "time_range 不在 Smooth Line 专属 Query section 中，但 buildQueryObject 接受该字段；hydrateExplore 缺省时也会补默认时间范围，因此模板中保留为可选全局字段。",
+      "SmoothLine/index.ts 在运行时注入 seriesType=Smooth；API 创建图表时不要把 seriesType 写入根层 form_data。",
+      "SmoothLine 没有 stack、percentage_threshold、area、opacity；这些字段属于其它时序变体，不属于 SmoothLine controlPanel。",
+      "only_total 虽然被注册进 form_data，但 SmoothLine 面板没有 stack 控件，它在 Explore 中通常隐藏，在非堆叠 smooth line 中基本无实际效果。",
+      "markerEnabled 在 SmoothLine 上是有效字段；transformers.ts 会在 line 分支用它控制 marker 显示。"
+    ],
+    "naming_and_pipeline": {
+      "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写成 form_data[name]",
+      "api_form_data_to_query_context": "Timeseries/buildQuery.ts 使用原始 form_data 构建 query context",
+      "api_form_data_to_runtime_form_data": "ChartProps.ts 会把 form_data 转成 camelCase 的 runtime formData，同时保留 rawFormData"
+    },
+    "global_required_fields": {
+      "datasource": {
+        "data_type": "string",
+        "required": true,
+        "sample_data": "<dataset_id>__table",
+        "source": "datasourceAndVizType section"
+      },
+      "viz_type": {
+        "data_type": "string",
+        "required": true,
+        "fixed_value": "echarts_timeseries_smooth",
+        "source": "datasourceAndVizType section"
+      }
+    },
+    "global_optional_fields": {
+      "time_range": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "No filter",
+        "source": "generic QueryFormData + hydrateExplore default"
+      },
+      "slice_id": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 0,
+        "source": "datasourceAndVizType hidden control",
+        "notes": "新建图表时通常省略；编辑已存在图表时由服务端或上层调用方提供。"
+      },
+      "cache_timeout": {
+        "data_type": "integer | null",
+        "required": false,
+        "sample_data": null,
+        "source": "datasourceAndVizType hidden control"
+      },
+      "url_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "datasourceAndVizType hidden control"
+      },
+      "custom_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "datasourceAndVizType hidden control"
+      }
+    },
+    "minimal_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "echarts_timeseries_smooth",
+      "time_range": "No filter",
+      "x_axis": "<time_column>",
+      "metrics": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        }
+      ],
+      "groupby": [],
+      "adhoc_filters": [],
+      "row_limit": 10000,
+      "order_desc": true
+    },
+    "recommended_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "echarts_timeseries_smooth",
+      "time_range": "No filter",
+      "x_axis": "<time_column>",
+      "time_grain_sqla": "P1D",
+      "xAxisForceCategorical": false,
+      "x_axis_sort": null,
+      "x_axis_sort_asc": true,
+      "metrics": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        }
+      ],
+      "groupby": [],
+      "contributionMode": null,
+      "adhoc_filters": [],
+      "limit": null,
+      "group_others_when_limit_reached": false,
+      "timeseries_limit_metric": null,
+      "order_desc": true,
+      "row_limit": 10000,
+      "truncate_metric": true,
+      "show_empty_columns": true,
+      "rolling_type": null,
+      "rolling_periods": null,
+      "min_periods": null,
+      "time_compare": null,
+      "comparison_type": "values",
+      "resample_rule": null,
+      "resample_method": null,
+      "annotation_layers": [],
+      "forecastEnabled": false,
+      "forecastPeriods": 10,
+      "forecastInterval": 0.8,
+      "forecastSeasonalityYearly": null,
+      "forecastSeasonalityWeekly": null,
+      "forecastSeasonalityDaily": null,
+      "x_axis_title": "",
+      "x_axis_title_margin": 15,
+      "y_axis_title": "",
+      "y_axis_title_margin": 30,
+      "y_axis_title_position": "Left",
+      "sort_series_type": "sum",
+      "sort_series_ascending": false,
+      "color_scheme": "<categoricalSchemeRegistry.defaultKey>",
+      "time_shift_color": true,
+      "show_value": false,
+      "only_total": true,
+      "markerEnabled": false,
+      "markerSize": 6,
+      "zoomable": false,
+      "minorTicks": false,
+      "show_legend": true,
+      "legendType": "scroll",
+      "legendOrientation": "top",
+      "legendMargin": null,
+      "x_axis_time_format": "smart_date",
+      "xAxisLabelRotation": 0,
+      "xAxisLabelInterval": "auto",
+      "truncateXAxis": true,
+      "xAxisBounds": null,
+      "rich_tooltip": true,
+      "showTooltipTotal": true,
+      "showTooltipPercentage": false,
+      "tooltipSortByMetric": false,
+      "tooltipTimeFormat": "smart_date",
+      "y_axis_format": "SMART_NUMBER",
+      "currency_format": null,
+      "logAxis": false,
+      "minorSplitLine": false,
+      "truncateYAxis": false,
+      "y_axis_bounds": [
+        null,
+        null
+      ]
+    },
+    "conditional_blocks": {
+      "multi_series": {
+        "condition": "需要按维度拆分多条平滑曲线时",
+        "fields": {
+          "groupby": [
+            "<dimension_column>"
+          ]
+        }
+      },
+      "sort_x_axis_series": {
+        "condition": "需要按名称、求和、均值等规则对 x 轴系列排序时",
+        "fields": {
+          "x_axis_sort": "<metric_label_or_sort_choice>",
+          "x_axis_sort_asc": true
+        }
+      },
+      "limit_series": {
+        "condition": "需要限制 series 数量时",
+        "fields": {
+          "limit": 10,
+          "timeseries_limit_metric": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          },
+          "order_desc": true,
+          "group_others_when_limit_reached": false
+        }
+      },
+      "markers": {
+        "condition": "需要在平滑曲线上显示 marker 时",
+        "fields": {
+          "markerEnabled": true,
+          "markerSize": 6
+        },
+        "notes": "SmoothLine 的 markerSize 控件 UI 范围是 0-20。"
+      },
+      "forecast": {
+        "condition": "需要 Prophet 预测时",
+        "fields": {
+          "forecastEnabled": true,
+          "forecastPeriods": 10,
+          "forecastInterval": 0.8,
+          "forecastSeasonalityYearly": null,
+          "forecastSeasonalityWeekly": null,
+          "forecastSeasonalityDaily": null
+        }
+      },
+      "axis_bounds": {
+        "condition": "需要显式指定坐标轴上下界时",
+        "fields": {
+          "truncateYAxis": true,
+          "y_axis_bounds": [
+            0,
+            null
+          ],
+          "xAxisBounds": null
+        }
+      },
+      "advanced_analytics": {
+        "condition": "需要 rolling、time compare 或 resample 时",
+        "fields": {
+          "rolling_type": null,
+          "rolling_periods": null,
+          "min_periods": null,
+          "time_compare": null,
+          "comparison_type": "values",
+          "resample_rule": null,
+          "resample_method": null
+        }
+      }
+    },
+    "runtime_only_or_non_template_fields": {
+      "runtime_injected": [
+        {
+          "field_name": "seriesType",
+          "reason": "SmoothLine/index.ts 在运行时包装 transformProps 时注入 seriesType=Smooth，不是 controlPanel 导出的 API 模板字段。"
+        }
+      ],
+      "registered_but_effectively_hidden": [
+        {
+          "field_name": "only_total",
+          "reason": "虽然被注册进 form_data，但其 visibility 仍依赖 stack；SmoothLine 面板没有 stack 控件，因此 Explore 中通常隐藏。"
+        }
+      ],
+      "not_in_smooth_control_panel": [
+        {
+          "field_name": "stack",
+          "reason": "SmoothLine/controlPanel.tsx 没有注册 stack 控件。"
+        },
+        {
+          "field_name": "percentage_threshold",
+          "reason": "SmoothLine/controlPanel.tsx 没有注册该字段。"
+        },
+        {
+          "field_name": "area",
+          "reason": "这是 Line controlPanel 的根字段；SmoothLine/controlPanel.tsx 没有使用它。"
+        },
+        {
+          "field_name": "opacity",
+          "reason": "这是 Line 的面积透明度字段；SmoothLine/controlPanel.tsx 没有使用它。"
+        },
+        {
+          "field_name": "show_extra_controls",
+          "reason": "该字段存在于其它时序图 control 中，但 SmoothLine/controlPanel.tsx 没有使用它，不应写入 SmoothLine 的推荐模板。"
+        }
+      ],
+      "viz_switch_only": [
+        {
+          "field_name": "formDataOverrides(metrics/groupby remap)",
+          "reason": "只在 standardizedFormData.transform() 切换 viz_type 时触发，不是常规导出 SmoothLine form_data 的必经步骤。"
+        }
+      ]
+    },
+    "api_usage_guidance": {
+      "high_confidence_required_fields": [
+        "datasource",
+        "viz_type",
+        "x_axis",
+        "metrics"
+      ],
+      "recommended_always_set": [
+        "time_range",
+        "time_grain_sqla",
+        "groupby",
+        "adhoc_filters",
+        "row_limit",
+        "order_desc"
+      ],
+      "mixed_case_examples": [
+        "x_axis",
+        "time_grain_sqla",
+        "xAxisForceCategorical",
+        "forecastEnabled",
+        "legendOrientation",
+        "markerEnabled",
+        "xAxisLabelRotation"
+      ],
+      "do_not_send_as_root_form_data": [
+        "seriesType",
+        "stack",
+        "percentage_threshold",
+        "area",
+        "opacity",
+        "show_extra_controls"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "echarts_timeseries_smooth",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/echarts_timeseries_smooth-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/echarts_timeseries_smooth-form-data-schema.json",
+      "control-schema": "form-data-schema/echarts_timeseries_smooth-schema.json"
+    }
+  }
+}

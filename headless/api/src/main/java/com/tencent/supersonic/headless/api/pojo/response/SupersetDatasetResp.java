@@ -31,6 +31,20 @@ public class SupersetDatasetResp {
 
     private Long supersetDatasetId;
 
+    private String sourceType;
+
+    private String syncState;
+
+    private Date syncAttemptAt;
+
+    private Date nextRetryAt;
+
+    private Integer retryCount;
+
+    private String syncErrorType;
+
+    private String syncErrorMsg;
+
     private Date createdAt;
 
     private String createdBy;

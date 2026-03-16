@@ -1,0 +1,302 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "tree_chart",
+  "display_name": "Tree Chart",
+  "generation_mode": "heuristic_seed",
+  "slot_candidates": [
+    {
+      "field_name": "adhoc_filters",
+      "required": false,
+      "slot_kind": "filter_list",
+      "accepted_dataset_roles": [
+        "filter_context"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [],
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [
+        "extra_form_data.append"
+      ],
+      "descriptions": [
+        "Filters"
+      ]
+    },
+    {
+      "field_name": "id",
+      "required": true,
+      "slot_kind": "node_id",
+      "accepted_dataset_roles": [
+        "entity_id",
+        "dimension"
+      ],
+      "cardinality": "1",
+      "placeholder": "<id_column>",
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Name of the id column."
+      ]
+    },
+    {
+      "field_name": "metric",
+      "required": false,
+      "slot_kind": "metric",
+      "accepted_dataset_roles": [
+        "metric",
+        "saved_metric",
+        "adhoc_metric"
+      ],
+      "cardinality": "1",
+      "placeholder": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Metric for node values."
+      ]
+    },
+    {
+      "field_name": "parent",
+      "required": true,
+      "slot_kind": "parent_id",
+      "accepted_dataset_roles": [
+        "entity_id",
+        "dimension"
+      ],
+      "cardinality": "0..1",
+      "placeholder": "<parent_id_column>",
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Name of the column containing the id of the parent node."
+      ]
+    },
+    {
+      "field_name": "root_node_id",
+      "required": false,
+      "slot_kind": "graph_or_hierarchy",
+      "accepted_dataset_roles": [
+        "entity_id",
+        "entity",
+        "dimension"
+      ],
+      "cardinality": "0..1",
+      "placeholder": "<entity_or_relation_column>",
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Id of root node of the tree."
+      ]
+    }
+  ],
+  "non_binding_form_controls": [
+    {
+      "field_name": "child_label_position",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Position of child node label on tree."
+      ]
+    },
+    {
+      "field_name": "emphasis",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Which relatives to highlight on hover."
+      ]
+    },
+    {
+      "field_name": "layout",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Layout type of tree."
+      ]
+    },
+    {
+      "field_name": "name",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Optional name of the data column."
+      ]
+    },
+    {
+      "field_name": "node_label_position",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Position of intermediate node label on tree."
+      ]
+    },
+    {
+      "field_name": "orient",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Orientation of tree."
+      ]
+    },
+    {
+      "field_name": "roam",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to enable changing graph position and scaling."
+      ]
+    },
+    {
+      "field_name": "row_limit",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Limits the number of the rows that are computed in the query that is the source of the data used for this chart."
+      ]
+    },
+    {
+      "field_name": "symbol",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Layout type of tree."
+      ]
+    },
+    {
+      "field_name": "symbolSize",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Size of edge symbols."
+      ]
+    }
+  ],
+  "dataset_role_inventory": {
+    "adhoc_metric": [
+      "metric"
+    ],
+    "dimension": [
+      "id",
+      "parent",
+      "root_node_id"
+    ],
+    "entity": [
+      "root_node_id"
+    ],
+    "entity_id": [
+      "id",
+      "parent",
+      "root_node_id"
+    ],
+    "filter_context": [
+      "adhoc_filters"
+    ],
+    "metric": [
+      "metric"
+    ],
+    "saved_metric": [
+      "metric"
+    ]
+  },
+  "binding_seed_example": {
+    "id": "<id_column>",
+    "parent": "<parent_id_column>"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "tree_chart",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/tree_chart-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/tree_chart-form-data-schema.json",
+      "control-schema": "form-data-schema/tree_chart-schema.json"
+    }
+  }
+}

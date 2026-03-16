@@ -1,0 +1,336 @@
+{
+  "viz_type": "deck_geojson",
+  "display_name": "deck.gl Geojson",
+  "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Geojson/controlPanel.ts",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Geojson/controlPanel.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Geojson/index.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Geojson/Geojson.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/common.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/Shared_DeckGL.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/sharedDndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/utils.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utils/crossFiltersDataMask.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+    "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+    "D:/vsx/sources/superset-6.0.0/superset/views/core.py",
+    "D:/vsx/sources/superset-6.0.0/superset/utils/core.py"
+  ],
+  "notes": [
+    "deck_geojson 位于 `legacy-preset-chart-deckgl/src/layers/Geojson`，metadata 明确声明 `useLegacyApi=true`，因此真实请求路径是 `/superset/explore_json/`。",
+    "前端展示名是 `deck.gl Geojson`，后端类名是 `superset/viz.py::DeckGeoJson`。构造模板时应以 `viz_type='deck_geojson'` 为准。",
+    "当前图的主查询输入不是 `spatial` 点位对象，而是一个 GeoJSON 字符串列 `geojson`。这个字段底层复用 `sharedControls.entity -> dndEntityControl`，单选、`validateNonEmpty`、默认值为 null。",
+    "后端 `DeckGeoJson.query_obj()` 会在 `BaseDeckGLViz.query_obj()` 基础上把 `geojson` 列追加进 `query_obj['columns']`，然后强制清空 `metrics=[]` 和 `groupby=[]`。因此当前图没有正式指标字段，查询本质上是按行返回 GeoJSON 文本列。",
+    "当前 controlPanel 仍然复用了 `filter_nulls`，但 `DeckGeoJson` 没有声明 `spatial_control_keys`，也没有 `line_column`。所以 `BaseDeckGLViz.add_null_filters()` 在这个图上实际上不会追加任何空值过滤，这是一个源码层面的 no-op 控件。",
+    "`Geojson.tsx` 在运行时直接解构 `formData.fill_color_picker` 与 `formData.stroke_color_picker`。因此即便这两个控件主要依赖默认值，手工构造 API 模板时也应显式提供它们，避免前端运行时访问空对象。",
+    "`fill_color_picker` / `stroke_color_picker` 来自共享 DeckGL 颜色控件，其说明明确写着：若不想覆盖 GeoJSON 自带颜色，可把 opacity 设为 0。运行时 `Geojson.tsx` 也确实只在 alpha 大于 0 时才把颜色覆盖写入 `propOverrides`。",
+    "`Geojson.tsx` 会递归遍历 `payload.data` 中的 GeoJSON 结构，把 `fill-color` / `stroke-color` / `stroke-width` 等属性归一化，并把字符串 hex 色值转成 RGB 数组。若 `js_data_mutator` 存在，还会在绘图前对整批 feature 做二次加工。",
+    "当前图支持交互筛选。`crossFiltersDataMask.ts` 在检测到 `formData.geojson` 时，会构造一个 SQL 表达式列 `REPLACE(<geojson列>, ' ', '')`，并用 `LIKE '%<geometry coordinates json>%` 形式写入 `extraFormData.filters`。"
+  ],
+  "legacy_api_behavior": {
+    "useLegacyApi": true,
+    "frontend_request_endpoint": "/superset/explore_json/",
+    "frontend_request_payload": {
+      "form_data": "<raw form_data>"
+    },
+    "query_builder": "deck_geojson 没有专属前端 buildQuery。ChartClient.ts 在 `useLegacyApi=true` 且未注册 buildQuery 时，会把原始 form_data 直接包装进 legacy payload。"
+  },
+  "query_compilation": {
+    "backend_class": "superset/viz.py::DeckGeoJson",
+    "base_query": "继承 `BaseDeckGLViz.query_obj()` -> `BaseViz.query_obj()`，因此会先执行 `convert_legacy_filters_into_adhoc(form_data)` 与 `merge_extra_filters(form_data)`。",
+    "null_filter_injection": "虽然 controlPanel 暴露了 `filter_nulls`，但当前类没有 `spatial_control_keys`，也没有 `line_column`。因此 `BaseDeckGLViz.add_null_filters()` 在本图上不会追加任何空值过滤条件。",
+    "columns": "`BaseDeckGLViz.query_obj()` 只会把可选 `js_columns` 放进 `query_obj['columns']`；随后 `DeckGeoJson.query_obj()` 额外追加 `geojson` 列，并强制把 `metrics=[]`、`groupby=[]`。",
+    "returned_data": "`DeckGeoJson.get_properties()` 会对 `data[get_column_name(form_data['geojson'])]` 执行 `json.loads()`。最终 `BaseDeckGLViz.get_data()` 返回 `{ features, mapboxApiKey, metricLabels }`，其中 `features[*]` 是解析后的 GeoJSON 对象，可带 `extraProps`。",
+    "runtime_rendering": "`Geojson.tsx` 会从 root `fill_color_picker` / `stroke_color_picker` 生成颜色覆盖，递归处理 `payload.data` 里的 GeoJSON，应用 `js_data_mutator`，再把 `extruded`、`filled`、`stroked`、`line_width`、`line_width_unit`、`point_radius_scale` 传给 `GeoJsonLayer`。若 `autozoom=true`，还会用 `geojsonExtent` 自动拟合 viewport。"
+  },
+  "field_categories": {
+    "Query": [
+      {
+        "field_name": "geojson",
+        "description": "Select the geojson column",
+        "data_type": "string | object",
+        "enum_source": "datasource columns；底层共享控件是 `dndEntityControl` 单选列控件",
+        "sample_data": "geom",
+        "required": true,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "这里传的是“数据集里的列名”，不是原始 GeoJSON 对象本身。后端会读取该列的 JSON 字符串并执行 `json.loads()`。"
+      },
+      {
+        "field_name": "row_limit",
+        "runtime_alias": "rowLimit",
+        "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+        "data_type": "integer",
+        "enum_values": [
+          10,
+          50,
+          100,
+          250,
+          500,
+          1000,
+          5000,
+          10000,
+          50000
+        ],
+        "sample_data": 5000,
+        "required": false,
+        "embedding": "否",
+        "default_value": 10000
+      },
+      {
+        "field_name": "filter_nulls",
+        "description": "Whether to ignore locations that are null",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true,
+        "notes": "当前图沿用了共享控件，但后端类没有声明 `spatial_control_keys`。源码追踪结果是：它在 `deck_geojson` 上不会实际注入任何 `IS NOT NULL` 过滤。"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "description": "字段标签为 Filters。legacy `/superset/explore_json/` 路径会先把 legacy filters 归并进 `adhoc_filters`，再继续 merge `extra_form_data`。",
+        "data_type": "array[object]",
+        "enum_source": "datasource columns",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "country",
+            "operator": "IN",
+            "comparator": [
+              "US"
+            ]
+          }
+        ],
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "default_value": [],
+        "notes": "因为当前图没有指标，过滤控件上下文里的 `selectedMetrics` 为空。"
+      }
+    ],
+    "Map": [
+      {
+        "field_name": "mapbox_style",
+        "description": "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/ or tile server URL.",
+        "data_type": "string",
+        "enum_source": "bootstrap common.deckgl_tiles or DEFAULT_DECKGL_TILES",
+        "sample_data": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+        "required": false,
+        "embedding": "否",
+        "default_value": "getDeckGLTiles()[0][0]"
+      },
+      {
+        "field_name": "viewport",
+        "description": "Parameters related to the view and perspective on the map",
+        "data_type": "object",
+        "sample_data": {
+          "longitude": 6.85236157047845,
+          "latitude": 31.222656842808707,
+          "zoom": 1,
+          "bearing": 0,
+          "pitch": 0
+        },
+        "required": false,
+        "embedding": "否",
+        "default_value": {
+          "longitude": 6.85236157047845,
+          "latitude": 31.222656842808707,
+          "zoom": 1,
+          "bearing": 0,
+          "pitch": 0
+        },
+        "notes": "运行时 `transformProps.ts` 会把当前图表的 `width`/`height` 合并进 viewport，但 root form_data 不需要自己提供宽高。"
+      },
+      {
+        "field_name": "autozoom",
+        "description": "When checked, the map will zoom to your data after each query",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true,
+        "notes": "为 true 时，`Geojson.tsx` 会用 `geojsonExtent` 基于 `payload.data.features` 自动拟合视口。"
+      }
+    ],
+    "GeoJson Settings": [
+      {
+        "field_name": "fill_color_picker",
+        "description": "Set the opacity to 0 if you do not want to override the color specified in the GeoJSON",
+        "data_type": "object",
+        "sample_data": {
+          "r": 0,
+          "g": 122,
+          "b": 135,
+          "a": 1
+        },
+        "required": false,
+        "embedding": "否",
+        "default_value": {
+          "r": 0,
+          "g": 122,
+          "b": 135,
+          "a": 1
+        },
+        "notes": "`Geojson.tsx` 会直接读取它。若 alpha 大于 0，则把 `fillColor` 覆盖写入每个 feature 的 properties。"
+      },
+      {
+        "field_name": "stroke_color_picker",
+        "description": "Set the opacity to 0 if you do not want to override the color specified in the GeoJSON",
+        "data_type": "object",
+        "sample_data": {
+          "r": 0,
+          "g": 122,
+          "b": 135,
+          "a": 1
+        },
+        "required": false,
+        "embedding": "否",
+        "default_value": {
+          "r": 0,
+          "g": 122,
+          "b": 135,
+          "a": 1
+        },
+        "notes": "`Geojson.tsx` 会直接读取它。若 alpha 大于 0，则把 `strokeColor` 覆盖写入每个 feature 的 properties。"
+      },
+      {
+        "field_name": "filled",
+        "description": "Whether to fill the objects",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true
+      },
+      {
+        "field_name": "stroked",
+        "description": "Whether to display the stroke",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      },
+      {
+        "field_name": "extruded",
+        "description": "Whether to make the grid 3D",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true
+      },
+      {
+        "field_name": "line_width",
+        "description": "The width of the lines",
+        "data_type": "integer | string",
+        "sample_data": 1,
+        "required": false,
+        "embedding": "否",
+        "default_value": 1,
+        "notes": "`Geojson.tsx` 运行时若未提供，会回退到 1。"
+      },
+      {
+        "field_name": "line_width_unit",
+        "description": "字段标签为 Line width unit。",
+        "data_type": "string",
+        "enum_values": [
+          "meters",
+          "pixels"
+        ],
+        "sample_data": "pixels",
+        "required": false,
+        "embedding": "否",
+        "default_value": "pixels"
+      },
+      {
+        "field_name": "point_radius_scale",
+        "description": "字段标签为 Point Radius Scale。",
+        "data_type": "integer | string | null",
+        "enum_values": [
+          0,
+          100,
+          200,
+          300,
+          500
+        ],
+        "sample_data": 100,
+        "required": false,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "控件 `freeForm=true`，并用 `legacyValidateInteger` 校验。运行时直接传给 `GeoJsonLayer.pointRadiusScale`。"
+      }
+    ],
+    "Advanced": [
+      {
+        "field_name": "js_columns",
+        "description": "List of extra columns made available in JavaScript functions",
+        "data_type": "array[string | object]",
+        "enum_source": "datasource columns",
+        "sample_data": [
+          "name"
+        ],
+        "required": false,
+        "embedding": "否",
+        "default_value": [],
+        "notes": "后端会把这些列作为 `extraProps` 附加到解析后的 GeoJSON feature 上。"
+      },
+      {
+        "field_name": "js_data_mutator",
+        "description": "Define a javascript function that receives the data array used in the visualization and is expected to return a modified version of that array.",
+        "data_type": "string",
+        "sample_data": "data => data",
+        "required": false,
+        "embedding": "否",
+        "default_value": "",
+        "notes": "如果功能开关 `EnableJavascriptControls` 关闭，该控件会变成只读并显示安全提示。"
+      },
+      {
+        "field_name": "js_tooltip",
+        "description": "Define a function that receives the input and outputs the content for a tooltip",
+        "data_type": "string",
+        "sample_data": "o => `<div>${o.object.extraProps?.name}</div>`",
+        "required": false,
+        "embedding": "否",
+        "default_value": "",
+        "notes": "若未提供，默认 tooltip 只会遍历 `extraProps`。"
+      },
+      {
+        "field_name": "js_onclick_href",
+        "description": "Define a function that returns a URL to navigate to when user clicks",
+        "data_type": "string",
+        "sample_data": "o => `https://example.com/?id=${o.object.extraProps?.id}`",
+        "required": false,
+        "embedding": "否",
+        "default_value": "",
+        "notes": "若提供，`commonLayerProps()` 会在点击时打开该 URL。"
+      }
+    ]
+  }
+}

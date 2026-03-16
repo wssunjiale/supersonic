@@ -1,0 +1,264 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "histogram_v2",
+  "display_name": "Histogram",
+  "generation_mode": "heuristic_seed",
+  "slot_candidates": [
+    {
+      "field_name": "adhoc_filters",
+      "required": false,
+      "slot_kind": "filter_list",
+      "accepted_dataset_roles": [
+        "filter_context"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [],
+      "source_categories": [
+        "Query / Data & Filters"
+      ],
+      "embedding_modes": [
+        "extra_form_data.append"
+      ],
+      "descriptions": [
+        "源码未提供额外描述；字段标签为 Filters。"
+      ]
+    },
+    {
+      "field_name": "column",
+      "required": true,
+      "slot_kind": "dimension",
+      "accepted_dataset_roles": [
+        "dimension",
+        "category_dimension"
+      ],
+      "cardinality": "0..1",
+      "placeholder": "<dimension_column>",
+      "source_categories": [
+        "Query / Data & Filters"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Numeric column used to calculate the histogram."
+      ]
+    },
+    {
+      "field_name": "cumulative",
+      "required": false,
+      "slot_kind": "latitude",
+      "accepted_dataset_roles": [
+        "geo_latitude"
+      ],
+      "cardinality": "0..1",
+      "placeholder": "<latitude_column>",
+      "source_categories": [
+        "Query / Histogram Calculation"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The cumulative option allows you to see how your data accumulates over different values. When enabled, the histogram bars represent the running total of frequencies up to each bin. This helps you understand how likely it is to encounter values below a certain point. Keep in mind that enabling cumulative doesn't change your original data, it just changes the way the histogram is displayed."
+      ]
+    },
+    {
+      "field_name": "groupby",
+      "required": false,
+      "slot_kind": "dimension_list",
+      "accepted_dataset_roles": [
+        "dimension",
+        "category_dimension"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [
+        "<dimension_column>"
+      ],
+      "source_categories": [
+        "Query / Data & Filters"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Dimensions contain qualitative values such as names, dates, or geographical data. Use dimensions to categorize, segment, and reveal the details in your data. Dimensions affect the level of detail in the view."
+      ]
+    }
+  ],
+  "non_binding_form_controls": [
+    {
+      "field_name": "bins",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query / Histogram Calculation"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The number of bins for the histogram"
+      ]
+    },
+    {
+      "field_name": "color_scheme",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Display"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The color scheme for rendering chart"
+      ]
+    },
+    {
+      "field_name": "normalize",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query / Histogram Calculation"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The normalize option transforms the histogram values into proportions or probabilities by dividing each bin's count by the total count of data points. This normalization process ensures that the resulting values sum up to 1, enabling a relative comparison of the data's distribution and providing a clearer understanding of the proportion of data points within each bin."
+      ]
+    },
+    {
+      "field_name": "row_limit",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query / Data & Filters"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Limits the number of the rows that are computed in the query that is the source of the data used for this chart."
+      ]
+    },
+    {
+      "field_name": "show_legend",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Display"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to display a legend for the chart"
+      ]
+    },
+    {
+      "field_name": "show_value",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Display"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Show series values on the chart"
+      ]
+    },
+    {
+      "field_name": "x_axis_format",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Axis Labels & Formats"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "D3 format syntax: https://github.com/d3/d3-format Only applies when \"Label Type\" is set to show values."
+      ]
+    },
+    {
+      "field_name": "x_axis_title",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Axis Labels & Formats"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "源码未提供额外描述；字段标签为 X Axis Title。"
+      ]
+    },
+    {
+      "field_name": "y_axis_format",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Axis Labels & Formats"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "D3 format syntax: https://github.com/d3/d3-format Only applies when \"Label Type\" is set to show values."
+      ]
+    },
+    {
+      "field_name": "y_axis_title",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Axis Labels & Formats"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "源码未提供额外描述；字段标签为 Y Axis Title。"
+      ]
+    }
+  ],
+  "dataset_role_inventory": {
+    "category_dimension": [
+      "column",
+      "groupby"
+    ],
+    "dimension": [
+      "column",
+      "groupby"
+    ],
+    "filter_context": [
+      "adhoc_filters"
+    ],
+    "geo_latitude": [
+      "cumulative"
+    ]
+  },
+  "binding_seed_example": {
+    "column": "<dimension_column>"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "histogram_v2",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/histogram_v2-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/histogram_v2-form-data-schema.json",
+      "control-schema": "form-data-schema/histogram_v2-schema.json"
+    }
+  }
+}

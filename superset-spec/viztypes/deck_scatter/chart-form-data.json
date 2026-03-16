@@ -1,0 +1,699 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "deck_scatter",
+  "display_name": "deck.gl Scatterplot",
+  "source_kind": "schema_file",
+  "normalized_chart_form_data": {
+    "required_root_fields": [
+      "datasource",
+      "max_radius",
+      "min_radius",
+      "point_radius_fixed",
+      "spatial",
+      "viz_type"
+    ],
+    "optional_root_fields": [
+      "adhoc_filters",
+      "autozoom",
+      "cache_timeout",
+      "color_breakpoints",
+      "color_picker",
+      "color_scheme",
+      "color_scheme_type",
+      "custom_params",
+      "deafult_breakpoint_color",
+      "dimension",
+      "extra_form_data",
+      "filter_nulls",
+      "granularity_sqla",
+      "js_columns",
+      "js_data_mutator",
+      "js_onclick_href",
+      "js_tooltip",
+      "legend_format",
+      "legend_position",
+      "mapbox_style",
+      "multiplier",
+      "point_unit",
+      "row_limit",
+      "slice_id",
+      "time_grain_sqla",
+      "time_range",
+      "url_params",
+      "viewport"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "autozoom",
+      "color_picker",
+      "color_scheme_type",
+      "datasource",
+      "mapbox_style",
+      "max_radius",
+      "min_radius",
+      "point_radius_fixed",
+      "point_unit",
+      "spatial",
+      "viewport",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "autozoom",
+      "color_breakpoints",
+      "color_picker",
+      "color_scheme",
+      "color_scheme_type",
+      "datasource",
+      "deafult_breakpoint_color",
+      "dimension",
+      "filter_nulls",
+      "js_columns",
+      "js_data_mutator",
+      "js_onclick_href",
+      "js_tooltip",
+      "legend_format",
+      "legend_position",
+      "mapbox_style",
+      "max_radius",
+      "min_radius",
+      "multiplier",
+      "point_radius_fixed",
+      "point_unit",
+      "row_limit",
+      "spatial",
+      "viewport",
+      "viz_type"
+    ],
+    "fallback_template_seed": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "deck_scatter",
+      "max_radius": null,
+      "min_radius": null,
+      "point_radius_fixed": null,
+      "spatial": "<spatial_column_or_expression>",
+      "adhoc_filters": [],
+      "time_range": "No filter"
+    }
+  },
+  "original_chart_form_data_schema": {
+    "viz_type": "deck_scatter",
+    "display_name": "deck.gl Scatterplot",
+    "purpose": "用于调用 API 创建或保存 deck.gl Scatterplot 时填写的 form_data 模板",
+    "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/deck_scatter-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Scatter/controlPanel.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Scatter/index.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Scatter/Scatter.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/factory.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/CategoricalDeckGLContainer.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/common.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/Shared_DeckGL.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utils/geo.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utils/crossFiltersDataMask.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-demo/storybook/stories/plugins/legacy-preset-chart-deckgl/Scatter/payload.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-demo/storybook/stories/plugins/legacy-preset-chart-deckgl/Scatter/Scatter.stories.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/QueryFormData.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+      "D:/vsx/sources/superset-6.0.0/superset/views/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/viz.py"
+    ],
+    "notes": [
+      "deck_scatter 是 legacy 图，metadata 明确声明 `useLegacyApi=true`，真实请求路径仍是 `/superset/explore_json/`。",
+      "Explore 导出 form_data 时走 `getFormDataFromControls()`，它按 control name 原样写入 root form_data。API 根层必须使用 `spatial`、`point_radius_fixed`、`point_unit`、`min_radius`、`max_radius` 等原始键名。",
+      "deck_scatter 没有专属前端 buildQuery。ChartClient.ts 对它会退回 `() => formData`，也就是说，API 层真正应该构造的是原始 root `form_data`，然后由 legacy `/superset/explore_json/` 包装成 `{ form_data: ... }`。",
+      "scatter 当前正式的“大小指标”是 `point_radius_fixed.type='metric'`。不要再把旧的 `size` 当作当前 API 创建字段；storybook 里的 `size` 只是遗留保存态。",
+      "`min_radius` 和 `max_radius` 都带 `validateNonEmpty` 且默认值分别是 `2` / `250`。如果你要构造稳定的 API 模板，应显式写出这两个值。",
+      "`dimension` 只有在 `color_scheme_type='categorical_palette'` 时才真正参与分类配色；若缺失，运行时会回退到 `color_picker` 固定色。",
+      "`deafult_breakpoint_color` 仍应按控件键名写入保存态，但当前 scatter 通用分类容器代码读取的是 `default_breakpoint_color`。因此 color breakpoints 模式下的“默认断点色”存在源码级命名错位。"
+    ],
+    "naming_and_pipeline": {
+      "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写成 form_data[name]，不会自动把 snake_case 改成 camelCase。",
+      "api_form_data_to_backend_request": "ChartClient.ts 在 `useLegacyApi=true` 时，把 `buildQuery(formData)` 包成 `{ form_data }` POST 到 `/superset/explore_json/`；deck_scatter 没有专属 buildQuery，因此等价于直接发送原始 form_data。",
+      "backend_form_data_normalization": "`explore_json()` 会先补 `datasource`，再执行 `convert_legacy_filters_into_adhoc(form_data)` 与 `merge_extra_filters(form_data)`。",
+      "backend_form_data_to_query_obj": "`DeckScatterViz.query_obj()` 会先把 `point_radius_fixed` 回填默认对象并决定 `is_timeseries`，再复用 `BaseDeckGLViz.query_obj()`。真正是否生成 metrics，取决于 `point_radius_fixed.type` 是否是 `metric`。",
+      "runtime_chart_props": "`transformProps.ts` 直接把 `rawFormData` 透传成 runtime `formData`，把 `queriesData[0]` 透传成 runtime `payload`，并把 `viewport` 与 `width`/`height` 合并。",
+      "color_runtime_pipeline": "Scatter 真正上屏前会先经过 `CategoricalDeckGLContainer` 注入 `feature.color`，然后 `Scatter.tsx` 只负责处理半径、tooltip 和高亮层。"
+    },
+    "global_required_fields": {
+      "datasource": {
+        "data_type": "string",
+        "required": true,
+        "sample_data": "<dataset_id>__table",
+        "source": "explore_json() + datasourceAndVizType hidden control"
+      },
+      "viz_type": {
+        "data_type": "string",
+        "required": true,
+        "fixed_value": "deck_scatter",
+        "source": "Scatter/index.ts + VizType.DeckScatter"
+      },
+      "spatial": {
+        "data_type": "object",
+        "required": true,
+        "sample_data": {
+          "type": "latlong",
+          "lonCol": "LON",
+          "latCol": "LAT"
+        },
+        "source": "Scatter Query section + SpatialControl validator + BaseDeckGLViz.query_obj()"
+      },
+      "point_radius_fixed": {
+        "data_type": "object",
+        "required": true,
+        "sample_data": {
+          "type": "metric",
+          "value": "count"
+        },
+        "source": "Point Size section + DeckScatterViz.get_metrics() + DeckScatterViz.get_properties()"
+      },
+      "min_radius": {
+        "data_type": "number | string",
+        "required": true,
+        "sample_data": 2,
+        "source": "Point Size section validator + Scatter.tsx radiusMinPixels"
+      },
+      "max_radius": {
+        "data_type": "number | string",
+        "required": true,
+        "sample_data": 250,
+        "source": "Point Size section validator + Scatter.tsx radiusMaxPixels"
+      }
+    },
+    "global_optional_fields": {
+      "row_limit": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 5000,
+        "source": "Query section"
+      },
+      "filter_nulls": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": true,
+        "source": "Query section"
+      },
+      "adhoc_filters": {
+        "data_type": "array[object]",
+        "required": false,
+        "sample_data": [],
+        "source": "Query section"
+      },
+      "mapbox_style": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "mapbox://styles/mapbox/light-v9",
+        "source": "Map section"
+      },
+      "autozoom": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": true,
+        "source": "Map section"
+      },
+      "viewport": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {
+          "bearing": -4.952916738791771,
+          "latitude": 37.78926922909199,
+          "longitude": -122.42613341901688,
+          "pitch": 4.750411100577438,
+          "zoom": 12.729132798697304
+        },
+        "source": "Map section"
+      },
+      "point_unit": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "square_m",
+        "source": "Point Size section"
+      },
+      "multiplier": {
+        "data_type": "number | string",
+        "required": false,
+        "sample_data": 10,
+        "source": "Point Size section"
+      },
+      "legend_position": {
+        "data_type": "string | null",
+        "required": false,
+        "sample_data": "tr",
+        "source": "Point Color section"
+      },
+      "legend_format": {
+        "data_type": "string | null",
+        "required": false,
+        "sample_data": null,
+        "source": "Point Color section"
+      },
+      "color_scheme_type": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "fixed_color",
+        "source": "Point Color section"
+      },
+      "color_picker": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {
+          "r": 205,
+          "g": 0,
+          "b": 3,
+          "a": 0.82
+        },
+        "source": "Point Color section"
+      },
+      "dimension": {
+        "data_type": "string | object | null",
+        "required": false,
+        "sample_data": "category",
+        "source": "Point Color section"
+      },
+      "color_scheme": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "bnbColors",
+        "source": "Point Color section"
+      },
+      "deafult_breakpoint_color": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {
+          "r": 158,
+          "g": 158,
+          "b": 158,
+          "a": 1
+        },
+        "source": "Point Color section"
+      },
+      "color_breakpoints": {
+        "data_type": "array[ColorBreakpointType]",
+        "required": false,
+        "sample_data": [
+          {
+            "minValue": 0,
+            "maxValue": 100,
+            "color": {
+              "r": 255,
+              "g": 0,
+              "b": 0,
+              "a": 1
+            }
+          }
+        ],
+        "source": "Point Color section"
+      },
+      "js_columns": {
+        "data_type": "array[string | object]",
+        "required": false,
+        "sample_data": [],
+        "source": "Advanced section"
+      },
+      "js_data_mutator": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "data => data",
+        "source": "Advanced section"
+      },
+      "js_tooltip": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "o => `<div>${o.object.metric}</div>`",
+        "source": "Advanced section"
+      },
+      "js_onclick_href": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "o => `https://example.com/?lon=${o.object.position[0]}&lat=${o.object.position[1]}`",
+        "source": "Advanced section"
+      },
+      "granularity_sqla": {
+        "data_type": "string | null",
+        "required": false,
+        "sample_data": "dttm",
+        "source": "storybook payload + BaseViz hidden time form_data fields",
+        "notes": "当前 controlPanel 没有正式时间 section，且 `onInit` 还会把 `granularity` 清空。"
+      },
+      "time_grain_sqla": {
+        "data_type": "string | null",
+        "required": false,
+        "sample_data": null,
+        "source": "controlOverrides.time_grain_sqla + DeckScatterViz.query_obj()"
+      },
+      "time_range": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "Last 30 days",
+        "source": "storybook payload + BaseViz hidden time form_data fields"
+      },
+      "slice_id": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 0,
+        "source": "datasourceAndVizType hidden control",
+        "notes": "新建图表时通常省略；编辑已存在图表时由服务端或上层调用方提供。"
+      },
+      "cache_timeout": {
+        "data_type": "integer | null",
+        "required": false,
+        "sample_data": null,
+        "source": "datasourceAndVizType hidden control"
+      },
+      "url_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "QueryFormData"
+      },
+      "custom_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "QueryFormData"
+      },
+      "extra_form_data": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "utils.merge_extra_form_data()",
+        "notes": "虽然不属于 deck_scatter controlPanel 正式字段，但 legacy explore_json 路径会消费它。"
+      }
+    },
+    "minimal_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "deck_scatter",
+      "spatial": {
+        "type": "latlong",
+        "lonCol": "LON",
+        "latCol": "LAT"
+      },
+      "adhoc_filters": [],
+      "point_radius_fixed": {
+        "type": "fix",
+        "value": 1000
+      },
+      "point_unit": "square_m",
+      "min_radius": 2,
+      "max_radius": 250,
+      "mapbox_style": "mapbox://styles/mapbox/light-v9",
+      "autozoom": true,
+      "viewport": {
+        "longitude": 6.85236157047845,
+        "latitude": 31.222656842808707,
+        "zoom": 1,
+        "bearing": 0,
+        "pitch": 0
+      },
+      "color_scheme_type": "fixed_color",
+      "color_picker": {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      }
+    },
+    "recommended_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "deck_scatter",
+      "spatial": {
+        "type": "latlong",
+        "lonCol": "LON",
+        "latCol": "LAT"
+      },
+      "row_limit": 5000,
+      "filter_nulls": true,
+      "adhoc_filters": [],
+      "mapbox_style": "mapbox://styles/mapbox/light-v9",
+      "autozoom": true,
+      "viewport": {
+        "longitude": 6.85236157047845,
+        "latitude": 31.222656842808707,
+        "zoom": 1,
+        "bearing": 0,
+        "pitch": 0
+      },
+      "point_radius_fixed": {
+        "type": "metric",
+        "value": "count"
+      },
+      "point_unit": "square_m",
+      "min_radius": 2,
+      "max_radius": 250,
+      "multiplier": 10,
+      "legend_position": "tr",
+      "legend_format": null,
+      "color_scheme_type": "fixed_color",
+      "color_picker": {
+        "r": 205,
+        "g": 0,
+        "b": 3,
+        "a": 0.82
+      },
+      "dimension": null,
+      "color_scheme": "bnbColors",
+      "deafult_breakpoint_color": {
+        "r": 158,
+        "g": 158,
+        "b": 158,
+        "a": 1
+      },
+      "color_breakpoints": [],
+      "js_columns": [],
+      "js_data_mutator": "",
+      "js_tooltip": "",
+      "js_onclick_href": ""
+    },
+    "conditional_blocks": {
+      "metric_radius_mode": {
+        "condition": "需要按指标驱动点大小并在 tooltip 中显示 metric 值时",
+        "fields": {
+          "point_radius_fixed": {
+            "type": "metric",
+            "value": "count"
+          }
+        }
+      },
+      "fixed_radius_mode": {
+        "condition": "需要固定大小散点时",
+        "fields": {
+          "point_radius_fixed": {
+            "type": "fix",
+            "value": 1000
+          }
+        },
+        "notes": "此时后端不需要 query metrics，`feature.metric` 通常为 null。"
+      },
+      "categorical_palette_mode": {
+        "condition": "需要按维度做分类着色时",
+        "fields": {
+          "color_scheme_type": "categorical_palette",
+          "dimension": "category",
+          "color_scheme": "bnbColors",
+          "legend_position": "tr"
+        },
+        "notes": "如果 `dimension` 为空，scatter 的 categorical 模式会回退成 `color_picker` 固定色。"
+      },
+      "color_breakpoints_mode": {
+        "condition": "需要按 metric 断点着色时",
+        "fields": {
+          "point_radius_fixed": {
+            "type": "metric",
+            "value": "count"
+          },
+          "color_scheme_type": "color_breakpoints",
+          "deafult_breakpoint_color": {
+            "r": 158,
+            "g": 158,
+            "b": 158,
+            "a": 1
+          },
+          "color_breakpoints": [
+            {
+              "minValue": 0,
+              "maxValue": 100,
+              "color": {
+                "r": 255,
+                "g": 0,
+                "b": 0,
+                "a": 1
+              }
+            }
+          ]
+        },
+        "notes": "该模式依赖 `feature.metric`，因此只有 `point_radius_fixed.type='metric'` 时才有意义。"
+      },
+      "alternate_spatial_encodings": {
+        "condition": "空间列不是分开的经纬度列时",
+        "fields": {
+          "spatial": {
+            "type": "delimited",
+            "lonlatCol": "lonlat",
+            "delimiter": ",",
+            "reverseCheckbox": false
+          }
+        },
+        "notes": "若数据是 geohash，则把 `type` 改成 `geohash` 并提供 `geohashCol`。"
+      },
+      "hidden_timeseries_mode": {
+        "condition": "虽然当前 UI 会清空时间字段，但如果上层调用方强制沿用隐藏时间查询路径时",
+        "fields": {
+          "granularity_sqla": "dttm",
+          "time_grain_sqla": "P1D",
+          "time_range": "Last 30 days"
+        },
+        "notes": "这不是当前 controlPanel 正式字段；仅在你明确知道数据集有时间列时使用。"
+      }
+    },
+    "runtime_only_or_non_template_fields": {
+      "runtime_props_generated_by_transformProps": [
+        {
+          "field_name": "payload",
+          "reason": "这是运行时从 `queriesData[0]` 注入的对象，不是 API root form_data 字段。"
+        },
+        {
+          "field_name": "formData",
+          "reason": "这是 runtime 对 `rawFormData` 的整体透传容器，不是额外的 API root 字段。"
+        },
+        {
+          "field_name": "viewport.width",
+          "reason": "运行时由图表尺寸补入，不需要写到 root form_data。"
+        },
+        {
+          "field_name": "viewport.height",
+          "reason": "运行时由图表尺寸补入，不需要写到 root form_data。"
+        },
+        {
+          "field_name": "emitCrossFilters",
+          "reason": "这是 ChartProps/hook 层运行时能力，不是 API root 字段。"
+        },
+        {
+          "field_name": "filterState",
+          "reason": "这是 runtime 交互状态，不是 API root 字段。"
+        }
+      ],
+      "backend_response_only_fields": [
+        {
+          "field_name": "queriesData[0].data.features[*].metric",
+          "reason": "这是后端 `DeckScatterViz.get_properties()` 生成的运行时字段，不是 root form_data 字段。"
+        },
+        {
+          "field_name": "queriesData[0].data.features[*].radius",
+          "reason": "这是后端返回的原始半径值，前端还会再结合 `point_unit` / `multiplier` 转换；不是 root form_data 字段。"
+        },
+        {
+          "field_name": "queriesData[0].data.features[*].cat_color",
+          "reason": "这是后端根据 `dimension` 写入的分类值，不是 root form_data 字段。"
+        },
+        {
+          "field_name": "queriesData[0].data.features[*].position",
+          "reason": "这是后端根据 `spatial` 解析出的坐标对，不是 root form_data 字段。"
+        },
+        {
+          "field_name": "queriesData[0].data.features[*].color",
+          "reason": "这是 `CategoricalDeckGLContainer` 在前端运行时补入的绘图颜色，不是 root form_data 字段。"
+        },
+        {
+          "field_name": "queriesData[0].data.mapboxApiKey",
+          "reason": "这是后端 payload 附带的运行时地图密钥，不是 root form_data 字段。"
+        }
+      ],
+      "legacy_hidden_or_non_canonical_fields": [
+        {
+          "field_name": "size",
+          "reason": "storybook payload 中仍出现它，但当前 `DeckScatterViz` 正式逻辑只看 `point_radius_fixed`。不要把 `size` 当成当前 scatter 的 API 创建字段。"
+        },
+        {
+          "field_name": "groupby",
+          "reason": "旧保存态里可能出现空数组，但当前 scatter controlPanel 没有正式暴露它。"
+        },
+        {
+          "field_name": "granularity",
+          "reason": "`onInit` 会把它置空，当前 controlPanel 没有正式暴露它。"
+        },
+        {
+          "field_name": "label_colors",
+          "reason": "storybook formData 中出现过，但当前 scatter 颜色逻辑不依赖它。"
+        },
+        {
+          "field_name": "filters",
+          "reason": "这不是当前 controlPanel 正式字段。它可能在旧保存态或 legacy 兼容处理中出现，但当前创建模板应优先使用 `adhoc_filters`。"
+        },
+        {
+          "field_name": "where",
+          "reason": "legacy 兼容字段，不是当前 deck_scatter controlPanel 正式字段。"
+        },
+        {
+          "field_name": "having",
+          "reason": "legacy 兼容字段，不是当前 deck_scatter controlPanel 正式字段。"
+        },
+        {
+          "field_name": "payload.form_data",
+          "reason": "这是 legacy `/superset/explore_json/` 请求的外层包裹字段，不是图表保存态内部的 root form_data 字段。"
+        }
+      ]
+    },
+    "api_usage_guidance": {
+      "high_confidence_required_fields": [
+        "datasource",
+        "viz_type",
+        "spatial",
+        "point_radius_fixed",
+        "min_radius",
+        "max_radius"
+      ],
+      "conditionally_required_fields": {
+        "dimension": "当 `color_scheme_type='categorical_palette'` 且确实需要分类着色时",
+        "color_scheme": "当 `color_scheme_type='categorical_palette'` 时",
+        "color_breakpoints": "当 `color_scheme_type='color_breakpoints'` 时",
+        "deafult_breakpoint_color": "当 `color_scheme_type='color_breakpoints'` 且想自定义断点未命中值的回退颜色时"
+      },
+      "recommended_always_set": [
+        "adhoc_filters",
+        "filter_nulls",
+        "row_limit",
+        "mapbox_style",
+        "autozoom",
+        "viewport",
+        "point_unit",
+        "multiplier",
+        "legend_position",
+        "color_scheme_type",
+        "color_picker"
+      ],
+      "api_field_examples": [
+        "spatial",
+        "point_radius_fixed",
+        "point_unit",
+        "min_radius",
+        "max_radius",
+        "dimension",
+        "color_scheme_type",
+        "color_scheme",
+        "color_breakpoints"
+      ],
+      "avoid_confusion": [
+        "不要把 deck_scatter 当成标准 chart data API 图表去套 `/api/v1/chart/data` 的 `query_context` 模板；当前图真实入口是 legacy `/superset/explore_json/`。",
+        "`point_radius_fixed` 才是 scatter 当前正式的点大小字段，不要再用旧的 `size`。",
+        "`spatial` 这里传的是空间列配置对象，不是坐标数组本身。",
+        "`deafult_breakpoint_color` 的保存态键名必须保持源码拼写；即便当前运行时存在 `default_breakpoint_color` 的命名错位，也不要擅自改 root form_data 字段名。",
+        "如果你把 `color_scheme_type` 设成 `categorical_palette`，又不传 `dimension`，运行时会退回固定色而不是报错。",
+        "如果你把 `color_scheme_type` 设成 `color_breakpoints`，但 `point_radius_fixed.type` 仍是 `fix`，那么断点配色通常不会得到有效 `metric` 输入。"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "deck_scatter",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/deck_scatter-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/deck_scatter-form-data-schema.json",
+      "control-schema": "form-data-schema/deck_scatter-schema.json"
+    }
+  }
+}

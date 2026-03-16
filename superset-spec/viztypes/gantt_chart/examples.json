@@ -1,0 +1,285 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "gantt_chart",
+  "display_name": "Gantt Chart",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      []
+    ],
+    "color_scheme": [
+      "supersetColors"
+    ],
+    "end_time": [
+      "end_time"
+    ],
+    "legendMargin": [
+      0
+    ],
+    "legendOrientation": [
+      "top"
+    ],
+    "legendType": [
+      "scroll"
+    ],
+    "order_by_cols": [
+      [
+        "[\"start_time\",true]"
+      ]
+    ],
+    "row_limit": [
+      10000
+    ],
+    "series": [
+      "owner"
+    ],
+    "show_extra_controls": [
+      false
+    ],
+    "show_legend": [
+      true
+    ],
+    "start_time": [
+      "start_time"
+    ],
+    "subcategories": [
+      false
+    ],
+    "tooltipTimeFormat": [
+      "smart_date"
+    ],
+    "tooltipValuesFormat": [
+      "SMART_NUMBER"
+    ],
+    "tooltip_columns": [
+      [
+        "status"
+      ]
+    ],
+    "tooltip_metrics": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "duration_sec"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(duration_sec)"
+        }
+      ]
+    ],
+    "x_axis_time_bounds": [
+      [
+        null,
+        "19:00:00"
+      ]
+    ],
+    "x_axis_time_format": [
+      "smart_date"
+    ],
+    "x_axis_title": [
+      "Time"
+    ],
+    "x_axis_title_margin": [
+      15
+    ],
+    "y_axis": [
+      "task_name"
+    ],
+    "y_axis_title": [
+      "Task"
+    ],
+    "y_axis_title_margin": [
+      30
+    ],
+    "zoomable": [
+      false
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "gantt_chart",
+      "start_time": "<start_time_column>",
+      "end_time": "<end_time_column>",
+      "y_axis": "<category_column>",
+      "tooltip_metrics": [],
+      "tooltip_columns": [],
+      "adhoc_filters": [],
+      "order_by_cols": [],
+      "row_limit": 10000
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "gantt_chart",
+      "start_time": "<start_time_column>",
+      "end_time": "<end_time_column>",
+      "y_axis": "<category_column>",
+      "series": "<series_dimension>",
+      "subcategories": false,
+      "tooltip_metrics": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<duration_metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<duration_metric_column>)"
+        }
+      ],
+      "tooltip_columns": [
+        "<status_column>"
+      ],
+      "adhoc_filters": [],
+      "order_by_cols": [
+        "[\"<start_time_column>\",true]"
+      ],
+      "row_limit": 10000,
+      "color_scheme": "supersetColors",
+      "show_legend": true,
+      "legendType": "scroll",
+      "legendOrientation": "top",
+      "legendMargin": null,
+      "zoomable": true,
+      "show_extra_controls": false,
+      "x_axis_time_bounds": [
+        null,
+        "19:00:00"
+      ],
+      "x_axis_time_format": "smart_date",
+      "tooltipTimeFormat": "smart_date",
+      "tooltipValuesFormat": "SMART_NUMBER",
+      "x_axis_title": "Time",
+      "x_axis_title_margin": 15,
+      "y_axis_title": "Task",
+      "y_axis_title_margin": 30
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "gantt_chart",
+      "start_time": "<copied_from_saved_chart>",
+      "end_time": "<copied_from_saved_chart>",
+      "y_axis": "<copied_from_saved_chart>",
+      "series": "<copied_from_saved_chart_if_present>",
+      "tooltip_metrics": "<copied_from_saved_chart_if_present>",
+      "tooltip_columns": "<copied_from_saved_chart_if_present>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "order_by_cols": "<copied_from_saved_chart_if_present>",
+      "row_limit": "<copied_from_saved_chart_if_present>",
+      "subcategories": "<copied_from_saved_chart_if_present>",
+      "color_scheme": "<copied_from_saved_chart_if_present>",
+      "show_legend": "<copied_from_saved_chart_if_present>",
+      "legendType": "<copied_from_saved_chart_if_present>",
+      "legendOrientation": "<copied_from_saved_chart_if_present>",
+      "legendMargin": "<copied_from_saved_chart_if_present>",
+      "zoomable": "<copied_from_saved_chart_if_present>",
+      "show_extra_controls": "<copied_from_saved_chart_if_present>",
+      "x_axis_time_bounds": "<copied_from_saved_chart_if_present>",
+      "x_axis_time_format": "<copied_from_saved_chart_if_present>",
+      "tooltipTimeFormat": "<copied_from_saved_chart_if_present>",
+      "tooltipValuesFormat": "<copied_from_saved_chart_if_present>",
+      "x_axis_title": "<copied_from_saved_chart_if_present>",
+      "x_axis_title_margin": "<copied_from_saved_chart_if_present>",
+      "y_axis_title": "<copied_from_saved_chart_if_present>",
+      "y_axis_title_margin": "<copied_from_saved_chart_if_present>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "task_name",
+            "op": "IN",
+            "val": [
+              "Deploy"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "owner",
+            "operator": "IN",
+            "comparator": [
+              "Ops"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_gantt": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "task_name",
+            "op": "IN",
+            "val": [
+              "Deploy"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters；后端会把它们转换为额外 adhoc filters 并并入实际查询。",
+        "source": "superset/constants.py + superset/utils/core.py + frontend QueryFormData.ts"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_gantt": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "owner",
+            "operator": "IN",
+            "comparator": [
+              "Ops"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会标记为 `isExtra` 并并入查询。",
+        "source": "superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_gantt": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "可以传递非标准附加数据；Gantt 默认 buildQuery / transformProps 不直接消费它。",
+        "source": "frontend QueryFormData.ts"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_gantt": false,
+        "recommended": false,
+        "sample_data": "Last 7 days",
+        "effect": "这是通用 extra_form_data override 字段，但 Gantt 当前 controlPanel 不以标准时间过滤控件为主，guest embedding 不建议依赖它。",
+        "source": "frontend query/constants.ts + processExtraFormData.ts",
+        "status": "低相关，不建议作为 Gantt guest embedding 的主要动态入口"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "gantt_chart",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/gantt_chart-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/gantt_chart-form-data-schema.json",
+      "control-schema": "form-data-schema/gantt_chart-schema.json"
+    }
+  }
+}

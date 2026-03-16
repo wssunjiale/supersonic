@@ -1,0 +1,445 @@
+{
+  "viz_type": "heatmap_v2",
+  "display_name": "Heatmap",
+  "purpose": "用于调用 API 创建或保存 Heatmap 图表时填写的 form_data 模板",
+  "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/heatmap_v2-schema.json",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Heatmap/controlPanel.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Heatmap/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Heatmap/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Heatmap/types.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/controls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/defaults.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/mixins.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/operators/rankOperator.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/getXAxis.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractQueryFields.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryObject.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/standardizedFormData.ts"
+  ],
+  "notes": [
+    "直接构造 Heatmap 的 API form_data 时，高置信必填根字段是 `datasource`、`viz_type`、`x_axis`、`groupby`、`metric`。",
+    "Heatmap 的 canonical 查询指标字段是单值 `metric`，不是数组 `metrics`；真正发往 query object 时，`extractQueryFields()` 才会把它归并到 `metrics`。",
+    "`buildQuery.ts` 会显式生成 `columns = [x_axis, groupby]`，并总是追加 `rank` post_processing，因此这个图没有“无 post processing”的极简查询路径。",
+    "若 X 轴是时间字段，`time_grain_sqla`、`time_range`、可选的 `granularity_sqla` 仍然能参与通用时间编译链；但直接调 API 时，最稳妥的写法仍是显式传 `x_axis`。",
+    "`normalized=true` 只改变颜色映射读取 `rank` 还是原始 metric，不会取消底层 metric 查询。"
+  ],
+  "naming_and_pipeline": {
+    "control_to_api_form_data": "`getFormDataFromControls()` 会按控件名原样写 root form_data。",
+    "api_form_data_to_query_context": "`buildQuery.ts` 先调用通用 `buildQueryContext()`，再用 Heatmap 自己的 `columns`、`orderby`、`post_processing` 覆盖 `baseQueryObject`。",
+    "api_form_data_to_runtime_props": "进入前端渲染阶段后，Heatmap 运行时主要读取 standardized camelCase 别名，例如 `sort_x_axis -> sortXAxis`、`normalize_across -> normalizeAcross`、`show_legend -> showLegend`。"
+  },
+  "global_required_fields": {
+    "datasource": {
+      "data_type": "string",
+      "required": true,
+      "sample_data": "<dataset_id>__table",
+      "source": "datasourceAndVizType section"
+    },
+    "viz_type": {
+      "data_type": "string",
+      "required": true,
+      "fixed_value": "heatmap_v2",
+      "source": "plugin metadata"
+    },
+    "x_axis": {
+      "data_type": "string | object",
+      "required": true,
+      "sample_data": "order_date",
+      "source": "shared `x_axis` control + Heatmap controlPanel"
+    },
+    "groupby": {
+      "data_type": "string | object",
+      "required": true,
+      "sample_data": "region",
+      "source": "Heatmap overrides shared `groupby` to single-value `Y-Axis`"
+    },
+    "metric": {
+      "data_type": "string | object",
+      "required": true,
+      "sample_data": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "sales"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(sales)"
+      },
+      "source": "shared `metric` control"
+    }
+  },
+  "conditional_required_rules": {
+    "direct_api_creation": {
+      "when": "直接从外部程序构造 Heatmap 的 root form_data 时",
+      "ui_validator_rule": "`x_axis`、`groupby`、`metric` 都带 `validateNonEmpty`。",
+      "practical_api_rule": "优先显式传 `x_axis`、`groupby`、`metric`；不要只依赖 `granularity_sqla` 的 fallback。"
+    },
+    "temporal_x_axis": {
+      "when": "X 轴是时间字段，且你需要时间粒度或时间过滤时",
+      "ui_validator_rule": "`time_grain_sqla` 由共享时间控件管理；`time_range` 由通用时间链路管理。",
+      "practical_api_rule": "建议至少传 `x_axis`，需要时间粒度时再补 `time_grain_sqla`；若你手上已有保存态表单，也可以保留 `granularity_sqla` 与 `time_range`。"
+    },
+    "explicit_axis_sorting": {
+      "when": "需要强制指定 X/Y 轴排序时",
+      "ui_validator_rule": "`sort_x_axis` / `sort_y_axis` 可空，不选时不生成对应 `orderby`。",
+      "practical_api_rule": "排序值必须来自 `alpha_asc` / `alpha_desc` / `value_asc` / `value_desc`。"
+    },
+    "normalized_color_scale": {
+      "when": "需要按排名做颜色归一化时",
+      "ui_validator_rule": "`normalized` 与 `normalize_across` 都是可选项。",
+      "practical_api_rule": "若打开 `normalized=true`，建议同时显式写出 `normalize_across`，避免调用方默认假定错误。"
+    }
+  },
+  "global_optional_fields": {
+    "sort_x_axis": {
+      "data_type": "string | null",
+      "required": false,
+      "sample_data": "alpha_asc",
+      "source": "Heatmap controlPanel custom select"
+    },
+    "sort_y_axis": {
+      "data_type": "string | null",
+      "required": false,
+      "sample_data": "value_desc",
+      "source": "Heatmap controlPanel custom select"
+    },
+    "normalize_across": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "heatmap",
+      "source": "Heatmap controlPanel custom select"
+    },
+    "adhoc_filters": {
+      "data_type": "array[object]",
+      "required": false,
+      "sample_data": [],
+      "source": "shared Filters control"
+    },
+    "row_limit": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 10000,
+      "source": "shared Row limit control"
+    },
+    "granularity_sqla": {
+      "data_type": "string | object | null",
+      "required": false,
+      "sample_data": "ds",
+      "source": "shared time control; Heatmap build chain仍可消费"
+    },
+    "time_grain_sqla": {
+      "data_type": "string | null",
+      "required": false,
+      "sample_data": "P1D",
+      "source": "shared time grain control"
+    },
+    "time_range": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "No filter",
+      "source": "shared time range control"
+    },
+    "legend_type": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "continuous",
+      "source": "Heatmap Chart Options"
+    },
+    "linear_color_scheme": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "<sequential_scheme_key>",
+      "source": "shared Linear Color Scheme control"
+    },
+    "border_color": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 1
+      },
+      "source": "Heatmap Chart Options"
+    },
+    "border_width": {
+      "data_type": "number",
+      "required": false,
+      "sample_data": 0,
+      "source": "Heatmap Chart Options"
+    },
+    "xscale_interval": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": -1,
+      "source": "Heatmap Chart Options"
+    },
+    "yscale_interval": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": -1,
+      "source": "Heatmap Chart Options"
+    },
+    "left_margin": {
+      "data_type": "string | number",
+      "required": false,
+      "sample_data": "auto",
+      "source": "Heatmap Chart Options"
+    },
+    "bottom_margin": {
+      "data_type": "string | number",
+      "required": false,
+      "sample_data": "auto",
+      "source": "Heatmap Chart Options"
+    },
+    "value_bounds": {
+      "data_type": "array[number | null, number | null]",
+      "required": false,
+      "sample_data": [
+        null,
+        null
+      ],
+      "source": "Heatmap Chart Options"
+    },
+    "y_axis_format": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "SMART_NUMBER",
+      "source": "shared Y axis format control, label overridden to Value Format"
+    },
+    "x_axis_time_format": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "smart_date",
+      "source": "shared Time format control"
+    },
+    "xAxisLabelRotation": {
+      "data_type": "number",
+      "required": false,
+      "sample_data": 0,
+      "source": "plugin-chart-echarts shared control"
+    },
+    "currency_format": {
+      "data_type": "object | null",
+      "required": false,
+      "sample_data": {
+        "symbol": "USD",
+        "symbolPosition": "prefix"
+      },
+      "source": "shared Currency format control"
+    },
+    "show_legend": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": true,
+      "source": "Heatmap Chart Options"
+    },
+    "show_percentage": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": true,
+      "source": "Heatmap Chart Options"
+    },
+    "show_values": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": false,
+      "source": "Heatmap Chart Options"
+    },
+    "normalized": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": false,
+      "source": "Heatmap Chart Options"
+    },
+    "slice_id": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 0,
+      "source": "datasourceAndVizType hidden control",
+      "notes": "新建图表时通常省略；编辑已存在图表时由服务端或上层调用方提供。"
+    },
+    "cache_timeout": {
+      "data_type": "integer | null",
+      "required": false,
+      "sample_data": null,
+      "source": "datasourceAndVizType hidden control"
+    },
+    "url_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "datasourceAndVizType hidden control"
+    },
+    "custom_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "datasourceAndVizType hidden control"
+    }
+  },
+  "minimal_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "heatmap_v2",
+    "x_axis": "<x_axis_column>",
+    "groupby": "<y_axis_column>",
+    "metric": {
+      "expressionType": "SIMPLE",
+      "column": {
+        "column_name": "<metric_column>"
+      },
+      "aggregate": "SUM",
+      "label": "SUM(<metric_column>)"
+    }
+  },
+  "recommended_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "heatmap_v2",
+    "x_axis": "order_date",
+    "groupby": "region",
+    "metric": {
+      "expressionType": "SIMPLE",
+      "column": {
+        "column_name": "sales"
+      },
+      "aggregate": "SUM",
+      "label": "SUM(sales)"
+    },
+    "row_limit": 10000,
+    "time_range": "No filter",
+    "adhoc_filters": [],
+    "normalize_across": "heatmap",
+    "legend_type": "continuous",
+    "linear_color_scheme": "<sequential_scheme_key>",
+    "border_color": {
+      "r": 0,
+      "g": 0,
+      "b": 0,
+      "a": 1
+    },
+    "border_width": 0,
+    "xscale_interval": -1,
+    "yscale_interval": -1,
+    "left_margin": "auto",
+    "bottom_margin": "auto",
+    "value_bounds": [
+      null,
+      null
+    ],
+    "y_axis_format": "SMART_NUMBER",
+    "x_axis_time_format": "smart_date",
+    "xAxisLabelRotation": 0,
+    "show_legend": true,
+    "show_percentage": true,
+    "show_values": false,
+    "normalized": false
+  },
+  "conditional_blocks": {
+    "temporal_x_axis": {
+      "condition": "X 轴是时间字段，并且你需要时间粒度或时间过滤",
+      "fields": {
+        "x_axis": "ds",
+        "granularity_sqla": "ds",
+        "time_grain_sqla": "P1D",
+        "time_range": "Last 30 days",
+        "x_axis_time_format": "smart_date"
+      },
+      "notes": "直接 API 创建时建议让 `x_axis` 与 `granularity_sqla` 保持一致，避免仅依赖 fallback。"
+    },
+    "explicit_axis_sorting": {
+      "condition": "需要固定 X/Y 轴排序规则",
+      "fields": {
+        "sort_x_axis": "alpha_asc",
+        "sort_y_axis": "value_desc"
+      }
+    },
+    "normalized_color_scale": {
+      "condition": "需要按排名而非原始值着色",
+      "fields": {
+        "normalize_across": "x",
+        "normalized": true
+      },
+      "notes": "此时 tooltip 百分比分母按列汇总，颜色列读取 backend post-processing 输出的 `rank`。"
+    },
+    "hard_value_bounds": {
+      "condition": "需要锁定颜色刻度上下界",
+      "fields": {
+        "value_bounds": [
+          0,
+          100
+        ]
+      }
+    },
+    "show_cell_values": {
+      "condition": "需要在单元格内部显示数值",
+      "fields": {
+        "show_values": true,
+        "y_axis_format": "SMART_NUMBER"
+      }
+    }
+  },
+  "runtime_only_or_non_template_fields": {
+    "query_context_only": [
+      {
+        "field_name": "query_context.queries[*].columns",
+        "reason": "由 `buildQuery.ts` 用 `x_axis + groupby` 编译得到。"
+      },
+      {
+        "field_name": "query_context.queries[*].metrics",
+        "reason": "由 root `metric` 经 `extractQueryFields()` 别名归并得到。"
+      },
+      {
+        "field_name": "query_context.queries[*].orderby",
+        "reason": "由 `sort_x_axis` / `sort_y_axis` 编译得到。"
+      },
+      {
+        "field_name": "query_context.queries[*].post_processing",
+        "reason": "Heatmap 会固定追加 `rank` operator，不是 root form_data 直接填写字段。"
+      }
+    ],
+    "runtime_aliases": [
+      {
+        "field_name": "xAxis / sortXAxis / sortYAxis / normalizeAcross / legendType / linearColorScheme / leftMargin / bottomMargin / borderColor / borderWidth / showLegend / showPercentage / showValues / valueBounds / yAxisFormat / xAxisTimeFormat / currencyFormat",
+        "reason": "这些是 standardized runtime props；创建 API form_data 时应使用 control name 版本。"
+      }
+    ],
+    "noncanonical_or_carryover_fields": [
+      {
+        "field_name": "metrics",
+        "reason": "Heatmap 控件定义的 canonical 根字段是单值 `metric`，不是 `metrics`。"
+      },
+      {
+        "field_name": "columns / orderby",
+        "reason": "这两个字段属于 query 编译结果，不是 Heatmap controlPanel 直接暴露的 root 字段。"
+      }
+    ]
+  },
+  "api_usage_guidance": {
+    "high_confidence_required_fields": [
+      "datasource",
+      "viz_type",
+      "x_axis",
+      "groupby",
+      "metric"
+    ],
+    "recommended_always_set": [
+      "row_limit",
+      "adhoc_filters",
+      "normalize_across",
+      "legend_type",
+      "show_legend",
+      "show_percentage",
+      "show_values",
+      "normalized"
+    ],
+    "important_caveats": [
+      "不要把 Heatmap 的根指标字段写成 `metrics` 作为首选写法；canonical 根字段是 `metric`。",
+      "不要把 runtime camelCase 字段名直接当成 API root form_data 键，例如 `normalizeAcross`、`legendType`、`showLegend`。",
+      "若你需要时间粒度，请优先显式传 `x_axis`，不要只传 `granularity_sqla` 指望前端 fallback。",
+      "若 `value_bounds` 留空，颜色上下界会在 `transformProps.ts` 里根据数据动态推导。"
+    ]
+  }
+}

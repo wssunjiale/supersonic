@@ -1,0 +1,361 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "rose",
+  "display_name": "Nightingale Rose Chart",
+  "selection_summary": {
+    "category": "composition",
+    "tags": [
+      "rose",
+      "polar",
+      "composition",
+      "categorical"
+    ],
+    "description_zh": "Rose Chart (Polar Bar) displays categorical data on a polar coordinate system, with each category as a spoke and bar length/area representing metric values.",
+    "visual_shape_zh": "玫瑰图（极坐标柱状型）",
+    "use_cases_zh": [
+      "类别数值的极坐标对比（如各产品销售额、各区域用户数）",
+      "周期性类别数据展示",
+      "视觉化的类别占比/数值对比"
+    ],
+    "required_slots": [
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "Query",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+          "聚合指标，用于计算每个类别的数值（柱长/面积依据）。"
+        ]
+      }
+    ],
+    "optional_slots": [
+      {
+        "field_name": "adhoc_filters",
+        "required": false,
+        "slot_kind": "filter_list",
+        "accepted_dataset_roles": [
+          "filter_context"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [],
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "字段标签为 Filters。legacy explore_json 路径会先把 legacy filters 转成 adhoc_filters，再继续处理 extra filters / extra_form_data。"
+        ]
+      },
+      {
+        "field_name": "granularity_sqla",
+        "required": false,
+        "slot_kind": "time_column",
+        "accepted_dataset_roles": [
+          "time_dimension"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<time_column>",
+        "source_categories": [
+          "Time"
+        ],
+        "embedding_modes": [
+          "extra_form_data.override"
+        ],
+        "descriptions": [
+          "The time column for the visualization. Note that you can define arbitrary expression that return a DATETIME column in the table. Also note that the filter below is applied against this column or expression"
+        ]
+      },
+      {
+        "field_name": "groupby",
+        "required": false,
+        "slot_kind": "dimension_list",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [
+          "<dimension_column>"
+        ],
+        "source_categories": [
+          "Query",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Dimensions contain qualitative values such as names, dates, or geographical data. Use dimensions to categorize, segment, and reveal the details in your data. Dimensions affect the level of detail in the view.",
+          "分类维度字段，用于定义玫瑰图的辐条类别。"
+        ]
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "required": false,
+        "slot_kind": "time_grain",
+        "accepted_dataset_roles": [
+          "time_grain"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "P1D",
+        "source_categories": [
+          "Time"
+        ],
+        "embedding_modes": [
+          "extra_form_data.override"
+        ],
+        "descriptions": [
+          "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart."
+        ]
+      }
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "metric",
+      "saved_metric"
+    ],
+    "optional_dataset_roles": [
+      "category_dimension",
+      "dimension",
+      "filter_context",
+      "time_dimension",
+      "time_grain"
+    ],
+    "dataset_role_inventory": {
+      "adhoc_metric": [
+        "metrics"
+      ],
+      "category_dimension": [
+        "groupby"
+      ],
+      "dimension": [
+        "groupby"
+      ],
+      "filter_context": [
+        "adhoc_filters"
+      ],
+      "metric": [
+        "metrics"
+      ],
+      "saved_metric": [
+        "metrics"
+      ],
+      "time_dimension": [
+        "granularity_sqla"
+      ],
+      "time_grain": [
+        "time_grain_sqla"
+      ]
+    },
+    "non_binding_control_names": [
+      "color_scheme",
+      "comparison_type",
+      "contribution",
+      "date_time_format",
+      "granularity",
+      "limit",
+      "min_periods",
+      "number_format",
+      "order_desc",
+      "resample_method",
+      "resample_rule",
+      "rich_tooltip",
+      "rolling_periods",
+      "rolling_type",
+      "rose_area_proportion",
+      "row_limit",
+      "time_compare",
+      "time_range",
+      "timeseries_limit_metric"
+    ],
+    "embedding_runtime_field_names": [
+      "adhoc_filters",
+      "custom_form_data",
+      "filters",
+      "granularity",
+      "granularity_sqla",
+      "relative_end",
+      "relative_start",
+      "time_compare",
+      "time_grain_sqla",
+      "time_range"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "granularity_sqla",
+      "groupby",
+      "metrics",
+      "order_desc",
+      "time_grain_sqla",
+      "time_range",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "color_scheme",
+      "comparison_type",
+      "contribution",
+      "datasource",
+      "date_time_format",
+      "granularity",
+      "granularity_sqla",
+      "groupby",
+      "limit",
+      "metrics",
+      "min_periods",
+      "number_format",
+      "order_desc",
+      "resample_method",
+      "resample_rule",
+      "rich_tooltip",
+      "rolling_periods",
+      "rolling_type",
+      "rose_area_proportion",
+      "row_limit",
+      "time_compare",
+      "time_grain_sqla",
+      "time_range",
+      "timeseries_limit_metric",
+      "viz_type"
+    ],
+    "structural_flags": {
+      "time_series": true,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": false,
+      "flow_like": false,
+      "distribution_like": false,
+      "supports_breakdown": true,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": false,
+      "needs_dimension": false
+    },
+    "selection_hints": [
+      "优先用于趋势、演化、时间对比类问题。",
+      "至少需要 1 个可聚合指标字段。",
+      "支持按维度拆分多序列或子组。",
+      "可结合时间粒度控制趋势聚合窗口。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：类别数值的极坐标对比（如各产品销售额、各区域用户数）；周期性类别数据展示；视觉化的类别占比/数值对比"
+    ]
+  },
+  "selection_prompt_card": {
+    "viz_type": "rose",
+    "display_name": "Nightingale Rose Chart",
+    "category": "composition",
+    "description_zh": "Rose Chart (Polar Bar) displays categorical data on a polar coordinate system, with each category as a spoke and bar length/area representing metric values.",
+    "visual_shape_zh": "玫瑰图（极坐标柱状型）",
+    "best_for": [
+      "类别数值的极坐标对比（如各产品销售额、各区域用户数）",
+      "周期性类别数据展示",
+      "视觉化的类别占比/数值对比"
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "metric",
+      "saved_metric"
+    ],
+    "optional_dataset_roles": [
+      "category_dimension",
+      "dimension",
+      "filter_context",
+      "time_dimension",
+      "time_grain"
+    ],
+    "required_slots": [
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "Query",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+          "聚合指标，用于计算每个类别的数值（柱长/面积依据）。"
+        ]
+      }
+    ],
+    "optional_slot_names": [
+      "adhoc_filters",
+      "granularity_sqla",
+      "groupby",
+      "time_grain_sqla"
+    ],
+    "structural_flags": {
+      "time_series": true,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": false,
+      "flow_like": false,
+      "distribution_like": false,
+      "supports_breakdown": true,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": false,
+      "needs_dimension": false
+    },
+    "selection_hints": [
+      "优先用于趋势、演化、时间对比类问题。",
+      "至少需要 1 个可聚合指标字段。",
+      "支持按维度拆分多序列或子组。",
+      "可结合时间粒度控制趋势聚合窗口。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：类别数值的极坐标对比（如各产品销售额、各区域用户数）；周期性类别数据展示；视觉化的类别占比/数值对比"
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "rose",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/rose-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/rose-form-data-schema.json",
+      "control-schema": "form-data-schema/rose-schema.json"
+    }
+  }
+}

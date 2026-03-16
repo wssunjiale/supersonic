@@ -1,0 +1,498 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "time_table",
+  "display_name": "Time-series Table",
+  "source_kind": "schema_file",
+  "normalized_chart_form_data": {
+    "required_root_fields": [
+      "column_collection",
+      "datasource",
+      "metrics",
+      "viz_type"
+    ],
+    "optional_root_fields": [
+      "adhoc_filters",
+      "cache_timeout",
+      "custom_params",
+      "extra_form_data",
+      "granularity",
+      "groupby",
+      "limit",
+      "row_limit",
+      "slice_id",
+      "url",
+      "url_params"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "column_collection",
+      "datasource",
+      "granularity_sqla",
+      "metrics",
+      "time_grain_sqla",
+      "time_range",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "column_collection",
+      "datasource",
+      "granularity_sqla",
+      "groupby",
+      "limit",
+      "metrics",
+      "row_limit",
+      "time_grain_sqla",
+      "time_range",
+      "url",
+      "viz_type"
+    ],
+    "fallback_template_seed": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "time_table",
+      "column_collection": null,
+      "column_collection[].key": null,
+      "metrics": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        }
+      ],
+      "adhoc_filters": [],
+      "time_range": "No filter"
+    }
+  },
+  "original_chart_form_data_schema": {
+    "viz_type": "time_table",
+    "display_name": "Time-series Table",
+    "purpose": "用于调用 API 创建或保存 Time-series Table 时填写的 form_data 模板",
+    "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/time_table-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/visualizations/TimeTable/config/controlPanel/controlPanel.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/visualizations/TimeTable/index.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/visualizations/TimeTable/config/transformProps/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/visualizations/TimeTable/types.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/visualizations/TimeTable/TimeTable.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/visualizations/TimeTable/components/LeftCell/LeftCell.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/visualizations/TimeTable/utils/valueCalculations/valueCalculations.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/visualizations/TimeTable/utils/sparklineDataUtils/sparklineDataUtils.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/components/controls/TimeSeriesColumnControl/index.jsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/components/controls/CollectionControl/index.jsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/sections/sections.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset/views/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/viz.py"
+    ],
+    "notes": [
+      "time_table 是 legacy 图，前端真实请求路径是 `/superset/explore_json/`，不是 `/api/v1/chart/data`。",
+      "Explore 导出 form_data 时走 `getFormDataFromControls()`，control name 会原样写进 root form_data。因此 API 模板必须使用 `column_collection` 这个 snake_case 名称，而不是运行时的 `columnCollection`。",
+      "当前图 controlPanel 没有暴露 `order_desc`，但后端 `TimeTableViz.query_obj()` 仍会读取它决定排序方向。手工 API 创建通常不需要显式传；如果业务确实依赖排序方向，再根据源码显式补充。",
+      "`TimeTableViz.query_obj()` 会校验 `metrics` 非空；若 `groupby` 有值，`metrics` 只能保留 1 个。",
+      "`TimeTableViz.get_data()` 返回的 query 结果形态会随 `groupby` 是否存在而变化；前端 `transformProps()` 再把表格行模式切成 `metric` 或 `column`。",
+      "`column_collection` 不只是展示字段，它直接定义每一列的计算语义和 sparkline 渲染语义；因此它必须作为根层核心字段保留。"
+    ],
+    "naming_and_pipeline": {
+      "control_to_api_form_data": "`getFormDataFromControls()` 直接把 control 名字写成 form_data key；Time section + Query section 最终落到 root `granularity*`、`time_range`、`metrics`、`groupby`、`column_collection`、`url` 等字段。",
+      "api_form_data_to_backend_request": "`ChartClient` 在 `useLegacyApi=true` 时，把原始 form_data 包装成 `{ form_data }`，POST 到 `/superset/explore_json/`。",
+      "backend_form_data_normalization": "`explore_json()` 会补 `datasource`，然后执行 `convert_legacy_filters_into_adhoc(form_data)` 与 `merge_extra_filters(form_data)`。",
+      "backend_form_data_to_query_obj": "`BaseViz.query_obj()` 先消费 `granularity_sqla`、`time_grain_sqla`、`time_range`；`TimeTableViz.query_obj()` 再校验 `metrics` / `groupby` 约束，并设置默认 `orderby`。",
+      "backend_query_result_to_runtime_props": "`TimeTableViz.get_data()` 先返回 `{ records, columns, is_group_by }`；`transformProps()` 再把 `column_collection` 映射到 `columnConfigs`，并把字符串型 `timeLag` 转成整数；`TimeTable.tsx` 根据 `rowType`、`columnConfigs`、`url` 真正渲染表格。"
+    },
+    "global_required_fields": {
+      "datasource": {
+        "data_type": "string",
+        "required": true,
+        "sample_data": "<dataset_id>__table",
+        "source": "datasourceAndVizType hidden control + explore_json()"
+      },
+      "viz_type": {
+        "data_type": "string",
+        "required": true,
+        "fixed_value": "time_table",
+        "source": "TimeTable/index.ts + TimeTableViz.viz_type"
+      },
+      "metrics": {
+        "data_type": "array[string | object]",
+        "required": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          }
+        ],
+        "source": "TimeTable Query section + TimeTableViz.query_obj()"
+      },
+      "column_collection": {
+        "data_type": "array[TimeTableColumnConfig]",
+        "required": true,
+        "sample_data": [
+          {
+            "key": "LHHNPhamU",
+            "label": "Current",
+            "colType": "time",
+            "timeLag": 0
+          }
+        ],
+        "source": "TimeTable Query section + CollectionControl + TimeSeriesColumnControl"
+      }
+    },
+    "global_conditionally_required_fields": {
+      "granularity_sqla": {
+        "data_type": "string | object | null",
+        "required_when": "datasource 是 SQLA / temporal dataset，并且需要显式指定 Time Column",
+        "sample_data": "order_date",
+        "source": "legacyTimeseriesTime + dndGranularitySqlaControl + BaseViz.query_obj()"
+      },
+      "time_grain_sqla": {
+        "data_type": "string | null",
+        "required_when": "需要显式复现 UI 保存态时间粒度",
+        "sample_data": "P1D",
+        "source": "legacyTimeseriesTime + shared control"
+      },
+      "time_range": {
+        "data_type": "string",
+        "required_when": "需要显式复现 UI 保存态时间范围",
+        "sample_data": "No filter",
+        "source": "legacyTimeseriesTime + BaseViz.query_obj()"
+      }
+    },
+    "global_optional_fields": {
+      "granularity": {
+        "data_type": "string | null",
+        "required": false,
+        "sample_data": "P1D",
+        "source": "legacyTimeseriesTime shared control",
+        "notes": "legacy datasource-specific 的兼容字段；不是 time_table 主路径下的高置信核心字段。"
+      },
+      "adhoc_filters": {
+        "data_type": "array[object]",
+        "required": false,
+        "sample_data": [],
+        "source": "TimeTable Query section"
+      },
+      "groupby": {
+        "data_type": "array[string | object]",
+        "required": false,
+        "sample_data": [
+          "gender"
+        ],
+        "source": "TimeTable Query section + dndGroupByControl",
+        "notes": "当前图 override 成单选；若此字段非空，则 `metrics` 只能传 1 个。"
+      },
+      "limit": {
+        "data_type": "integer | string | null",
+        "required": false,
+        "sample_data": 50,
+        "source": "TimeTable Query section"
+      },
+      "row_limit": {
+        "data_type": "integer | string",
+        "required": false,
+        "sample_data": 10000,
+        "source": "TimeTable Query section",
+        "notes": "shared control 默认值是 `10000`。"
+      },
+      "url": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "/detail/{{metric.metric_name}}",
+        "source": "TimeTable Query section + LeftCell.tsx"
+      },
+      "slice_id": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 0,
+        "source": "datasourceAndVizType hidden control",
+        "notes": "新建图表时通常省略；编辑已存在图表时由服务端或上层调用方提供。"
+      },
+      "cache_timeout": {
+        "data_type": "integer | null",
+        "required": false,
+        "sample_data": null,
+        "source": "datasourceAndVizType hidden control"
+      },
+      "url_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "datasourceAndVizType hidden control"
+      },
+      "custom_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "datasourceAndVizType hidden control"
+      },
+      "extra_form_data": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "utils.merge_extra_form_data() + merge_extra_filters()",
+        "notes": "虽然不属于 controlPanel 字段，但 legacy explore_json 路径会消费它。"
+      }
+    },
+    "column_collection_item_schema": {
+      "description": "`column_collection` 数组元素的字段结构。这里的条件字段来自 `TimeSeriesColumnControl` 与 TimeTable 运行时组件。",
+      "required_fields": {
+        "key": {
+          "data_type": "string",
+          "required": true,
+          "sample_data": "9g4K-B-YL",
+          "source": "CollectionControl.itemGenerator()"
+        }
+      },
+      "conditionally_required_or_semantic_fields": {
+        "colType": {
+          "data_type": "string",
+          "enum_values": [
+            "time",
+            "contrib",
+            "spark",
+            "avg"
+          ],
+          "required_when": "你希望这个数组元素真正承担明确的计算 / 渲染语义时",
+          "sample_data": "time",
+          "source": "TimeSeriesColumnControl + calculateCellValue() + Sparkline.tsx"
+        },
+        "timeLag": {
+          "data_type": "integer | string",
+          "required_when": "`colType` 为 `time` 或 `avg`，并且你要定义滞后期 / 平均窗口",
+          "sample_data": 1,
+          "source": "TimeSeriesColumnControl + transformProps() + valueCalculations.ts"
+        },
+        "comparisonType": {
+          "data_type": "string",
+          "enum_values": [
+            "value",
+            "diff",
+            "perc",
+            "perc_change"
+          ],
+          "required_when": "`colType` 为 `time` 且你要定义比较方式时",
+          "sample_data": "perc",
+          "source": "TimeSeriesColumnControl + valueCalculations.ts"
+        }
+      },
+      "optional_fields": {
+        "label": {
+          "data_type": "string",
+          "sample_data": "Last Year"
+        },
+        "tooltip": {
+          "data_type": "string",
+          "sample_data": "Compare against one period ago"
+        },
+        "width": {
+          "data_type": "string",
+          "sample_data": "300",
+          "visibility": "`colType=spark`"
+        },
+        "height": {
+          "data_type": "string",
+          "sample_data": "50",
+          "visibility": "`colType=spark`"
+        },
+        "timeRatio": {
+          "data_type": "integer | string",
+          "sample_data": 1,
+          "visibility": "`colType=spark`"
+        },
+        "showYAxis": {
+          "data_type": "boolean",
+          "sample_data": false,
+          "visibility": "`colType=spark`"
+        },
+        "yAxisBounds": {
+          "data_type": "array[number | null, number | null]",
+          "sample_data": [
+            null,
+            null
+          ],
+          "visibility": "`colType=spark`"
+        },
+        "bounds": {
+          "data_type": "array[number | null, number | null]",
+          "sample_data": [
+            null,
+            null
+          ],
+          "visibility": "`colType!=spark`"
+        },
+        "d3format": {
+          "data_type": "string",
+          "sample_data": "%"
+        },
+        "dateFormat": {
+          "data_type": "string",
+          "sample_data": "%Y-%m-%d",
+          "visibility": "`colType=spark`"
+        }
+      }
+    },
+    "minimal_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "time_table",
+      "granularity_sqla": "<temporal_column>",
+      "time_grain_sqla": "P1D",
+      "time_range": "No filter",
+      "metrics": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        }
+      ],
+      "adhoc_filters": [],
+      "column_collection": [
+        {
+          "key": "LHHNPhamU",
+          "label": "Current",
+          "colType": "time",
+          "timeLag": 0
+        }
+      ]
+    },
+    "recommended_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "time_table",
+      "granularity_sqla": "<temporal_column>",
+      "time_grain_sqla": "P1D",
+      "time_range": "No filter",
+      "metrics": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        },
+        "count"
+      ],
+      "adhoc_filters": [],
+      "groupby": [],
+      "limit": null,
+      "row_limit": 10000,
+      "column_collection": [
+        {
+          "key": "LHHNPhamU",
+          "label": "Current",
+          "colType": "time",
+          "timeLag": 0
+        },
+        {
+          "key": "9g4K-B-YL",
+          "label": "Last Year",
+          "colType": "time",
+          "timeLag": 1,
+          "comparisonType": "value"
+        },
+        {
+          "key": "JVZXtNu7_",
+          "label": "YoY",
+          "colType": "time",
+          "timeLag": 1,
+          "comparisonType": "perc",
+          "d3format": "%"
+        },
+        {
+          "key": "tN5Gba36u",
+          "label": "Trend",
+          "colType": "spark"
+        }
+      ],
+      "url": ""
+    },
+    "groupby_single_metric_variant": {
+      "description": "如果要进入 groupby-row 模式，`metrics` 只能有 1 个元素。",
+      "template": {
+        "datasource": "<dataset_id>__table",
+        "viz_type": "time_table",
+        "granularity_sqla": "<temporal_column>",
+        "time_grain_sqla": "P1D",
+        "time_range": "No filter",
+        "metrics": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "adhoc_filters": [],
+        "groupby": [
+          "<dimension_column>"
+        ],
+        "limit": 50,
+        "row_limit": 10000,
+        "column_collection": [
+          {
+            "key": "LHHNPhamU",
+            "label": "Current",
+            "colType": "time",
+            "timeLag": 0
+          },
+          {
+            "key": "JVZXtNu7_",
+            "label": "YoY",
+            "colType": "time",
+            "timeLag": 1,
+            "comparisonType": "perc",
+            "d3format": "%"
+          }
+        ],
+        "url": "/detail/{{metric.label}}"
+      }
+    },
+    "api_field_examples": {
+      "root_keys": [
+        "datasource",
+        "viz_type",
+        "granularity_sqla",
+        "time_grain_sqla",
+        "time_range",
+        "metrics",
+        "adhoc_filters",
+        "groupby",
+        "limit",
+        "column_collection",
+        "row_limit",
+        "url"
+      ],
+      "avoid_confusion": [
+        "不要把 `time_table` 当成标准 chart data API 图表去套 `/api/v1/chart/data` 的 `query_context` 模板。",
+        "不要把运行时 camelCase 字段名 `columnCollection` 写回 API root form_data；真正要传的是 `column_collection`。",
+        "不要在 `groupby` 非空时传多个 metrics；后端会直接报错。",
+        "不要把 `column_collection` 当成纯展示字段；它直接改变值计算和 sparkline 语义。"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "time_table",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/time_table-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/time_table-form-data-schema.json",
+      "control-schema": "form-data-schema/time_table-schema.json"
+    }
+  }
+}

@@ -1,0 +1,131 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "histogram_v2",
+  "display_name": "Histogram",
+  "normalized_summary": {
+    "category": "distribution",
+    "tags": [
+      "histogram",
+      "distribution",
+      "frequency",
+      "statistics"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "数值型指标，用于计算频率分布的基础数据。"
+      },
+      {
+        "key": "bin_size",
+        "required": true,
+        "description": "分箱大小，用于定义数值区间的宽度（如 10、50）。"
+      },
+      {
+        "key": "show_mean",
+        "required": false,
+        "description": "是否展示均值线（true/false），控制均值的显示。"
+      },
+      {
+        "key": "show_median",
+        "required": false,
+        "description": "是否展示中位数线（true/false），控制中位数的显示。"
+      }
+    ],
+    "description_zh": "Histogram displays the frequency distribution of numerical data, grouping values into bins (intervals) and showing bin counts as bars.",
+    "visual_shape_zh": "直方图（频率分布型）",
+    "use_cases_zh": [
+      "数值型数据的频率分布分析（如用户年龄分布、销售额分布）",
+      "数据分布形态识别（正态/偏态）",
+      "区间频次统计"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "histogram_v2",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/histogram_v2-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/histogram_v2-form-data-schema.json",
+      "control-schema": "form-data-schema/histogram_v2-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Histogram",
+    "viztype": "histogram_v2",
+    "详细描述": "Histogram displays the frequency distribution of numerical data, grouping values into bins (intervals) and showing bin counts as bars.",
+    "表现形态": "直方图（频率分布型）",
+    "适用场景": [
+      "数值型数据的频率分布分析（如用户年龄分布、销售额分布）",
+      "数据分布形态识别（正态/偏态）",
+      "区间频次统计"
+    ],
+    "vizKey": "Histogram",
+    "pluginCategory": "Distribution",
+    "pluginTags": [],
+    "category": "distribution",
+    "tags": [
+      "histogram",
+      "distribution",
+      "frequency",
+      "statistics"
+    ],
+    "关键字段": [
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "数值型指标，用于计算频率分布的基础数据。"
+      },
+      {
+        "key": "bin_size",
+        "required": true,
+        "description": "分箱大小，用于定义数值区间的宽度（如 10、50）。"
+      },
+      {
+        "key": "show_mean",
+        "required": false,
+        "description": "是否展示均值线（true/false），控制均值的显示。"
+      },
+      {
+        "key": "show_median",
+        "required": false,
+        "description": "是否展示中位数线（true/false），控制中位数的显示。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

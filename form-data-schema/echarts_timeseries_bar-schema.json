@@ -1,0 +1,1013 @@
+{
+  "viz_type": "echarts_timeseries_bar",
+  "display_name": "Bar Chart",
+  "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Timeseries/Regular/Bar/controlPanel.tsx",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Timeseries/Regular/Bar/controlPanel.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Timeseries/Regular/Bar/index.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Timeseries/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Timeseries/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Timeseries/constants.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Timeseries/types.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/controls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/constants.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/sections/echartsTimeSeriesQuery.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/sections/advancedAnalytics.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/sections/annotationsAndLayers.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/sections/forecastInterval.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/sections/chartTitle.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/customControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/mixins.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/constants.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/constants.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/AdvancedAnalytics.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/time-format/formatters/smartDate.ts"
+  ],
+  "notes": [
+    "字段名优先取 controlPanel 配置中的 name；如 transformProps/types 中确认了 camelCase 运行时别名，则补充 runtime_alias。",
+    "Bar Chart 与 Area/Line 共用 Timeseries/buildQuery.ts；Query、Advanced analytics、Annotations 和 Forecast 基本一致，差异主要在 Chart Orientation、Chart Title 和 Chart Options。",
+    "Bar/index.ts 在运行时包装 transformProps 时注入 seriesType=bar；seriesType 不是 Bar controlPanel 导出的 form_data 字段。",
+    "x_axis、x_axis_sort、x_axis_sort_asc 的控件标签会随 orientation 在 X/Y 轴之间切换，但 form_data 键名始终不变。",
+    "同一组 x_axis_title / y_axis_title / x_axis_time_format / y_axis_format 等字段会在 controlPanel 中按 orientation 切换显示位置；序列化后的 form_data 仍只有一份键值。",
+    "show_extra_controls 在 Bar/controlPanel.tsx 中定义，但未在 Timeseries/buildQuery.ts 与 Timeseries/transformProps.ts 中找到直接消费；当前更像预留 UI 字段。",
+    "embedding 仅在字段命中 superset-ui-core/query/constants.ts 的 extra_form_data append/override 白名单时标记为可用。"
+  ],
+  "control_overrides": {},
+  "form_data_overrides": {
+    "metrics": "getStandardizedControls().popAllMetrics()",
+    "groupby": "getStandardizedControls().popAllColumns()"
+  },
+  "field_categories": {
+    "Query": [
+      {
+        "field_name": "x_axis",
+        "runtime_alias": "xAxis",
+        "description": "Dimension to use on x-axis. orientation=horizontal 时控件标签切换为 Y-axis，但 form_data 键仍为 x_axis。",
+        "data_type": "string | object",
+        "enum_source": "datasource columns; xAxisMixin 会在 granularity_sqla 已存在且 x_axis 为空时回填",
+        "sample_data": "order_date",
+        "required": true,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "runtime_alias": "timeGrainSqla",
+        "description": "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart.",
+        "data_type": "string | null",
+        "enum_source": "datasource.time_grain_sqla",
+        "sample_data": "P1D",
+        "required": false,
+        "embedding": "extra_form_data.override",
+        "default_value": "P1D"
+      },
+      {
+        "field_name": "xAxisForceCategorical",
+        "description": "Treat values as categorical.",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false,
+        "notes": "仅在 x_axis 的通用类型为 Numeric 时显示。"
+      },
+      {
+        "field_name": "x_axis_sort",
+        "runtime_alias": "xAxisSort",
+        "description": "Decides which column or measure to sort the base axis by.",
+        "data_type": "string | null",
+        "enum_source": "当前 x_axis、metrics、timeseries_limit_metric 和 SORT_SERIES_CHOICES 的动态组合",
+        "sample_data": "SUM(sales)",
+        "required": false,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "orientation=horizontal 时控件标签改为 Y-Axis Sort By。"
+      },
+      {
+        "field_name": "x_axis_sort_asc",
+        "runtime_alias": "xAxisSortAsc",
+        "description": "Whether to sort ascending or descending on the base Axis.",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true,
+        "notes": "orientation=horizontal 时控件标签改为 Y-Axis Sort Ascending。"
+      },
+      {
+        "field_name": "metrics",
+        "description": "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+        "data_type": "array[string | object]",
+        "enum_source": "saved metrics + adhoc metrics",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          }
+        ],
+        "required": true,
+        "embedding": "否",
+        "default_value": []
+      },
+      {
+        "field_name": "groupby",
+        "description": "Dimensions contain qualitative values such as names, dates, or geographical data. Use dimensions to categorize, segment, and reveal the details in your data. Dimensions affect the level of detail in the view.",
+        "data_type": "array[string | object]",
+        "enum_source": "datasource columns",
+        "sample_data": [
+          "region"
+        ],
+        "required": false,
+        "embedding": "否",
+        "default_value": []
+      },
+      {
+        "field_name": "contributionMode",
+        "description": "Calculate contribution per series or row",
+        "data_type": "string | null",
+        "enum_values": [
+          null,
+          "row",
+          "column"
+        ],
+        "sample_data": "column",
+        "required": false,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "adhoc_filters",
+        "description": "源码未提供额外描述；字段标签为 Filters。",
+        "data_type": "array[object]",
+        "enum_source": "dataset columns + saved metrics + 当前 metrics",
+        "sample_data": [
+          {
+            "clause": "WHERE",
+            "subject": "order_date",
+            "operator": "TEMPORAL_RANGE",
+            "comparator": "No filter",
+            "expressionType": "SIMPLE"
+          }
+        ],
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "default_value": []
+      },
+      {
+        "field_name": "limit",
+        "description": "Limits the number of series that get displayed. A joined subquery (or an extra phase where subqueries are not supported) is applied to limit the number of series that get fetched and rendered. This feature is useful when grouping by high cardinality column(s) though does increase the query complexity and cost.",
+        "data_type": "integer | null",
+        "enum_values": [
+          5,
+          10,
+          25,
+          50,
+          100,
+          500
+        ],
+        "sample_data": 10,
+        "required": false,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "group_others_when_limit_reached",
+        "description": "Groups remaining series into an \"Others\" category when series limit is reached. This prevents incomplete time series data from being displayed.",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      },
+      {
+        "field_name": "timeseries_limit_metric",
+        "description": "Orders the query result that generates the source data for this chart. If a series or row limit is reached, this determines what data are truncated. If undefined, defaults to the first metric (where appropriate).",
+        "data_type": "string | object | null",
+        "enum_source": "saved metrics + adhoc metrics",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        },
+        "required": false,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "order_desc",
+        "runtime_alias": "orderDesc",
+        "description": "If enabled, this control sorts the results/values descending, otherwise it sorts the results ascending.",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true
+      },
+      {
+        "field_name": "row_limit",
+        "runtime_alias": "rowLimit",
+        "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+        "data_type": "integer",
+        "enum_values": [
+          10,
+          50,
+          100,
+          250,
+          500,
+          1000,
+          5000,
+          10000,
+          50000
+        ],
+        "sample_data": 10000,
+        "required": false,
+        "embedding": "否",
+        "default_value": 10000
+      },
+      {
+        "field_name": "truncate_metric",
+        "description": "Whether to truncate metrics",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true
+      },
+      {
+        "field_name": "show_empty_columns",
+        "description": "Show empty columns",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true
+      }
+    ],
+    "Advanced analytics": [
+      {
+        "field_name": "rolling_type",
+        "description": "Defines a rolling window function to apply, works along with the [Periods] text box",
+        "data_type": "string | null",
+        "enum_values": [
+          null,
+          "mean",
+          "sum",
+          "std",
+          "cumsum"
+        ],
+        "sample_data": "mean",
+        "required": false,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "rolling_periods",
+        "description": "Defines the size of the rolling window function, relative to the time granularity selected",
+        "data_type": "integer | null",
+        "sample_data": 7,
+        "required": false,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "min_periods",
+        "description": "The minimum number of rolling periods required to show a value.",
+        "data_type": "integer | null",
+        "sample_data": 7,
+        "required": false,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "time_compare",
+        "runtime_alias": "timeCompare",
+        "description": "Overlay one or more timeseries from a relative time period. Expects relative time deltas in natural language. Free text is supported.",
+        "data_type": "array[string]",
+        "enum_values": [
+          "1 day ago",
+          "1 week ago",
+          "28 days ago",
+          "30 days ago",
+          "52 weeks ago",
+          "1 year ago",
+          "104 weeks ago",
+          "2 years ago",
+          "156 weeks ago",
+          "3 years ago"
+        ],
+        "sample_data": [
+          "1 year ago"
+        ],
+        "required": false,
+        "embedding": "extra_form_data.override",
+        "default_value": null
+      },
+      {
+        "field_name": "comparison_type",
+        "runtime_alias": "comparisonType",
+        "description": "How to display time shifts: as individual lines; as the difference between the main time series and each time shift; as the percentage change; or as the ratio between series and time shifts.",
+        "data_type": "string",
+        "enum_values": [
+          "values",
+          "difference",
+          "percentage",
+          "ratio"
+        ],
+        "sample_data": "values",
+        "required": false,
+        "embedding": "否",
+        "default_value": "values"
+      },
+      {
+        "field_name": "resample_rule",
+        "runtime_alias": "resampleRule",
+        "description": "Pandas resample rule",
+        "data_type": "string | null",
+        "enum_values": [
+          "1T",
+          "1H",
+          "1D",
+          "7D",
+          "1MS",
+          "1M",
+          "1AS",
+          "1A"
+        ],
+        "sample_data": "1D",
+        "required": false,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "resample_method",
+        "runtime_alias": "resampleMethod",
+        "description": "Pandas resample method",
+        "data_type": "string | null",
+        "enum_values": [
+          "asfreq",
+          "zerofill",
+          "linear",
+          "ffill",
+          "bfill",
+          "median",
+          "mean",
+          "sum"
+        ],
+        "sample_data": "asfreq",
+        "required": false,
+        "embedding": "否",
+        "default_value": null
+      }
+    ],
+    "Annotations and Layers": [
+      {
+        "field_name": "annotation_layers",
+        "runtime_alias": "annotationLayers",
+        "description": "Annotation Layers",
+        "data_type": "array[object]",
+        "sample_data": [],
+        "required": false,
+        "embedding": "否",
+        "default_value": []
+      }
+    ],
+    "Predictive Analytics": [
+      {
+        "field_name": "forecastEnabled",
+        "description": "Enable forecasting",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      },
+      {
+        "field_name": "forecastPeriods",
+        "description": "How many periods into the future do we want to predict",
+        "data_type": "integer",
+        "sample_data": 10,
+        "required": false,
+        "embedding": "否",
+        "default_value": 10
+      },
+      {
+        "field_name": "forecastInterval",
+        "description": "Width of the confidence interval. Should be between 0 and 1",
+        "data_type": "number",
+        "sample_data": 0.8,
+        "required": false,
+        "embedding": "否",
+        "default_value": 0.8
+      },
+      {
+        "field_name": "forecastSeasonalityYearly",
+        "description": "Should yearly seasonality be applied. An integer value will specify Fourier order of seasonality.",
+        "data_type": "null | boolean | integer",
+        "enum_values": [
+          null,
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "forecastSeasonalityWeekly",
+        "description": "Should weekly seasonality be applied. An integer value will specify Fourier order of seasonality.",
+        "data_type": "null | boolean | integer",
+        "enum_values": [
+          null,
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "forecastSeasonalityDaily",
+        "description": "Should daily seasonality be applied. An integer value will specify Fourier order of seasonality.",
+        "data_type": "null | boolean | integer",
+        "enum_values": [
+          null,
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": null
+      }
+    ],
+    "Chart Orientation": [
+      {
+        "field_name": "orientation",
+        "description": "Orientation of bar chart",
+        "data_type": "string",
+        "enum_values": [
+          "vertical",
+          "horizontal"
+        ],
+        "sample_data": "vertical",
+        "required": false,
+        "embedding": "否",
+        "default_value": "vertical",
+        "notes": "影响 x_axis 标签文案、轴标题/轴格式控件的显示位置，以及 transformProps 中的坐标轴方向。"
+      }
+    ],
+    "Chart Title": [
+      {
+        "field_name": "x_axis_title",
+        "runtime_alias": "xAxisTitle",
+        "description": "Axis Title。orientation=horizontal 时该控件在 Y Axis 子区展示，但字段名仍为 x_axis_title。",
+        "data_type": "string",
+        "sample_data": "Order Date",
+        "required": false,
+        "embedding": "否",
+        "default_value": ""
+      },
+      {
+        "field_name": "x_axis_title_margin",
+        "runtime_alias": "xAxisTitleMargin",
+        "description": "Axis title margin。orientation=horizontal 时该控件在 Y Axis 子区展示，但字段名仍为 x_axis_title_margin。",
+        "data_type": "number | null",
+        "enum_values": [
+          15,
+          30,
+          50,
+          75,
+          100,
+          125,
+          150,
+          200
+        ],
+        "sample_data": 15,
+        "required": false,
+        "embedding": "否",
+        "default_value": 15
+      },
+      {
+        "field_name": "y_axis_title",
+        "runtime_alias": "yAxisTitle",
+        "description": "Axis Title。orientation=horizontal 时该控件在 X Axis 子区展示，但字段名仍为 y_axis_title。",
+        "data_type": "string",
+        "sample_data": "Sales",
+        "required": false,
+        "embedding": "否",
+        "default_value": ""
+      },
+      {
+        "field_name": "y_axis_title_margin",
+        "runtime_alias": "yAxisTitleMargin",
+        "description": "Axis title margin。orientation=horizontal 时该控件在 X Axis 子区展示，但字段名仍为 y_axis_title_margin。",
+        "data_type": "number | null",
+        "enum_values": [
+          15,
+          30,
+          50,
+          75,
+          100,
+          125,
+          150,
+          200
+        ],
+        "sample_data": 30,
+        "required": false,
+        "embedding": "否",
+        "default_value": 30
+      },
+      {
+        "field_name": "y_axis_title_position",
+        "runtime_alias": "yAxisTitlePosition",
+        "description": "Axis title position。orientation=horizontal 时该控件在 X Axis 子区展示，但字段名仍为 y_axis_title_position。",
+        "data_type": "string",
+        "enum_values": [
+          "Left",
+          "Top"
+        ],
+        "sample_data": "Left",
+        "required": false,
+        "embedding": "否",
+        "default_value": "Left"
+      }
+    ],
+    "Chart Options / Series Order": [
+      {
+        "field_name": "sort_series_type",
+        "runtime_alias": "sortSeriesType",
+        "description": "Based on what should series be ordered on the chart and legend",
+        "data_type": "string",
+        "enum_values": [
+          "name",
+          "sum",
+          "min",
+          "max",
+          "avg"
+        ],
+        "sample_data": "sum",
+        "required": false,
+        "embedding": "否",
+        "default_value": "sum"
+      },
+      {
+        "field_name": "sort_series_ascending",
+        "runtime_alias": "sortSeriesAscending",
+        "description": "Sort series in ascending order",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      }
+    ],
+    "Chart Options / General": [
+      {
+        "field_name": "color_scheme",
+        "description": "The color scheme for rendering chart",
+        "data_type": "string",
+        "enum_source": "categoricalSchemeRegistry.keys()",
+        "sample_data": "supersetColors",
+        "required": false,
+        "embedding": "否",
+        "default_value": "<categoricalSchemeRegistry.defaultKey>"
+      },
+      {
+        "field_name": "time_shift_color",
+        "runtime_alias": "timeShiftColor",
+        "description": "When unchecked, colors from the selected color scheme will be used for time shifted series",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true
+      },
+      {
+        "field_name": "show_value",
+        "runtime_alias": "showValue",
+        "description": "Show series values on the chart",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      },
+      {
+        "field_name": "stack",
+        "description": "Stack series on top of each other",
+        "data_type": "string | null | boolean",
+        "enum_values": [
+          null,
+          "Stack",
+          "Stream"
+        ],
+        "sample_data": "Stack",
+        "required": false,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "controlPanel 默认值是 null；Timeseries/DEFAULT_FORM_DATA 的 runtime fallback 为 false。"
+      },
+      {
+        "field_name": "only_total",
+        "runtime_alias": "onlyTotal",
+        "description": "Only show the total value on the stacked chart, and not show on the selected category",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true,
+        "notes": "controlPanel 默认值是 true；Timeseries/DEFAULT_FORM_DATA 的 runtime fallback 为 false。"
+      },
+      {
+        "field_name": "percentage_threshold",
+        "runtime_alias": "percentageThreshold",
+        "description": "Minimum threshold in percentage points for showing labels.",
+        "data_type": "number",
+        "sample_data": 5,
+        "required": false,
+        "embedding": "否",
+        "default_value": 0
+      },
+      {
+        "field_name": "stackDimension",
+        "description": "Stack in groups, where each group corresponds to a dimension",
+        "data_type": "string | null",
+        "enum_source": "当前 groupby 的 string 值列表",
+        "sample_data": "region",
+        "required": false,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "仅当 stack === 'Stack' 时显示；transformProps.ts 会根据该字段把 series.stack 重写为分组维度值。"
+      },
+      {
+        "field_name": "show_extra_controls",
+        "runtime_alias": "showExtraControls",
+        "description": "Whether to show extra controls or not. Extra controls include things like making multiBar charts stacked or side by side.",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false,
+        "notes": "源码中定义了该字段，但未在 Timeseries/buildQuery.ts 与 Timeseries/transformProps.ts 中找到直接消费。"
+      },
+      {
+        "field_name": "minorTicks",
+        "description": "Show minor ticks on axes.",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      },
+      {
+        "field_name": "zoomable",
+        "description": "Enable data zooming controls",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      }
+    ],
+    "Chart Options / Legend": [
+      {
+        "field_name": "show_legend",
+        "runtime_alias": "showLegend",
+        "description": "Whether to display a legend for the chart",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true
+      },
+      {
+        "field_name": "legendType",
+        "description": "Legend type",
+        "data_type": "string",
+        "enum_values": [
+          "scroll",
+          "plain"
+        ],
+        "sample_data": "scroll",
+        "required": false,
+        "embedding": "否",
+        "default_value": "scroll"
+      },
+      {
+        "field_name": "legendOrientation",
+        "description": "Legend Orientation",
+        "data_type": "string",
+        "enum_values": [
+          "top",
+          "bottom",
+          "left",
+          "right"
+        ],
+        "sample_data": "top",
+        "required": false,
+        "embedding": "否",
+        "default_value": "top"
+      },
+      {
+        "field_name": "legendMargin",
+        "description": "Additional padding for legend.",
+        "data_type": "integer | null",
+        "sample_data": 12,
+        "required": false,
+        "embedding": "否",
+        "default_value": null
+      }
+    ],
+    "Chart Options / X Axis": [
+      {
+        "field_name": "x_axis_time_format",
+        "runtime_alias": "xAxisTimeFormat",
+        "description": "D3 time format syntax: https://github.com/d3/d3-time-format. When using other than adaptive formatting, labels may overlap",
+        "data_type": "string",
+        "enum_source": "D3_TIME_FORMAT_OPTIONS",
+        "sample_data": "smart_date",
+        "required": false,
+        "embedding": "否",
+        "default_value": "smart_date",
+        "notes": "orientation=horizontal 时该控件会出现在 Y Axis 子区。"
+      },
+      {
+        "field_name": "xAxisLabelRotation",
+        "description": "Input field supports custom rotation. e.g. 30 for 30°",
+        "data_type": "number",
+        "enum_values": [
+          0,
+          45,
+          90
+        ],
+        "sample_data": 0,
+        "required": false,
+        "embedding": "否",
+        "default_value": 0,
+        "notes": "orientation=horizontal 时该控件会出现在 Y Axis 子区。"
+      },
+      {
+        "field_name": "xAxisLabelInterval",
+        "description": "Choose how many X-Axis labels to show",
+        "data_type": "string",
+        "enum_values": [
+          "auto",
+          "0"
+        ],
+        "sample_data": "auto",
+        "required": false,
+        "embedding": "否",
+        "default_value": "auto",
+        "notes": "orientation=horizontal 时该控件会出现在 Y Axis 子区。"
+      },
+      {
+        "field_name": "truncateXAxis",
+        "description": "Truncate X Axis. Can be overridden by specifying a min or max bound. Only applicable for numerical X axis.",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true
+      },
+      {
+        "field_name": "xAxisBounds",
+        "description": "Bounds for numerical X axis. Not applicable for temporal or categorical axes. When left empty, the bounds are dynamically defined based on the min/max of the data. Note that this feature will only expand the axis range. It won't narrow the data's extent.",
+        "data_type": "array[number | null, number | null] | null",
+        "sample_data": [
+          0,
+          100
+        ],
+        "required": false,
+        "embedding": "否",
+        "default_value": null
+      }
+    ],
+    "Chart Options / Tooltip": [
+      {
+        "field_name": "rich_tooltip",
+        "runtime_alias": "richTooltip",
+        "description": "Shows a list of all series available at that point in time",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true
+      },
+      {
+        "field_name": "showTooltipTotal",
+        "description": "Whether to display the total value in the tooltip",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true
+      },
+      {
+        "field_name": "showTooltipPercentage",
+        "description": "Whether to display the percentage value in the tooltip",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      },
+      {
+        "field_name": "tooltipSortByMetric",
+        "description": "Whether to sort tooltip by the selected metric in descending order.",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      },
+      {
+        "field_name": "tooltipTimeFormat",
+        "description": "Tooltip time format; shared control derives from x_axis_time_format.",
+        "data_type": "string",
+        "enum_source": "D3_TIME_FORMAT_OPTIONS",
+        "sample_data": "smart_date",
+        "required": false,
+        "embedding": "否",
+        "default_value": "smart_date"
+      }
+    ],
+    "Chart Options / Y Axis": [
+      {
+        "field_name": "y_axis_format",
+        "runtime_alias": "yAxisFormat",
+        "description": "D3 format syntax: https://github.com/d3/d3-format",
+        "data_type": "string",
+        "enum_source": "D3_FORMAT_OPTIONS; comparison_type=percentage 时仅保留百分比格式",
+        "sample_data": "SMART_NUMBER",
+        "required": false,
+        "embedding": "否",
+        "default_value": "SMART_NUMBER",
+        "notes": "Bar/controlPanel.tsx 中该控件标签为 Axis Format；orientation=horizontal 时它会出现在 X Axis 子区。"
+      },
+      {
+        "field_name": "currency_format",
+        "runtime_alias": "currencyFormat",
+        "description": "Currency format",
+        "data_type": "string | object | null",
+        "sample_data": {
+          "symbol": "$",
+          "symbolPosition": "prefix"
+        },
+        "required": false,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "orientation=horizontal 时该控件会出现在 X Axis 子区。"
+      },
+      {
+        "field_name": "logAxis",
+        "description": "Logarithmic axis",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false,
+        "notes": "orientation=horizontal 时该控件会出现在 X Axis 子区。"
+      },
+      {
+        "field_name": "minorSplitLine",
+        "description": "Draw split lines for minor axis ticks",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false,
+        "notes": "orientation=horizontal 时该控件会出现在 X Axis 子区。"
+      },
+      {
+        "field_name": "truncateYAxis",
+        "description": "It’s not recommended to truncate axis in Bar chart.",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false,
+        "notes": "orientation=horizontal 时该控件会出现在 X Axis 子区。"
+      },
+      {
+        "field_name": "y_axis_bounds",
+        "runtime_alias": "yAxisBounds",
+        "description": "Bounds for the axis. When left empty, the bounds are dynamically defined based on the min/max of the data. Note that this feature will only expand the axis range. It won't narrow the data's extent.",
+        "data_type": "array[number | null, number | null]",
+        "sample_data": [
+          null,
+          null
+        ],
+        "required": false,
+        "embedding": "否",
+        "default_value": [
+          null,
+          null
+        ],
+        "notes": "orientation=horizontal 时该控件会出现在 X Axis 子区。"
+      }
+    ]
+  }
+}

@@ -1,0 +1,173 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "cartodiagram",
+  "display_name": "Cartodiagram",
+  "normalized_summary": {
+    "category": "geospatial",
+    "tags": [
+      "cartodiagram",
+      "geospatial",
+      "chart overlay",
+      "map layer",
+      "spatial analysis"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "map_layers",
+        "required": true,
+        "description": "地图底图层配置，支持WMS、WFS、XYZ等类型的背景图层定义。"
+      },
+      {
+        "key": "chart_viz_type",
+        "required": true,
+        "description": "叠加的图表类型（如bar、line、pie），指定要渲染在地图上的图表类型。"
+      },
+      {
+        "key": "geographic_field",
+        "required": true,
+        "description": "地理维度字段，用于关联地图位置与图表数据。"
+      },
+      {
+        "key": "chart_form_data",
+        "required": true,
+        "description": "叠加图表的配置参数，复用对应图表的所有表单配置（如groupby、metrics）。"
+      },
+      {
+        "key": "initial_map_extent",
+        "required": false,
+        "description": "初始地图视野范围，定义地图加载时的经纬度边界与缩放级别。"
+      },
+      {
+        "key": "chart_size",
+        "required": false,
+        "description": "图表尺寸配置（按缩放级别自定义），控制不同地图缩放层级下的图表大小。"
+      },
+      {
+        "key": "chart_background",
+        "required": false,
+        "description": "图表背景样式（颜色、圆角），优化地图上图表的视觉展示效果。"
+      },
+      {
+        "key": "map_interaction",
+        "required": false,
+        "description": "地图交互配置（平移、缩放、旋转），控制地图的交互行为。"
+      }
+    ],
+    "description_zh": "CartoDiagram overlays arbitrary Superset charts onto a customizable geographic map (supporting WMS/WFS/XYZ layers), enabling combined visualization of chart metrics and spatial data.",
+    "visual_shape_zh": "地图叠加图表（复合地理空间型）",
+    "use_cases_zh": [
+      "地理空间与多维度指标的联合分析（如地图上叠加柱状图/折线图展示区域趋势）",
+      "自定义底图（WMS/WFS/XYZ）+ 业务图表的融合展示",
+      "多尺度地理视角下的精细化指标对比"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "cartodiagram",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/cartodiagram-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/cartodiagram-form-data-schema.json",
+      "control-schema": "form-data-schema/cartodiagram-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Cartodiagram",
+    "viztype": "cartodiagram",
+    "详细描述": "CartoDiagram overlays arbitrary Superset charts onto a customizable geographic map (supporting WMS/WFS/XYZ layers), enabling combined visualization of chart metrics and spatial data.",
+    "表现形态": "地图叠加图表（复合地理空间型）",
+    "适用场景": [
+      "地理空间与多维度指标的联合分析（如地图上叠加柱状图/折线图展示区域趋势）",
+      "自定义底图（WMS/WFS/XYZ）+ 业务图表的融合展示",
+      "多尺度地理视角下的精细化指标对比"
+    ],
+    "vizKey": "CartoDiagram",
+    "pluginCategory": "Geospatial",
+    "pluginTags": [],
+    "category": "geospatial",
+    "tags": [
+      "cartodiagram",
+      "geospatial",
+      "chart overlay",
+      "map layer",
+      "spatial analysis"
+    ],
+    "关键字段": [
+      {
+        "key": "map_layers",
+        "required": true,
+        "description": "地图底图层配置，支持WMS、WFS、XYZ等类型的背景图层定义。"
+      },
+      {
+        "key": "chart_viz_type",
+        "required": true,
+        "description": "叠加的图表类型（如bar、line、pie），指定要渲染在地图上的图表类型。"
+      },
+      {
+        "key": "geographic_field",
+        "required": true,
+        "description": "地理维度字段，用于关联地图位置与图表数据。"
+      },
+      {
+        "key": "chart_form_data",
+        "required": true,
+        "description": "叠加图表的配置参数，复用对应图表的所有表单配置（如groupby、metrics）。"
+      },
+      {
+        "key": "initial_map_extent",
+        "required": false,
+        "description": "初始地图视野范围，定义地图加载时的经纬度边界与缩放级别。"
+      },
+      {
+        "key": "chart_size",
+        "required": false,
+        "description": "图表尺寸配置（按缩放级别自定义），控制不同地图缩放层级下的图表大小。"
+      },
+      {
+        "key": "chart_background",
+        "required": false,
+        "description": "图表背景样式（颜色、圆角），优化地图上图表的视觉展示效果。"
+      },
+      {
+        "key": "map_interaction",
+        "required": false,
+        "description": "地图交互配置（平移、缩放、旋转），控制地图的交互行为。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

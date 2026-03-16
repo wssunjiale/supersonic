@@ -1,0 +1,514 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "graph_chart",
+  "display_name": "Graph Chart",
+  "selection_summary": {
+    "category": "relationship",
+    "tags": [
+      "graph",
+      "network",
+      "nodes",
+      "edges",
+      "relationship"
+    ],
+    "description_zh": "Graph Chart (Network) displays nodes and edges to represent relationships between entities, with node size/edge width indicating relationship strength.",
+    "visual_shape_zh": "网络图（节点-边关联型）",
+    "use_cases_zh": [
+      "实体间的关联分析（如用户关系、产品关联）",
+      "网络结构可视化（如社交网络、供应链）",
+      "关联强度与聚类分析"
+    ],
+    "required_slots": [
+      {
+        "field_name": "metric",
+        "required": true,
+        "slot_kind": "metric",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1",
+        "placeholder": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        },
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+        ]
+      },
+      {
+        "field_name": "source",
+        "required": true,
+        "slot_kind": "graph_source",
+        "accepted_dataset_roles": [
+          "entity_id",
+          "dimension"
+        ],
+        "cardinality": "1",
+        "placeholder": "<source_column>",
+        "source_categories": [
+          "Query",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Name of the source nodes",
+          "来源节点字段，用于定义边的起点。"
+        ]
+      },
+      {
+        "field_name": "target",
+        "required": true,
+        "slot_kind": "graph_target",
+        "accepted_dataset_roles": [
+          "entity_id",
+          "dimension"
+        ],
+        "cardinality": "1",
+        "placeholder": "<target_column>",
+        "source_categories": [
+          "Query",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Name of the target nodes",
+          "目标节点字段，用于定义边的终点。"
+        ]
+      },
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "关联强度指标，用于控制节点大小/边宽度。"
+        ]
+      }
+    ],
+    "optional_slots": [
+      {
+        "field_name": "adhoc_filters",
+        "required": false,
+        "slot_kind": "filter_list",
+        "accepted_dataset_roles": [
+          "filter_context"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [],
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "字段标签为 Filters。"
+        ]
+      },
+      {
+        "field_name": "source_category",
+        "required": false,
+        "slot_kind": "graph_or_hierarchy",
+        "accepted_dataset_roles": [
+          "entity_id",
+          "entity",
+          "dimension"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<entity_or_relation_column>",
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "The category of source nodes used to assign colors. If a node is associated with more than one category, only the first will be used."
+        ]
+      },
+      {
+        "field_name": "target_category",
+        "required": false,
+        "slot_kind": "graph_or_hierarchy",
+        "accepted_dataset_roles": [
+          "entity_id",
+          "entity",
+          "dimension"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<entity_or_relation_column>",
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Category of target nodes"
+        ]
+      },
+      {
+        "field_name": "base_node_size",
+        "required": false,
+        "slot_kind": "graph_or_hierarchy",
+        "accepted_dataset_roles": [
+          "entity_id",
+          "entity",
+          "dimension"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<entity_or_relation_column>",
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "基础节点大小，用于控制节点的默认尺寸。"
+        ]
+      },
+      {
+        "field_name": "base_edge_width",
+        "required": false,
+        "slot_kind": "graph_or_hierarchy",
+        "accepted_dataset_roles": [
+          "entity_id",
+          "entity",
+          "dimension"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<entity_or_relation_column>",
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "基础边宽度，用于控制边的默认宽度。"
+        ]
+      }
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "dimension",
+      "entity_id",
+      "metric",
+      "saved_metric"
+    ],
+    "optional_dataset_roles": [
+      "dimension",
+      "entity",
+      "entity_id",
+      "filter_context"
+    ],
+    "dataset_role_inventory": {
+      "adhoc_metric": [
+        "metric",
+        "metrics"
+      ],
+      "dimension": [
+        "base_edge_width",
+        "base_node_size",
+        "source",
+        "source_category",
+        "target",
+        "target_category"
+      ],
+      "entity": [
+        "base_edge_width",
+        "base_node_size",
+        "source_category",
+        "target_category"
+      ],
+      "entity_id": [
+        "base_edge_width",
+        "base_node_size",
+        "source",
+        "source_category",
+        "target",
+        "target_category"
+      ],
+      "filter_context": [
+        "adhoc_filters"
+      ],
+      "metric": [
+        "metric",
+        "metrics"
+      ],
+      "saved_metric": [
+        "metric",
+        "metrics"
+      ]
+    },
+    "non_binding_control_names": [
+      "baseEdgeWidth",
+      "baseNodeSize",
+      "color_scheme",
+      "draggable",
+      "edgeLength",
+      "edgeSymbol",
+      "friction",
+      "gravity",
+      "layout",
+      "legendMargin",
+      "legendOrientation",
+      "legendType",
+      "repulsion",
+      "roam",
+      "row_limit",
+      "selectedMode",
+      "showSymbolThreshold",
+      "show_legend"
+    ],
+    "embedding_runtime_field_names": [
+      "adhoc_filters",
+      "custom_form_data",
+      "filters",
+      "interactive_drilldown",
+      "interactive_groupby",
+      "interactive_highlight",
+      "time_grain_sqla",
+      "time_range"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "metric",
+      "source",
+      "target",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "baseEdgeWidth",
+      "baseNodeSize",
+      "color_scheme",
+      "datasource",
+      "draggable",
+      "edgeLength",
+      "edgeSymbol",
+      "friction",
+      "gravity",
+      "layout",
+      "legendMargin",
+      "legendOrientation",
+      "legendType",
+      "metric",
+      "repulsion",
+      "roam",
+      "row_limit",
+      "selectedMode",
+      "showSymbolThreshold",
+      "show_legend",
+      "source",
+      "source_category",
+      "target",
+      "target_category",
+      "viz_type"
+    ],
+    "structural_flags": {
+      "time_series": false,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": false,
+      "flow_like": true,
+      "distribution_like": false,
+      "supports_breakdown": false,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": false,
+      "needs_dimension": true
+    },
+    "selection_hints": [
+      "至少需要 1 个可聚合指标字段。",
+      "需要至少 1 个维度字段用于分组、拆分或定位。",
+      "适合流向、路径、节点关系或网络结构问题。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：实体间的关联分析（如用户关系、产品关联）；网络结构可视化（如社交网络、供应链）；关联强度与聚类分析"
+    ]
+  },
+  "selection_prompt_card": {
+    "viz_type": "graph_chart",
+    "display_name": "Graph Chart",
+    "category": "relationship",
+    "description_zh": "Graph Chart (Network) displays nodes and edges to represent relationships between entities, with node size/edge width indicating relationship strength.",
+    "visual_shape_zh": "网络图（节点-边关联型）",
+    "best_for": [
+      "实体间的关联分析（如用户关系、产品关联）",
+      "网络结构可视化（如社交网络、供应链）",
+      "关联强度与聚类分析"
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "dimension",
+      "entity_id",
+      "metric",
+      "saved_metric"
+    ],
+    "optional_dataset_roles": [
+      "dimension",
+      "entity",
+      "entity_id",
+      "filter_context"
+    ],
+    "required_slots": [
+      {
+        "field_name": "metric",
+        "required": true,
+        "slot_kind": "metric",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1",
+        "placeholder": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        },
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+        ]
+      },
+      {
+        "field_name": "source",
+        "required": true,
+        "slot_kind": "graph_source",
+        "accepted_dataset_roles": [
+          "entity_id",
+          "dimension"
+        ],
+        "cardinality": "1",
+        "placeholder": "<source_column>",
+        "source_categories": [
+          "Query",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Name of the source nodes",
+          "来源节点字段，用于定义边的起点。"
+        ]
+      },
+      {
+        "field_name": "target",
+        "required": true,
+        "slot_kind": "graph_target",
+        "accepted_dataset_roles": [
+          "entity_id",
+          "dimension"
+        ],
+        "cardinality": "1",
+        "placeholder": "<target_column>",
+        "source_categories": [
+          "Query",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Name of the target nodes",
+          "目标节点字段，用于定义边的终点。"
+        ]
+      },
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "关联强度指标，用于控制节点大小/边宽度。"
+        ]
+      }
+    ],
+    "optional_slot_names": [
+      "adhoc_filters",
+      "source_category",
+      "target_category",
+      "base_node_size",
+      "base_edge_width"
+    ],
+    "structural_flags": {
+      "time_series": false,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": false,
+      "flow_like": true,
+      "distribution_like": false,
+      "supports_breakdown": false,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": false,
+      "needs_dimension": true
+    },
+    "selection_hints": [
+      "至少需要 1 个可聚合指标字段。",
+      "需要至少 1 个维度字段用于分组、拆分或定位。",
+      "适合流向、路径、节点关系或网络结构问题。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：实体间的关联分析（如用户关系、产品关联）；网络结构可视化（如社交网络、供应链）；关联强度与聚类分析"
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "graph_chart",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/graph_chart-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/graph_chart-form-data-schema.json",
+      "control-schema": "form-data-schema/graph_chart-schema.json"
+    }
+  }
+}

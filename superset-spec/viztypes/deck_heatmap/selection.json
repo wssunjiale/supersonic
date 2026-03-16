@@ -1,0 +1,467 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "deck_heatmap",
+  "display_name": "deck.gl Heatmap",
+  "selection_summary": {
+    "category": "geospatial",
+    "tags": [
+      "geo",
+      "deckgl",
+      "deckGL",
+      "Spatial",
+      "Comparison",
+      "geospatial",
+      "aggregate"
+    ],
+    "description_zh": "Uses Gaussian Kernel Density Estimation to visualize spatial distribution of data",
+    "visual_shape_zh": "地图/空间可视化（deck.gl）",
+    "use_cases_zh": [
+      "空间点/面/轨迹数据展示",
+      "地理分布密度（网格/六边形/热力）",
+      "地图交互（缩放/旋转/视角）"
+    ],
+    "required_slots": [
+      {
+        "field_name": "size",
+        "required": true,
+        "slot_kind": "metric",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1",
+        "placeholder": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        },
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Metric used as a weight for the grid's coloring"
+        ]
+      },
+      {
+        "field_name": "spatial",
+        "required": true,
+        "slot_kind": "geo_spatial",
+        "accepted_dataset_roles": [
+          "geo_point",
+          "geo_geometry"
+        ],
+        "cardinality": "1",
+        "placeholder": "<spatial_column_or_expression>",
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Point to your spatial columns"
+        ]
+      },
+      {
+        "field_name": "groupby",
+        "required": true,
+        "slot_kind": "dimension_list",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [
+          "<dimension_column>"
+        ],
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "维度字段列表（列名）。用于分组/系列/分类轴，把明细数据按维度聚合到可视化需要的粒度。"
+        ]
+      },
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "指标列表（聚合/度量）。用于计算数值（如 sum(sales)、count(*)），通常至少提供 1 个。"
+        ]
+      },
+      {
+        "field_name": "percent_metrics",
+        "required": true,
+        "slot_kind": "metric",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "0..n",
+        "placeholder": "<metric_or_metric_list>",
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "百分比指标列表。用于把指标转换为百分比/占比列（具体展示随图表而定）；通常与 metrics 搭配使用。"
+        ]
+      }
+    ],
+    "optional_slots": [
+      {
+        "field_name": "adhoc_filters",
+        "required": false,
+        "slot_kind": "filter_list",
+        "accepted_dataset_roles": [
+          "filter_context"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [],
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "字段标签为 Filters。legacy `/superset/explore_json/` 路径会先把 legacy filters 归并进 `adhoc_filters`，再继续 merge `extra_form_data`。"
+        ]
+      },
+      {
+        "field_name": "filter_nulls",
+        "required": false,
+        "slot_kind": "filter_list",
+        "accepted_dataset_roles": [
+          "filter_context"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [],
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Whether to ignore locations that are null"
+        ]
+      }
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "category_dimension",
+      "dimension",
+      "geo_geometry",
+      "geo_point",
+      "metric",
+      "saved_metric"
+    ],
+    "optional_dataset_roles": [
+      "filter_context"
+    ],
+    "dataset_role_inventory": {
+      "adhoc_metric": [
+        "metrics",
+        "percent_metrics",
+        "size"
+      ],
+      "filter_context": [
+        "adhoc_filters",
+        "filter_nulls"
+      ],
+      "geo_geometry": [
+        "spatial"
+      ],
+      "geo_point": [
+        "spatial"
+      ],
+      "metric": [
+        "metrics",
+        "percent_metrics",
+        "size"
+      ],
+      "saved_metric": [
+        "metrics",
+        "percent_metrics",
+        "size"
+      ],
+      "dimension": [
+        "groupby"
+      ],
+      "category_dimension": [
+        "groupby"
+      ]
+    },
+    "non_binding_control_names": [
+      "aggregation",
+      "autozoom",
+      "color_picker",
+      "color_scheme_type",
+      "intensity",
+      "js_columns",
+      "js_data_mutator",
+      "js_onclick_href",
+      "js_tooltip",
+      "linear_color_scheme",
+      "mapbox_style",
+      "radius_pixels",
+      "row_limit",
+      "viewport"
+    ],
+    "embedding_runtime_field_names": [
+      "adhoc_filters",
+      "custom_form_data",
+      "filters",
+      "time_range"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "size",
+      "spatial",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "aggregation",
+      "autozoom",
+      "color_picker",
+      "color_scheme_type",
+      "datasource",
+      "filter_nulls",
+      "intensity",
+      "js_columns",
+      "js_data_mutator",
+      "js_onclick_href",
+      "js_tooltip",
+      "linear_color_scheme",
+      "mapbox_style",
+      "radius_pixels",
+      "row_limit",
+      "size",
+      "spatial",
+      "viewport",
+      "viz_type"
+    ],
+    "structural_flags": {
+      "time_series": false,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": true,
+      "flow_like": false,
+      "distribution_like": true,
+      "supports_breakdown": true,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": false,
+      "needs_dimension": true
+    },
+    "selection_hints": [
+      "至少需要 1 个可聚合指标字段。",
+      "需要至少 1 个维度字段用于分组、拆分或定位。",
+      "需要地理信息字段；点位地图优先经纬度，区域地图优先行政区维度。",
+      "支持按维度拆分多序列或子组。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：空间点/面/轨迹数据展示；地理分布密度（网格/六边形/热力）；地图交互（缩放/旋转/视角）"
+    ]
+  },
+  "selection_prompt_card": {
+    "viz_type": "deck_heatmap",
+    "display_name": "deck.gl Heatmap",
+    "category": "geospatial",
+    "description_zh": "Uses Gaussian Kernel Density Estimation to visualize spatial distribution of data",
+    "visual_shape_zh": "地图/空间可视化（deck.gl）",
+    "best_for": [
+      "空间点/面/轨迹数据展示",
+      "地理分布密度（网格/六边形/热力）",
+      "地图交互（缩放/旋转/视角）"
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "category_dimension",
+      "dimension",
+      "geo_geometry",
+      "geo_point",
+      "metric",
+      "saved_metric"
+    ],
+    "optional_dataset_roles": [
+      "filter_context"
+    ],
+    "required_slots": [
+      {
+        "field_name": "size",
+        "required": true,
+        "slot_kind": "metric",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1",
+        "placeholder": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        },
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Metric used as a weight for the grid's coloring"
+        ]
+      },
+      {
+        "field_name": "spatial",
+        "required": true,
+        "slot_kind": "geo_spatial",
+        "accepted_dataset_roles": [
+          "geo_point",
+          "geo_geometry"
+        ],
+        "cardinality": "1",
+        "placeholder": "<spatial_column_or_expression>",
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Point to your spatial columns"
+        ]
+      },
+      {
+        "field_name": "groupby",
+        "required": true,
+        "slot_kind": "dimension_list",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [
+          "<dimension_column>"
+        ],
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "维度字段列表（列名）。用于分组/系列/分类轴，把明细数据按维度聚合到可视化需要的粒度。"
+        ]
+      },
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "指标列表（聚合/度量）。用于计算数值（如 sum(sales)、count(*)），通常至少提供 1 个。"
+        ]
+      },
+      {
+        "field_name": "percent_metrics",
+        "required": true,
+        "slot_kind": "metric",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "0..n",
+        "placeholder": "<metric_or_metric_list>",
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "百分比指标列表。用于把指标转换为百分比/占比列（具体展示随图表而定）；通常与 metrics 搭配使用。"
+        ]
+      }
+    ],
+    "optional_slot_names": [
+      "adhoc_filters",
+      "filter_nulls"
+    ],
+    "structural_flags": {
+      "time_series": false,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": true,
+      "flow_like": false,
+      "distribution_like": true,
+      "supports_breakdown": true,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": false,
+      "needs_dimension": true
+    },
+    "selection_hints": [
+      "至少需要 1 个可聚合指标字段。",
+      "需要至少 1 个维度字段用于分组、拆分或定位。",
+      "需要地理信息字段；点位地图优先经纬度，区域地图优先行政区维度。",
+      "支持按维度拆分多序列或子组。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：空间点/面/轨迹数据展示；地理分布密度（网格/六边形/热力）；地图交互（缩放/旋转/视角）"
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "deck_heatmap",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/deck_heatmap-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/deck_heatmap-form-data-schema.json",
+      "control-schema": "form-data-schema/deck_heatmap-schema.json"
+    }
+  }
+}

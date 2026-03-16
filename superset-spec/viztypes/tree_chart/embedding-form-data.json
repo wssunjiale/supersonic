@@ -1,0 +1,353 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "tree_chart",
+  "display_name": "Tree Chart",
+  "source_kind": "schema_file",
+  "normalized_embedding_policy": {
+    "immutable_root_keys": [
+      "slice_id",
+      "datasource",
+      "viz_type",
+      "all_saved_chart_definition_fields"
+    ],
+    "allowed_runtime_fields": [
+      {
+        "field_name": "adhoc_filters",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "custom_form_data",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "filters",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_range",
+        "behavior": "override",
+        "source": "embedding-schema"
+      }
+    ],
+    "safe_embedding_form_data_seed": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "tree_chart",
+      "extra_form_data": {
+        "filters": [],
+        "adhoc_filters": []
+      }
+    }
+  },
+  "original_embedding_form_data_schema": {
+    "viz_type": "tree_chart",
+    "display_name": "Tree Chart",
+    "purpose": "第三方 embedding / guest token 场景下安全传输的 form_data 模板",
+    "base_form_data_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/tree_chart-form-data-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset/security/manager.py",
+      "D:/vsx/sources/superset-6.0.0/superset/constants.py",
+      "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/charts/data/api.py",
+      "D:/vsx/sources/superset-6.0.0/superset/commands/chart/data/get_data_command.py",
+      "D:/vsx/sources/superset-6.0.0/superset/charts/schemas.py",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/constants.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/QueryFormData.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/processExtraFormData.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/dashboard/components/nativeFilters/utils.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataWithDashboardContext.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Tree/controlPanel.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Tree/buildQuery.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Tree/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Tree/types.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractQueryFields.ts"
+    ],
+    "notes": [
+      "tree_chart 是现代 chart data API 图。embedded guest 的核心限制不在前端，而在后端 `security/manager.py::query_context_modified()`。",
+      "安全做法不是重新拼装一份新的 Tree Chart form_data，而是以已保存图表的 form_data 原样复制为 base，只把动态条件放进 `extra_form_data`。",
+      "对于 Tree Chart，直接影响 query_context 的核心字段是 `id`、`parent`、可选 `name`、可选 `metric`、`adhoc_filters`、`row_limit`。其中 `id/parent/name` 会进 query.columns，`metric` 会经 core alias 进 query.metrics。",
+      "`root_node_id`、`layout`、`orient`、`node_label_position`、`child_label_position`、`emphasis`、`symbol`、`symbolSize`、`roam` 虽然不改变 query.columns/query.metrics，但它们仍是图表定义字段；guest 请求里不应临时改写。",
+      "Tree Chart controlPanel 没有时间列、时间粒度、时间范围控件；因此 embedding 下虽然 extra_form_data 白名单允许时间相关 override，但它们不属于这个 viztype 的常规推荐动态入口。"
+    ],
+    "security_enforcement": {
+      "backend_check_function": "superset/security/manager.py::query_context_modified",
+      "checked_when": "ChartDataCommand.validate() -> QueryContext.raise_for_access()",
+      "error_message": "Guest user cannot modify chart payload",
+      "hard_block_fields": [
+        "slice_id",
+        "metrics",
+        "columns",
+        "groupby",
+        "orderby"
+      ],
+      "indirectly_sensitive_fields_for_tree_chart": [
+        "id",
+        "parent",
+        "name",
+        "metric",
+        "adhoc_filters",
+        "row_limit"
+      ],
+      "recommended_strategy": "复制保存态 chart form_data 作为 base，仅通过 extra_form_data 追加 filters / adhoc_filters；不要在 guest 请求里重构 Tree Chart 的 root 查询字段与布局字段。"
+    },
+    "safe_base_rule": {
+      "description": "第三方 embedding 请求中的根层 form_data，应当从已保存图表的 form_data 直接复制，不要重构。",
+      "must_be_copied_from_saved_chart": [
+        "slice_id",
+        "datasource",
+        "viz_type",
+        "id",
+        "parent",
+        "name",
+        "root_node_id",
+        "metric",
+        "adhoc_filters",
+        "row_limit",
+        "layout",
+        "orient",
+        "node_label_position",
+        "child_label_position",
+        "emphasis",
+        "symbol",
+        "symbolSize",
+        "roam",
+        "all other chart-definition fields"
+      ],
+      "why": [
+        "query_context_modified() 会把请求 query_context 与保存态图表对比。",
+        "Tree/buildQuery.ts 会把 `id`、`parent`、`name` 写进 query.columns。",
+        "core `extractQueryFields()` 会把 root `metric` 归并到 query.metrics。",
+        "`adhoc_filters` 与 `row_limit` 直接改变查询结果。",
+        "`root_node_id/layout/...` 虽然不改 query，但会改树的可视语义；保守 guest 模式也应直接复制保存态。"
+      ]
+    },
+    "safe_embedding_form_data_template": {
+      "description": "这是 guest embedding 下的安全写法。根层以保存态图表为 base，仅改 extra_form_data。",
+      "template": {
+        "slice_id": "<saved_chart_id>",
+        "dashboardId": "<dashboard_id>",
+        "datasource": "<copied_from_saved_chart>",
+        "viz_type": "tree_chart",
+        "id": "<copied_from_saved_chart>",
+        "parent": "<copied_from_saved_chart>",
+        "name": "<copied_from_saved_chart>",
+        "root_node_id": "<copied_from_saved_chart>",
+        "metric": "<copied_from_saved_chart>",
+        "adhoc_filters": "<copied_from_saved_chart>",
+        "row_limit": "<copied_from_saved_chart>",
+        "layout": "<copied_from_saved_chart>",
+        "orient": "<copied_from_saved_chart>",
+        "node_label_position": "<copied_from_saved_chart>",
+        "child_label_position": "<copied_from_saved_chart>",
+        "emphasis": "<copied_from_saved_chart>",
+        "symbol": "<copied_from_saved_chart>",
+        "symbolSize": "<copied_from_saved_chart>",
+        "roam": "<copied_from_saved_chart>",
+        "extra_form_data": {
+          "filters": [
+            {
+              "col": "region",
+              "op": "IN",
+              "val": [
+                "APAC"
+              ]
+            }
+          ],
+          "adhoc_filters": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "region",
+              "operator": "IN",
+              "comparator": [
+                "APAC"
+              ]
+            }
+          ],
+          "custom_form_data": {}
+        }
+      }
+    },
+    "preferred_dynamic_container": {
+      "field_name": "extra_form_data",
+      "description": "chart data API 与 dashboard filter context 都会把动态过滤条件并入这里。",
+      "append_keys": [
+        "adhoc_filters",
+        "filters",
+        "custom_form_data"
+      ],
+      "override_keys_backend_high_confidence": [],
+      "notes": "Tree Chart 没有时间控件；embedding 场景下应优先只用 `filters` / `adhoc_filters` 做动态条件，不建议改时间 override。"
+    },
+    "extra_form_data_field_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_tree_chart": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "APAC"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_tree_chart": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "APAC"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_tree_chart": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；Tree Chart 默认不直接消费它。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_tree_chart": false,
+        "recommended": false,
+        "sample_data": "Last 90 days",
+        "effect": "Tree Chart controlPanel 本身没有时间控件；guest 场景下不建议把它当成常规动态入口。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_tree_chart": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "Tree Chart 常规场景不直接消费它。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      }
+    ],
+    "unsafe_root_form_data_changes": [
+      {
+        "field_name": "slice_id",
+        "reason": "与保存态图表 id 不一致会被后端立即判定为请求了另一张图。"
+      },
+      {
+        "field_name": "id",
+        "reason": "会改变 query.columns，并直接改变树节点身份。"
+      },
+      {
+        "field_name": "parent",
+        "reason": "会改变 query.columns，并直接改变树的父子结构。"
+      },
+      {
+        "field_name": "name",
+        "reason": "若非空会进入 query.columns，并改变树节点显示名来源。"
+      },
+      {
+        "field_name": "metric",
+        "reason": "会进入 query.metrics，改变节点 value 与 tooltip 数值。"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "reason": "会直接改变查询结果；guest 动态过滤应走 extra_form_data。"
+      },
+      {
+        "field_name": "row_limit",
+        "reason": "会改变查询结果规模。"
+      },
+      {
+        "field_name": "root_node_id",
+        "reason": "虽然不改 query，但会改变运行时选择的树根。"
+      },
+      {
+        "field_name": "layout",
+        "reason": "属于图表定义字段；会改变树布局。"
+      },
+      {
+        "field_name": "orient",
+        "reason": "属于图表定义字段；会改变正交树方向。"
+      },
+      {
+        "field_name": "node_label_position",
+        "reason": "属于图表定义字段；会改变节点标签位置。"
+      },
+      {
+        "field_name": "child_label_position",
+        "reason": "属于图表定义字段；会改变叶子标签位置。"
+      },
+      {
+        "field_name": "emphasis",
+        "reason": "属于图表定义字段；会改变 hover 高亮语义。"
+      },
+      {
+        "field_name": "symbol",
+        "reason": "属于图表定义字段；会改变节点图形。"
+      },
+      {
+        "field_name": "symbolSize",
+        "reason": "属于图表定义字段；会改变节点符号尺寸。"
+      },
+      {
+        "field_name": "roam",
+        "reason": "属于图表定义字段；会改变缩放/拖动画布交互。"
+      }
+    ],
+    "practical_guidance": {
+      "best_practice": [
+        "先从保存态图表读取完整 form_data。",
+        "根层字段保持不变。",
+        "Tree Chart 优先只在 extra_form_data 中放 filters / adhoc_filters / custom_form_data。",
+        "如果页面需要 guest 联动筛选，优先使用 filters 或 adhoc_filters，而不是改 id、parent、name、metric 或布局字段。"
+      ],
+      "avoid": [
+        "不要在 guest embedding 请求里手工重写 id、parent、name、metric。",
+        "不要在 guest 请求里切换 root_node_id 或 layout/orient；这会改变树的可视定义。",
+        "不要把运行时 camelCase 字段 `rootNodeId`、`nodeLabelPosition`、`childLabelPosition` 当成 API 根键名。",
+        "Tree Chart 常规场景不要把 time_range、time_grain_sqla 当成首选动态入口。"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "tree_chart",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/tree_chart-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/tree_chart-form-data-schema.json",
+      "control-schema": "form-data-schema/tree_chart-schema.json"
+    }
+  }
+}

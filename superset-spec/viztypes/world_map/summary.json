@@ -1,0 +1,153 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "world_map",
+  "display_name": "World Map",
+  "normalized_summary": {
+    "category": "geospatial",
+    "tags": [
+      "world_map",
+      "geospatial",
+      "global",
+      "geographic",
+      "spatial"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "geographic_field",
+        "required": true,
+        "description": "地理维度字段（如国家/地区编码、名称），用于关联地图地理边界与数据。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于计算每个地理区域的数值（地图配色/尺寸依据）。"
+      },
+      {
+        "key": "map_projection",
+        "required": false,
+        "description": "地图投影方式（如墨卡托、等积投影），控制地图的空间展示形态。"
+      },
+      {
+        "key": "range_min",
+        "required": false,
+        "description": "数值区间最小值，用于定义地图配色/尺寸的下限阈值。"
+      },
+      {
+        "key": "range_max",
+        "required": false,
+        "description": "数值区间最大值，用于定义地图配色/尺寸的上限阈值。"
+      },
+      {
+        "key": "show_legend",
+        "required": false,
+        "description": "是否展示图例（true/false），控制数值与颜色/尺寸对应关系的显示。"
+      }
+    ],
+    "description_zh": "World Map displays geographic data on a global map canvas, with regions/countries colored or sized based on metric values to visualize spatial distribution of data.",
+    "visual_shape_zh": "世界地图（地理空间型）",
+    "use_cases_zh": [
+      "全球范围内的数值分布展示（如各国人口、GDP、销售额）",
+      "地理维度的指标对比分析",
+      "跨国/跨区域业务数据的空间可视化"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "world_map",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/world_map-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/world_map-form-data-schema.json",
+      "control-schema": "form-data-schema/world_map-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "World Map",
+    "viztype": "world_map",
+    "详细描述": "World Map displays geographic data on a global map canvas, with regions/countries colored or sized based on metric values to visualize spatial distribution of data.",
+    "表现形态": "世界地图（地理空间型）",
+    "适用场景": [
+      "全球范围内的数值分布展示（如各国人口、GDP、销售额）",
+      "地理维度的指标对比分析",
+      "跨国/跨区域业务数据的空间可视化"
+    ],
+    "vizKey": "WorldMap",
+    "pluginCategory": "Geospatial",
+    "pluginTags": [],
+    "category": "geospatial",
+    "tags": [
+      "world_map",
+      "geospatial",
+      "global",
+      "geographic",
+      "spatial"
+    ],
+    "关键字段": [
+      {
+        "key": "geographic_field",
+        "required": true,
+        "description": "地理维度字段（如国家/地区编码、名称），用于关联地图地理边界与数据。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于计算每个地理区域的数值（地图配色/尺寸依据）。"
+      },
+      {
+        "key": "map_projection",
+        "required": false,
+        "description": "地图投影方式（如墨卡托、等积投影），控制地图的空间展示形态。"
+      },
+      {
+        "key": "range_min",
+        "required": false,
+        "description": "数值区间最小值，用于定义地图配色/尺寸的下限阈值。"
+      },
+      {
+        "key": "range_max",
+        "required": false,
+        "description": "数值区间最大值，用于定义地图配色/尺寸的上限阈值。"
+      },
+      {
+        "key": "show_legend",
+        "required": false,
+        "description": "是否展示图例（true/false），控制数值与颜色/尺寸对应关系的显示。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

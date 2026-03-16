@@ -1,0 +1,121 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "box_plot",
+  "display_name": "Box Plot",
+  "normalized_summary": {
+    "category": "distribution",
+    "tags": [
+      "boxplot",
+      "distribution",
+      "statistics",
+      "outliers"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "groupby",
+        "required": true,
+        "description": "维度字段列表，用于分组展示不同类别的箱线图。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "数值型指标，用于计算箱线图的分布特征（中位数、四分位等）。"
+      },
+      {
+        "key": "show_outliers",
+        "required": false,
+        "description": "是否展示异常值（true/false），控制离群点的显示。"
+      }
+    ],
+    "description_zh": "Box Plot (Box and Whisker) chart displays the distribution of numerical data based on the five-number summary: minimum, first quartile, median, third quartile, and maximum.",
+    "visual_shape_zh": "箱线图（分布型）",
+    "use_cases_zh": [
+      "数据分布特征分析（如中位数、四分位、异常值）",
+      "多组数据分布对比",
+      "离群值检测"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "box_plot",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/box_plot-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/box_plot-form-data-schema.json",
+      "control-schema": "form-data-schema/box_plot-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Box Plot",
+    "viztype": "box_plot",
+    "详细描述": "Box Plot (Box and Whisker) chart displays the distribution of numerical data based on the five-number summary: minimum, first quartile, median, third quartile, and maximum.",
+    "表现形态": "箱线图（分布型）",
+    "适用场景": [
+      "数据分布特征分析（如中位数、四分位、异常值）",
+      "多组数据分布对比",
+      "离群值检测"
+    ],
+    "vizKey": "BoxPlot",
+    "pluginCategory": "Distribution",
+    "pluginTags": [],
+    "category": "distribution",
+    "tags": [
+      "boxplot",
+      "distribution",
+      "statistics",
+      "outliers"
+    ],
+    "关键字段": [
+      {
+        "key": "groupby",
+        "required": true,
+        "description": "维度字段列表，用于分组展示不同类别的箱线图。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "数值型指标，用于计算箱线图的分布特征（中位数、四分位等）。"
+      },
+      {
+        "key": "show_outliers",
+        "required": false,
+        "description": "是否展示异常值（true/false），控制离群点的显示。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

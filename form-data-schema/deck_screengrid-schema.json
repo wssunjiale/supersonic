@@ -1,0 +1,301 @@
+{
+  "viz_type": "deck_screengrid",
+  "display_name": "deck.gl Screen Grid",
+  "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Screengrid/controlPanel.ts",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Screengrid/controlPanel.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Screengrid/index.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Screengrid/Screengrid.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/factory.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/common.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/Shared_DeckGL.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/utils.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utils/crossFiltersDataMask.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-demo/storybook/stories/plugins/legacy-preset-chart-deckgl/Screengrid/Stories.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-demo/storybook/stories/plugins/legacy-preset-chart-deckgl/Screengrid/payload.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+    "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+    "D:/vsx/sources/superset-6.0.0/superset/views/core.py",
+    "D:/vsx/sources/superset-6.0.0/superset/utils/core.py"
+  ],
+  "notes": [
+    "deck_screengrid 位于 `legacy-preset-chart-deckgl/src/layers/Screengrid`，metadata 明确声明 `useLegacyApi=true`，因此真实请求路径是 `/superset/explore_json/`。",
+    "前端展示名是 `deck.gl Screen Grid`，后端类名是 `superset/viz.py::DeckScreengrid`。构造模板时应以 `viz_type='deck_screengrid'` 为准。",
+    "当前图的主查询输入是 `spatial` 对象和 `size` 指标。`BaseDeckGLViz.get_metrics()` 明确读取 `form_data.size`，`DeckScreengrid.get_properties()` 再把对应指标标签映射为每个点的 `weight`。",
+    "当前图对 `size` 做了 `controlOverrides`：标签改为 `Weight`、描述改为 `Metric used as a weight for the grid's coloring`、并追加 `validateNonEmpty`。因此规范创建模板应把 `size` 视为必填。",
+    "`formDataOverrides.size = getStandardizedControls().shiftMetric()` 只影响 standardized controls 切换图表时的字段迁移，不改变最终 API root 键名；真正提交给 API 的字段仍然叫 `size`。",
+    "`Grid` section 的颜色控件不是通用 `generateDeckGLColorSchemeControls()`，而是当前 `controlPanel.ts` 手工改写过的 3 个字段：`color_scheme_type` 只允许 `default`、`fixed_color`、`categorical_palette`，没有正式的 `color_breakpoints` 和 `legend_position` 控件。",
+    "`Screengrid.tsx` 在 `color_scheme_type='default'` 时使用内置 `defaultScreenGridColorRange` 且 `colorScaleType='linear'`；切到 `fixed_color` 或 `categorical_palette` 时才改用 `getColorRange()` 和 `quantize`。",
+    "运行时代码仍能读取 `deafult_breakpoint_color` 与 `color_breakpoints`，但当前 controlPanel 没有正式暴露这两个字段。它们只能视为隐藏运行时支持字段，不属于 canonical 创建模板。",
+    "`DeckScreengrid.query_obj()` 会根据 `time_grain_sqla` 切换 `is_timeseries`，但当前 controlPanel 没有正式暴露时间控件；storybook 里出现的 `granularity_sqla`、`time_grain_sqla`、`time_range` 只能视为遗留保存态。",
+    "`crossFiltersDataMask.ts` 对 screengrid 的交互筛选同时支持 cell 内点集合过滤和按拾取坐标估算 bounding box 过滤。`latlong` 模式下会生成经纬度 `IN` 或 `>=`/`<=` 过滤；`delimited`、`geohash` 模式下主要依赖 picked points 生成精确值过滤。"
+  ],
+  "control_overrides": {
+    "size": {
+      "label": "Weight",
+      "description": "Metric used as a weight for the grid's coloring",
+      "validators": [
+        "validateNonEmpty"
+      ]
+    },
+    "time_grain_sqla": {
+      "source": "timeGrainSqlaAnimationOverrides"
+    }
+  },
+  "form_data_overrides": {
+    "size": "getStandardizedControls().shiftMetric()"
+  },
+  "legacy_api_behavior": {
+    "useLegacyApi": true,
+    "frontend_request_endpoint": "/superset/explore_json/",
+    "frontend_request_payload": {
+      "form_data": "<raw form_data>"
+    },
+    "query_builder": "deck_screengrid 没有专属前端 buildQuery。ChartClient.ts 在 `useLegacyApi=true` 且未注册 buildQuery 时，会把原始 form_data 直接包装进 legacy payload。"
+  },
+  "query_compilation": {
+    "backend_class": "superset/viz.py::DeckScreengrid",
+    "base_query": "继承 `BaseDeckGLViz.query_obj()` -> `BaseViz.query_obj()`，因此会先执行 `convert_legacy_filters_into_adhoc(form_data)` 与 `merge_extra_filters(form_data)`。",
+    "timeseries_toggle": "`DeckScreengrid.query_obj()` 先做 `self.is_timeseries = bool(self.form_data.get('time_grain_sqla'))`，再复用 `BaseDeckGLViz.query_obj()`。但当前 controlPanel 没有正式暴露时间字段。",
+    "null_filter_injection": "当 `filter_nulls=true`（默认值）时，`BaseDeckGLViz.add_null_filters()` 会为 `spatial` 引用到的经纬度列、delimited 列或 geohash 列自动追加 `IS NOT NULL` adhoc filter。",
+    "groupby": "`BaseDeckGLViz.query_obj()` 会把 `spatial` 展开的实际列追加到 `group_by`，再拼上可选 `js_columns`。当前图没有 dimension 控件，因此常规情况下 groupby 只由空间列和 js_columns 组成。",
+    "metrics": "规范保存态里 `size` 因 `validateNonEmpty` 应始终存在，因此 `query_obj['metrics']=[size]` 且 `query_obj['columns']=[]`。若手工绕过 UI 不传 `size`，后端仍会回退成无指标 columns 查询，随后 `weight` 回退为 1。",
+    "orderby": "当有 `size` 指标时，`query_obj['orderby']=[(size, not order_desc)]`。由于 root 没有正式 `order_desc` 控件，缺省行为等价于按指标降序。",
+    "returned_data": "`DeckScreengrid.get_data()` 会先把 `self.metric_label` 设为 `utils.get_metric_name(self.metric)`，再复用 `BaseDeckGLViz.get_data()` 返回 `{ features, mapboxApiKey, metricLabels }`。每个 feature 的形状是 `{ position, weight, __timestamp }`。",
+    "runtime_rendering": "`Screengrid.tsx` 会把 `payload.data.features` 交给 `ScreenGridLayer`。`grid_size` 映射到 `cellSizePixels`，`getWeight` 取 `d.weight || 0`，`color_scheme_type='default'` 时使用内置黄橙红色带并走 `linear` 颜色比例；其他模式使用 `getColorRange()`，并在 `filterState.value` 存在时把 opacity 压到 0.3。"
+  },
+  "field_categories": {
+    "Query": [
+      {
+        "field_name": "spatial",
+        "description": "Point to your spatial columns",
+        "data_type": "object",
+        "enum_values": [
+          "latlong",
+          "delimited",
+          "geohash"
+        ],
+        "sample_data": {
+          "type": "latlong",
+          "lonCol": "LON",
+          "latCol": "LAT"
+        },
+        "required": true,
+        "embedding": "否",
+        "default_value": {
+          "type": "latlong"
+        },
+        "notes": "控件是 `SpatialControl` + `validateNonEmpty`。源码支持三种对象形状：`{type:'latlong', lonCol, latCol}`、`{type:'delimited', lonlatCol, delimiter, reverseCheckbox}`、`{type:'geohash', geohashCol, reverseCheckbox}`。"
+      },
+      {
+        "field_name": "size",
+        "description": "Metric used as a weight for the grid's coloring",
+        "data_type": "string | object",
+        "enum_source": "saved metrics + adhoc metrics",
+        "sample_data": "count",
+        "required": true,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "字段名就是 `size`。后端 `BaseDeckGLViz.get_metrics()` 直接读取它，`DeckScreengrid.get_properties()` 再把对应值写成 `weight`。"
+      },
+      {
+        "field_name": "row_limit",
+        "runtime_alias": "rowLimit",
+        "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+        "data_type": "integer",
+        "enum_values": [
+          10,
+          50,
+          100,
+          250,
+          500,
+          1000,
+          5000,
+          10000,
+          50000
+        ],
+        "sample_data": 5000,
+        "required": false,
+        "embedding": "否",
+        "default_value": 10000
+      },
+      {
+        "field_name": "filter_nulls",
+        "description": "Whether to ignore locations that are null",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "default_value": true,
+        "notes": "即便 root 不显式提供，若 `filter_nulls=true`，后端也会在查询前自动把空间列的 `IS NOT NULL` 过滤补进来。"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "description": "源码未提供额外描述；字段标签为 Filters。",
+        "data_type": "array[object]",
+        "enum_source": "dataset columns + saved metrics + 当前 metrics",
+        "sample_data": [],
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "default_value": [],
+        "notes": "当前图的动态过滤应优先追加到 `extra_form_data`，不要直接覆盖保存态根字段。"
+      }
+    ],
+    "Map": [
+      {
+        "field_name": "mapbox_style",
+        "description": "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/ or tile server URL.",
+        "data_type": "string",
+        "enum_source": "bootstrap common.deckgl_tiles or DEFAULT_DECKGL_TILES",
+        "sample_data": "mapbox://styles/mapbox/dark-v9",
+        "required": false,
+        "embedding": "否",
+        "default_value": "getDeckGLTiles()[0][0]"
+      },
+      {
+        "field_name": "autozoom",
+        "description": "When checked, the map will zoom to your data after each query",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true
+      },
+      {
+        "field_name": "viewport",
+        "description": "Parameters related to the view and perspective on the map",
+        "data_type": "object",
+        "sample_data": {
+          "longitude": -122.41827069521386,
+          "latitude": 37.76024135844065,
+          "zoom": 14.161641703941438,
+          "bearing": -4.952916738791771,
+          "pitch": 4.750411100577438
+        },
+        "required": false,
+        "embedding": "否",
+        "default_value": {
+          "longitude": 6.85236157047845,
+          "latitude": 31.222656842808707,
+          "zoom": 1,
+          "bearing": 0,
+          "pitch": 0
+        },
+        "notes": "运行时 `transformProps.ts` 会把当前图表的 `width`/`height` 合并进 viewport，但 root form_data 不需要自己提供宽高。"
+      }
+    ],
+    "Grid": [
+      {
+        "field_name": "grid_size",
+        "description": "Defines the grid size in pixels",
+        "data_type": "integer | string",
+        "sample_data": 20,
+        "required": false,
+        "embedding": "否",
+        "default_value": 20,
+        "notes": "`Screengrid.tsx` 运行时把它直接映射到 `ScreenGridLayer.cellSizePixels`。"
+      },
+      {
+        "field_name": "color_scheme_type",
+        "description": "Select the type of color scheme to use.",
+        "data_type": "string",
+        "enum_values": [
+          "default",
+          "fixed_color",
+          "categorical_palette"
+        ],
+        "sample_data": "default",
+        "required": false,
+        "embedding": "否",
+        "default_value": "default",
+        "notes": "这是当前图专属改写过的 choices。正式 controlPanel 没有 `color_breakpoints` 选项。"
+      },
+      {
+        "field_name": "color_picker",
+        "description": "Select the fixed color",
+        "data_type": "object",
+        "sample_data": {
+          "r": 14,
+          "g": 255,
+          "b": 0,
+          "a": 1
+        },
+        "required": false,
+        "embedding": "否",
+        "default_value": {
+          "r": 0,
+          "g": 122,
+          "b": 135,
+          "a": 1
+        },
+        "notes": "仅当 `color_scheme_type='fixed_color'` 时可见。"
+      },
+      {
+        "field_name": "color_scheme",
+        "description": "The color scheme for rendering chart",
+        "data_type": "string",
+        "enum_source": "categoricalSchemeRegistry.keys()",
+        "sample_data": "SUPERSET_DEFAULT",
+        "required": false,
+        "embedding": "否",
+        "default_value": "categoricalSchemeRegistry.getDefaultKey()",
+        "notes": "仅当 `color_scheme_type='categorical_palette'` 时可见。当前图没有独立 dimension 字段，这里实际只提供调色板 range。"
+      }
+    ],
+    "Advanced": [
+      {
+        "field_name": "js_columns",
+        "description": "List of extra columns made available in JavaScript functions",
+        "data_type": "array[string | object]",
+        "enum_source": "datasource columns",
+        "sample_data": [
+          "city"
+        ],
+        "required": false,
+        "embedding": "否",
+        "default_value": [],
+        "notes": "`BaseDeckGLViz.query_obj()` 会把它们并入 query groupby，并在返回特征中以 `extraProps` 暴露给自定义 JS。"
+      },
+      {
+        "field_name": "js_data_mutator",
+        "description": "Define a javascript function that receives the data array used in the visualization and is expected to return a modified version of that array.",
+        "data_type": "string",
+        "sample_data": "data => data",
+        "required": false,
+        "embedding": "否",
+        "default_value": "",
+        "notes": "如果功能开关 `EnableJavascriptControls` 关闭，该控件会变成只读并显示安全提示。`Screengrid.tsx` 会在绘图前对 `payload.data.features` 执行它。"
+      },
+      {
+        "field_name": "js_tooltip",
+        "description": "Define a function that receives the input and outputs the content for a tooltip",
+        "data_type": "string",
+        "sample_data": "o => `<div>${o.object?.value}</div>`",
+        "required": false,
+        "embedding": "否",
+        "default_value": "",
+        "notes": "若未提供，默认 tooltip 显示经纬度和 Weight。"
+      },
+      {
+        "field_name": "js_onclick_href",
+        "description": "Define a function that returns a URL to navigate to when user clicks",
+        "data_type": "string",
+        "sample_data": "o => `https://example.com/?lon=${o.coordinate[0]}&lat=${o.coordinate[1]}`",
+        "required": false,
+        "embedding": "否",
+        "default_value": "",
+        "notes": "若提供，`commonLayerProps()` 会在点击时打开该 URL。"
+      }
+    ]
+  }
+}

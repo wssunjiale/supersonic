@@ -1,0 +1,43 @@
+{
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "immutable_root_keys": [
+    "slice_id",
+    "datasource",
+    "viz_type",
+    "all_saved_chart_definition_fields"
+  ],
+  "recommended_dynamic_container": "extra_form_data",
+  "allowed_runtime_field_frequency": {
+    "adhoc_filters": 56,
+    "custom_form_data": 56,
+    "filters": 56,
+    "time_range": 53,
+    "time_grain_sqla": 36,
+    "granularity_sqla": 35,
+    "interactive_groupby": 32,
+    "relative_end": 32,
+    "relative_start": 32,
+    "interactive_drilldown": 30,
+    "interactive_highlight": 30,
+    "time_column": 29,
+    "time_grain": 29,
+    "time_compare": 24,
+    "granularity": 22,
+    "filter_nulls": 1,
+    "adhoc_filters_b": 1,
+    "all_columns": 1,
+    "groupby": 1,
+    "metrics": 1,
+    "order_by_cols": 1,
+    "order_desc": 1,
+    "percent_metric_calculation": 1,
+    "percent_metrics": 1,
+    "query_mode": 1,
+    "row_limit": 1,
+    "server_page_length": 1,
+    "server_pagination": 1,
+    "show_totals": 1,
+    "start_date_offset": 1,
+    "timeseries_limit_metric": 1
+  }
+}

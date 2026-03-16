@@ -1,0 +1,339 @@
+{
+  "viz_type": "sunburst_v2",
+  "display_name": "Sunburst Chart",
+  "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Sunburst/controlPanel.tsx",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Sunburst/index.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Sunburst/controlPanel.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Sunburst/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Sunburst/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Sunburst/types.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/utils/treeBuilder.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/constants.ts"
+  ],
+  "notes": [
+    "sunburst_v2 是标准 chart data API 图，不是 legacy chart；查询由 Sunburst/buildQuery.ts 基于 buildQueryContext() 构造。",
+    "字段名优先取 controlPanel 配置中的 name；如 transformProps/types 中确认了 camelCase 运行时别名，则补充 runtime_alias。",
+    "Sunburst 图的核心输入是 columns、metric 和可选的 secondary_metric。transformProps 会把 columns 转成 columnLabels，再交给 utils/treeBuilder.ts 构建多层树。",
+    "columns 在源码层没有 validateNonEmpty 校验，但 treeBuilder 直接依赖 groupBy/columns 作为层级输入；从图表语义上它是高重要字段。",
+    "secondary_metric 存在时，transformProps 会切换到 linearColorScheme，并按 secondary_metric / metric 比值计算线性颜色；否则使用 color_scheme 的分类色。",
+    "sort_by_metric 并不是纯显示字段；Sunburst/buildQuery.ts 会在其为真时写入 orderby=[[metric,false]]。",
+    "Sunburst controlPanel 没有 Chart Title、Advanced analytics、Annotations、Forecast 等 section。",
+    "embedding 仅在字段命中 superset-ui-core/query/constants.ts 的 extra_form_data append/override 白名单时标记为可用。"
+  ],
+  "control_overrides": {
+    "metric": {
+      "label": "Primary Metric",
+      "description": "The primary metric is used to define the arc segment sizes"
+    },
+    "secondary_metric": {
+      "label": "Secondary Metric",
+      "default_value": null,
+      "description": "[optional] this secondary metric is used to define the color as a ratio against the primary metric. When omitted, the color is categorical and based on labels"
+    },
+    "color_scheme": {
+      "description": "When only a primary metric is provided, a categorical color scale is used."
+    },
+    "linear_color_scheme": {
+      "description": "When a secondary metric is provided, a linear color scale is used."
+    },
+    "columns": {
+      "label": "Hierarchy",
+      "description": "Sets the hierarchy levels of the chart. Each level is represented by one ring with the innermost circle as the top of the hierarchy."
+    }
+  },
+  "form_data_overrides": {
+    "groupby": "getStandardizedControls().popAllColumns()",
+    "metric": "getStandardizedControls().shiftMetric()",
+    "secondary_metric": "getStandardizedControls().shiftMetric()"
+  },
+  "field_categories": {
+    "Query": [
+      {
+        "field_name": "columns",
+        "description": "Sets the hierarchy levels of the chart. Each level is represented by one ring with the innermost circle as the top of the hierarchy.",
+        "data_type": "array[string | object]",
+        "enum_source": "datasource columns",
+        "sample_data": [
+          "continent",
+          "country"
+        ],
+        "required": false,
+        "embedding": "否",
+        "default_value": [],
+        "notes": "源码层没有 validateNonEmpty，但 treeBuilder.ts 会直接把 columns 作为 hierarchy 输入，因此实际调用 API 时建议至少提供 1 个层级字段。"
+      },
+      {
+        "field_name": "metric",
+        "description": "The primary metric is used to define the arc segment sizes",
+        "data_type": "string | object",
+        "enum_source": "saved metrics + adhoc metrics",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        },
+        "required": true,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "secondary_metric",
+        "runtime_alias": "secondaryMetric",
+        "description": "[optional] this secondary metric is used to define the color as a ratio against the primary metric. When omitted, the color is categorical and based on labels",
+        "data_type": "string | object | null",
+        "enum_source": "saved metrics + adhoc metrics",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "profit"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(profit)"
+        },
+        "required": false,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "adhoc_filters",
+        "description": "源码未提供额外描述；字段标签为 Filters。",
+        "data_type": "array[object]",
+        "enum_source": "dataset columns + saved metrics + 当前 metric/secondary_metric",
+        "sample_data": [
+          {
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "APAC"
+            ],
+            "expressionType": "SIMPLE"
+          }
+        ],
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "default_value": []
+      },
+      {
+        "field_name": "row_limit",
+        "runtime_alias": "rowLimit",
+        "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+        "data_type": "integer",
+        "enum_values": [
+          10,
+          50,
+          100,
+          250,
+          500,
+          1000,
+          5000,
+          10000,
+          50000
+        ],
+        "sample_data": 10000,
+        "required": false,
+        "embedding": "否",
+        "default_value": 10000
+      },
+      {
+        "field_name": "sort_by_metric",
+        "runtime_alias": "sortByMetric",
+        "description": "Whether to sort results by the selected metric in descending order.",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": null,
+        "ui_default_state": "unchecked",
+        "notes": "shared control 没有显式 `default`；`getControlState.ts` 只有在 `state.default` 为 truthy 时才会把默认值写入 control.value，因此 untouched root form_data 的缺省态通常是未设置。与此同时，`CheckboxControl.jsx` 的 `defaultProps.value=false` 且 `checked={!!value}`，所以 UI 会以未勾选状态展示。启用后 buildQuery.ts 会写入 orderby=[[metric,false]]。"
+      }
+    ],
+    "Chart Options / Colors": [
+      {
+        "field_name": "color_scheme",
+        "runtime_alias": "colorScheme",
+        "description": "When only a primary metric is provided, a categorical color scale is used.",
+        "data_type": "string",
+        "enum_source": "categoricalSchemeRegistry.keys()",
+        "sample_data": "supersetColors",
+        "required": false,
+        "embedding": "否",
+        "default_value": "categoricalSchemeRegistry.getDefaultKey()",
+        "notes": "仅当 secondary_metric 为空或与 metric 相同时显示。"
+      },
+      {
+        "field_name": "linear_color_scheme",
+        "runtime_alias": "linearColorScheme",
+        "description": "When a secondary metric is provided, a linear color scale is used.",
+        "data_type": "string",
+        "enum_source": "sequentialSchemeRegistry.keys()",
+        "sample_data": "superset_seq_1",
+        "required": false,
+        "embedding": "否",
+        "default_value": "sequentialSchemeRegistry.getDefaultKey()",
+        "notes": "仅当 secondary_metric 有值且不等于 metric 时显示。"
+      }
+    ],
+    "Chart Options / Labels": [
+      {
+        "field_name": "show_labels",
+        "runtime_alias": "showLabels",
+        "description": "Whether to display the labels.",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      },
+      {
+        "field_name": "show_labels_threshold",
+        "runtime_alias": "showLabelsThreshold",
+        "description": "Minimum threshold in percentage points for showing labels.",
+        "data_type": "number",
+        "sample_data": 5,
+        "required": false,
+        "embedding": "否",
+        "default_value": 5
+      },
+      {
+        "field_name": "show_total",
+        "runtime_alias": "showTotal",
+        "description": "Whether to display the aggregate count",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      },
+      {
+        "field_name": "label_type",
+        "runtime_alias": "labelType",
+        "description": "What should be shown on the label?",
+        "data_type": "string",
+        "enum_values": [
+          "key",
+          "value",
+          "key_value"
+        ],
+        "sample_data": "key",
+        "required": false,
+        "embedding": "否",
+        "default_value": "key"
+      }
+    ],
+    "Chart Options / Formatting": [
+      {
+        "field_name": "number_format",
+        "runtime_alias": "numberFormat",
+        "description": "D3 format syntax: https://github.com/d3/d3-format. Values like `.2f`, `,.0%`, or `,.2r` are supported.",
+        "data_type": "string",
+        "enum_source": "D3_FORMAT_OPTIONS",
+        "sample_data": "SMART_NUMBER",
+        "required": false,
+        "embedding": "否",
+        "default_value": "SMART_NUMBER"
+      },
+      {
+        "field_name": "currency_format",
+        "runtime_alias": "currencyFormat",
+        "description": "Currency format",
+        "data_type": "string | object | null",
+        "sample_data": {
+          "symbol": "$",
+          "symbolPosition": "prefix"
+        },
+        "required": false,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "date_format",
+        "runtime_alias": "dateFormat",
+        "description": "D3 time format syntax: https://github.com/d3/d3-time-format",
+        "data_type": "string",
+        "enum_source": "D3_TIME_FORMAT_OPTIONS",
+        "sample_data": "smart_date",
+        "required": false,
+        "embedding": "否",
+        "default_value": "smart_date"
+      }
+    ]
+  },
+  "runtime_only_or_non_template_fields": {
+    "standardized_or_viz_switch_only": [
+      {
+        "field_name": "groupby",
+        "reason": "formDataOverrides 在标准化表单转换时会从 columns 回填 groupby，但 Sunburst controlPanel 的直接 API 字段仍然是 columns。"
+      },
+      {
+        "field_name": "formDataOverrides(metric/secondary_metric/groupby remap)",
+        "reason": "只在 standardizedFormData.transform() 切换 viz_type 时触发，不是常规导出 Sunburst form_data 的必经步骤。"
+      }
+    ],
+    "runtime_aliases_only": [
+      {
+        "field_name": "secondaryMetric",
+        "reason": "这是 secondary_metric 的 camelCase 运行时别名，不是 API root form_data 键名。"
+      },
+      {
+        "field_name": "showLabels/showLabelsThreshold/showTotal/labelType/numberFormat/dateFormat/colorScheme/linearColorScheme",
+        "reason": "这些是运行时 camelCase 形态；API 调用时应使用原始 control name。"
+      }
+    ]
+  },
+  "api_usage_guidance": {
+    "high_confidence_required_fields": [
+      "datasource",
+      "viz_type",
+      "metric",
+      "columns"
+    ],
+    "recommended_always_set": [
+      "secondary_metric",
+      "adhoc_filters",
+      "row_limit",
+      "sort_by_metric",
+      "label_type",
+      "number_format"
+    ],
+    "mixed_case_examples": [
+      "secondary_metric",
+      "linear_color_scheme",
+      "show_labels",
+      "show_total",
+      "label_type",
+      "number_format",
+      "date_format"
+    ],
+    "do_not_send_as_root_form_data": [
+      "groupby",
+      "secondaryMetric",
+      "showLabels",
+      "showLabelsThreshold",
+      "showTotal",
+      "labelType",
+      "numberFormat",
+      "dateFormat",
+      "colorScheme",
+      "linearColorScheme"
+    ]
+  }
+}

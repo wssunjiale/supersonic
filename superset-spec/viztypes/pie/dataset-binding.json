@@ -1,0 +1,446 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "pie",
+  "display_name": "Pie Chart",
+  "generation_mode": "heuristic_seed",
+  "slot_candidates": [
+    {
+      "field_name": "adhoc_filters",
+      "required": false,
+      "slot_kind": "filter_list",
+      "accepted_dataset_roles": [
+        "filter_context"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [],
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [
+        "extra_form_data.append"
+      ],
+      "descriptions": [
+        "源码未提供额外描述；字段标签为 Filters。"
+      ]
+    },
+    {
+      "field_name": "groupby",
+      "required": false,
+      "slot_kind": "dimension_list",
+      "accepted_dataset_roles": [
+        "dimension",
+        "category_dimension"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [
+        "<dimension_column>"
+      ],
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Dimensions contain qualitative values such as names, dates, or geographical data. Use dimensions to categorize, segment, and reveal the details in your data. Dimensions affect the level of detail in the view."
+      ]
+    },
+    {
+      "field_name": "metric",
+      "required": true,
+      "slot_kind": "metric",
+      "accepted_dataset_roles": [
+        "metric",
+        "saved_metric",
+        "adhoc_metric"
+      ],
+      "cardinality": "1",
+      "placeholder": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+      ]
+    }
+  ],
+  "non_binding_form_controls": [
+    {
+      "field_name": "color_scheme",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / General"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The color scheme for rendering chart"
+      ]
+    },
+    {
+      "field_name": "currency_format",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Labels"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Currency format"
+      ]
+    },
+    {
+      "field_name": "date_format",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Labels"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "D3 format syntax for dates and times"
+      ]
+    },
+    {
+      "field_name": "donut",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Pie Shape"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Do you want a donut or a pie?"
+      ]
+    },
+    {
+      "field_name": "innerRadius",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Pie Shape"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Inner radius of donut hole"
+      ]
+    },
+    {
+      "field_name": "label_line",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Labels"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Draw line from Pie to label when labels outside?"
+      ]
+    },
+    {
+      "field_name": "label_template",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Labels"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Format data labels. Use variables: {name}, {value}, {percent}. \\n represents a new line. ECharts compatibility: {a} (series), {b} (name), {c} (value), {d} (percentage)"
+      ]
+    },
+    {
+      "field_name": "label_type",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Labels"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "What should be shown on the label?"
+      ]
+    },
+    {
+      "field_name": "labels_outside",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Labels"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Put the labels outside of the pie?"
+      ]
+    },
+    {
+      "field_name": "legendMargin",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Legend"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Additional padding for legend."
+      ]
+    },
+    {
+      "field_name": "legendOrientation",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Legend"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Legend Orientation"
+      ]
+    },
+    {
+      "field_name": "legendType",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Legend"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Legend type"
+      ]
+    },
+    {
+      "field_name": "number_format",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Labels"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "D3 format syntax for numbers"
+      ]
+    },
+    {
+      "field_name": "outerRadius",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Pie Shape"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Outer edge of Pie chart"
+      ]
+    },
+    {
+      "field_name": "roseType",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / General"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to show as Nightingale chart."
+      ]
+    },
+    {
+      "field_name": "row_limit",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Limits the number of the rows that are computed in the query that is the source of the data used for this chart."
+      ]
+    },
+    {
+      "field_name": "show_labels",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Labels"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to display the labels."
+      ]
+    },
+    {
+      "field_name": "show_labels_threshold",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Labels"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Minimum threshold in percentage points for showing labels."
+      ]
+    },
+    {
+      "field_name": "show_legend",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Legend"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to display a legend for the chart"
+      ]
+    },
+    {
+      "field_name": "show_total",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / General"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to display the aggregate count"
+      ]
+    },
+    {
+      "field_name": "sort_by_metric",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to sort results by the selected metric in descending order."
+      ]
+    },
+    {
+      "field_name": "threshold_for_other",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / General"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Values less than this percentage will be grouped into the Other category."
+      ]
+    }
+  ],
+  "dataset_role_inventory": {
+    "adhoc_metric": [
+      "metric"
+    ],
+    "category_dimension": [
+      "groupby"
+    ],
+    "dimension": [
+      "groupby"
+    ],
+    "filter_context": [
+      "adhoc_filters"
+    ],
+    "metric": [
+      "metric"
+    ],
+    "saved_metric": [
+      "metric"
+    ]
+  },
+  "binding_seed_example": {
+    "metric": {
+      "expressionType": "SIMPLE",
+      "column": {
+        "column_name": "<metric_column>"
+      },
+      "aggregate": "SUM",
+      "label": "SUM(<metric_column>)"
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "pie",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/pie-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/pie-form-data-schema.json",
+      "control-schema": "form-data-schema/pie-schema.json"
+    }
+  }
+}

@@ -1,0 +1,311 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "para",
+  "display_name": "Parallel Coordinates",
+  "selection_summary": {
+    "category": "relationship",
+    "tags": [
+      "parallel",
+      "multi_dimensional",
+      "relationship",
+      "coordinates"
+    ],
+    "description_zh": "Parallel Coordinates Chart displays multi-dimensional numerical data, with each dimension as a vertical axis and data points as lines connecting values across axes.",
+    "visual_shape_zh": "平行坐标图（多维关联型）",
+    "use_cases_zh": [
+      "多维数值数据关联分析（如多指标特征对比）",
+      "高维数据模式识别",
+      "多维度异常值检测"
+    ],
+    "required_slots": [
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "Query",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+          "数值指标列表，用于绘制跨维度的数值连线。"
+        ]
+      }
+    ],
+    "optional_slots": [
+      {
+        "field_name": "adhoc_filters",
+        "required": false,
+        "slot_kind": "filter_list",
+        "accepted_dataset_roles": [
+          "filter_context"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [],
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "字段标签为 Filters。legacy explore_json 路径会先把 legacy filters 转成 adhoc_filters，再继续处理 extra filters / extra_form_data。"
+        ]
+      },
+      {
+        "field_name": "secondary_metric",
+        "required": false,
+        "slot_kind": "secondary_metric",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "0..1",
+        "placeholder": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<secondary_metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<secondary_metric_column>)"
+        },
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "A metric to use for color"
+        ]
+      },
+      {
+        "field_name": "series",
+        "required": false,
+        "slot_kind": "dimension",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "1",
+        "placeholder": "<dimension_column>",
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Defines the grouping of entities. Each series is represented by a specific color in the chart."
+        ]
+      }
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "metric",
+      "saved_metric"
+    ],
+    "optional_dataset_roles": [
+      "adhoc_metric",
+      "category_dimension",
+      "dimension",
+      "filter_context",
+      "metric",
+      "saved_metric"
+    ],
+    "dataset_role_inventory": {
+      "adhoc_metric": [
+        "metrics",
+        "secondary_metric"
+      ],
+      "category_dimension": [
+        "series"
+      ],
+      "dimension": [
+        "series"
+      ],
+      "filter_context": [
+        "adhoc_filters"
+      ],
+      "metric": [
+        "metrics",
+        "secondary_metric"
+      ],
+      "saved_metric": [
+        "metrics",
+        "secondary_metric"
+      ]
+    },
+    "non_binding_control_names": [
+      "include_series",
+      "limit",
+      "linear_color_scheme",
+      "order_desc",
+      "row_limit",
+      "show_datatable",
+      "timeseries_limit_metric"
+    ],
+    "embedding_runtime_field_names": [
+      "adhoc_filters",
+      "custom_form_data",
+      "filters",
+      "granularity_sqla",
+      "interactive_drilldown",
+      "interactive_groupby",
+      "interactive_highlight",
+      "relative_end",
+      "relative_start",
+      "time_column",
+      "time_grain",
+      "time_grain_sqla",
+      "time_range"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "metrics",
+      "series",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "include_series",
+      "limit",
+      "linear_color_scheme",
+      "metrics",
+      "order_desc",
+      "row_limit",
+      "secondary_metric",
+      "series",
+      "show_datatable",
+      "timeseries_limit_metric",
+      "viz_type"
+    ],
+    "structural_flags": {
+      "time_series": false,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": false,
+      "flow_like": false,
+      "distribution_like": false,
+      "supports_breakdown": false,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": false,
+      "needs_dimension": false
+    },
+    "selection_hints": [
+      "至少需要 1 个可聚合指标字段。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：多维数值数据关联分析（如多指标特征对比）；高维数据模式识别；多维度异常值检测"
+    ]
+  },
+  "selection_prompt_card": {
+    "viz_type": "para",
+    "display_name": "Parallel Coordinates",
+    "category": "relationship",
+    "description_zh": "Parallel Coordinates Chart displays multi-dimensional numerical data, with each dimension as a vertical axis and data points as lines connecting values across axes.",
+    "visual_shape_zh": "平行坐标图（多维关联型）",
+    "best_for": [
+      "多维数值数据关联分析（如多指标特征对比）",
+      "高维数据模式识别",
+      "多维度异常值检测"
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "metric",
+      "saved_metric"
+    ],
+    "optional_dataset_roles": [
+      "adhoc_metric",
+      "category_dimension",
+      "dimension",
+      "filter_context",
+      "metric",
+      "saved_metric"
+    ],
+    "required_slots": [
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "Query",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+          "数值指标列表，用于绘制跨维度的数值连线。"
+        ]
+      }
+    ],
+    "optional_slot_names": [
+      "adhoc_filters",
+      "secondary_metric",
+      "series"
+    ],
+    "structural_flags": {
+      "time_series": false,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": false,
+      "flow_like": false,
+      "distribution_like": false,
+      "supports_breakdown": false,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": false,
+      "needs_dimension": false
+    },
+    "selection_hints": [
+      "至少需要 1 个可聚合指标字段。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：多维数值数据关联分析（如多指标特征对比）；高维数据模式识别；多维度异常值检测"
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "para",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/para-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/para-form-data-schema.json",
+      "control-schema": "form-data-schema/para-schema.json"
+    }
+  }
+}

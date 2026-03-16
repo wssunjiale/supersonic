@@ -1,0 +1,593 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "mapbox",
+  "display_name": "MapBox",
+  "source_kind": "schema_file",
+  "normalized_embedding_policy": {
+    "immutable_root_keys": [
+      "slice_id",
+      "datasource",
+      "viz_type",
+      "all_saved_chart_definition_fields"
+    ],
+    "allowed_runtime_fields": [
+      {
+        "field_name": "adhoc_filters",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "custom_form_data",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "filters",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "granularity",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "relative_end",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "relative_start",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_column",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_compare",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_grain",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_range",
+        "behavior": "override",
+        "source": "embedding-schema"
+      }
+    ],
+    "safe_embedding_form_data_seed": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "mapbox",
+      "extra_form_data": {
+        "filters": [],
+        "adhoc_filters": []
+      }
+    }
+  },
+  "original_embedding_form_data_schema": {
+    "viz_type": "mapbox",
+    "display_name": "MapBox",
+    "purpose": "第三方 embedding / guest token 场景下安全传输的 MapBox form_data 模板",
+    "base_form_data_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/mapbox-form-data-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-map-box/src/index.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+      "D:/vsx/sources/superset-6.0.0/superset/views/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/constants.py",
+      "D:/vsx/sources/superset-6.0.0/superset/charts/schemas.py",
+      "D:/vsx/sources/superset-6.0.0/superset/security/manager.py",
+      "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/QueryFormData.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/constants.ts"
+    ],
+    "notes": [
+      "MapBox 仍然是 legacy 图，前端 metadata 明确声明 `useLegacyApi=true`，真实请求路径是 `/superset/explore_json/`。",
+      "`/superset/explore_json/` 路径会读取原始 `form_data`，补 `datasource`，然后执行 `convert_legacy_filters_into_adhoc(form_data)` 与 `merge_extra_filters(form_data)`。",
+      "当前源码里 `Guest user cannot modify chart payload` 这条错误只在 `security/manager.py::raise_for_access(query_context=...)` 分支触发，核心比较器是 `query_context_modified()`。",
+      "legacy `/superset/explore_json/` 的权限检查会走 `views/utils.py::check_datasource_perms()` -> `get_viz()` -> `viz.raise_for_access()` -> `security/manager.py::raise_for_access(viz=self)`。当前 `viz` 分支会校验 `dashboardId` / `slice_id` / datasource 绑定，但没有 `query_context_modified()` 那种 columns / metrics / orderby 子集比较器。",
+      "即便如此，最稳妥的策略仍然是根层 form_data 直接复制保存态图表，只把动态筛选放进 `extra_form_data`。因为 `MapboxViz.query_obj()` 会直接用 root `all_columns_x`、`all_columns_y`、`groupby`、`point_radius`、`mapbox_label` 编译最终查询。",
+      "`mapbox_style`、`mapbox_color`、`global_opacity`、`render_while_dragging`、`viewport_*` 虽然不决定 SQL 结果，但属于图表定义/展示字段，embedding 下也不建议临时改写。"
+    ],
+    "security_enforcement": {
+      "frontend_request_mode": "legacy explore_json",
+      "frontend_request_endpoint": "/superset/explore_json/",
+      "frontend_request_payload": {
+        "form_data": "<raw form_data>"
+      },
+      "backend_normalization_steps": [
+        "convert_legacy_filters_into_adhoc(form_data)",
+        "merge_extra_filters(form_data)"
+      ],
+      "verified_guest_payload_guard": {
+        "chart_data_api": "security/manager.py::query_context_modified",
+        "chart_data_api_error": "Guest user cannot modify chart payload",
+        "legacy_explore_json_api": "`check_datasource_perms()` 会构造 viz 并调用 `raise_for_access(viz=self)`；该分支校验 datasource / dashboard / slice 绑定，但没有 `query_context_modified()` 那种 query subset guard",
+        "confidence": "high"
+      },
+      "guest_access_binding_fields": [
+        "dashboardId",
+        "slice_id"
+      ],
+      "query_critical_root_fields": [
+        "slice_id",
+        "datasource",
+        "viz_type",
+        "all_columns_x",
+        "all_columns_y",
+        "groupby",
+        "point_radius",
+        "mapbox_label",
+        "adhoc_filters",
+        "row_limit"
+      ],
+      "recommended_strategy": "复制保存态 chart form_data 作为 base，仅通过 extra_form_data 追加过滤条件；不要在 embedding 请求里重构 MapBox 的 root 查询字段和图表定义字段。"
+    },
+    "safe_base_rule": {
+      "description": "第三方 embedding 请求中的根层 form_data，应当从已保存的 MapBox 图表直接复制，不要自行重构。",
+      "must_be_copied_from_saved_chart": [
+        "slice_id",
+        "dashboardId",
+        "datasource",
+        "viz_type",
+        "all_columns_x",
+        "all_columns_y",
+        "clustering_radius",
+        "row_limit",
+        "adhoc_filters",
+        "groupby",
+        "point_radius",
+        "point_radius_unit",
+        "mapbox_label",
+        "pandas_aggfunc",
+        "render_while_dragging",
+        "mapbox_style",
+        "global_opacity",
+        "mapbox_color",
+        "viewport_longitude",
+        "viewport_latitude",
+        "viewport_zoom",
+        "all other saved chart-definition fields"
+      ],
+      "why": [
+        "MapBox 没有专属前端 buildQuery，前端直接把 root form_data 发给 `/superset/explore_json/`。",
+        "`MapboxViz.query_obj()` 会直接从 root `all_columns_x`、`all_columns_y`、`groupby`、`point_radius`、`mapbox_label` 编译最终查询。",
+        "`merge_extra_filters()` 会在后端把 `extra_form_data` 并入查询，因此动态上下文不需要通过改 root 字段来实现。",
+        "虽然当前没有在 legacy 路径定位到 `query_context_modified()` 等价校验，但复制保存态仍然是最稳妥、最接近官方前端行为的策略。"
+      ]
+    },
+    "safe_embedding_form_data_template": {
+      "description": "这是 MapBox embedding 下的保守安全写法。根层以保存态图表为 base，仅改 extra_form_data。",
+      "template": {
+        "slice_id": "<saved_chart_id>",
+        "dashboardId": "<dashboard_id>",
+        "datasource": "<copied_from_saved_chart>",
+        "viz_type": "mapbox",
+        "all_columns_x": "<copied_from_saved_chart>",
+        "all_columns_y": "<copied_from_saved_chart>",
+        "clustering_radius": "<copied_from_saved_chart>",
+        "row_limit": "<copied_from_saved_chart>",
+        "adhoc_filters": "<copied_from_saved_chart>",
+        "groupby": "<copied_from_saved_chart>",
+        "point_radius": "<copied_from_saved_chart>",
+        "point_radius_unit": "<copied_from_saved_chart>",
+        "mapbox_label": "<copied_from_saved_chart>",
+        "pandas_aggfunc": "<copied_from_saved_chart>",
+        "render_while_dragging": "<copied_from_saved_chart>",
+        "mapbox_style": "<copied_from_saved_chart>",
+        "global_opacity": "<copied_from_saved_chart>",
+        "mapbox_color": "<copied_from_saved_chart>",
+        "viewport_longitude": "<copied_from_saved_chart>",
+        "viewport_latitude": "<copied_from_saved_chart>",
+        "viewport_zoom": "<copied_from_saved_chart>",
+        "extra_form_data": {
+          "filters": [
+            {
+              "col": "region",
+              "op": "IN",
+              "val": [
+                "West"
+              ]
+            }
+          ],
+          "adhoc_filters": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "region",
+              "operator": "IN",
+              "comparator": [
+                "West"
+              ]
+            }
+          ],
+          "custom_form_data": {}
+        }
+      }
+    },
+    "preferred_dynamic_container": {
+      "field_name": "extra_form_data",
+      "description": "legacy `/superset/explore_json/` 路径同样会在 `merge_extra_filters()` -> `merge_extra_form_data()` 中消费它。",
+      "append_keys": [
+        "adhoc_filters",
+        "filters",
+        "interactive_groupby",
+        "interactive_highlight",
+        "interactive_drilldown",
+        "custom_form_data"
+      ],
+      "override_keys_backend_high_confidence": [
+        "granularity_sqla",
+        "granularity",
+        "time_column",
+        "time_grain",
+        "time_range",
+        "time_grain_sqla",
+        "relative_start",
+        "relative_end"
+      ],
+      "legacy_also_accepted_root_container": "extra_filters",
+      "notes": "上述 override key 是 legacy merge 逻辑通用支持项，但 MapBox 当前 controlPanel 没有时间 section，因此对当前图大多不应依赖。"
+    },
+    "extra_form_data_field_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_mapbox_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "West"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters；后端会把它们并入额外过滤条件。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_mapbox_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "West"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会标记为 extra 并并入查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_mapbox_legacy": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；MapBox 默认不直接消费它。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_mapbox_legacy": false,
+        "recommended": false,
+        "sample_data": "Last 30 days",
+        "effect": "legacy merge 逻辑支持该 override，但 MapBox 当前 controlPanel 没有时间范围字段，当前图没有高置信证据表明应依赖它。",
+        "source": "superset/constants.py + superset/utils/core.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_mapbox_legacy": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "legacy merge 逻辑支持该 override，但 MapBox 6.0.0 controlPanel 没有正式时间粒度字段；当前图不应把它当作稳定入口。",
+        "source": "superset/constants.py + superset/utils/core.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_mapbox_legacy": false,
+        "recommended": false,
+        "sample_data": "day",
+        "effect": "通用时间列 override 键；虽然 legacy 示例数据里出现过它，但它不属于当前 MapBox controlPanel 的稳定字段。",
+        "source": "superset/constants.py + QueryFormData.ts + superset/examples/long_lat.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "granularity",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_mapbox_legacy": false,
+        "recommended": false,
+        "sample_data": "__time",
+        "effect": "通用 QueryObject 时间列 override；MapBox 当前 controlPanel 不应依赖它重构查询。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_column",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_mapbox_legacy": false,
+        "recommended": false,
+        "sample_data": "ds",
+        "effect": "底层 QueryObject 时间列 override；当前图表定义里没有对应 controlPanel 正式字段。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_grain",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_mapbox_legacy": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "底层 QueryObject 时间粒度 override；MapBox 常规场景通常不需要手动传。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "relative_start",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_mapbox_legacy": false,
+        "recommended": false,
+        "sample_data": "now",
+        "effect": "写入 query extras 的相对开始时间。MapBox 当前没有明确的官方时间控件链路，建议谨慎使用。",
+        "source": "superset/charts/schemas.py + superset/utils/core.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "relative_end",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_mapbox_legacy": false,
+        "recommended": false,
+        "sample_data": "today",
+        "effect": "写入 query extras 的相对结束时间。MapBox 当前没有明确的官方时间控件链路，建议谨慎使用。",
+        "source": "superset/charts/schemas.py + superset/utils/core.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_mapbox_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用 ExtraFormData 字段。MapBox 默认不直接消费它。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_mapbox_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用交互字段；MapBox 默认不直接消费。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_mapbox_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用交互字段；MapBox 默认不直接消费。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "time_compare",
+        "data_type": "string | array[string]",
+        "behavior": "override",
+        "safe_for_mapbox_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "1 year ago"
+        ],
+        "effect": "frontend 类型声明存在，但后端 constants.py 的 merge whitelist 未把它列为高置信 override；MapBox 当前也没有直接消费它的证据。",
+        "source": "QueryFormData.ts + query/constants.ts + superset/constants.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      }
+    ],
+    "minimal_extra_form_data_template": {
+      "filters": [
+        {
+          "col": "region",
+          "op": "IN",
+          "val": [
+            "West"
+          ]
+        }
+      ]
+    },
+    "recommended_extra_form_data_template": {
+      "filters": [
+        {
+          "col": "region",
+          "op": "IN",
+          "val": [
+            "West",
+            "North"
+          ]
+        }
+      ],
+      "adhoc_filters": [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "region",
+          "operator": "IN",
+          "comparator": [
+            "West",
+            "North"
+          ]
+        }
+      ],
+      "custom_form_data": {}
+    },
+    "unsafe_root_form_data_changes": [
+      {
+        "field_name": "slice_id",
+        "reason": "会改变请求对应的图表实体，最不应该在 embedding 请求里改。"
+      },
+      {
+        "field_name": "dashboardId",
+        "reason": "guest 用户的数据访问上下文通常依赖 dashboard 绑定关系，保守写法应直接复制保存态。"
+      },
+      {
+        "field_name": "datasource",
+        "reason": "legacy MapBox 的 root form_data 会直接驱动后端查询，embedding 不应改图表绑定数据集。"
+      },
+      {
+        "field_name": "viz_type",
+        "reason": "MapBox 仍应保持 `mapbox`；不应在请求里改成其他 viz。"
+      },
+      {
+        "field_name": "all_columns_x",
+        "reason": "`MapboxViz.query_obj()` 会直接把它编译到经度查询字段约束中。"
+      },
+      {
+        "field_name": "all_columns_y",
+        "reason": "`MapboxViz.query_obj()` 会直接把它编译到纬度查询字段约束中。"
+      },
+      {
+        "field_name": "groupby",
+        "reason": "会直接决定是否走 groupby 查询分支，以及 label / radius 字段的合法性。"
+      },
+      {
+        "field_name": "point_radius",
+        "reason": "非 Auto 时它会直接改变后端查询字段集合或 groupby 约束。"
+      },
+      {
+        "field_name": "mapbox_label",
+        "reason": "它会直接决定后端是否额外读取标签列，以及是否需要 `count` / groupby 特殊处理。"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "reason": "动态筛选应优先放进 `extra_form_data.append`，不要覆盖保存态根字段。"
+      },
+      {
+        "field_name": "row_limit",
+        "reason": "会直接改变参与点位/聚类计算的底层记录数。"
+      },
+      {
+        "field_name": "clustering_radius",
+        "reason": "会直接改变聚类算法半径，属于图表定义字段。"
+      },
+      {
+        "field_name": "point_radius_unit",
+        "reason": "会改变点半径的解释方式，属于图表定义字段。"
+      },
+      {
+        "field_name": "pandas_aggfunc",
+        "reason": "会改变 cluster label 聚合逻辑，属于图表定义字段。"
+      },
+      {
+        "field_name": "render_while_dragging",
+        "reason": "会改变交互渲染行为，属于图表定义字段。"
+      },
+      {
+        "field_name": "mapbox_style",
+        "reason": "会改变底图样式，属于图表定义字段。"
+      },
+      {
+        "field_name": "global_opacity",
+        "reason": "会改变点和聚类层透明度，属于图表定义字段。"
+      },
+      {
+        "field_name": "mapbox_color",
+        "reason": "会改变点和聚类层颜色，属于图表定义字段。"
+      },
+      {
+        "field_name": "viewport_longitude / viewport_latitude / viewport_zoom",
+        "reason": "虽然当前实现并不真正用它们初始化视口，但它们仍是保存态图表的一部分，不建议在 guest 请求中临时改写。"
+      }
+    ],
+    "practical_guidance": {
+      "best_practice": [
+        "先从保存态 MapBox 图表读取完整 form_data。",
+        "根层字段保持不变，尤其保留 `all_columns_x`、`all_columns_y`、`groupby`、`point_radius`、`mapbox_label`、`row_limit`。",
+        "只在 `extra_form_data` 中放动态 filters / adhoc_filters。",
+        "如果你的接入代码自己发请求，MapBox 仍应按 `/superset/explore_json/` 的 `{ form_data: ... }` 形状发送。"
+      ],
+      "avoid": [
+        "不要把 MapBox 当成标准 chart data API 图去套 `/api/v1/chart/data` 的 `query_context` 模板。",
+        "不要在 guest 请求里把 `all_columns_x`、`all_columns_y`、`groupby` 改成另一组坐标或分组字段；这会直接改变查询结构。",
+        "不要把动态筛选直接覆盖到根层 `adhoc_filters`；优先用 `extra_form_data.append`。",
+        "不要把运行时 camelCase 名称 `allColumnsX`、`mapboxStyle`、`globalOpacity` 写回 root form_data。"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "mapbox",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/mapbox-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/mapbox-form-data-schema.json",
+      "control-schema": "form-data-schema/mapbox-schema.json"
+    }
+  }
+}

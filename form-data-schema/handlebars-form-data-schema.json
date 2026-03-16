@@ -1,0 +1,393 @@
+{
+  "viz_type": "handlebars",
+  "display_name": "Handlebars",
+  "purpose": "用于调用 API 创建或保存 Handlebars Chart 时填写的 form_data 模板",
+  "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/handlebars-schema.json",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/plugin/controlPanel.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/plugin/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/plugin/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/Handlebars.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/components/Handlebars/HandlebarsViewer.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/plugin/controls/columns.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/plugin/controls/groupBy.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/plugin/controls/handlebarTemplate.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/plugin/controls/includeTime.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/plugin/controls/limits.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/plugin/controls/metrics.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/plugin/controls/orderBy.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/plugin/controls/queryMode.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/plugin/controls/style.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryContext.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryObject.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractExtras.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractQueryFields.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/normalizeOrderBy.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/actions/hydrateExplore.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/standardizedFormData.ts"
+  ],
+  "notes": [
+    "创建 Handlebars 图表时，绝对需要的根字段只有 `datasource`、`viz_type` 和 `handlebarsTemplate`；但要想查出数据，还必须再按 query mode 提供一组查询字段。",
+    "`query_mode` 缺省时并不是“无模式”，而是源码会根据 `all_columns` 是否非空自动推断：有 `all_columns` 视为 raw，没有则视为 aggregate。",
+    "aggregate 模式的 UI 校验是 `groupby / metrics / percent_metrics` 至少一项非空；但 Handlebars buildQuery 真正编译 query 时，只会消费 `groupby` 和 `metrics`，不会像 Table plugin 那样专门处理 `percent_metrics`。",
+    "如果你是直接构造 chart data API / 创建图表 API 的 form_data，而不是走 Explore hydrate 流程，不要仅依赖 `include_time=true` 来让时间列出现。更稳妥的做法是显式传 `granularity_sqla`，并在需要时把时间列直接放进 `groupby` 或 `all_columns`。",
+    "根层模板字段的 canonical 键名是 `handlebarsTemplate` 和 `styleTemplate`。"
+  ],
+  "naming_and_pipeline": {
+    "control_to_api_form_data": "`getFormDataFromControls()` 直接把 controls[name].value 写成 form_data[name]。",
+    "api_form_data_to_query_context": "`buildQuery.ts` -> `buildQueryContext()` -> `buildQueryObject()` -> `extractQueryFields()` / `extractExtras()` -> `normalizeOrderBy()`。",
+    "api_form_data_to_render_template": "`transformProps.ts` 把 `queriesData[0].data` 原样透传给 `Handlebars.tsx`；`Handlebars.tsx` 再把模板拼成 `templateSource`，最后由 `HandlebarsViewer` 编译渲染。"
+  },
+  "global_required_fields": {
+    "datasource": {
+      "data_type": "string",
+      "required": true,
+      "sample_data": "<dataset_id>__table",
+      "source": "datasourceAndVizType section"
+    },
+    "viz_type": {
+      "data_type": "string",
+      "required": true,
+      "fixed_value": "handlebars",
+      "source": "plugin metadata"
+    },
+    "handlebarsTemplate": {
+      "data_type": "string",
+      "required": true,
+      "sample_data": "<ul class=\"data-list\">\\n  {{#each data}}\\n    <li>{{stringify this}}</li>\\n  {{/each}}\\n</ul>",
+      "source": "Handlebars Template control"
+    }
+  },
+  "conditional_required_rules": {
+    "aggregate_mode": {
+      "when": "`query_mode` = `aggregate`，或 `query_mode` 缺省且 `all_columns` 为空",
+      "ui_validator_rule": "源码 UI 校验要求 `groupby`、`metrics`、`percent_metrics` 至少一项非空。",
+      "practical_api_rule": "对 Handlebars 直接 API 调用，建议至少提供 `metrics` 或 `groupby`。`percent_metrics` 单独存在时，当前 Handlebars buildQuery 不会把它编译进 query.metrics。"
+    },
+    "raw_mode": {
+      "when": "`query_mode` = `raw`，或 `query_mode` 缺省且 `all_columns` 非空",
+      "ui_validator_rule": "`all_columns` 必须非空。",
+      "practical_api_rule": "raw 模式下根字段应至少包含 `all_columns`，需要排序时再加 `order_by_cols`。"
+    },
+    "time_usage": {
+      "when": "需要时间过滤或时间列参与查询时",
+      "ui_validator_rule": "共享时间控件允许 `granularity_sqla` / `time_grain_sqla` / `time_range`。",
+      "practical_api_rule": "若你不是通过 Explore 页面 hydrate 来生成 form_data，建议显式传 `granularity_sqla`，并在需要显示时间列时把时间列直接加入 `groupby` 或 `all_columns`。"
+    }
+  },
+  "global_optional_fields": {
+    "query_mode": {
+      "data_type": "string | null",
+      "required": false,
+      "sample_data": "aggregate",
+      "source": "Query mode control"
+    },
+    "groupby": {
+      "data_type": "array[string | object]",
+      "required": false,
+      "sample_data": [
+        "name"
+      ],
+      "source": "Dimensions control"
+    },
+    "metrics": {
+      "data_type": "array[string | object]",
+      "required": false,
+      "sample_data": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "value"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(value)"
+        }
+      ],
+      "source": "Metrics control"
+    },
+    "all_columns": {
+      "data_type": "array[string | object]",
+      "required": false,
+      "sample_data": [
+        "name",
+        "state"
+      ],
+      "source": "Columns control"
+    },
+    "percent_metrics": {
+      "data_type": "array[string | object]",
+      "required": false,
+      "sample_data": [],
+      "source": "Percentage metrics control",
+      "notes": "UI 暴露但当前 Handlebars buildQuery 不会追加专用 post-processing。"
+    },
+    "timeseries_limit_metric": {
+      "data_type": "string | object | null",
+      "required": false,
+      "sample_data": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "value"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(value)"
+      },
+      "source": "Sort query by control"
+    },
+    "order_by_cols": {
+      "data_type": "array[string | array]",
+      "required": false,
+      "sample_data": [
+        "[\"num\", false]"
+      ],
+      "source": "Ordering control"
+    },
+    "order_desc": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": true,
+      "source": "Sort descending control"
+    },
+    "row_limit": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 10000,
+      "source": "Row limit control"
+    },
+    "granularity_sqla": {
+      "data_type": "string | object | null",
+      "required": false,
+      "sample_data": "ds",
+      "source": "shared time section"
+    },
+    "time_grain_sqla": {
+      "data_type": "string | null",
+      "required": false,
+      "sample_data": "P1D",
+      "source": "shared time section"
+    },
+    "time_range": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "No filter",
+      "source": "shared time section"
+    },
+    "include_time": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": false,
+      "source": "Include time control"
+    },
+    "adhoc_filters": {
+      "data_type": "array[object]",
+      "required": false,
+      "sample_data": [],
+      "source": "Filters control"
+    },
+    "show_totals": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": false,
+      "source": "Show summary control",
+      "notes": "源码里被保存，但 Handlebars buildQuery 没有生成 totals extra query。"
+    },
+    "styleTemplate": {
+      "data_type": "string | null",
+      "required": false,
+      "sample_data": "/*\\n  .data-list {\\n    background-color: yellow;\\n  }\\n*/",
+      "source": "CSS Styles control"
+    },
+    "slice_id": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 0,
+      "source": "datasourceAndVizType hidden control",
+      "notes": "新建图表时通常省略；编辑已存在图表时由服务端或上层调用方提供。"
+    },
+    "cache_timeout": {
+      "data_type": "integer | null",
+      "required": false,
+      "sample_data": null,
+      "source": "datasourceAndVizType hidden control"
+    },
+    "url_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "datasourceAndVizType hidden control"
+    },
+    "custom_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "datasourceAndVizType hidden control"
+    }
+  },
+  "minimal_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "handlebars",
+    "query_mode": "aggregate",
+    "metrics": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      }
+    ],
+    "row_limit": 10000,
+    "adhoc_filters": [],
+    "time_range": "No filter",
+    "handlebarsTemplate": "<ul class=\"data-list\">\\n  {{#each data}}\\n    <li>{{stringify this}}</li>\\n  {{/each}}\\n</ul>"
+  },
+  "recommended_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "handlebars",
+    "query_mode": "aggregate",
+    "groupby": [
+      "name"
+    ],
+    "metrics": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "value"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(value)"
+      }
+    ],
+    "percent_metrics": [],
+    "timeseries_limit_metric": {
+      "expressionType": "SIMPLE",
+      "column": {
+        "column_name": "value"
+      },
+      "aggregate": "SUM",
+      "label": "SUM(value)"
+    },
+    "order_desc": true,
+    "row_limit": 10000,
+    "time_range": "No filter",
+    "include_time": false,
+    "show_totals": false,
+    "adhoc_filters": [],
+    "handlebarsTemplate": "<ul class=\"data-list\">\\n  {{#each data}}\\n    <li>{{this.name}}: {{formatNumber this['SUM(value)']}}</li>\\n  {{/each}}\\n</ul>",
+    "styleTemplate": "/*\\n  .data-list {\\n    padding-left: 1rem;\\n  }\\n*/"
+  },
+  "conditional_blocks": {
+    "raw_records_mode": {
+      "condition": "需要直接渲染原始记录列时",
+      "fields": {
+        "query_mode": "raw",
+        "all_columns": [
+          "name",
+          "state",
+          "num"
+        ],
+        "order_by_cols": [
+          "[\"num\", false]"
+        ]
+      }
+    },
+    "aggregate_sorting": {
+      "condition": "aggregate 模式下需要显式指定排序指标时",
+      "fields": {
+        "query_mode": "aggregate",
+        "timeseries_limit_metric": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "value"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(value)"
+        },
+        "order_desc": true
+      }
+    },
+    "time_aware_query": {
+      "condition": "需要按时间过滤，或需要把时间列显式送进模板时",
+      "fields": {
+        "granularity_sqla": "ds",
+        "time_grain_sqla": "P1D",
+        "time_range": "Last 30 days",
+        "include_time": true,
+        "groupby": [
+          "ds",
+          "name"
+        ]
+      }
+    },
+    "custom_css": {
+      "condition": "需要给模板输出添加内联 CSS 时",
+      "fields": {
+        "styleTemplate": "/*\\n  .data-list {\\n    background-color: #f8f8f8;\\n  }\\n*/"
+      }
+    },
+    "stored_but_currently_noop_fields": {
+      "condition": "如果只是为了与 Explore 保存态保持一致，可以保留这些 UI 字段",
+      "fields": {
+        "percent_metrics": [],
+        "show_totals": false
+      },
+      "notes": "当前 Handlebars buildQuery 不会像 Table plugin 那样专门消费它们。"
+    }
+  },
+  "runtime_only_or_non_template_fields": {
+    "query_context_only": [
+      {
+        "field_name": "query_context.queries[*].columns",
+        "reason": "这是 `groupby` / `all_columns` 经过 `extractQueryFields()` 编译出来的结果，不是额外 root form_data 字段。"
+      },
+      {
+        "field_name": "query_context.queries[*].metrics",
+        "reason": "这是 `metrics` 经过 `extractQueryFields()` 编译出来的结果；`percent_metrics` 默认不会自动出现在这里。"
+      },
+      {
+        "field_name": "query_context.queries[*].orderby",
+        "reason": "这是 `order_by_cols` 或 `timeseries_limit_metric + order_desc` 经过 `normalizeOrderBy()` 归一化后的结果。"
+      }
+    ],
+    "noncanonical_or_table_only_fields": [
+      {
+        "field_name": "handlebars_template / style_template",
+        "reason": "源码没有证据表明这两个 snake_case 键是 canonical root form_data 键。"
+      },
+      {
+        "field_name": "percent_metric_calculation / server_pagination / server_page_length / page_length / include_search / table_timestamp_format / column_config / allow_render_html",
+        "reason": "这些字段属于 Table plugin，不在 Handlebars controlPanel 中。"
+      }
+    ],
+    "viz_switch_only": [
+      {
+        "field_name": "formDataOverrides(groupby / metrics remap)",
+        "reason": "只在 standardized controls 切换图表时触发，不是常规创建 Handlebars Chart 时必须手工传入的 root 字段。"
+      }
+    ]
+  },
+  "api_usage_guidance": {
+    "high_confidence_required_fields": [
+      "datasource",
+      "viz_type",
+      "handlebarsTemplate"
+    ],
+    "practical_required_query_fields": [
+      "aggregate 模式至少给 `metrics` 或 `groupby`",
+      "raw 模式给非空 `all_columns`"
+    ],
+    "recommended_always_set": [
+      "query_mode",
+      "row_limit",
+      "adhoc_filters",
+      "time_range"
+    ],
+    "important_caveats": [
+      "不要把 Table plugin 的 `page_length`、`include_search`、`column_config` 等字段直接照搬到 Handlebars。",
+      "如果你是直接调 API，不要只设置 `include_time=true` 就期待时间列出现；请显式设置 `granularity_sqla`，并在需要时把时间列加入 `groupby` 或 `all_columns`。",
+      "如果你确实要保存 `percent_metrics` / `show_totals`，应把它们视为保存态字段，而不是高置信的 Handlebars 查询字段。"
+    ]
+  }
+}

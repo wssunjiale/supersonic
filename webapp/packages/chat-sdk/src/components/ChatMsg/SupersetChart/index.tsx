@@ -1,16 +1,18 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Button, Dropdown, Segmented, message } from 'antd';
+import { Button, Input, Modal, message } from 'antd';
 import { embedDashboard } from '@superset-ui/embedded-sdk';
 import type { EmbeddedDashboard, ThemeMode } from '@superset-ui/embedded-sdk';
 import {
   MsgDataType,
   SupersetChartResponseType,
-  SupersetDashboardType,
+  SupersetDashboardItem,
+  SupersetDashboardManageResp,
   SupersetVizTypeCandidate,
 } from '../../../common/type';
 import {
-  fetchSupersetDashboards,
+  createSupersetDashboard,
   fetchSupersetGuestToken,
+  fetchSupersetManualDashboards,
   pushSupersetChartToDashboard,
 } from '../../../service';
 
@@ -20,80 +22,203 @@ type Props = {
   triggerResize?: boolean;
 };
 
+type SupersetChartView = SupersetVizTypeCandidate & {
+  key: string;
+  label: string;
+};
+
+type ApiEnvelope<T> = {
+  code?: number | string;
+  msg?: string;
+  data?: T;
+};
+
 const DEFAULT_HEIGHT = 800;
-const SUPERSET_SINGLE_CHART_PREFIX = 'supersonic_';
 const SUPERSET_IFRAME_TITLE = 'supersetIframe';
 
 type EmbedInstance = EmbeddedDashboard;
 
-export const filterTemporaryDashboards = (
-  dashboardList: SupersetDashboardType[],
-  pluginName?: string
-) => {
-  if (!Array.isArray(dashboardList) || dashboardList.length === 0) {
-    return [];
-  }
-  if (!pluginName) {
-    return dashboardList;
-  }
-  const prefix = `${SUPERSET_SINGLE_CHART_PREFIX}${pluginName}_`;
-  return dashboardList.filter(dashboard => {
-    const title = dashboard?.title || '';
-    return !title.startsWith(prefix);
-  });
+const SUPERSET_VIZTYPE_ZH_LABELS: Record<string, string> = {
+  big_number: '指标卡',
+  big_number_total: '累计指标卡',
+  box_plot: '箱线图',
+  bubble: '气泡图',
+  bubble_v2: '气泡图',
+  bullet: '子弹图',
+  cal_heatmap: '日历热力图',
+  cartodiagram: '地图叠加图',
+  chord: '弦图',
+  compare: '百分比变化图',
+  country_map: '国家地图',
+  dashboard: '看板',
+  deck_arc: '弧线地图',
+  deck_contour: '等值线地图',
+  deck_geojson: 'GeoJSON 地图',
+  deck_grid: '网格地图',
+  deck_heatmap: '热力地图',
+  deck_hex: '六边形地图',
+  deck_multi: '复合地图',
+  deck_path: '路径地图',
+  deck_polygon: '多边形地图',
+  deck_scatter: '散点地图',
+  deck_screengrid: '屏幕网格地图',
+  echarts_area: '面积图',
+  echarts_timeseries: '时间序列图',
+  echarts_timeseries_bar: '柱状图',
+  echarts_timeseries_line: '折线图',
+  echarts_timeseries_scatter: '散点图',
+  echarts_timeseries_smooth: '平滑折线图',
+  echarts_timeseries_step: '阶梯折线图',
+  funnel: '漏斗图',
+  gantt_chart: '甘特图',
+  gauge_chart: '仪表盘',
+  graph_chart: '关系图',
+  handlebars: '自定义模板',
+  heatmap_v2: '热力图',
+  histogram_v2: '直方图',
+  horizon: '地平线图',
+  mapbox: 'MapBox 地图',
+  mixed_timeseries: '混合时序图',
+  paired_ttest: '配对 T 检验表',
+  para: '平行坐标图',
+  partition: '分区图',
+  pie: '饼图',
+  pivot_table_v2: '透视表',
+  radar: '雷达图',
+  rose: '玫瑰图',
+  sankey_v2: '桑基图',
+  sunburst_v2: '旭日图',
+  table: '数据表',
+  time_pivot: '时间透视表',
+  time_table: '时间表',
+  tree_chart: '树图',
+  treemap_v2: '矩形树图',
+  waterfall: '瀑布图',
+  word_cloud: '词云图',
+  world_map: '世界地图',
 };
+
+const hasChineseText = (value?: string) => /[\u4e00-\u9fff]/.test(value || '');
+
+function inferVizTypeLabel(value?: string) {
+  if (!value) {
+    return '';
+  }
+  const normalized = value.trim().toLowerCase();
+  if (!normalized) {
+    return '';
+  }
+  if (normalized.includes('table')) {
+    return '数据表';
+  }
+  if (normalized.includes('line')) {
+    return '折线图';
+  }
+  if (normalized.includes('bar')) {
+    return '柱状图';
+  }
+  if (normalized.includes('pie')) {
+    return '饼图';
+  }
+  if (normalized.includes('area')) {
+    return '面积图';
+  }
+  if (normalized.includes('scatter')) {
+    return '散点图';
+  }
+  if (normalized.includes('radar')) {
+    return '雷达图';
+  }
+  if (normalized.includes('heatmap')) {
+    return '热力图';
+  }
+  if (normalized.includes('funnel')) {
+    return '漏斗图';
+  }
+  if (normalized.includes('gantt')) {
+    return '甘特图';
+  }
+  if (normalized.includes('gauge')) {
+    return '仪表盘';
+  }
+  if (normalized.includes('map')) {
+    return '地图';
+  }
+  if (normalized.includes('treemap')) {
+    return '矩形树图';
+  }
+  if (normalized.includes('sunburst')) {
+    return '旭日图';
+  }
+  if (normalized.includes('sankey')) {
+    return '桑基图';
+  }
+  if (normalized.includes('word')) {
+    return '词云图';
+  }
+  return '';
+}
+
+function resolveVizTypeLabel(vizType?: string, vizName?: string, fallbackLabel = '图表') {
+  const normalizedVizType = vizType?.trim().toLowerCase();
+  const mappedLabel = normalizedVizType ? SUPERSET_VIZTYPE_ZH_LABELS[normalizedVizType] : '';
+  if (mappedLabel) {
+    return mappedLabel;
+  }
+  if (hasChineseText(vizName)) {
+    return vizName!.trim();
+  }
+  const inferredLabel = inferVizTypeLabel(vizName) || inferVizTypeLabel(normalizedVizType);
+  if (inferredLabel) {
+    return inferredLabel;
+  }
+  return vizName?.trim() || fallbackLabel;
+}
+
+function unwrapApiEnvelope<T>(payload: ApiEnvelope<T> | T | null | undefined): T | undefined {
+  if (payload == null) {
+    return undefined;
+  }
+  if (typeof payload === 'object' && 'code' in (payload as Record<string, unknown>)) {
+    const envelope = payload as ApiEnvelope<T>;
+    const code = Number(envelope.code);
+    if (Number.isFinite(code) && code !== 200 && code !== 0) {
+      throw new Error(envelope.msg || '请求失败');
+    }
+    return envelope.data;
+  }
+  return payload as T;
+}
 
 const SupersetChart: React.FC<Props> = ({ id, data, triggerResize }) => {
   const [height, setHeight] = useState(DEFAULT_HEIGHT);
   const [backgroundColor, setBackgroundColor] = useState<string>();
-  const [dashboards, setDashboards] = useState<SupersetDashboardType[]>([]);
-  const [dashboardsLoading, setDashboardsLoading] = useState(false);
+  const [activeViewKey, setActiveViewKey] = useState('');
+  const [pushModalOpen, setPushModalOpen] = useState(false);
   const [pushLoading, setPushLoading] = useState(false);
-  const [candidateIndex, setCandidateIndex] = useState(0);
+  const [dashboardLoading, setDashboardLoading] = useState(false);
+  const [manualDashboards, setManualDashboards] = useState<SupersetDashboardItem[]>([]);
+  const [selectedDashboardId, setSelectedDashboardId] = useState<number>();
+  const [newDashboardTitle, setNewDashboardTitle] = useState('');
   const embedContainerRef = useRef<HTMLDivElement>(null);
   const embedInstanceRef = useRef<EmbedInstance | null>(null);
   const backgroundColorRef = useRef<string>();
   const response = data.response as SupersetChartResponseType;
   const webPage = response?.webPage;
-  const vizTypeCandidates = useMemo(() => {
-    const candidates = response?.vizTypeCandidates;
-    if (Array.isArray(candidates) && candidates.length > 0) {
-      return candidates.filter(Boolean);
-    }
-    if (response?.embeddedId || response?.supersetDomain || response?.chartId) {
-      return [
-        {
-          vizType: response?.vizType || '',
-          vizName: response?.vizType,
-          chartId: response?.chartId,
-          chartUuid: response?.chartUuid,
-          guestToken: response?.guestToken,
-          embeddedId: response?.embeddedId,
-          supersetDomain: response?.supersetDomain,
-        },
-      ];
-    }
-    return [];
-  }, [response]);
-  const activeCandidate = useMemo(() => {
-    if (!vizTypeCandidates.length) {
-      return null;
-    }
-    const index = Math.min(candidateIndex, vizTypeCandidates.length - 1);
-    return vizTypeCandidates[index];
-  }, [candidateIndex, vizTypeCandidates]);
+
   const resolveGuestToken = (payload: any) => {
-    if (!payload) {
+    const resolvedPayload = unwrapApiEnvelope<any>(payload) ?? payload;
+    if (!resolvedPayload) {
       return '';
     }
-    if (typeof payload === 'string') {
-      return payload;
+    if (typeof resolvedPayload === 'string') {
+      return resolvedPayload;
     }
-    if (typeof payload.token === 'string' && payload.token) {
-      return payload.token;
+    if (typeof resolvedPayload.token === 'string' && resolvedPayload.token) {
+      return resolvedPayload.token;
     }
-    if (typeof payload?.data?.token === 'string' && payload.data.token) {
-      return payload.data.token;
+    if (typeof resolvedPayload?.data?.token === 'string' && resolvedPayload.data.token) {
+      return resolvedPayload.data.token;
     }
     return '';
   };
@@ -103,7 +228,7 @@ const SupersetChart: React.FC<Props> = ({ id, data, triggerResize }) => {
     return Array.isArray(rawParams) ? rawParams : [];
   }, [webPage]);
 
-  const minHeight = useMemo(() => {
+  const defaultMinHeight = useMemo(() => {
     const heightValue =
       params?.find((option: any) => option.paramType === 'FORWARD' && option.key === 'height')
         ?.value ?? DEFAULT_HEIGHT;
@@ -113,39 +238,130 @@ const SupersetChart: React.FC<Props> = ({ id, data, triggerResize }) => {
     }
     return numericValue;
   }, [params]);
-  const hasFixedHeight = useMemo(() => {
-    return params?.some(
-      (option: any) => option.paramType === 'FORWARD' && option.key === 'height'
-    );
-  }, [params]);
 
-  useEffect(() => {
-    setCandidateIndex(0);
-  }, [id]);
+  const rawCandidateLabels = useMemo(() => {
+    const rawCandidates = Array.isArray(response?.vizTypeCandidates) ? response.vizTypeCandidates : [];
+    return rawCandidates
+      .map((candidate, index) => ({
+        key: `${candidate?.chartId || candidate?.chartUuid || candidate?.vizType || index}`,
+        label: resolveVizTypeLabel(
+          candidate?.vizType,
+          candidate?.vizName,
+          `图表${index + 1}`
+        ),
+      }))
+      .filter(item => Boolean(item.label));
+  }, [response?.vizTypeCandidates]);
 
-  useEffect(() => {
-    setCandidateIndex(prev => (prev < vizTypeCandidates.length ? prev : 0));
-  }, [vizTypeCandidates.length]);
+  const interactiveViewCandidates = useMemo<SupersetChartView[]>(() => {
+    const rawCandidates = Array.isArray(response?.vizTypeCandidates) ? response.vizTypeCandidates : [];
+    return rawCandidates
+      .map((candidate, index) => {
+        const label = resolveVizTypeLabel(
+          candidate?.vizType,
+          candidate?.vizName,
+          `图表${index + 1}`
+        );
+        const embeddedId = candidate?.embeddedId;
+        const supersetDomain = candidate?.supersetDomain;
+        if (!label || !embeddedId || !supersetDomain) {
+          return null;
+        }
+        return {
+          ...candidate,
+          embeddedId,
+          supersetDomain,
+          key: `${embeddedId}-${candidate?.chartId || candidate?.chartUuid || candidate?.vizType || index}`,
+          label,
+        } as SupersetChartView;
+      })
+      .filter(Boolean) as SupersetChartView[];
+  }, [response?.vizTypeCandidates]);
 
-  const embedInfo = useMemo(() => {
-    const embeddedId = activeCandidate ? activeCandidate.embeddedId : response?.embeddedId;
-    const supersetDomain = activeCandidate
-      ? activeCandidate.supersetDomain
-      : response?.supersetDomain;
-    if (embeddedId && supersetDomain) {
-      return { embedId: embeddedId, supersetDomain };
+  const viewCandidates = useMemo<SupersetChartView[]>(() => {
+    if (interactiveViewCandidates.length > 0) {
+      return interactiveViewCandidates;
     }
-    return null;
+    if (response?.embeddedId && response?.supersetDomain) {
+      const fallbackLabel = resolveVizTypeLabel(
+        response?.vizType,
+        undefined,
+        '看板'
+      );
+      return [
+        {
+          key: `dashboard-${response.embeddedId}`,
+          label: fallbackLabel,
+          vizType: response?.vizType || 'dashboard',
+          vizName: fallbackLabel,
+          embeddedId: response.embeddedId,
+          supersetDomain: response.supersetDomain,
+        },
+      ];
+    }
+    return [];
   }, [
-    activeCandidate?.embeddedId,
-    activeCandidate?.supersetDomain,
     response?.embeddedId,
     response?.supersetDomain,
+    response?.vizType,
+    interactiveViewCandidates,
   ]);
 
+  const defaultViewKey = useMemo(() => {
+    const matched = viewCandidates.find(candidate => candidate.vizType === response?.vizType);
+    return matched?.key || viewCandidates[0]?.key || '';
+  }, [response?.vizType, viewCandidates]);
+
   useEffect(() => {
-    setHeight(minHeight);
-  }, [minHeight]);
+    setActiveViewKey(defaultViewKey);
+  }, [defaultViewKey]);
+
+  const activeView = useMemo(() => {
+    return viewCandidates.find(candidate => candidate.key === activeViewKey) || viewCandidates[0] || null;
+  }, [activeViewKey, viewCandidates]);
+
+  const activeMinHeight = useMemo(() => {
+    const heightValue = activeView?.dashboardHeight ?? defaultMinHeight;
+    const numericValue = typeof heightValue === 'number' ? heightValue : Number(heightValue);
+    if (!Number.isFinite(numericValue) || numericValue <= 0) {
+      return defaultMinHeight;
+    }
+    return numericValue;
+  }, [activeView?.dashboardHeight, defaultMinHeight]);
+
+  const hasFixedHeight = useMemo(() => {
+    return Boolean(activeView?.dashboardHeight) || params?.some(
+      (option: any) => option.paramType === 'FORWARD' && option.key === 'height'
+    );
+  }, [activeView?.dashboardHeight, params]);
+
+  const embedInfo = useMemo(() => {
+    if (activeView?.embeddedId && activeView?.supersetDomain) {
+      return { embedId: activeView.embeddedId, supersetDomain: activeView.supersetDomain };
+    }
+    if (response?.embeddedId && response?.supersetDomain) {
+      return { embedId: response.embeddedId, supersetDomain: response.supersetDomain };
+    }
+    return null;
+  }, [activeView?.embeddedId, activeView?.supersetDomain, response?.embeddedId, response?.supersetDomain]);
+
+  const canPushCurrentChart = Boolean(activeView?.chartId && response?.pluginId);
+  const showSummary =
+    interactiveViewCandidates.length > 0 || rawCandidateLabels.length > 0 || canPushCurrentChart;
+
+  useEffect(() => {
+    setHeight(activeMinHeight);
+  }, [activeMinHeight]);
+
+  useEffect(() => {
+    if (!pushModalOpen) {
+      setManualDashboards([]);
+      setSelectedDashboardId(undefined);
+      setNewDashboardTitle('');
+      setDashboardLoading(false);
+      setPushLoading(false);
+    }
+  }, [pushModalOpen]);
 
   const resolveThemeMode = useCallback((): ThemeMode => {
     if (typeof document === 'undefined') {
@@ -216,10 +432,10 @@ const SupersetChart: React.FC<Props> = ({ id, data, triggerResize }) => {
 
   const computeAvailableHeight = useCallback(() => {
     if (typeof window === 'undefined') {
-      return minHeight;
+      return activeMinHeight;
     }
     if (hasFixedHeight) {
-      return minHeight;
+      return activeMinHeight;
     }
     const rect = embedContainerRef.current?.getBoundingClientRect();
     const top = rect ? rect.top : 0;
@@ -230,12 +446,13 @@ const SupersetChart: React.FC<Props> = ({ id, data, triggerResize }) => {
     if (scrollContainer) {
       const containerRect = scrollContainer.getBoundingClientRect();
       const available = containerRect.bottom - top - padding;
-      return Math.max(available, minHeight);
+      return Math.max(available, activeMinHeight);
     }
-    const viewportHeight = window.innerHeight || document.documentElement.clientHeight || minHeight;
+    const viewportHeight =
+      window.innerHeight || document.documentElement.clientHeight || activeMinHeight;
     const available = viewportHeight - Math.max(top, 0) - padding;
-    return Math.max(available, minHeight);
-  }, [hasFixedHeight, minHeight]);
+    return Math.max(available, activeMinHeight);
+  }, [activeMinHeight, hasFixedHeight]);
 
   const getDashboardScrollHeight = useCallback(async () => {
     const instance = embedInstanceRef.current;
@@ -264,14 +481,105 @@ const SupersetChart: React.FC<Props> = ({ id, data, triggerResize }) => {
 
   const syncHeight = useCallback(async () => {
     if (hasFixedHeight) {
-      setHeight(prev => (prev === minHeight ? prev : minHeight));
+      setHeight(prev => (prev === activeMinHeight ? prev : activeMinHeight));
       return;
     }
     const baseHeight = computeAvailableHeight();
     const scrollHeight = await getDashboardScrollHeight();
     const nextHeight = scrollHeight && scrollHeight > baseHeight ? scrollHeight : baseHeight;
     setHeight(prev => (prev === nextHeight ? prev : nextHeight));
-  }, [computeAvailableHeight, getDashboardScrollHeight, hasFixedHeight, minHeight]);
+  }, [activeMinHeight, computeAvailableHeight, getDashboardScrollHeight, hasFixedHeight]);
+
+  const handleOpenPushModal = useCallback(async () => {
+    if (!canPushCurrentChart) {
+      return;
+    }
+    setPushModalOpen(true);
+    setDashboardLoading(true);
+    try {
+      const manageResp = unwrapApiEnvelope<SupersetDashboardManageResp>(
+        await fetchSupersetManualDashboards(response?.pluginId)
+      );
+      const dashboards =
+        manageResp && Array.isArray(manageResp.dashboards) ? manageResp.dashboards : [];
+      setManualDashboards(dashboards);
+      setSelectedDashboardId(dashboards[0]?.id);
+    } catch (error: any) {
+      message.error(error?.message || '获取看板列表失败');
+    } finally {
+      setDashboardLoading(false);
+    }
+  }, [canPushCurrentChart, response?.pluginId]);
+
+  const handlePushExistingDashboard = useCallback(async () => {
+    if (!canPushCurrentChart || !activeView?.chartId) {
+      message.error('当前图表不可推送');
+      return;
+    }
+    if (!selectedDashboardId) {
+      message.error('请选择目标看板');
+      return;
+    }
+    setPushLoading(true);
+    try {
+      const pushed = unwrapApiEnvelope<boolean>(
+        await pushSupersetChartToDashboard({
+          pluginId: response?.pluginId,
+          dashboardId: selectedDashboardId,
+          chartId: activeView.chartId,
+        })
+      );
+      if (pushed !== true) {
+        throw new Error('推送到看板失败');
+      }
+      message.success('已推送到看板');
+      setPushModalOpen(false);
+    } catch (error: any) {
+      message.error(error?.message || '推送到看板失败');
+    } finally {
+      setPushLoading(false);
+    }
+  }, [activeView?.chartId, canPushCurrentChart, response?.pluginId, selectedDashboardId]);
+
+  const handleCreateAndPushDashboard = useCallback(async () => {
+    if (!canPushCurrentChart || !activeView?.chartId) {
+      message.error('当前图表不可推送');
+      return;
+    }
+    const title = newDashboardTitle.trim();
+    if (!title) {
+      message.error('请输入新看板名称');
+      return;
+    }
+    setPushLoading(true);
+    try {
+      const dashboard = unwrapApiEnvelope<SupersetDashboardItem>(
+        await createSupersetDashboard({
+          pluginId: response?.pluginId,
+          title,
+        })
+      );
+      if (!dashboard?.id) {
+        throw new Error('新建看板失败');
+      }
+      const pushed = unwrapApiEnvelope<boolean>(
+        await pushSupersetChartToDashboard({
+          pluginId: response?.pluginId,
+          dashboardId: dashboard.id,
+          chartId: activeView.chartId,
+        })
+      );
+      if (pushed !== true) {
+        throw new Error('推送到看板失败');
+      }
+      message.success('已新建并推送到看板');
+      setPushModalOpen(false);
+    } catch (error: any) {
+      message.error(error?.message || '新建并推送失败');
+    } finally {
+      setPushLoading(false);
+    }
+  }, [activeView?.chartId, canPushCurrentChart, newDashboardTitle, response?.pluginId]);
 
   useEffect(() => {
     if (!embedInfo || !embedContainerRef.current) {
@@ -281,7 +589,7 @@ const SupersetChart: React.FC<Props> = ({ id, data, triggerResize }) => {
     embedInstanceRef.current?.unmount();
     embedInstanceRef.current = null;
     embedContainerRef.current.replaceChildren();
-    const fetchGuestToken = async () => {
+    const fetchToken = async () => {
       const responseToken = await fetchSupersetGuestToken({
         pluginId: response?.pluginId,
         embeddedId: embedInfo.embedId,
@@ -303,7 +611,7 @@ const SupersetChart: React.FC<Props> = ({ id, data, triggerResize }) => {
       supersetDomain: embedInfo.supersetDomain,
       mountPoint: embedContainerRef.current,
       iframeTitle: SUPERSET_IFRAME_TITLE,
-      fetchGuestToken,
+      fetchGuestToken: fetchToken,
       dashboardUiConfig: {
         hideTitle: true,
         hideTab: true,
@@ -359,36 +667,7 @@ const SupersetChart: React.FC<Props> = ({ id, data, triggerResize }) => {
   }, [embedInfo, resolveBackgroundColor, response?.pluginId, syncHeight, syncTheme]);
 
   useEffect(() => {
-    if (Array.isArray(response?.dashboards)) {
-      setDashboards(response?.dashboards || []);
-    }
-  }, [response?.dashboards]);
-
-  useEffect(() => {
-    const shouldFetch =
-      Boolean(response?.pluginId) &&
-      (!Array.isArray(response?.dashboards) || response.dashboards.length === 0);
-    if (!shouldFetch) {
-      return;
-    }
-    setDashboardsLoading(true);
-    fetchSupersetDashboards(response.pluginId)
-      .then(res => {
-        setDashboards(res?.data || []);
-      })
-      .catch(() => {
-        message.error('获取 Dashboard 列表失败');
-      })
-      .finally(() => {
-        setDashboardsLoading(false);
-      });
-  }, [response?.dashboards, response?.pluginId]);
-
-  useEffect(() => {
-    if (!embedInfo) {
-      return;
-    }
-    if (typeof window === 'undefined') {
+    if (!embedInfo || typeof window === 'undefined') {
       return;
     }
     const handleResize = () => {
@@ -440,95 +719,70 @@ const SupersetChart: React.FC<Props> = ({ id, data, triggerResize }) => {
     };
   }, [syncTheme]);
 
-  const activeChartId = activeCandidate ? activeCandidate.chartId : response?.chartId;
-
-  const handlePush = (dashboardId?: number) => {
-    if (!dashboardId) {
-      return;
-    }
-    if (!activeChartId) {
-      message.error('Chart 信息缺失');
-      return;
-    }
-    setPushLoading(true);
-    pushSupersetChartToDashboard({
-      pluginId: response?.pluginId,
-      dashboardId,
-      chartId: activeChartId,
-    })
-      .then(() => {
-        message.success('已推送到看板');
-      })
-      .catch(() => {
-        message.error('推送失败');
-      })
-      .finally(() => {
-        setPushLoading(false);
-      });
-  };
-
-  const filteredDashboards = useMemo(
-    () => filterTemporaryDashboards(dashboards, response?.name),
-    [dashboards, response?.name]
-  );
-
-  const menuItems =
-    filteredDashboards.length > 0
-      ? filteredDashboards.map(item => ({
-          key: String(item.id ?? item.title ?? 'unknown'),
-          label: item.title || `Dashboard ${item.id}`,
-        }))
-      : [
-          {
-            key: 'empty',
-            label: '暂无 Dashboard',
-            disabled: true,
-          },
-        ];
-
-  const candidateOptions = useMemo(
-    () =>
-      vizTypeCandidates.map((candidate: SupersetVizTypeCandidate, index: number) => ({
-        label: candidate?.vizName || candidate?.vizType || `候选${index + 1}`,
-        value: index,
-      })),
-    [vizTypeCandidates]
-  );
-  const showCandidateSwitch = candidateOptions.length > 1;
-  const showPushButton = Boolean(!response?.fallback && response?.pluginId && activeChartId);
-
   return (
     <>
-      {showPushButton && (
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
-          <Dropdown
-            menu={{
-              items: menuItems,
-              onClick: info => {
-                const dashboardId = Number(info.key);
-                handlePush(Number.isNaN(dashboardId) ? undefined : dashboardId);
-              },
+      {showSummary && (
+        <div
+          data-testid="superset-chart-summary"
+          style={{
+            marginBottom: 12,
+            padding: '10px 12px',
+            borderRadius: 8,
+            background: 'rgba(0, 0, 0, 0.04)',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: 8,
             }}
-            disabled={dashboardsLoading}
           >
-            <Button size="small" loading={dashboardsLoading || pushLoading}>
-              推送到看板
-            </Button>
-          </Dropdown>
-        </div>
-      )}
-      {showCandidateSwitch && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-          <span style={{ color: 'rgba(0, 0, 0, 0.45)', fontSize: 12 }}>图表形式</span>
-          <Segmented
-            size="small"
-            options={candidateOptions}
-            value={candidateIndex}
-            onChange={value => {
-              const resolved = typeof value === 'number' ? value : Number(value);
-              setCandidateIndex(Number.isFinite(resolved) ? resolved : 0);
-            }}
-          />
+            {interactiveViewCandidates.length > 0 && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, flex: '1 1 auto' }}>
+                {viewCandidates.map(view => (
+                  <Button
+                    key={view.key}
+                    size="small"
+                    type={activeView?.key === view.key ? 'primary' : 'default'}
+                    onClick={() => setActiveViewKey(view.key)}
+                  >
+                    {view.label}
+                  </Button>
+                ))}
+              </div>
+            )}
+            {interactiveViewCandidates.length === 0 && rawCandidateLabels.length > 0 && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, flex: '1 1 auto' }}>
+                {rawCandidateLabels.map(item => (
+                  <span
+                    key={item.key}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      padding: '2px 8px',
+                      borderRadius: 999,
+                      background: '#ffffff',
+                      color: 'rgba(0, 0, 0, 0.75)',
+                      fontSize: 12,
+                      lineHeight: '20px',
+                    }}
+                  >
+                    {item.label}
+                  </span>
+                ))}
+              </div>
+            )}
+            {canPushCurrentChart && (
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginLeft: 'auto' }}>
+                <Button size="small" onClick={handleOpenPushModal}>
+                  推送到看板
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
       )}
       {embedInfo ? (
@@ -546,6 +800,66 @@ const SupersetChart: React.FC<Props> = ({ id, data, triggerResize }) => {
           Superset 嵌入信息缺失，无法渲染看板。
         </div>
       )}
+      <Modal
+        title="推送到看板"
+        open={pushModalOpen}
+        onCancel={() => setPushModalOpen(false)}
+        footer={null}
+        destroyOnClose
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ fontSize: 13, fontWeight: 600 }}>选择现有看板</div>
+          {dashboardLoading ? (
+            <div>加载中...</div>
+          ) : manualDashboards.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {manualDashboards.map(dashboard => (
+                <Button
+                  key={dashboard.id}
+                  type={selectedDashboardId === dashboard.id ? 'primary' : 'default'}
+                  onClick={() => setSelectedDashboardId(dashboard.id)}
+                >
+                  {dashboard.title || `看板 ${dashboard.id}`}
+                </Button>
+              ))}
+            </div>
+          ) : (
+            <div>暂无手工看板，可直接新建并推送。</div>
+          )}
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Button
+              type="primary"
+              disabled={!selectedDashboardId}
+              loading={pushLoading}
+              onClick={handlePushExistingDashboard}
+            >
+              推送到所选看板
+            </Button>
+          </div>
+          <div
+            style={{
+              borderTop: '1px solid rgba(0, 0, 0, 0.08)',
+              paddingTop: 12,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 12,
+            }}
+          >
+            <div style={{ fontSize: 13, fontWeight: 600 }}>新建看板</div>
+            <Input
+              placeholder="输入新看板名称"
+              value={newDashboardTitle}
+              onChange={event => setNewDashboardTitle(event.target.value)}
+              maxLength={120}
+            />
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Button type="primary" loading={pushLoading} onClick={handleCreateAndPushDashboard}>
+                新建并推送
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Modal>
     </>
   );
 };

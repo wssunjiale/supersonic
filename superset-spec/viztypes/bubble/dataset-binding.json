@@ -1,0 +1,411 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "bubble",
+  "display_name": "Bubble Chart (legacy)",
+  "generation_mode": "heuristic_seed",
+  "slot_candidates": [
+    {
+      "field_name": "adhoc_filters",
+      "required": false,
+      "slot_kind": "filter_list",
+      "accepted_dataset_roles": [
+        "filter_context"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [],
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [
+        "extra_form_data.append"
+      ],
+      "descriptions": [
+        "字段标签为 Filters。legacy explore_json 路径会先把 legacy filters 转成 adhoc_filters，再继续处理 extra filters。"
+      ]
+    },
+    {
+      "field_name": "entity",
+      "required": true,
+      "slot_kind": "entity",
+      "accepted_dataset_roles": [
+        "entity",
+        "entity_id",
+        "dimension"
+      ],
+      "cardinality": "0..1",
+      "placeholder": "<entity_column>",
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "This defines the element to be plotted on the chart"
+      ]
+    },
+    {
+      "field_name": "series",
+      "required": false,
+      "slot_kind": "dimension",
+      "accepted_dataset_roles": [
+        "dimension",
+        "category_dimension"
+      ],
+      "cardinality": "1",
+      "placeholder": "<dimension_column>",
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Defines the grouping of entities. Each series is represented by a specific color in the chart."
+      ]
+    },
+    {
+      "field_name": "size",
+      "required": true,
+      "slot_kind": "metric",
+      "accepted_dataset_roles": [
+        "metric",
+        "saved_metric",
+        "adhoc_metric"
+      ],
+      "cardinality": "1",
+      "placeholder": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Metric used to calculate bubble size"
+      ]
+    }
+  ],
+  "non_binding_form_controls": [
+    {
+      "field_name": "bottom_margin",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Y Axis"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Bottom margin, in pixels, allowing for more room for axis labels"
+      ]
+    },
+    {
+      "field_name": "color_scheme",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The color scheme for rendering chart"
+      ]
+    },
+    {
+      "field_name": "left_margin",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "X Axis"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Left margin, in pixels, allowing for more room for axis labels"
+      ]
+    },
+    {
+      "field_name": "limit",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "UI 标签沿用共享控件的 Series limit，但 legacy Bubble 后端会把它直接写成 query_obj.row_limit。"
+      ]
+    },
+    {
+      "field_name": "max_bubble_size",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Max Bubble Size"
+      ]
+    },
+    {
+      "field_name": "show_legend",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to display the legend (toggles)"
+      ]
+    },
+    {
+      "field_name": "x",
+      "required": true,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The dataset column/metric that returns the values on your chart's x-axis."
+      ]
+    },
+    {
+      "field_name": "x_axis_format",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "X Axis"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "D3 format syntax: https://github.com/d3/d3-format"
+      ]
+    },
+    {
+      "field_name": "x_axis_label",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "X Axis"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "X Axis Label"
+      ]
+    },
+    {
+      "field_name": "x_axis_showminmax",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "X Axis"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to display the min and max values of the X-axis"
+      ]
+    },
+    {
+      "field_name": "x_log_scale",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "X Axis"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Use a log scale for the X-axis"
+      ]
+    },
+    {
+      "field_name": "x_ticks_layout",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "X Axis"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The way the ticks are laid out on the X-axis"
+      ]
+    },
+    {
+      "field_name": "y",
+      "required": true,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The dataset column/metric that returns the values on your chart's y-axis."
+      ]
+    },
+    {
+      "field_name": "y_axis_bounds",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Y Axis"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Bounds for the Y-axis. When left empty, the bounds are dynamically defined based on the min/max of the data. Note that this feature will only expand the axis range. It won't narrow the data's extent."
+      ]
+    },
+    {
+      "field_name": "y_axis_format",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Y Axis"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "D3 format syntax: https://github.com/d3/d3-format"
+      ]
+    },
+    {
+      "field_name": "y_axis_label",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Y Axis"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Y Axis Label"
+      ]
+    },
+    {
+      "field_name": "y_axis_showminmax",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Y Axis"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to display the min and max values of the Y-axis"
+      ]
+    },
+    {
+      "field_name": "y_log_scale",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Y Axis"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Use a log scale for the Y-axis"
+      ]
+    }
+  ],
+  "dataset_role_inventory": {
+    "adhoc_metric": [
+      "size"
+    ],
+    "category_dimension": [
+      "series"
+    ],
+    "dimension": [
+      "entity",
+      "series"
+    ],
+    "entity": [
+      "entity"
+    ],
+    "entity_id": [
+      "entity"
+    ],
+    "filter_context": [
+      "adhoc_filters"
+    ],
+    "metric": [
+      "size"
+    ],
+    "saved_metric": [
+      "size"
+    ]
+  },
+  "binding_seed_example": {
+    "entity": "<entity_column>",
+    "size": {
+      "expressionType": "SIMPLE",
+      "column": {
+        "column_name": "<metric_column>"
+      },
+      "aggregate": "SUM",
+      "label": "SUM(<metric_column>)"
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "bubble",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/bubble-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/bubble-form-data-schema.json",
+      "control-schema": "form-data-schema/bubble-schema.json"
+    }
+  }
+}

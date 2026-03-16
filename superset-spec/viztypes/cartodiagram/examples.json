@@ -1,0 +1,595 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "cartodiagram",
+  "display_name": "Cartodiagram",
+  "field_sample_inventory": {
+    "chart_background_border_radius": [
+      10
+    ],
+    "chart_background_color": [
+      {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 0.2
+      }
+    ],
+    "chart_size": [
+      {
+        "type": "FIXED",
+        "configs": {
+          "zoom": 6,
+          "width": 100,
+          "height": 100
+        },
+        "values": {
+          "0": {
+            "width": 100,
+            "height": 100
+          },
+          "6": {
+            "width": 100,
+            "height": 100
+          },
+          "28": {
+            "width": 100,
+            "height": 100
+          }
+        }
+      }
+    ],
+    "geom_column": [
+      "geom"
+    ],
+    "layer_configs": [
+      [
+        {
+          "type": "WMS",
+          "version": "1.3.0",
+          "title": "Base Layer",
+          "url": "https://example.com/geoserver/wms",
+          "layersParam": "workspace:layer",
+          "attribution": "© Example"
+        }
+      ]
+    ],
+    "map_view": [
+      {
+        "mode": "FIT_DATA"
+      }
+    ],
+    "selected_chart": [
+      "{\"id\":321,\"slice_name\":\"Pie Chart\",\"viz_type\":\"pie\",\"params\":\"{\\\"datasource\\\":\\\"12__table\\\",\\\"viz_type\\\":\\\"pie\\\",\\\"groupby\\\":[\\\"category\\\"],\\\"metric\\\":\\\"count\\\"}\"}"
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "12__table",
+      "viz_type": "cartodiagram",
+      "selected_chart": "{\"id\":321,\"slice_name\":\"Pie Chart\",\"viz_type\":\"pie\",\"params\":\"{\\\"datasource\\\":\\\"12__table\\\",\\\"viz_type\\\":\\\"pie\\\",\\\"groupby\\\":[\\\"category\\\"],\\\"metric\\\":\\\"count\\\"}\"}",
+      "geom_column": "geom",
+      "map_view": {
+        "mode": "FIT_DATA"
+      },
+      "layer_configs": [],
+      "chart_background_color": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 0.2
+      },
+      "chart_background_border_radius": 10,
+      "chart_size": {
+        "type": "FIXED",
+        "configs": {
+          "zoom": 6,
+          "width": 100,
+          "height": 100,
+          "slope": 30,
+          "exponent": 2
+        },
+        "values": {
+          "0": {
+            "width": 100,
+            "height": 100
+          },
+          "1": {
+            "width": 100,
+            "height": 100
+          },
+          "2": {
+            "width": 100,
+            "height": 100
+          },
+          "3": {
+            "width": 100,
+            "height": 100
+          },
+          "4": {
+            "width": 100,
+            "height": 100
+          },
+          "5": {
+            "width": 100,
+            "height": 100
+          },
+          "6": {
+            "width": 100,
+            "height": 100
+          },
+          "7": {
+            "width": 100,
+            "height": 100
+          },
+          "8": {
+            "width": 100,
+            "height": 100
+          },
+          "9": {
+            "width": 100,
+            "height": 100
+          },
+          "10": {
+            "width": 100,
+            "height": 100
+          },
+          "11": {
+            "width": 100,
+            "height": 100
+          },
+          "12": {
+            "width": 100,
+            "height": 100
+          },
+          "13": {
+            "width": 100,
+            "height": 100
+          },
+          "14": {
+            "width": 100,
+            "height": 100
+          },
+          "15": {
+            "width": 100,
+            "height": 100
+          },
+          "16": {
+            "width": 100,
+            "height": 100
+          },
+          "17": {
+            "width": 100,
+            "height": 100
+          },
+          "18": {
+            "width": 100,
+            "height": 100
+          },
+          "19": {
+            "width": 100,
+            "height": 100
+          },
+          "20": {
+            "width": 100,
+            "height": 100
+          },
+          "21": {
+            "width": 100,
+            "height": 100
+          },
+          "22": {
+            "width": 100,
+            "height": 100
+          },
+          "23": {
+            "width": 100,
+            "height": 100
+          },
+          "24": {
+            "width": 100,
+            "height": 100
+          },
+          "25": {
+            "width": 100,
+            "height": 100
+          },
+          "26": {
+            "width": 100,
+            "height": 100
+          },
+          "27": {
+            "width": 100,
+            "height": 100
+          },
+          "28": {
+            "width": 100,
+            "height": 100
+          }
+        }
+      }
+    },
+    "recommended": {
+      "datasource": "12__table",
+      "viz_type": "cartodiagram",
+      "selected_chart": "{\"id\":321,\"slice_name\":\"Pie Chart\",\"viz_type\":\"pie\",\"params\":\"{\\\"datasource\\\":\\\"12__table\\\",\\\"viz_type\\\":\\\"pie\\\",\\\"groupby\\\":[\\\"category\\\"],\\\"metric\\\":\\\"count\\\",\\\"adhoc_filters\\\":[]}\"}",
+      "geom_column": "geom",
+      "map_view": {
+        "mode": "FIT_DATA"
+      },
+      "layer_configs": [],
+      "chart_background_color": {
+        "r": 255,
+        "g": 255,
+        "b": 255,
+        "a": 0.2
+      },
+      "chart_background_border_radius": 10,
+      "chart_size": {
+        "type": "FIXED",
+        "configs": {
+          "zoom": 6,
+          "width": 100,
+          "height": 100,
+          "slope": 30,
+          "exponent": 2
+        },
+        "values": {
+          "0": {
+            "width": 100,
+            "height": 100
+          },
+          "1": {
+            "width": 100,
+            "height": 100
+          },
+          "2": {
+            "width": 100,
+            "height": 100
+          },
+          "3": {
+            "width": 100,
+            "height": 100
+          },
+          "4": {
+            "width": 100,
+            "height": 100
+          },
+          "5": {
+            "width": 100,
+            "height": 100
+          },
+          "6": {
+            "width": 100,
+            "height": 100
+          },
+          "7": {
+            "width": 100,
+            "height": 100
+          },
+          "8": {
+            "width": 100,
+            "height": 100
+          },
+          "9": {
+            "width": 100,
+            "height": 100
+          },
+          "10": {
+            "width": 100,
+            "height": 100
+          },
+          "11": {
+            "width": 100,
+            "height": 100
+          },
+          "12": {
+            "width": 100,
+            "height": 100
+          },
+          "13": {
+            "width": 100,
+            "height": 100
+          },
+          "14": {
+            "width": 100,
+            "height": 100
+          },
+          "15": {
+            "width": 100,
+            "height": 100
+          },
+          "16": {
+            "width": 100,
+            "height": 100
+          },
+          "17": {
+            "width": 100,
+            "height": 100
+          },
+          "18": {
+            "width": 100,
+            "height": 100
+          },
+          "19": {
+            "width": 100,
+            "height": 100
+          },
+          "20": {
+            "width": 100,
+            "height": 100
+          },
+          "21": {
+            "width": 100,
+            "height": 100
+          },
+          "22": {
+            "width": 100,
+            "height": 100
+          },
+          "23": {
+            "width": 100,
+            "height": 100
+          },
+          "24": {
+            "width": 100,
+            "height": 100
+          },
+          "25": {
+            "width": 100,
+            "height": 100
+          },
+          "26": {
+            "width": 100,
+            "height": 100
+          },
+          "27": {
+            "width": 100,
+            "height": 100
+          },
+          "28": {
+            "width": 100,
+            "height": 100
+          }
+        }
+      },
+      "extra_form_data": {}
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "cartodiagram",
+      "selected_chart": "<copied_from_saved_chart>",
+      "geom_column": "<copied_from_saved_chart>",
+      "map_view": "<copied_from_saved_chart>",
+      "layer_configs": "<copied_from_saved_chart>",
+      "chart_background_color": "<copied_from_saved_chart>",
+      "chart_background_border_radius": "<copied_from_saved_chart>",
+      "chart_size": "<copied_from_saved_chart>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "East"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East"
+            ]
+          }
+        ],
+        "time_range": "Last 30 days",
+        "custom_form_data": {}
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_cartodiagram": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "East"
+            ]
+          }
+        ],
+        "effect": "Cartodiagram 会把它透传给被引用图表；如果被引用图表走标准 extra_form_data merge，它会作为追加 simple filters 生效。",
+        "source": "plugin-chart-cartodiagram/buildQuery.ts + superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_cartodiagram": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East"
+            ]
+          }
+        ],
+        "effect": "Cartodiagram 会把它透传给被引用图表；如果被引用图表走标准 extra_form_data merge，它会作为追加 adhoc filters 生效。",
+        "source": "plugin-chart-cartodiagram/buildQuery.ts + superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_cartodiagram": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "Cartodiagram 只负责透传；是否被底层图表消费取决于 selected_chart.viz_type。",
+        "source": "plugin-chart-cartodiagram/buildQuery.ts + QueryFormData.ts"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_cartodiagram": true,
+        "recommended": false,
+        "sample_data": "Last 30 days",
+        "effect": "Cartodiagram 会把它透传给被引用图表；如果底层图表有时间语义，通常会覆盖时间范围；如果底层图表不是时序图，则可能无实际效果。",
+        "source": "plugin-chart-cartodiagram/buildQuery.ts + superset/constants.py + superset/utils/core.py",
+        "status": "有条件推荐，仅当 selected_chart 本身是时间相关图表时使用"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_cartodiagram": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "Cartodiagram 只做透传；最终是否安全、是否生效，完全取决于 selected_chart.viz_type。",
+        "source": "plugin-chart-cartodiagram/buildQuery.ts + superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议把 Cartodiagram 当成统一的时间粒度覆盖入口"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_cartodiagram": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "Cartodiagram 只做透传；更换时间列是否被底层图表接受、是否影响 guest payload 校验，取决于 selected_chart.viz_type。",
+        "source": "plugin-chart-cartodiagram/buildQuery.ts + superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "granularity",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_cartodiagram": false,
+        "recommended": false,
+        "sample_data": "__time",
+        "effect": "Cartodiagram 只做透传；不同底层图表对该键的使用并不统一。",
+        "source": "plugin-chart-cartodiagram/buildQuery.ts + superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_column",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_cartodiagram": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "Cartodiagram 只做透传；是否被底层图表 buildQuery 转为实际 query object 字段，取决于 selected_chart.viz_type。",
+        "source": "plugin-chart-cartodiagram/buildQuery.ts + superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_grain",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_cartodiagram": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "Cartodiagram 只做透传；不同底层图表对该键的消费并不统一。",
+        "source": "plugin-chart-cartodiagram/buildQuery.ts + superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "relative_start",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_cartodiagram": false,
+        "recommended": false,
+        "sample_data": "now",
+        "effect": "Cartodiagram 只做透传；是否进入最终 query extras 取决于底层图表 buildQuery。",
+        "source": "plugin-chart-cartodiagram/buildQuery.ts + superset/charts/schemas.py + superset/utils/core.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "relative_end",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_cartodiagram": false,
+        "recommended": false,
+        "sample_data": "today",
+        "effect": "Cartodiagram 只做透传；是否进入最终 query extras 取决于底层图表 buildQuery。",
+        "source": "plugin-chart-cartodiagram/buildQuery.ts + superset/charts/schemas.py + superset/utils/core.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_cartodiagram": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "Cartodiagram 不直接消费它；底层图表若不专门处理，也通常不会有实际效果。",
+        "source": "plugin-chart-cartodiagram/buildQuery.ts + QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_cartodiagram": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "Cartodiagram 不直接消费它；底层图表是否处理取决于 selected_chart.viz_type。",
+        "source": "plugin-chart-cartodiagram/buildQuery.ts + QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_cartodiagram": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "Cartodiagram 不直接消费它；底层图表是否处理取决于 selected_chart.viz_type。",
+        "source": "plugin-chart-cartodiagram/buildQuery.ts + QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "time_compare",
+        "data_type": "string | array[string]",
+        "behavior": "override",
+        "safe_for_cartodiagram": false,
+        "recommended": false,
+        "sample_data": [
+          "1 year ago"
+        ],
+        "effect": "frontend 类型声明存在，但后端 constants.py 的 extra_form_data merge whitelist 未把它列为高置信 override；再加上 Cartodiagram 只做透传，因此不应依赖。",
+        "source": "QueryFormData.ts + query/constants.ts + superset/constants.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "cartodiagram",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/cartodiagram-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/cartodiagram-form-data-schema.json",
+      "control-schema": "form-data-schema/cartodiagram-schema.json"
+    }
+  }
+}

@@ -1,0 +1,153 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "graph_chart",
+  "display_name": "Graph Chart",
+  "normalized_summary": {
+    "category": "relationship",
+    "tags": [
+      "graph",
+      "network",
+      "nodes",
+      "edges",
+      "relationship"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "source",
+        "required": true,
+        "description": "来源节点字段，用于定义边的起点。"
+      },
+      {
+        "key": "target",
+        "required": true,
+        "description": "目标节点字段，用于定义边的终点。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "关联强度指标，用于控制节点大小/边宽度。"
+      },
+      {
+        "key": "layout",
+        "required": false,
+        "description": "布局方式（如 force、circular），控制节点的排列方式。"
+      },
+      {
+        "key": "base_node_size",
+        "required": false,
+        "description": "基础节点大小，用于控制节点的默认尺寸。"
+      },
+      {
+        "key": "base_edge_width",
+        "required": false,
+        "description": "基础边宽度，用于控制边的默认宽度。"
+      }
+    ],
+    "description_zh": "Graph Chart (Network) displays nodes and edges to represent relationships between entities, with node size/edge width indicating relationship strength.",
+    "visual_shape_zh": "网络图（节点-边关联型）",
+    "use_cases_zh": [
+      "实体间的关联分析（如用户关系、产品关联）",
+      "网络结构可视化（如社交网络、供应链）",
+      "关联强度与聚类分析"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "graph_chart",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/graph_chart-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/graph_chart-form-data-schema.json",
+      "control-schema": "form-data-schema/graph_chart-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Graph Chart",
+    "viztype": "graph_chart",
+    "详细描述": "Graph Chart (Network) displays nodes and edges to represent relationships between entities, with node size/edge width indicating relationship strength.",
+    "表现形态": "网络图（节点-边关联型）",
+    "适用场景": [
+      "实体间的关联分析（如用户关系、产品关联）",
+      "网络结构可视化（如社交网络、供应链）",
+      "关联强度与聚类分析"
+    ],
+    "vizKey": "Graph",
+    "pluginCategory": "Relationship",
+    "pluginTags": [],
+    "category": "relationship",
+    "tags": [
+      "graph",
+      "network",
+      "nodes",
+      "edges",
+      "relationship"
+    ],
+    "关键字段": [
+      {
+        "key": "source",
+        "required": true,
+        "description": "来源节点字段，用于定义边的起点。"
+      },
+      {
+        "key": "target",
+        "required": true,
+        "description": "目标节点字段，用于定义边的终点。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "关联强度指标，用于控制节点大小/边宽度。"
+      },
+      {
+        "key": "layout",
+        "required": false,
+        "description": "布局方式（如 force、circular），控制节点的排列方式。"
+      },
+      {
+        "key": "base_node_size",
+        "required": false,
+        "description": "基础节点大小，用于控制节点的默认尺寸。"
+      },
+      {
+        "key": "base_edge_width",
+        "required": false,
+        "description": "基础边宽度，用于控制边的默认宽度。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

@@ -1,0 +1,372 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "horizon",
+  "display_name": "Horizon Chart",
+  "selection_summary": {
+    "category": "timeseries",
+    "tags": [
+      "timeseries",
+      "horizon",
+      "compact",
+      "multiple_series"
+    ],
+    "description_zh": "Horizon Chart is a compact time-series chart that splits negative/positive values into bands, ideal for displaying multiple time-series in a small space.",
+    "visual_shape_zh": "水平地平线图（紧凑型时间序列）",
+    "use_cases_zh": [
+      "多时间序列紧凑型展示（如多指标趋势、多维度对比）",
+      "正负值分离的趋势分析",
+      "小空间内的高密度时间序列展示"
+    ],
+    "required_slots": [
+      {
+        "field_name": "granularity_sqla",
+        "required": true,
+        "slot_kind": "time_column",
+        "accepted_dataset_roles": [
+          "time_dimension"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<time_column>",
+        "source_categories": [
+          "Time"
+        ],
+        "embedding_modes": [
+          "低置信；不要依赖 extra_form_data.override"
+        ],
+        "descriptions": [
+          "The time column for the visualization. Note that you can define arbitrary expression that return a DATETIME column in the table."
+        ]
+      },
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "Query",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+          "聚合指标列表，用于展示多时间序列的数值。"
+        ]
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "required": true,
+        "slot_kind": "time_grain",
+        "accepted_dataset_roles": [
+          "time_grain"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "P1D",
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "时间粒度（如 day/week），用于时间聚合桶。"
+        ]
+      }
+    ],
+    "optional_slots": [
+      {
+        "field_name": "adhoc_filters",
+        "required": false,
+        "slot_kind": "filter_list",
+        "accepted_dataset_roles": [
+          "filter_context"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [],
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "字段标签为 Filters。legacy explore_json 路径会先把 legacy filters 转成 adhoc_filters，再继续处理 extra filters / extra_form_data。"
+        ]
+      },
+      {
+        "field_name": "groupby",
+        "required": false,
+        "slot_kind": "dimension_list",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [
+          "<dimension_column>"
+        ],
+        "source_categories": [
+          "Query",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Dimensions contain qualitative values such as names, dates, or geographical data. Use dimensions to categorize, segment, and reveal the details in your data.",
+          "维度字段列表（通常为时间维度），用于分组展示时间序列。"
+        ]
+      }
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "metric",
+      "saved_metric",
+      "time_dimension",
+      "time_grain"
+    ],
+    "optional_dataset_roles": [
+      "category_dimension",
+      "dimension",
+      "filter_context"
+    ],
+    "dataset_role_inventory": {
+      "adhoc_metric": [
+        "metrics"
+      ],
+      "category_dimension": [
+        "groupby"
+      ],
+      "dimension": [
+        "groupby"
+      ],
+      "filter_context": [
+        "adhoc_filters"
+      ],
+      "metric": [
+        "metrics"
+      ],
+      "saved_metric": [
+        "metrics"
+      ],
+      "time_dimension": [
+        "granularity_sqla"
+      ],
+      "time_grain": [
+        "time_grain_sqla"
+      ]
+    },
+    "non_binding_control_names": [
+      "contribution",
+      "horizon_color_scale",
+      "limit",
+      "order_desc",
+      "row_limit",
+      "series_height",
+      "time_range",
+      "timeseries_limit_metric"
+    ],
+    "embedding_runtime_field_names": [
+      "adhoc_filters",
+      "custom_form_data",
+      "filters",
+      "granularity",
+      "granularity_sqla",
+      "interactive_drilldown",
+      "interactive_groupby",
+      "interactive_highlight",
+      "relative_end",
+      "relative_start",
+      "time_column",
+      "time_grain",
+      "time_grain_sqla",
+      "time_range"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "granularity_sqla",
+      "metrics",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "contribution",
+      "datasource",
+      "granularity_sqla",
+      "groupby",
+      "horizon_color_scale",
+      "limit",
+      "metrics",
+      "order_desc",
+      "row_limit",
+      "series_height",
+      "time_range",
+      "timeseries_limit_metric",
+      "viz_type"
+    ],
+    "structural_flags": {
+      "time_series": true,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": false,
+      "flow_like": false,
+      "distribution_like": false,
+      "supports_breakdown": true,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": true,
+      "needs_dimension": false
+    },
+    "selection_hints": [
+      "优先用于趋势、演化、时间对比类问题。",
+      "至少需要 1 个可聚合指标字段。",
+      "需要时间字段，通常还应结合时间粒度或时间范围。",
+      "支持按维度拆分多序列或子组。",
+      "可结合时间粒度控制趋势聚合窗口。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：多时间序列紧凑型展示（如多指标趋势、多维度对比）；正负值分离的趋势分析；小空间内的高密度时间序列展示"
+    ]
+  },
+  "selection_prompt_card": {
+    "viz_type": "horizon",
+    "display_name": "Horizon Chart",
+    "category": "timeseries",
+    "description_zh": "Horizon Chart is a compact time-series chart that splits negative/positive values into bands, ideal for displaying multiple time-series in a small space.",
+    "visual_shape_zh": "水平地平线图（紧凑型时间序列）",
+    "best_for": [
+      "多时间序列紧凑型展示（如多指标趋势、多维度对比）",
+      "正负值分离的趋势分析",
+      "小空间内的高密度时间序列展示"
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "metric",
+      "saved_metric",
+      "time_dimension",
+      "time_grain"
+    ],
+    "optional_dataset_roles": [
+      "category_dimension",
+      "dimension",
+      "filter_context"
+    ],
+    "required_slots": [
+      {
+        "field_name": "granularity_sqla",
+        "required": true,
+        "slot_kind": "time_column",
+        "accepted_dataset_roles": [
+          "time_dimension"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<time_column>",
+        "source_categories": [
+          "Time"
+        ],
+        "embedding_modes": [
+          "低置信；不要依赖 extra_form_data.override"
+        ],
+        "descriptions": [
+          "The time column for the visualization. Note that you can define arbitrary expression that return a DATETIME column in the table."
+        ]
+      },
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "Query",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+          "聚合指标列表，用于展示多时间序列的数值。"
+        ]
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "required": true,
+        "slot_kind": "time_grain",
+        "accepted_dataset_roles": [
+          "time_grain"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "P1D",
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "时间粒度（如 day/week），用于时间聚合桶。"
+        ]
+      }
+    ],
+    "optional_slot_names": [
+      "adhoc_filters",
+      "groupby"
+    ],
+    "structural_flags": {
+      "time_series": true,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": false,
+      "flow_like": false,
+      "distribution_like": false,
+      "supports_breakdown": true,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": true,
+      "needs_dimension": false
+    },
+    "selection_hints": [
+      "优先用于趋势、演化、时间对比类问题。",
+      "至少需要 1 个可聚合指标字段。",
+      "需要时间字段，通常还应结合时间粒度或时间范围。",
+      "支持按维度拆分多序列或子组。",
+      "可结合时间粒度控制趋势聚合窗口。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：多时间序列紧凑型展示（如多指标趋势、多维度对比）；正负值分离的趋势分析；小空间内的高密度时间序列展示"
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "horizon",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/horizon-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/horizon-form-data-schema.json",
+      "control-schema": "form-data-schema/horizon-schema.json"
+    }
+  }
+}

@@ -1,0 +1,1112 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "echarts_timeseries_bar",
+  "display_name": "Bar Chart",
+  "generation_mode": "heuristic_seed",
+  "slot_candidates": [
+    {
+      "field_name": "adhoc_filters",
+      "required": false,
+      "slot_kind": "filter_list",
+      "accepted_dataset_roles": [
+        "filter_context"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [],
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [
+        "extra_form_data.append"
+      ],
+      "descriptions": [
+        "源码未提供额外描述；字段标签为 Filters。"
+      ]
+    },
+    {
+      "field_name": "groupby",
+      "required": false,
+      "slot_kind": "dimension_list",
+      "accepted_dataset_roles": [
+        "dimension",
+        "category_dimension"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [
+        "<dimension_column>"
+      ],
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Dimensions contain qualitative values such as names, dates, or geographical data. Use dimensions to categorize, segment, and reveal the details in your data. Dimensions affect the level of detail in the view."
+      ]
+    },
+    {
+      "field_name": "metrics",
+      "required": true,
+      "slot_kind": "metric_list",
+      "accepted_dataset_roles": [
+        "metric",
+        "saved_metric",
+        "adhoc_metric"
+      ],
+      "cardinality": "1..n",
+      "placeholder": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        }
+      ],
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+      ]
+    },
+    {
+      "field_name": "time_grain_sqla",
+      "required": false,
+      "slot_kind": "time_grain",
+      "accepted_dataset_roles": [
+        "time_grain"
+      ],
+      "cardinality": "0..1",
+      "placeholder": "P1D",
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [
+        "extra_form_data.override"
+      ],
+      "descriptions": [
+        "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart."
+      ]
+    },
+    {
+      "field_name": "x_axis",
+      "required": true,
+      "slot_kind": "x_axis",
+      "accepted_dataset_roles": [
+        "time_dimension",
+        "dimension"
+      ],
+      "cardinality": "1",
+      "placeholder": "<x_axis_column>",
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Dimension to use on x-axis. orientation=horizontal 时控件标签切换为 Y-axis，但 form_data 键仍为 x_axis。"
+      ]
+    }
+  ],
+  "non_binding_form_controls": [
+    {
+      "field_name": "annotation_layers",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Annotations and Layers"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Annotation Layers"
+      ]
+    },
+    {
+      "field_name": "color_scheme",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / General"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The color scheme for rendering chart"
+      ]
+    },
+    {
+      "field_name": "comparison_type",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Advanced analytics"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "How to display time shifts: as individual lines; as the difference between the main time series and each time shift; as the percentage change; or as the ratio between series and time shifts."
+      ]
+    },
+    {
+      "field_name": "contributionMode",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Calculate contribution per series or row"
+      ]
+    },
+    {
+      "field_name": "currency_format",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Y Axis"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Currency format"
+      ]
+    },
+    {
+      "field_name": "forecastEnabled",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Predictive Analytics"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Enable forecasting"
+      ]
+    },
+    {
+      "field_name": "forecastInterval",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Predictive Analytics"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Width of the confidence interval. Should be between 0 and 1"
+      ]
+    },
+    {
+      "field_name": "forecastPeriods",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Predictive Analytics"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "How many periods into the future do we want to predict"
+      ]
+    },
+    {
+      "field_name": "forecastSeasonalityDaily",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Predictive Analytics"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Should daily seasonality be applied. An integer value will specify Fourier order of seasonality."
+      ]
+    },
+    {
+      "field_name": "forecastSeasonalityWeekly",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Predictive Analytics"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Should weekly seasonality be applied. An integer value will specify Fourier order of seasonality."
+      ]
+    },
+    {
+      "field_name": "forecastSeasonalityYearly",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Predictive Analytics"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Should yearly seasonality be applied. An integer value will specify Fourier order of seasonality."
+      ]
+    },
+    {
+      "field_name": "group_others_when_limit_reached",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Groups remaining series into an \"Others\" category when series limit is reached. This prevents incomplete time series data from being displayed."
+      ]
+    },
+    {
+      "field_name": "legendMargin",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Legend"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Additional padding for legend."
+      ]
+    },
+    {
+      "field_name": "legendOrientation",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Legend"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Legend Orientation"
+      ]
+    },
+    {
+      "field_name": "legendType",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Legend"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Legend type"
+      ]
+    },
+    {
+      "field_name": "limit",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Limits the number of series that get displayed. A joined subquery (or an extra phase where subqueries are not supported) is applied to limit the number of series that get fetched and rendered. This feature is useful when grouping by high cardinality column(s) though does increase the query complexity and cost."
+      ]
+    },
+    {
+      "field_name": "logAxis",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Y Axis"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Logarithmic axis"
+      ]
+    },
+    {
+      "field_name": "min_periods",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Advanced analytics"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The minimum number of rolling periods required to show a value."
+      ]
+    },
+    {
+      "field_name": "minorSplitLine",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Y Axis"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Draw split lines for minor axis ticks"
+      ]
+    },
+    {
+      "field_name": "minorTicks",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / General"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Show minor ticks on axes."
+      ]
+    },
+    {
+      "field_name": "only_total",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / General"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Only show the total value on the stacked chart, and not show on the selected category"
+      ]
+    },
+    {
+      "field_name": "order_desc",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "If enabled, this control sorts the results/values descending, otherwise it sorts the results ascending."
+      ]
+    },
+    {
+      "field_name": "orientation",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Orientation"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Orientation of bar chart"
+      ]
+    },
+    {
+      "field_name": "percentage_threshold",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / General"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Minimum threshold in percentage points for showing labels."
+      ]
+    },
+    {
+      "field_name": "resample_method",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Advanced analytics"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Pandas resample method"
+      ]
+    },
+    {
+      "field_name": "resample_rule",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Advanced analytics"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Pandas resample rule"
+      ]
+    },
+    {
+      "field_name": "rich_tooltip",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Tooltip"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Shows a list of all series available at that point in time"
+      ]
+    },
+    {
+      "field_name": "rolling_periods",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Advanced analytics"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Defines the size of the rolling window function, relative to the time granularity selected"
+      ]
+    },
+    {
+      "field_name": "rolling_type",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Advanced analytics"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Defines a rolling window function to apply, works along with the [Periods] text box"
+      ]
+    },
+    {
+      "field_name": "row_limit",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Limits the number of the rows that are computed in the query that is the source of the data used for this chart."
+      ]
+    },
+    {
+      "field_name": "showTooltipPercentage",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Tooltip"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to display the percentage value in the tooltip"
+      ]
+    },
+    {
+      "field_name": "showTooltipTotal",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Tooltip"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to display the total value in the tooltip"
+      ]
+    },
+    {
+      "field_name": "show_empty_columns",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Show empty columns"
+      ]
+    },
+    {
+      "field_name": "show_extra_controls",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / General"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to show extra controls or not. Extra controls include things like making multiBar charts stacked or side by side."
+      ]
+    },
+    {
+      "field_name": "show_legend",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Legend"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to display a legend for the chart"
+      ]
+    },
+    {
+      "field_name": "show_value",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / General"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Show series values on the chart"
+      ]
+    },
+    {
+      "field_name": "sort_series_ascending",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Series Order"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Sort series in ascending order"
+      ]
+    },
+    {
+      "field_name": "sort_series_type",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Series Order"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Based on what should series be ordered on the chart and legend"
+      ]
+    },
+    {
+      "field_name": "stack",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / General"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Stack series on top of each other"
+      ]
+    },
+    {
+      "field_name": "stackDimension",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / General"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Stack in groups, where each group corresponds to a dimension"
+      ]
+    },
+    {
+      "field_name": "time_compare",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Advanced analytics"
+      ],
+      "embedding_modes": [
+        "extra_form_data.override"
+      ],
+      "descriptions": [
+        "Overlay one or more timeseries from a relative time period. Expects relative time deltas in natural language. Free text is supported."
+      ]
+    },
+    {
+      "field_name": "time_shift_color",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / General"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "When unchecked, colors from the selected color scheme will be used for time shifted series"
+      ]
+    },
+    {
+      "field_name": "timeseries_limit_metric",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Orders the query result that generates the source data for this chart. If a series or row limit is reached, this determines what data are truncated. If undefined, defaults to the first metric (where appropriate)."
+      ]
+    },
+    {
+      "field_name": "tooltipSortByMetric",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Tooltip"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to sort tooltip by the selected metric in descending order."
+      ]
+    },
+    {
+      "field_name": "tooltipTimeFormat",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Tooltip"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Tooltip time format; shared control derives from x_axis_time_format."
+      ]
+    },
+    {
+      "field_name": "truncateXAxis",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / X Axis"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Truncate X Axis. Can be overridden by specifying a min or max bound. Only applicable for numerical X axis."
+      ]
+    },
+    {
+      "field_name": "truncateYAxis",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Y Axis"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "It’s not recommended to truncate axis in Bar chart."
+      ]
+    },
+    {
+      "field_name": "truncate_metric",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to truncate metrics"
+      ]
+    },
+    {
+      "field_name": "xAxisBounds",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / X Axis"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Bounds for numerical X axis. Not applicable for temporal or categorical axes. When left empty, the bounds are dynamically defined based on the min/max of the data. Note that this feature will only expand the axis range. It won't narrow the data's extent."
+      ]
+    },
+    {
+      "field_name": "xAxisForceCategorical",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Treat values as categorical."
+      ]
+    },
+    {
+      "field_name": "xAxisLabelInterval",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / X Axis"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Choose how many X-Axis labels to show"
+      ]
+    },
+    {
+      "field_name": "xAxisLabelRotation",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / X Axis"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Input field supports custom rotation. e.g. 30 for 30°"
+      ]
+    },
+    {
+      "field_name": "x_axis_sort",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Decides which column or measure to sort the base axis by."
+      ]
+    },
+    {
+      "field_name": "x_axis_sort_asc",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to sort ascending or descending on the base Axis."
+      ]
+    },
+    {
+      "field_name": "x_axis_time_format",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / X Axis"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "D3 time format syntax: https://github.com/d3/d3-time-format. When using other than adaptive formatting, labels may overlap"
+      ]
+    },
+    {
+      "field_name": "x_axis_title",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Title"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Axis Title。orientation=horizontal 时该控件在 Y Axis 子区展示，但字段名仍为 x_axis_title。"
+      ]
+    },
+    {
+      "field_name": "x_axis_title_margin",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Title"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Axis title margin。orientation=horizontal 时该控件在 Y Axis 子区展示，但字段名仍为 x_axis_title_margin。"
+      ]
+    },
+    {
+      "field_name": "y_axis_bounds",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Y Axis"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Bounds for the axis. When left empty, the bounds are dynamically defined based on the min/max of the data. Note that this feature will only expand the axis range. It won't narrow the data's extent."
+      ]
+    },
+    {
+      "field_name": "y_axis_format",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / Y Axis"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "D3 format syntax: https://github.com/d3/d3-format"
+      ]
+    },
+    {
+      "field_name": "y_axis_title",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Title"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Axis Title。orientation=horizontal 时该控件在 X Axis 子区展示，但字段名仍为 y_axis_title。"
+      ]
+    },
+    {
+      "field_name": "y_axis_title_margin",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Title"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Axis title margin。orientation=horizontal 时该控件在 X Axis 子区展示，但字段名仍为 y_axis_title_margin。"
+      ]
+    },
+    {
+      "field_name": "y_axis_title_position",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Title"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Axis title position。orientation=horizontal 时该控件在 X Axis 子区展示，但字段名仍为 y_axis_title_position。"
+      ]
+    },
+    {
+      "field_name": "zoomable",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options / General"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Enable data zooming controls"
+      ]
+    }
+  ],
+  "dataset_role_inventory": {
+    "adhoc_metric": [
+      "metrics"
+    ],
+    "category_dimension": [
+      "groupby"
+    ],
+    "dimension": [
+      "groupby",
+      "x_axis"
+    ],
+    "filter_context": [
+      "adhoc_filters"
+    ],
+    "metric": [
+      "metrics"
+    ],
+    "saved_metric": [
+      "metrics"
+    ],
+    "time_dimension": [
+      "x_axis"
+    ],
+    "time_grain": [
+      "time_grain_sqla"
+    ]
+  },
+  "binding_seed_example": {
+    "metrics": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      }
+    ],
+    "x_axis": "<x_axis_column>"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "echarts_timeseries_bar",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/echarts_timeseries_bar-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/echarts_timeseries_bar-form-data-schema.json",
+      "control-schema": "form-data-schema/echarts_timeseries_bar-schema.json"
+    }
+  }
+}

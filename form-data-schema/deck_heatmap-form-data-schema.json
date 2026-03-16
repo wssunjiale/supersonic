@@ -1,0 +1,468 @@
+{
+  "viz_type": "deck_heatmap",
+  "display_name": "deck.gl Heatmap",
+  "purpose": "用于调用 API 创建或保存 deck.gl Heatmap 时填写的 form_data 模板",
+  "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/deck_heatmap-schema.json",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Heatmap/controlPanel.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Heatmap/index.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Heatmap/Heatmap.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/factory.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/common.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/Shared_DeckGL.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/utils.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utils/crossFiltersDataMask.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/QueryFormData.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+    "D:/vsx/sources/superset-6.0.0/superset/views/core.py",
+    "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+    "D:/vsx/sources/superset-6.0.0/superset/viz.py"
+  ],
+  "notes": [
+    "deck_heatmap 是 legacy 图，metadata 明确声明 `useLegacyApi=true`，真实请求路径仍是 `/superset/explore_json/`。",
+    "Explore 导出 form_data 时走 `getFormDataFromControls()`，它按 control name 原样写入 root form_data。API 根层必须使用 `spatial`、`size`、`intensity`、`radius_pixels`、`linear_color_scheme` 等原始键名。",
+    "deck_heatmap 没有专属前端 buildQuery。ChartClient.ts 对它会退回 `() => formData`，也就是说，API 层真正应该构造的是原始 root `form_data`，然后由 legacy `/superset/explore_json/` 包装成 `{ form_data: ... }`。",
+    "这个图的主空间输入是 `spatial` 对象，不是普通维度列。后端 `BaseDeckGLViz.query_obj()` 依赖它展开成真实经纬度列或 geohash 列。",
+    "`size` 在当前图里是高置信必填。虽然服务端在极端情况下仍能回退成 `weight=1`，但当前 controlPanel 明确加了 `validateNonEmpty`，规范创建模板应始终提供它。",
+    "`color_scheme_type` 在当前图只允许 `fixed_color` 和 `linear_palette`，不存在 `categorical_palette` 正式模式。",
+    "`deafult_breakpoint_color`、`color_breakpoints`、`legend_position`、`legend_format` 虽然会被运行时代码消费，但当前 `deck_heatmap` controlPanel 没有正式暴露它们；因此它们不应出现在 canonical 创建模板的正式字段列表里。"
+  ],
+  "naming_and_pipeline": {
+    "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写成 form_data[name]，不会自动把 snake_case 改成 camelCase。",
+    "api_form_data_to_backend_request": "ChartClient.ts 在 `useLegacyApi=true` 时，把 `buildQuery(formData)` 包成 `{ form_data }` POST 到 `/superset/explore_json/`；deck_heatmap 没有专属 buildQuery，因此等价于直接发送原始 form_data。",
+    "backend_form_data_normalization": "`explore_json()` 会先补 `datasource`，再执行 `convert_legacy_filters_into_adhoc(form_data)` 与 `merge_extra_filters(form_data)`。",
+    "backend_form_data_to_query_obj": "`BaseDeckGLViz.query_obj()` 会先按 `filter_nulls` 给空间列补空值过滤，再把 `spatial` 展开为实际空间列，拼上可选 `js_columns`，最后根据 `size` 构建 metrics 查询。",
+    "runtime_chart_props": "`transformProps.ts` 直接把 `rawFormData` 透传成 runtime `formData`，把 `queriesData[0]` 透传成 runtime `payload`，并把 `viewport` 与 `width`/`height` 合并。"
+  },
+  "global_required_fields": {
+    "datasource": {
+      "data_type": "string",
+      "required": true,
+      "sample_data": "<dataset_id>__table",
+      "source": "explore_json() + datasourceAndVizType hidden control"
+    },
+    "viz_type": {
+      "data_type": "string",
+      "required": true,
+      "fixed_value": "deck_heatmap",
+      "source": "Heatmap/index.ts + VizType.DeckHeatmap"
+    },
+    "spatial": {
+      "data_type": "object",
+      "required": true,
+      "sample_data": {
+        "type": "latlong",
+        "lonCol": "LON",
+        "latCol": "LAT"
+      },
+      "source": "Heatmap Query section + SpatialControl validator + BaseDeckGLViz.query_obj()",
+      "notes": "高置信必填。没有它，后端无法展开空间列并构造 `position`。"
+    },
+    "size": {
+      "data_type": "string | object",
+      "required": true,
+      "sample_data": "count",
+      "source": "controlOverrides.size + BaseDeckGLViz.get_metrics() + DeckHeatmap.get_data()",
+      "notes": "当前图在 UI 层明确设置了 `validateNonEmpty`。规范创建模板应始终提供它。"
+    }
+  },
+  "global_optional_fields": {
+    "row_limit": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 10000,
+      "source": "Query section"
+    },
+    "filter_nulls": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": true,
+      "source": "Query section"
+    },
+    "adhoc_filters": {
+      "data_type": "array[object]",
+      "required": false,
+      "sample_data": [],
+      "source": "Query section"
+    },
+    "intensity": {
+      "data_type": "number | string",
+      "required": false,
+      "sample_data": 1,
+      "source": "Query section"
+    },
+    "radius_pixels": {
+      "data_type": "integer | string",
+      "required": false,
+      "sample_data": 30,
+      "source": "Query section"
+    },
+    "mapbox_style": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+      "source": "Map section"
+    },
+    "viewport": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {
+        "longitude": 6.85236157047845,
+        "latitude": 31.222656842808707,
+        "zoom": 1,
+        "bearing": 0,
+        "pitch": 0
+      },
+      "source": "Map section"
+    },
+    "color_scheme_type": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "linear_palette",
+      "source": "Map section"
+    },
+    "color_picker": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      },
+      "source": "Map section"
+    },
+    "linear_color_scheme": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "superset_seq_1",
+      "source": "Map section"
+    },
+    "autozoom": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": true,
+      "source": "Map section"
+    },
+    "aggregation": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "sum",
+      "source": "Map section"
+    },
+    "js_columns": {
+      "data_type": "array[string | object]",
+      "required": false,
+      "sample_data": [],
+      "source": "Advanced section"
+    },
+    "js_data_mutator": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "data => data",
+      "source": "Advanced section"
+    },
+    "js_tooltip": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "o => `<div>${o.coordinate[0]}, ${o.coordinate[1]}</div>`",
+      "source": "Advanced section"
+    },
+    "js_onclick_href": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "o => `https://example.com/?lon=${o.coordinate[0]}&lat=${o.coordinate[1]}`",
+      "source": "Advanced section"
+    },
+    "slice_id": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 0,
+      "source": "datasourceAndVizType hidden control",
+      "notes": "新建图表时通常省略；编辑已存在图表时由服务端或上层调用方提供。"
+    },
+    "cache_timeout": {
+      "data_type": "integer | null",
+      "required": false,
+      "sample_data": null,
+      "source": "datasourceAndVizType hidden control"
+    },
+    "url_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "QueryFormData"
+    },
+    "custom_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "QueryFormData"
+    },
+    "extra_form_data": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "utils.merge_extra_form_data()",
+      "notes": "虽然不属于 deck_heatmap controlPanel 正式字段，但 legacy explore_json 路径会消费它。"
+    }
+  },
+  "minimal_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "deck_heatmap",
+    "spatial": {
+      "type": "latlong",
+      "lonCol": "LON",
+      "latCol": "LAT"
+    },
+    "size": "count",
+    "adhoc_filters": []
+  },
+  "recommended_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "deck_heatmap",
+    "spatial": {
+      "type": "latlong",
+      "lonCol": "LON",
+      "latCol": "LAT"
+    },
+    "row_limit": 10000,
+    "size": "count",
+    "filter_nulls": true,
+    "adhoc_filters": [],
+    "intensity": 1,
+    "radius_pixels": 30,
+    "mapbox_style": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    "viewport": {
+      "longitude": 6.85236157047845,
+      "latitude": 31.222656842808707,
+      "zoom": 1,
+      "bearing": 0,
+      "pitch": 0
+    },
+    "color_scheme_type": "linear_palette",
+    "color_picker": {
+      "r": 0,
+      "g": 122,
+      "b": 135,
+      "a": 1
+    },
+    "linear_color_scheme": "superset_seq_1",
+    "autozoom": true,
+    "aggregation": "sum",
+    "js_columns": [],
+    "js_data_mutator": "",
+    "js_tooltip": "",
+    "js_onclick_href": ""
+  },
+  "conditional_blocks": {
+    "delimited_spatial_column": {
+      "condition": "空间字段存储在单列经纬度字符串中时",
+      "fields": {
+        "spatial": {
+          "type": "delimited",
+          "lonlatCol": "LONLAT",
+          "delimiter": ",",
+          "reverseCheckbox": false
+        }
+      }
+    },
+    "geohash_spatial_column": {
+      "condition": "空间字段存储为 geohash 时",
+      "fields": {
+        "spatial": {
+          "type": "geohash",
+          "geohashCol": "geohash",
+          "reverseCheckbox": false
+        }
+      }
+    },
+    "custom_weight_metric": {
+      "condition": "需要按业务指标而不是默认计数作为热力权重时",
+      "fields": {
+        "size": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        }
+      }
+    },
+    "fixed_color_mode": {
+      "condition": "需要整个热力层使用单一固定色时",
+      "fields": {
+        "color_scheme_type": "fixed_color",
+        "color_picker": {
+          "r": 0,
+          "g": 122,
+          "b": 135,
+          "a": 1
+        }
+      }
+    },
+    "linear_palette_mode": {
+      "condition": "需要使用连续色板时",
+      "fields": {
+        "color_scheme_type": "linear_palette",
+        "linear_color_scheme": "superset_seq_1"
+      }
+    },
+    "custom_intensity_and_radius": {
+      "condition": "需要调整热力扩散强度和半径时",
+      "fields": {
+        "intensity": 0.8,
+        "radius_pixels": 45
+      }
+    },
+    "mean_aggregation": {
+      "condition": "需要在 cell 内按平均值而不是求和渲染时",
+      "fields": {
+        "aggregation": "mean"
+      }
+    },
+    "custom_js": {
+      "condition": "需要自定义数据加工、tooltip 或点击跳转行为时",
+      "fields": {
+        "js_columns": [
+          "city"
+        ],
+        "js_data_mutator": "data => data",
+        "js_tooltip": "o => `<div>${o.coordinate[0]}, ${o.coordinate[1]}</div>`",
+        "js_onclick_href": "o => `https://example.com/?lon=${o.coordinate[0]}&lat=${o.coordinate[1]}`"
+      }
+    }
+  },
+  "runtime_only_or_non_template_fields": {
+    "runtime_props_generated_by_transformProps": [
+      {
+        "field_name": "payload",
+        "reason": "这是运行时从 `queriesData[0]` 注入的对象，不是 API root form_data 字段。"
+      },
+      {
+        "field_name": "formData",
+        "reason": "这是 runtime 对 `rawFormData` 的整体透传容器，不是额外的 API root 字段。"
+      },
+      {
+        "field_name": "viewport.width",
+        "reason": "运行时由图表尺寸补入，不需要写到 root form_data。"
+      },
+      {
+        "field_name": "viewport.height",
+        "reason": "运行时由图表尺寸补入，不需要写到 root form_data。"
+      },
+      {
+        "field_name": "emitCrossFilters",
+        "reason": "这是 ChartProps/hook 层运行时能力，不是 API root 字段。"
+      },
+      {
+        "field_name": "filterState",
+        "reason": "这是 runtime 交互状态，不是 API root 字段。"
+      }
+    ],
+    "backend_response_only_fields": [
+      {
+        "field_name": "queriesData[0].data.features[*].position",
+        "reason": "这是后端 `DeckHeatmap.get_data()` 产出的空间点位，不是 root form_data 字段。"
+      },
+      {
+        "field_name": "queriesData[0].data.features[*].weight",
+        "reason": "这是后端 `DeckHeatmap.get_data()` 产出的点权重，不是 root form_data 字段。"
+      },
+      {
+        "field_name": "queriesData[0].data.mapboxApiKey",
+        "reason": "这是后端 payload 附带的运行时地图密钥，不是 root form_data 字段。"
+      },
+      {
+        "field_name": "queriesData[0].data.metricLabels",
+        "reason": "这是后端返回的指标标签列表，不是 root form_data 字段。"
+      }
+    ],
+    "hidden_runtime_supported_fields": [
+      {
+        "field_name": "deafult_breakpoint_color",
+        "reason": "`Heatmap.tsx` 仍会把它传给 `getColorRange()`，但当前 `deck_heatmap` controlPanel 没有正式暴露该控件。"
+      },
+      {
+        "field_name": "color_breakpoints",
+        "reason": "`Heatmap.tsx` 仍会把它传给 `getColorRange()`，但当前 `deck_heatmap` controlPanel 没有正式暴露该控件。"
+      },
+      {
+        "field_name": "legend_position",
+        "reason": "`factory.tsx` 的通用 `Legend` 会读取它，但当前 `deck_heatmap` controlPanel 没有正式暴露该控件。"
+      },
+      {
+        "field_name": "legend_format",
+        "reason": "`factory.tsx` 的通用 `Legend` 会读取它，但当前 `deck_heatmap` controlPanel 没有正式暴露该控件。"
+      }
+    ],
+    "legacy_or_generated_non_primary_fields": [
+      {
+        "field_name": "filters",
+        "reason": "这不是当前 controlPanel 正式字段。它可能在旧保存态或 legacy 兼容处理中出现，但当前创建模板应优先使用 `adhoc_filters`。"
+      },
+      {
+        "field_name": "where",
+        "reason": "legacy 兼容字段，不是当前 deck_heatmap controlPanel 正式字段。"
+      },
+      {
+        "field_name": "having",
+        "reason": "legacy 兼容字段，不是当前 deck_heatmap controlPanel 正式字段。"
+      },
+      {
+        "field_name": "groupby",
+        "reason": "当前 deck_heatmap 没有正式 groupby control；主 groupby 逻辑由 `spatial` 和可选 `js_columns` 决定。"
+      },
+      {
+        "field_name": "payload.form_data",
+        "reason": "这是 legacy `/superset/explore_json/` 请求的外层包裹字段，不是图表保存态内部的 root form_data 字段。"
+      }
+    ]
+  },
+  "api_usage_guidance": {
+    "high_confidence_required_fields": [
+      "datasource",
+      "viz_type",
+      "spatial",
+      "size"
+    ],
+    "recommended_always_set": [
+      "adhoc_filters",
+      "filter_nulls",
+      "row_limit",
+      "intensity",
+      "radius_pixels",
+      "mapbox_style",
+      "color_scheme_type",
+      "linear_color_scheme",
+      "viewport",
+      "autozoom",
+      "aggregation"
+    ],
+    "api_field_examples": [
+      "spatial",
+      "size",
+      "intensity",
+      "radius_pixels",
+      "mapbox_style",
+      "color_scheme_type",
+      "linear_color_scheme",
+      "viewport",
+      "aggregation"
+    ],
+    "avoid_confusion": [
+      "不要把 deck_heatmap 当成标准 chart data API 图表去套 `/api/v1/chart/data` 的 `query_context` 模板；当前图真实入口是 legacy `/superset/explore_json/`。",
+      "不要把 `size` 误写成 `metric` 或 `metrics`；当前图的正式权重字段名就是 `size`。",
+      "不要把 `color_scheme_type` 写成 `categorical_palette`；当前图的正式 choices 只有 `fixed_color` 和 `linear_palette`。",
+      "不要把 `deafult_breakpoint_color`、`color_breakpoints`、`legend_position`、`legend_format` 当成当前 controlPanel 的正式创建字段去主动构造。",
+      "`spatial` 不是单个字符串列名，而是一个对象。根据你的空间数据编码方式，必须传 `latlong` / `delimited` / `geohash` 三种形状之一。",
+      "`aggregation` 在 root form_data 里应使用小写枚举值 `sum|mean`，运行时才会转成大写。"
+    ]
+  }
+}

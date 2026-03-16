@@ -1,0 +1,513 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "deck_scatter",
+  "display_name": "deck.gl Scatterplot",
+  "source_kind": "schema_file",
+  "normalized_embedding_policy": {
+    "immutable_root_keys": [
+      "slice_id",
+      "datasource",
+      "viz_type",
+      "all_saved_chart_definition_fields"
+    ],
+    "allowed_runtime_fields": [
+      {
+        "field_name": "adhoc_filters",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "custom_form_data",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "filters",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_range",
+        "behavior": "override",
+        "source": "embedding-schema"
+      }
+    ],
+    "safe_embedding_form_data_seed": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "deck_scatter",
+      "extra_form_data": {
+        "filters": [],
+        "adhoc_filters": []
+      }
+    }
+  },
+  "original_embedding_form_data_schema": {
+    "viz_type": "deck_scatter",
+    "display_name": "deck.gl Scatterplot",
+    "purpose": "第三方 embedding / guest token 场景下安全传输的 deck.gl Scatterplot form_data 模板",
+    "base_form_data_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/deck_scatter-form-data-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Scatter/controlPanel.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Scatter/index.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Scatter/Scatter.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/factory.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/CategoricalDeckGLContainer.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/common.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/Shared_DeckGL.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utils/geo.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utils/crossFiltersDataMask.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/QueryFormData.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/constants.ts",
+      "D:/vsx/sources/superset-6.0.0/superset/views/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/constants.py",
+      "D:/vsx/sources/superset-6.0.0/superset/charts/schemas.py",
+      "D:/vsx/sources/superset-6.0.0/superset/security/manager.py",
+      "D:/vsx/sources/superset-6.0.0/superset/viz.py"
+    ],
+    "notes": [
+      "deck_scatter 仍然是 legacy 图，metadata 明确声明 `useLegacyApi=true`，真实请求路径是 `/superset/explore_json/`。",
+      "`/superset/explore_json/` 会读取原始 `form_data`，补 `datasource`，然后执行 `convert_legacy_filters_into_adhoc(form_data)` 与 `merge_extra_filters(form_data)`。",
+      "当前源码里 `Guest user cannot modify chart payload` 只在 `security/manager.py::raise_for_access(query_context=...)` 分支触发，核心比较器是 `query_context_modified()`；legacy `/superset/explore_json/` 则会走 `views/utils.py::check_datasource_perms()` -> `get_viz()` -> `viz.raise_for_access()` -> `security/manager.py::raise_for_access(viz=self)`。当前 `viz` 分支会校验 `dashboardId` / `slice_id` / datasource 绑定，但没有等价的 columns / metrics / orderby 子集比较器。",
+      "即便如此，deck_scatter 的空间列定义、点大小定义、点大小单位、半径像素钳位、倍率、配色方式、legend、地图样式、视角和自定义 JS 都直接来自 root form_data。最稳妥的 embedding 策略仍然是根层复制保存态图表，只把动态筛选放进 `extra_form_data`。",
+      "`crossFiltersDataMask.ts` 对 `deck_scatter` 的动态过滤形状取决于 `spatial.type`：`latlong` 生成经纬度双列精确过滤，`delimited` 生成单列坐标字符串精确过滤，`geohash` 生成 geohash 列精确过滤。",
+      "`point_radius_fixed` 才是当前 scatter 的正式点大小字段。旧的 `size` 只应视为 legacy 保存态残留，不应作为新的 embedding 根字段模板来构造。",
+      "`deafult_breakpoint_color` 仍应按控件键名保留在保存态里；不要在 embedding 请求里擅自改成 `default_breakpoint_color`。"
+    ],
+    "security_enforcement": {
+      "frontend_request_mode": "legacy explore_json",
+      "frontend_request_endpoint": "/superset/explore_json/",
+      "frontend_request_payload": {
+        "form_data": "<raw form_data>"
+      },
+      "backend_normalization_steps": [
+        "convert_legacy_filters_into_adhoc(form_data)",
+        "merge_extra_filters(form_data)"
+      ],
+      "verified_guest_payload_guard": {
+        "chart_data_api": "security/manager.py::query_context_modified",
+        "chart_data_api_error": "Guest user cannot modify chart payload",
+        "legacy_explore_json_api": "`check_datasource_perms()` 会构造 viz 并调用 `raise_for_access(viz=self)`；该分支校验 datasource / dashboard / slice 绑定，但没有 `query_context_modified()` 那种 query subset guard",
+        "confidence": "high"
+      },
+      "guest_access_binding_fields": [
+        "dashboardId",
+        "slice_id"
+      ],
+      "query_critical_root_fields": [
+        "slice_id",
+        "datasource",
+        "viz_type",
+        "spatial",
+        "point_radius_fixed",
+        "point_unit",
+        "min_radius",
+        "max_radius",
+        "multiplier",
+        "row_limit",
+        "filter_nulls",
+        "adhoc_filters",
+        "mapbox_style",
+        "viewport",
+        "autozoom",
+        "color_scheme_type",
+        "color_picker",
+        "dimension",
+        "color_scheme",
+        "deafult_breakpoint_color",
+        "color_breakpoints",
+        "legend_position",
+        "legend_format",
+        "js_columns",
+        "js_data_mutator",
+        "js_tooltip",
+        "js_onclick_href"
+      ],
+      "legacy_carry_over_root_fields_if_present": [
+        "granularity_sqla",
+        "time_grain_sqla",
+        "time_range",
+        "size",
+        "groupby",
+        "label_colors"
+      ],
+      "recommended_strategy": "复制保存态 chart form_data 作为 base，仅通过 extra_form_data 追加动态过滤条件；不要在 embedding 请求里重构 deck_scatter 的 root 查询字段和图表定义字段。"
+    },
+    "safe_base_rule": {
+      "description": "第三方 embedding 请求中的根层 form_data，应当从已保存的 deck_scatter 图表直接复制，不要自行重构。",
+      "must_be_copied_from_saved_chart": [
+        "slice_id",
+        "dashboardId",
+        "datasource",
+        "viz_type",
+        "spatial",
+        "point_radius_fixed",
+        "point_unit",
+        "min_radius",
+        "max_radius",
+        "multiplier",
+        "row_limit",
+        "filter_nulls",
+        "adhoc_filters",
+        "mapbox_style",
+        "viewport",
+        "autozoom",
+        "color_scheme_type",
+        "color_picker",
+        "dimension",
+        "color_scheme",
+        "deafult_breakpoint_color",
+        "color_breakpoints",
+        "legend_position",
+        "legend_format",
+        "js_columns",
+        "js_data_mutator",
+        "js_tooltip",
+        "js_onclick_href",
+        "granularity_sqla/time_grain_sqla/time_range (if present in saved chart)",
+        "size/groupby/label_colors (if present in legacy saved chart)",
+        "all other saved chart-definition fields"
+      ],
+      "why": [
+        "deck_scatter 没有专属前端 buildQuery，前端会把 root form_data 直接发给 `/superset/explore_json/`。",
+        "`DeckScatterViz.query_obj()` / `DeckScatterViz.get_metrics()` / `DeckScatterViz.get_properties()` 会直接消费 root `spatial`、`point_radius_fixed`、`dimension`、`filter_nulls` 和可选隐藏时间字段。",
+        "`Scatter.tsx` / `CategoricalDeckGLContainer.tsx` / `common.tsx` 会直接消费 root 的 `point_unit`、`min_radius`、`max_radius`、`multiplier`、配色、legend、viewport、mapbox_style 和 JS 字段。",
+        "`merge_extra_filters()` 会在后端把 `extra_form_data` 并入 legacy 请求，因此动态筛选不需要通过覆盖根层保存态字段来实现。",
+        "虽然当前没有在 legacy 路径定位到 `query_context_modified()` 等价校验，但复制保存态仍然是最稳妥、最接近官方前端行为的策略。"
+      ]
+    },
+    "safe_embedding_form_data_template": {
+      "description": "这是 deck_scatter embedding 下的保守安全写法。根层以保存态图表为 base，仅改 extra_form_data。",
+      "template": {
+        "slice_id": "<saved_chart_id>",
+        "dashboardId": "<dashboard_id>",
+        "datasource": "<copied_from_saved_chart>",
+        "viz_type": "deck_scatter",
+        "spatial": "<copied_from_saved_chart>",
+        "point_radius_fixed": "<copied_from_saved_chart>",
+        "point_unit": "<copied_from_saved_chart_if_present>",
+        "min_radius": "<copied_from_saved_chart_if_present>",
+        "max_radius": "<copied_from_saved_chart_if_present>",
+        "multiplier": "<copied_from_saved_chart_if_present>",
+        "row_limit": "<copied_from_saved_chart_if_present>",
+        "filter_nulls": "<copied_from_saved_chart_if_present>",
+        "adhoc_filters": "<copied_from_saved_chart>",
+        "mapbox_style": "<copied_from_saved_chart_if_present>",
+        "viewport": "<copied_from_saved_chart_if_present>",
+        "autozoom": "<copied_from_saved_chart_if_present>",
+        "color_scheme_type": "<copied_from_saved_chart_if_present>",
+        "color_picker": "<copied_from_saved_chart_if_present>",
+        "dimension": "<copied_from_saved_chart_if_present>",
+        "color_scheme": "<copied_from_saved_chart_if_present>",
+        "deafult_breakpoint_color": "<copied_from_saved_chart_if_present>",
+        "color_breakpoints": "<copied_from_saved_chart_if_present>",
+        "legend_position": "<copied_from_saved_chart_if_present>",
+        "legend_format": "<copied_from_saved_chart_if_present>",
+        "js_columns": "<copied_from_saved_chart_if_present>",
+        "js_data_mutator": "<copied_from_saved_chart_if_present>",
+        "js_tooltip": "<copied_from_saved_chart_if_present>",
+        "js_onclick_href": "<copied_from_saved_chart_if_present>",
+        "granularity_sqla": "<copied_from_saved_chart_if_present>",
+        "time_grain_sqla": "<copied_from_saved_chart_if_present>",
+        "time_range": "<copied_from_saved_chart_if_present>",
+        "size": "<copied_from_saved_chart_if_present>",
+        "groupby": "<copied_from_saved_chart_if_present>",
+        "label_colors": "<copied_from_saved_chart_if_present>",
+        "extra_form_data": {
+          "filters": [
+            {
+              "col": "LON",
+              "op": "==",
+              "val": -122.4221936
+            },
+            {
+              "col": "LAT",
+              "op": "==",
+              "val": 37.7786083
+            }
+          ],
+          "adhoc_filters": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "category",
+              "operator": "IN",
+              "comparator": [
+                "A"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "preferred_dynamic_container": {
+      "field_name": "extra_form_data",
+      "reason": "legacy `/superset/explore_json/` 请求会在后端执行 `merge_extra_filters(form_data)`；把动态筛选放进 `extra_form_data` 最接近官方交互筛选行为。",
+      "notes": [
+        "对 `deck_scatter`，推荐优先使用 `extra_form_data.filters` 与 `extra_form_data.adhoc_filters` 追加动态筛选，而不是直接覆盖根层 `adhoc_filters`。",
+        "`spatial.type='latlong'` 时，point click 生成两条精确过滤：`lonCol == lon` 和 `latCol == lat`。",
+        "`spatial.type='delimited'` 时，point click 生成单列字符串精确过滤：`lonlatCol == 'lon,lat'`，源码还会尝试兼容反转顺序。",
+        "`spatial.type='geohash'` 时，point click 生成单列 geohash 精确过滤：`geohashCol == ngeohash.encode(lat, lon, 12)`。",
+        "如果只是需要追加普通业务过滤条件，优先用 `extra_form_data.adhoc_filters`，不要改根层图表定义字段。"
+      ]
+    },
+    "extra_form_data_field_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_deck_scatter_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "LON",
+            "op": "==",
+            "val": -122.4221936
+          },
+          {
+            "col": "LAT",
+            "op": "==",
+            "val": 37.7786083
+          }
+        ],
+        "effect": "追加 simple filters；对 `latlong` scatter 来说，这正是 `crossFiltersDataMask.ts` 生成的交互过滤形状。",
+        "source": "superset/constants.py + superset/utils/core.py + crossFiltersDataMask.ts"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_deck_scatter_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "category",
+            "operator": "IN",
+            "comparator": [
+              "A"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会标记为 `isExtra` 并并入查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_deck_scatter_legacy": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；deck_scatter 默认不直接消费它。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_deck_scatter_legacy": false,
+        "recommended": false,
+        "sample_data": "Last 30 days",
+        "effect": "scatter 后端确实存在隐藏的时间查询路径，但当前 controlPanel 的 `onInit` 会清空时间字段。guest embedding 不建议依赖 override 去动态改它。",
+        "source": "QueryFormData.ts + superset/constants.py + superset/utils/core.py + superset/viz.py",
+        "status": "有后端消费证据，但不建议在 guest embedding 中依赖"
+      }
+    ],
+    "minimal_extra_form_data_template": {
+      "filters": [
+        {
+          "col": "LON",
+          "op": "==",
+          "val": -122.4221936
+        },
+        {
+          "col": "LAT",
+          "op": "==",
+          "val": 37.7786083
+        }
+      ]
+    },
+    "recommended_extra_form_data_template": {
+      "filters": [
+        {
+          "col": "LON",
+          "op": "==",
+          "val": -122.4221936
+        },
+        {
+          "col": "LAT",
+          "op": "==",
+          "val": 37.7786083
+        }
+      ],
+      "adhoc_filters": [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "category",
+          "operator": "IN",
+          "comparator": [
+            "A"
+          ]
+        }
+      ],
+      "custom_form_data": {}
+    },
+    "unsafe_root_form_data_changes": [
+      {
+        "field_name": "slice_id",
+        "reason": "会改变请求对应的图表实体，最不应该在 embedding 请求里改。"
+      },
+      {
+        "field_name": "dashboardId",
+        "reason": "guest 用户的数据访问上下文通常依赖 dashboard 绑定关系，保守写法应直接复制保存态。"
+      },
+      {
+        "field_name": "datasource",
+        "reason": "legacy deck_scatter 的 root form_data 会直接驱动后端查询，embedding 不应改图表绑定数据集。"
+      },
+      {
+        "field_name": "viz_type",
+        "reason": "deck_scatter 仍应保持 `deck_scatter`；不应在请求里改成其他 viz。"
+      },
+      {
+        "field_name": "spatial",
+        "reason": "它决定后端如何把列解析成坐标点，也是交互筛选生成精确过滤的基础。"
+      },
+      {
+        "field_name": "point_radius_fixed",
+        "reason": "它直接决定 scatter 是否携带 query metric，以及后端返回的 `metric` / `radius`。"
+      },
+      {
+        "field_name": "point_unit",
+        "reason": "会直接改变 `unitToRadius()` 的单位换算逻辑。"
+      },
+      {
+        "field_name": "min_radius",
+        "reason": "会直接改变 `ScatterplotLayer.radiusMinPixels`。"
+      },
+      {
+        "field_name": "max_radius",
+        "reason": "会直接改变 `ScatterplotLayer.radiusMaxPixels`。"
+      },
+      {
+        "field_name": "multiplier",
+        "reason": "会直接改变最终点半径缩放。"
+      },
+      {
+        "field_name": "row_limit",
+        "reason": "它直接影响参与散点渲染的原始记录数量。"
+      },
+      {
+        "field_name": "filter_nulls",
+        "reason": "它决定后端是否自动注入空间列非空过滤。"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "reason": "动态筛选应优先放进 `extra_form_data.append`，不要覆盖保存态根字段。"
+      },
+      {
+        "field_name": "mapbox_style",
+        "reason": "它直接改变底图样式。"
+      },
+      {
+        "field_name": "viewport",
+        "reason": "虽然主要影响前端视角，但它仍是图表保存态的一部分，guest 场景应保持与保存态一致。"
+      },
+      {
+        "field_name": "autozoom",
+        "reason": "会直接改变每次查询后的地图自动缩放行为。"
+      },
+      {
+        "field_name": "color_scheme_type",
+        "reason": "它直接改变 scatter 配色逻辑。"
+      },
+      {
+        "field_name": "color_picker",
+        "reason": "会直接改变 fixed-color 模式颜色，以及 categorical 模式无 dimension 时的回退颜色。"
+      },
+      {
+        "field_name": "dimension",
+        "reason": "会直接改变分类着色依据，并影响后端返回的 `cat_color`。"
+      },
+      {
+        "field_name": "color_scheme",
+        "reason": "会直接改变 categorical palette 模式色板。"
+      },
+      {
+        "field_name": "deafult_breakpoint_color",
+        "reason": "会直接改变 color breakpoints 模式中未命中断点值的回退颜色。"
+      },
+      {
+        "field_name": "color_breakpoints",
+        "reason": "会直接改变 color breakpoints 模式的断点定义。"
+      },
+      {
+        "field_name": "legend_position",
+        "reason": "会直接改变图例布局。"
+      },
+      {
+        "field_name": "legend_format",
+        "reason": "会直接改变图例数值格式。"
+      },
+      {
+        "field_name": "js_columns",
+        "reason": "会直接改变查询的附加列和返回给 JS 的 `extraProps`。"
+      },
+      {
+        "field_name": "js_data_mutator",
+        "reason": "会直接改变前端绘图前的数据数组。"
+      },
+      {
+        "field_name": "js_tooltip",
+        "reason": "会直接改变 tooltip 行为。"
+      },
+      {
+        "field_name": "js_onclick_href",
+        "reason": "会直接改变点击行为。"
+      },
+      {
+        "field_name": "granularity_sqla / time_grain_sqla / time_range",
+        "reason": "如果保存态图表本来就带有这些 hidden/legacy 时间字段，embedding 请求里也不应自行改写它们。"
+      },
+      {
+        "field_name": "size / groupby / label_colors",
+        "reason": "它们不是当前 scatter 的正式 controlPanel 字段，但若保存态本来就带有，embedding 请求里也不应自行重写。"
+      }
+    ],
+    "practical_guidance": {
+      "best_practice": [
+        "先从保存态 deck_scatter 图表读取完整 form_data。",
+        "根层字段保持不变，尤其保留 `spatial`、`point_radius_fixed`、`point_unit`、`min_radius`、`max_radius`、`multiplier`、配色字段、legend 字段和 `viewport`。",
+        "如果保存态里已经带有 `granularity_sqla`、`time_grain_sqla`、`time_range`、`size`、`groupby`、`label_colors`，embedding 根层也应原样复制。",
+        "只在 `extra_form_data` 中放动态 `filters` / `adhoc_filters`。",
+        "如果你的接入代码自己发请求，deck_scatter 仍应按 `/superset/explore_json/` 的 `{ form_data: ... }` 形状发送。",
+        "如果你希望和 Superset 前端交互筛选保持一致，先根据 `spatial.type` 选择正确的 `filters` 形状。"
+      ],
+      "avoid": [
+        "不要把 `deck_scatter` 当成标准 chart data API 图表去套 `/api/v1/chart/data` 的 `query_context` 模板。",
+        "不要把旧的 `size` 当成新的 scatter 根层模板字段来替代 `point_radius_fixed`。",
+        "不要依赖 `extra_form_data.override` 去动态修改 `spatial`、`point_radius_fixed`、`point_unit`、半径像素钳位、配色、legend 或 JS 字段。",
+        "不要把运行时字段 `payload`、`formData`、`filterState`、`emitCrossFilters` 或 `viewport.width/height` 写回 root form_data。",
+        "不要擅自更正 `deafult_breakpoint_color` 的字段名拼写。"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "deck_scatter",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/deck_scatter-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/deck_scatter-form-data-schema.json",
+      "control-schema": "form-data-schema/deck_scatter-schema.json"
+    }
+  }
+}

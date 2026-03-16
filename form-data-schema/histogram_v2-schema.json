@@ -1,0 +1,252 @@
+{
+  "viz_type": "histogram_v2",
+  "display_name": "Histogram",
+  "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Histogram/controlPanel.tsx",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Histogram/index.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Histogram/controlPanel.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Histogram/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Histogram/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Histogram/types.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/controls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/operators/histogramOperator.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryObject.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts"
+  ],
+  "notes": [
+    "插件 metadata 没有声明 `useLegacyApi=true`，因此 Histogram 走标准 `/api/v1/chart/data`。",
+    "metadata category 是 `Distribution`，description 明确把它定义为“按区间 / bins 展示数值分布、频率、离群点与分布形态”的图表。",
+    "Histogram 的核心查询字段不是 metric，而是数值型 `column`。该控件显式禁用了 `saved` 和 `sqlExpression` tabs，因此源码只接受物理数值列，不接受 saved metric 或 adhoc SQL metric。",
+    "`buildQuery.ts` 会把 `columns` 显式覆盖为 `[...groupby, column]`，并把 `metrics` 明确置为 `undefined`；Histogram 的统计行为完全交给 `histogram` post_processing。",
+    "`histogramOperator()` 会把 `bins` 转成数字；如果 `bins` 不是合法数字，源码会回退到 5。",
+    "`normalize` 与 `cumulative` 都只影响 histogram post_processing 结果和展示语义，不会改写 root `column` / `groupby` 选择。"
+  ],
+  "chart_data_api_behavior": {
+    "useLegacyApi": false,
+    "frontend_request_endpoint": "/api/v1/chart/data",
+    "frontend_request_payload": {
+      "query_context": "<buildQuery(form_data)>"
+    },
+    "query_builder": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Histogram/buildQuery.ts"
+  },
+  "query_compilation": {
+    "columns_mapping": "`buildQuery.ts` 会把 query `columns` 显式设为 `groupby + column`；其中 `groupby` 可为空数组，`column` 始终追加在最后。",
+    "metrics_mapping": "`buildQuery.ts` 把 `metrics` 显式置为 `undefined`，因此 Histogram 不依赖聚合 metric。",
+    "post_processing": "`histogramOperator()` 生成 `{ operation: 'histogram', options: { column, groupby, bins, cumulative, normalize } }`。",
+    "bins_fallback": "`histogramOperator()` 对 `bins` 执行 `Number(bins)`；若结果是 `NaN`，则回退为 5。",
+    "filters_mapping": "`adhoc_filters` 与 `row_limit` 仍由通用 `buildQueryObject()` 处理。"
+  },
+  "field_categories": {
+    "Query / Data & Filters": [
+      {
+        "field_name": "column",
+        "description": "Numeric column used to calculate the histogram.",
+        "data_type": "string | object",
+        "enum_source": "datasource numeric columns only",
+        "sample_data": "price",
+        "required": true,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "控件设置了 `freeForm=false`，并禁用了 `saved` / `sqlExpression` tabs。"
+      },
+      {
+        "field_name": "groupby",
+        "description": "Dimensions contain qualitative values such as names, dates, or geographical data. Use dimensions to categorize, segment, and reveal the details in your data. Dimensions affect the level of detail in the view.",
+        "data_type": "array[string | object]",
+        "enum_source": "datasource columns；若列元数据带 `groupby` 标记则优先只给出 groupby 列。",
+        "sample_data": [
+          "region"
+        ],
+        "required": false,
+        "embedding": "否",
+        "default_value": []
+      },
+      {
+        "field_name": "adhoc_filters",
+        "description": "源码未提供额外描述；字段标签为 Filters。",
+        "data_type": "array[object]",
+        "enum_source": "dataset filterable columns + 当前 Histogram root field",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "APAC"
+            ]
+          }
+        ],
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "default_value": []
+      },
+      {
+        "field_name": "row_limit",
+        "runtime_alias": "rowLimit",
+        "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+        "data_type": "integer",
+        "enum_values": [
+          10,
+          50,
+          100,
+          250,
+          500,
+          1000,
+          5000,
+          10000,
+          50000
+        ],
+        "sample_data": 10000,
+        "required": false,
+        "embedding": "否",
+        "default_value": 10000
+      }
+    ],
+    "Query / Histogram Calculation": [
+      {
+        "field_name": "bins",
+        "description": "The number of bins for the histogram",
+        "data_type": "integer | string",
+        "enum_values": [
+          5,
+          10,
+          15,
+          20
+        ],
+        "sample_data": 10,
+        "required": false,
+        "embedding": "否",
+        "default_value": 5,
+        "notes": "控件允许 freeForm；如果传入值无法转成数字，post_processing 会回退到 5。"
+      },
+      {
+        "field_name": "normalize",
+        "description": "The normalize option transforms the histogram values into proportions or probabilities by dividing each bin's count by the total count of data points. This normalization process ensures that the resulting values sum up to 1, enabling a relative comparison of the data's distribution and providing a clearer understanding of the proportion of data points within each bin.",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      },
+      {
+        "field_name": "cumulative",
+        "description": "The cumulative option allows you to see how your data accumulates over different values. When enabled, the histogram bars represent the running total of frequencies up to each bin. This helps you understand how likely it is to encounter values below a certain point. Keep in mind that enabling cumulative doesn't change your original data, it just changes the way the histogram is displayed.",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      }
+    ],
+    "Chart Options / Display": [
+      {
+        "field_name": "color_scheme",
+        "runtime_alias": "colorScheme",
+        "description": "The color scheme for rendering chart",
+        "data_type": "string",
+        "enum_source": "categoricalSchemeRegistry.keys()",
+        "sample_data": "<categorical_scheme_key>",
+        "required": false,
+        "embedding": "否",
+        "default_value": "categoricalSchemeRegistry.getDefaultKey()"
+      },
+      {
+        "field_name": "show_value",
+        "runtime_alias": "showValue",
+        "description": "Show series values on the chart",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      },
+      {
+        "field_name": "show_legend",
+        "runtime_alias": "showLegend",
+        "description": "Whether to display a legend for the chart",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true
+      }
+    ],
+    "Chart Options / Axis Labels & Formats": [
+      {
+        "field_name": "x_axis_title",
+        "runtime_alias": "xAxisTitle",
+        "description": "源码未提供额外描述；字段标签为 X Axis Title。",
+        "data_type": "string",
+        "sample_data": "Price Range",
+        "required": false,
+        "embedding": "否",
+        "default_value": ""
+      },
+      {
+        "field_name": "x_axis_format",
+        "runtime_alias": "xAxisFormat",
+        "description": "D3 format syntax: https://github.com/d3/d3-format Only applies when \"Label Type\" is set to show values.",
+        "data_type": "string",
+        "enum_source": "D3_FORMAT_OPTIONS",
+        "sample_data": "SMART_NUMBER",
+        "required": false,
+        "embedding": "否",
+        "default_value": "SMART_NUMBER"
+      },
+      {
+        "field_name": "y_axis_title",
+        "runtime_alias": "yAxisTitle",
+        "description": "源码未提供额外描述；字段标签为 Y Axis Title。",
+        "data_type": "string",
+        "sample_data": "Count",
+        "required": false,
+        "embedding": "否",
+        "default_value": ""
+      },
+      {
+        "field_name": "y_axis_format",
+        "runtime_alias": "yAxisFormat",
+        "description": "D3 format syntax: https://github.com/d3/d3-format Only applies when \"Label Type\" is set to show values.",
+        "data_type": "string",
+        "enum_source": "D3_FORMAT_OPTIONS",
+        "sample_data": "SMART_NUMBER",
+        "required": false,
+        "embedding": "否",
+        "default_value": "SMART_NUMBER"
+      }
+    ]
+  },
+  "runtime_only_or_removed_fields": [
+    {
+      "field_name": "query_context.queries[*].columns / metrics / post_processing",
+      "reason": "这些字段由 `buildQuery.ts` 和 `histogramOperator()` 从 root form_data 编译生成；其中 `metrics` 会被显式置为 `undefined`。"
+    },
+    {
+      "field_name": "colorScheme / showLegend / showValue / xAxisTitle / xAxisFormat / yAxisTitle / yAxisFormat / sliceId",
+      "reason": "这些是前端 `transformProps.ts` 使用的 runtime camelCase 别名，不是首选的 root API form_data 键名。"
+    },
+    {
+      "field_name": "metrics",
+      "reason": "Histogram 的 canonical 根字段是数值列 `column`，不是 `metrics`。"
+    }
+  ]
+}

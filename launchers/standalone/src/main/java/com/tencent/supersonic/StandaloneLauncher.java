@@ -13,7 +13,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableAsync
 public class StandaloneLauncher {
 
-    public static void main(String[] args) { 
+    public static void main(String[] args) {
         SpringApplication.run(StandaloneLauncher.class, args);
     }
 }

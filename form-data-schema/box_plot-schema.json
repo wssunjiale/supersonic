@@ -1,0 +1,346 @@
+{
+  "viz_type": "box_plot",
+  "display_name": "Box Plot",
+  "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BoxPlot/controlPanel.ts",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BoxPlot/controlPanel.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BoxPlot/index.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BoxPlot/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BoxPlot/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BoxPlot/types.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BoxPlot/EchartsBoxPlot.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/test/BoxPlot/buildQuery.test.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/test/BoxPlot/transformProps.test.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/sections/chartTitle.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/utils/D3Formatting.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/operators/boxplotOperator.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/PostProcessing.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/color/CategoricalSchemeRegistrySingleton.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/color/ColorSchemeRegistry.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/models/ChartProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/cypress-base/cypress/e2e/explore/visualizations/box_plot.test.js"
+  ],
+  "notes": [
+    "box_plot 使用独立的 BoxPlot 插件，不复用 Timeseries 的 Query section。它的核心结构是 `columns + groupby + metrics + boxplot post_processing`。",
+    "当前 controlPanel 的正式分布字段是 `columns`，显示标签被 override 成了 `Distribute across`，并带 `validateNonEmpty` 校验；buildQuery.ts 中仅在 `columns` 为空且 legacy 的 `granularity_sqla` 存在时，才会回退使用 `granularity_sqla`。",
+    "当前 controlPanel 的正式须线选项字段是 camelCase 的 `whiskerOptions`，不是 snake_case 的 `whisker_options`。后者只出现在老的 Cypress 用例中，不应作为新模板主字段。",
+    "当 `columns` 里选中了物理时间列且 `time_grain_sqla` 有值时，buildQuery.ts 会借助隐藏字段 `temporal_columns_lookup` 把该列包装成带 `timeGrain` 的 AdhocColumn，再送入 query.columns。",
+    "Chart Title 这组字段来自 `sections.chartTitle.tsx`。它们在 controlPanel 中的默认值是 `x_axis_title_margin=15`、`y_axis_title_margin=30`、`y_axis_title_position='Left'`；这与 `plugin-chart-echarts/src/constants.ts` 里的 `DEFAULT_TITLE_FORM_DATA` 不同。",
+    "buildQuery.ts 会把最终 query.columns 组织成 `columns + groupby`，并把 `groupby` 额外复制到 `series_columns`。boxplotOperator 再依据 `whiskerOptions` 输出 `whisker_type/percentiles/groupby/metrics` 的 post_processing。"
+  ],
+  "control_overrides": {
+    "groupby": {
+      "label": "Dimensions",
+      "description": "Categories to group by on the x-axis."
+    },
+    "columns": {
+      "label": "Distribute across",
+      "description": "Columns to calculate distribution across.",
+      "initialValue": "当 datasource 存在且当前值为空时，默认回填 getTemporalColumns(state.datasource).defaultTemporalColumn",
+      "validators": [
+        "validateNonEmpty"
+      ]
+    }
+  },
+  "form_data_overrides": {
+    "metrics": "getStandardizedControls().popAllMetrics()",
+    "groupby": "从 getStandardizedControls().controls.columns 中减去 formData.columns 后得到，并从 standardized controls.columns 中剔除这些 groupby 项"
+  },
+  "field_categories": {
+    "Query": [
+      {
+        "field_name": "columns",
+        "description": "Columns to calculate distribution across.",
+        "data_type": "array[string | object]",
+        "enum_source": "datasource columns + adhoc columns",
+        "sample_data": [
+          "order_date"
+        ],
+        "required": true,
+        "embedding": "否",
+        "default_value": "动态：若 datasource 存在且当前值为空，则回填 datasource 的默认时间列",
+        "notes": "buildQuery.ts 会把它们作为 box plot 分布轴的基础列；如果其中某个物理列是时间列且 time_grain_sqla 存在，则会被包装成带 timeGrain 的 AdhocColumn。"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "runtime_alias": "timeGrainSqla",
+        "description": "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart.",
+        "data_type": "string | null",
+        "enum_source": "datasource.time_grain_sqla",
+        "sample_data": "P1D",
+        "required": false,
+        "embedding": "extra_form_data.override",
+        "default_value": "P1D",
+        "notes": "controlPanel 中仅当 columns 里包含 adhoc column 或物理时间列时才显示。"
+      },
+      {
+        "field_name": "temporal_columns_lookup",
+        "runtime_alias": "temporalColumnsLookup",
+        "description": "隐藏辅助字段。记录 datasource 中哪些列是时间列，供 buildQuery.ts 在 time_grain_sqla 存在时判断是否需要把物理列包装成时间 AdhocColumn。",
+        "data_type": "object<string, boolean>",
+        "sample_data": {
+          "order_date": true
+        },
+        "required": false,
+        "embedding": "否",
+        "default_value": "动态：由 datasource.columns 中 is_dttm=true 的列自动生成",
+        "notes": "这是 controlPanel 显式放入 row 中的 HiddenControl，不是纯运行时局部变量。"
+      },
+      {
+        "field_name": "groupby",
+        "description": "Categories to group by on the x-axis.",
+        "data_type": "array[string | object]",
+        "enum_source": "datasource columns",
+        "sample_data": [
+          "region"
+        ],
+        "required": false,
+        "embedding": "否",
+        "default_value": []
+      },
+      {
+        "field_name": "metrics",
+        "description": "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+        "data_type": "array[string | object]",
+        "enum_source": "saved metrics + adhoc metrics",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          }
+        ],
+        "required": true,
+        "embedding": "否",
+        "default_value": []
+      },
+      {
+        "field_name": "adhoc_filters",
+        "description": "字段标签为 Filters。可用于普通筛选，也可通过 TEMPORAL_RANGE 表达时间过滤。",
+        "data_type": "array[object]",
+        "enum_source": "dataset columns + saved metrics + 当前 metrics",
+        "sample_data": [
+          {
+            "clause": "WHERE",
+            "subject": "order_date",
+            "operator": "TEMPORAL_RANGE",
+            "comparator": "Last 30 days",
+            "expressionType": "SIMPLE"
+          }
+        ],
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "default_value": []
+      },
+      {
+        "field_name": "series_limit",
+        "runtime_alias": "seriesLimit",
+        "description": "Limits the number of series that get displayed. A joined subquery (or an extra phase where subqueries are not supported) is applied to limit the number of series that get fetched and rendered. This feature is useful when grouping by high cardinality column(s) though does increase the query complexity and cost.",
+        "data_type": "integer | null",
+        "enum_values": [
+          5,
+          10,
+          25,
+          50,
+          100,
+          500
+        ],
+        "sample_data": 25,
+        "required": false,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "series_limit_metric",
+        "runtime_alias": "seriesLimitMetric",
+        "description": "Orders the query result that generates the source data for this chart. If a series or row limit is reached, this determines what data are truncated. If undefined, defaults to the first metric (where appropriate).",
+        "data_type": "string | object | null",
+        "enum_source": "saved metrics + adhoc metrics",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        },
+        "required": false,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "row_limit",
+        "runtime_alias": "rowLimit",
+        "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+        "data_type": "integer",
+        "enum_values": [
+          10,
+          50,
+          100,
+          250,
+          500,
+          1000,
+          5000,
+          10000,
+          50000
+        ],
+        "sample_data": 10000,
+        "required": false,
+        "embedding": "否",
+        "default_value": 10000
+      },
+      {
+        "field_name": "whiskerOptions",
+        "description": "Determines how whiskers and outliers are calculated.",
+        "data_type": "string",
+        "enum_values": [
+          "Tukey",
+          "Min/max (no outliers)",
+          "2/98 percentiles",
+          "5/95 percentiles",
+          "9/91 percentiles",
+          "10/90 percentiles"
+        ],
+        "sample_data": "Tukey",
+        "required": false,
+        "embedding": "否",
+        "default_value": "Tukey",
+        "notes": "boxplotOperator.ts 会把它翻译成 whisker_type=tukey|min/max|percentile；percentile 情况下会解析出 percentiles 数组。"
+      }
+    ],
+    "Chart Title": [
+      {
+        "field_name": "x_axis_title",
+        "runtime_alias": "xAxisTitle",
+        "description": "X Axis Title",
+        "data_type": "string",
+        "sample_data": "Order Date",
+        "required": false,
+        "embedding": "否",
+        "default_value": ""
+      },
+      {
+        "field_name": "x_axis_title_margin",
+        "runtime_alias": "xAxisTitleMargin",
+        "description": "X Axis Title Margin",
+        "data_type": "integer | string",
+        "enum_values": [
+          15,
+          30,
+          50,
+          75,
+          100,
+          125,
+          150,
+          200
+        ],
+        "sample_data": 15,
+        "required": false,
+        "embedding": "否",
+        "default_value": 15
+      },
+      {
+        "field_name": "y_axis_title",
+        "runtime_alias": "yAxisTitle",
+        "description": "Y Axis Title",
+        "data_type": "string",
+        "sample_data": "Sales",
+        "required": false,
+        "embedding": "否",
+        "default_value": ""
+      },
+      {
+        "field_name": "y_axis_title_margin",
+        "runtime_alias": "yAxisTitleMargin",
+        "description": "Y Axis Title Margin",
+        "data_type": "integer | string",
+        "enum_values": [
+          15,
+          30,
+          50,
+          75,
+          100,
+          125,
+          150,
+          200
+        ],
+        "sample_data": 30,
+        "required": false,
+        "embedding": "否",
+        "default_value": 30
+      },
+      {
+        "field_name": "y_axis_title_position",
+        "runtime_alias": "yAxisTitlePosition",
+        "description": "Y Axis Title Position",
+        "data_type": "string",
+        "enum_values": [
+          "Left",
+          "Top"
+        ],
+        "sample_data": "Left",
+        "required": false,
+        "embedding": "否",
+        "default_value": "Left"
+      }
+    ],
+    "Chart Options": [
+      {
+        "field_name": "color_scheme",
+        "runtime_alias": "colorScheme",
+        "description": "The color scheme for rendering chart",
+        "data_type": "string",
+        "enum_source": "categoricalSchemeRegistry.keys()",
+        "sample_data": "SUPERSET_DEFAULT",
+        "required": false,
+        "embedding": "否",
+        "default_value": "SUPERSET_DEFAULT",
+        "notes": "sharedControls.tsx 使用 categoricalSchemeRegistry.getDefaultKey() 作为默认值；ColorSchemeRegistry 开启 setFirstItemAsDefault，而 CategoricalSchemeRegistrySingleton 首个注册项是 SUPERSET_DEFAULT。"
+      },
+      {
+        "field_name": "x_ticks_layout",
+        "runtime_alias": "xTicksLayout",
+        "description": "The way the ticks are laid out on the X-axis",
+        "data_type": "string",
+        "enum_values": [
+          "auto",
+          "flat",
+          "45°",
+          "90°",
+          "staggered"
+        ],
+        "sample_data": "auto",
+        "required": false,
+        "embedding": "否",
+        "default_value": "auto"
+      },
+      {
+        "field_name": "number_format",
+        "runtime_alias": "numberFormat",
+        "description": "D3 format syntax: https://github.com/d3/d3-format Only applies when \"Label Type\" is set to show values.",
+        "data_type": "string",
+        "enum_source": "D3_FORMAT_OPTIONS",
+        "sample_data": "SMART_NUMBER",
+        "required": false,
+        "embedding": "否",
+        "default_value": "SMART_NUMBER"
+      },
+      {
+        "field_name": "date_format",
+        "runtime_alias": "dateFormat",
+        "description": "D3 format syntax: https://github.com/d3/d3-format",
+        "data_type": "string",
+        "enum_source": "D3_TIME_FORMAT_OPTIONS",
+        "sample_data": "smart_date",
+        "required": false,
+        "embedding": "否",
+        "default_value": "smart_date"
+      }
+    ]
+  }
+}

@@ -1,0 +1,963 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "cartodiagram",
+  "display_name": "Cartodiagram",
+  "source_kind": "schema_file",
+  "normalized_control_schema": {
+    "field_category_order": [
+      "Configuration",
+      "Map Options",
+      "Chart Options"
+    ],
+    "field_occurrences": [
+      {
+        "source_name": "control-schema",
+        "category": "Configuration",
+        "field_name": "selected_chart",
+        "runtime_alias": "selectedChart",
+        "required": true,
+        "embedding": "否",
+        "description": "Choose a chart for displaying on the map",
+        "data_type": "string (JSON-serialized chart object)",
+        "sample_data": "{\"id\":321,\"slice_name\":\"Pie Chart\",\"viz_type\":\"pie\",\"params\":\"{\\\"datasource\\\":\\\"12__table\\\",\\\"viz_type\\\":\\\"pie\\\",\\\"groupby\\\":[\\\"category\\\"],\\\"metric\\\":\\\"count\\\"}\"}",
+        "original_field": {
+          "field_name": "selected_chart",
+          "runtime_alias": "selectedChart",
+          "description": "Choose a chart for displaying on the map",
+          "data_type": "string (JSON-serialized chart object)",
+          "enum_source": "/api/v1/chart result filtered by current datasource_id; fields id, slice_name, params, viz_type",
+          "sample_data": "{\"id\":321,\"slice_name\":\"Pie Chart\",\"viz_type\":\"pie\",\"params\":\"{\\\"datasource\\\":\\\"12__table\\\",\\\"viz_type\\\":\\\"pie\\\",\\\"groupby\\\":[\\\"category\\\"],\\\"metric\\\":\\\"count\\\"}\"}",
+          "required": true,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "buildQuery 实际只读取 `viz_type` 和 `params`；但 UI 保存态来自 `/api/v1/chart` 返回对象的完整字符串。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Configuration",
+        "field_name": "geom_column",
+        "runtime_alias": "geomColumn",
+        "required": true,
+        "embedding": "否",
+        "description": "The name of the geometry column",
+        "data_type": "string",
+        "sample_data": "geom",
+        "original_field": {
+          "field_name": "geom_column",
+          "runtime_alias": "geomColumn",
+          "description": "The name of the geometry column",
+          "data_type": "string",
+          "enum_source": "current datasource columns.column_name",
+          "sample_data": "geom",
+          "required": true,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "buildQuery 会把它 unshift 到被引用图表的 `groupby` 最前面。当前图的根层 datasource 应与被引用图表 datasource 一致。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Map Options",
+        "field_name": "map_view",
+        "runtime_alias": "mapView",
+        "required": false,
+        "embedding": "否",
+        "description": "The extent of the map on application start. FIT DATA automatically sets the extent so that all data points are included in the viewport. CUSTOM allows users to define the extent manually.",
+        "data_type": "object",
+        "sample_data": {
+          "mode": "FIT_DATA"
+        },
+        "original_field": {
+          "field_name": "map_view",
+          "runtime_alias": "mapView",
+          "description": "The extent of the map on application start. FIT DATA automatically sets the extent so that all data points are included in the viewport. CUSTOM allows users to define the extent manually.",
+          "data_type": "object",
+          "enum_values": [
+            "FIT_DATA",
+            "CUSTOM"
+          ],
+          "sample_data": {
+            "mode": "FIT_DATA"
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": {
+            "mode": "FIT_DATA"
+          },
+          "notes": "在 CUSTOM 模式下对象会使用 `fixedZoom`、`fixedLatitude`、`fixedLongitude`；运行时还会回写当前 `zoom`、`latitude`、`longitude`。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Map Options",
+        "field_name": "layer_configs",
+        "runtime_alias": "layerConfigs",
+        "required": false,
+        "embedding": "否",
+        "description": "The configuration for the map layers",
+        "data_type": "array[WmsLayerConf | WfsLayerConf | XyzLayerConf]",
+        "sample_data": [
+          {
+            "type": "WMS",
+            "version": "1.3.0",
+            "title": "Base Layer",
+            "url": "https://example.com/geoserver/wms",
+            "layersParam": "workspace:layer",
+            "attribution": "© Example"
+          }
+        ],
+        "original_field": {
+          "field_name": "layer_configs",
+          "runtime_alias": "layerConfigs",
+          "description": "The configuration for the map layers",
+          "data_type": "array[WmsLayerConf | WfsLayerConf | XyzLayerConf]",
+          "enum_values": [
+            "WMS",
+            "WFS",
+            "XYZ"
+          ],
+          "sample_data": [
+            {
+              "type": "WMS",
+              "version": "1.3.0",
+              "title": "Base Layer",
+              "url": "https://example.com/geoserver/wms",
+              "layersParam": "workspace:layer",
+              "attribution": "© Example"
+            }
+          ],
+          "required": false,
+          "embedding": "否",
+          "default_value": [],
+          "notes": "WMS 版本枚举来自 `serviceUtil.ts`：`1.3.0`、`1.1.1`；WFS 版本枚举是 `2.0.2`、`2.0.0`、`1.1.0`。列表越靠前的图层会被插入得越靠上。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "chart_background_color",
+        "runtime_alias": "chartBackgroundColor",
+        "required": false,
+        "embedding": "否",
+        "description": "The background color of the charts.",
+        "data_type": "object",
+        "sample_data": {
+          "r": 255,
+          "g": 255,
+          "b": 255,
+          "a": 0.2
+        },
+        "original_field": {
+          "field_name": "chart_background_color",
+          "runtime_alias": "chartBackgroundColor",
+          "description": "The background color of the charts.",
+          "data_type": "object",
+          "sample_data": {
+            "r": 255,
+            "g": 255,
+            "b": 255,
+            "a": 0.2
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": {
+            "r": 255,
+            "g": 255,
+            "b": 255,
+            "a": 0.2
+          }
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "chart_background_border_radius",
+        "runtime_alias": "chartBackgroundBorderRadius",
+        "required": false,
+        "embedding": "否",
+        "description": "The corner radius of the chart background",
+        "data_type": "integer",
+        "sample_data": 10,
+        "original_field": {
+          "field_name": "chart_background_border_radius",
+          "runtime_alias": "chartBackgroundBorderRadius",
+          "description": "The corner radius of the chart background",
+          "data_type": "integer",
+          "enum_values": [
+            0,
+            1,
+            10,
+            100
+          ],
+          "sample_data": 10,
+          "required": false,
+          "embedding": "否",
+          "default_value": 10
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "chart_size",
+        "runtime_alias": "chartSize",
+        "required": false,
+        "embedding": "否",
+        "description": "Configure the chart size for each zoom level",
+        "data_type": "ZoomConfigsFixed | ZoomConfigsLinear | ZoomConfigsExp",
+        "sample_data": {
+          "type": "FIXED",
+          "configs": {
+            "zoom": 6,
+            "width": 100,
+            "height": 100
+          },
+          "values": {
+            "0": {
+              "width": 100,
+              "height": 100
+            },
+            "6": {
+              "width": 100,
+              "height": 100
+            },
+            "28": {
+              "width": 100,
+              "height": 100
+            }
+          }
+        },
+        "original_field": {
+          "field_name": "chart_size",
+          "runtime_alias": "chartSize",
+          "description": "Configure the chart size for each zoom level",
+          "data_type": "ZoomConfigsFixed | ZoomConfigsLinear | ZoomConfigsExp",
+          "enum_values": [
+            "FIXED",
+            "LINEAR",
+            "EXP"
+          ],
+          "sample_data": {
+            "type": "FIXED",
+            "configs": {
+              "zoom": 6,
+              "width": 100,
+              "height": 100
+            },
+            "values": {
+              "0": {
+                "width": 100,
+                "height": 100
+              },
+              "6": {
+                "width": 100,
+                "height": 100
+              },
+              "28": {
+                "width": 100,
+                "height": 100
+              }
+            }
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": "FIXED zoom-size config with configs {zoom:6,width:100,height:100,slope:30,exponent:2} and generated values for zoom 0..28",
+          "notes": "controlPanel 默认是 `FIXED`；`values` 实际由 `zoomUtil.computeConfigValues()` 生成，并覆盖 0 到 28 每一个 zoom level。"
+        }
+      }
+    ],
+    "field_inventory": [
+      {
+        "field_name": "chart_background_border_radius",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [
+          "chartBackgroundBorderRadius"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "The corner radius of the chart background"
+        ],
+        "data_types": [
+          "integer"
+        ],
+        "sample_data_examples": [
+          10
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "chart_background_border_radius",
+            "runtime_alias": "chartBackgroundBorderRadius",
+            "required": false,
+            "embedding": "否",
+            "description": "The corner radius of the chart background",
+            "data_type": "integer",
+            "sample_data": 10,
+            "original_field": {
+              "field_name": "chart_background_border_radius",
+              "runtime_alias": "chartBackgroundBorderRadius",
+              "description": "The corner radius of the chart background",
+              "data_type": "integer",
+              "enum_values": [
+                0,
+                1,
+                10,
+                100
+              ],
+              "sample_data": 10,
+              "required": false,
+              "embedding": "否",
+              "default_value": 10
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "chart_background_color",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [
+          "chartBackgroundColor"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "The background color of the charts."
+        ],
+        "data_types": [
+          "object"
+        ],
+        "sample_data_examples": [
+          {
+            "r": 255,
+            "g": 255,
+            "b": 255,
+            "a": 0.2
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "chart_background_color",
+            "runtime_alias": "chartBackgroundColor",
+            "required": false,
+            "embedding": "否",
+            "description": "The background color of the charts.",
+            "data_type": "object",
+            "sample_data": {
+              "r": 255,
+              "g": 255,
+              "b": 255,
+              "a": 0.2
+            },
+            "original_field": {
+              "field_name": "chart_background_color",
+              "runtime_alias": "chartBackgroundColor",
+              "description": "The background color of the charts.",
+              "data_type": "object",
+              "sample_data": {
+                "r": 255,
+                "g": 255,
+                "b": 255,
+                "a": 0.2
+              },
+              "required": false,
+              "embedding": "否",
+              "default_value": {
+                "r": 255,
+                "g": 255,
+                "b": 255,
+                "a": 0.2
+              }
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "chart_size",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [
+          "chartSize"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Configure the chart size for each zoom level"
+        ],
+        "data_types": [
+          "ZoomConfigsFixed | ZoomConfigsLinear | ZoomConfigsExp"
+        ],
+        "sample_data_examples": [
+          {
+            "type": "FIXED",
+            "configs": {
+              "zoom": 6,
+              "width": 100,
+              "height": 100
+            },
+            "values": {
+              "0": {
+                "width": 100,
+                "height": 100
+              },
+              "6": {
+                "width": 100,
+                "height": 100
+              },
+              "28": {
+                "width": 100,
+                "height": 100
+              }
+            }
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "chart_size",
+            "runtime_alias": "chartSize",
+            "required": false,
+            "embedding": "否",
+            "description": "Configure the chart size for each zoom level",
+            "data_type": "ZoomConfigsFixed | ZoomConfigsLinear | ZoomConfigsExp",
+            "sample_data": {
+              "type": "FIXED",
+              "configs": {
+                "zoom": 6,
+                "width": 100,
+                "height": 100
+              },
+              "values": {
+                "0": {
+                  "width": 100,
+                  "height": 100
+                },
+                "6": {
+                  "width": 100,
+                  "height": 100
+                },
+                "28": {
+                  "width": 100,
+                  "height": 100
+                }
+              }
+            },
+            "original_field": {
+              "field_name": "chart_size",
+              "runtime_alias": "chartSize",
+              "description": "Configure the chart size for each zoom level",
+              "data_type": "ZoomConfigsFixed | ZoomConfigsLinear | ZoomConfigsExp",
+              "enum_values": [
+                "FIXED",
+                "LINEAR",
+                "EXP"
+              ],
+              "sample_data": {
+                "type": "FIXED",
+                "configs": {
+                  "zoom": 6,
+                  "width": 100,
+                  "height": 100
+                },
+                "values": {
+                  "0": {
+                    "width": 100,
+                    "height": 100
+                  },
+                  "6": {
+                    "width": 100,
+                    "height": 100
+                  },
+                  "28": {
+                    "width": 100,
+                    "height": 100
+                  }
+                }
+              },
+              "required": false,
+              "embedding": "否",
+              "default_value": "FIXED zoom-size config with configs {zoom:6,width:100,height:100,slope:30,exponent:2} and generated values for zoom 0..28",
+              "notes": "controlPanel 默认是 `FIXED`；`values` 实际由 `zoomUtil.computeConfigValues()` 生成，并覆盖 0 到 28 每一个 zoom level。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "geom_column",
+        "required": true,
+        "categories": [
+          "Configuration"
+        ],
+        "runtime_aliases": [
+          "geomColumn"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "The name of the geometry column"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "geom"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Configuration",
+            "field_name": "geom_column",
+            "runtime_alias": "geomColumn",
+            "required": true,
+            "embedding": "否",
+            "description": "The name of the geometry column",
+            "data_type": "string",
+            "sample_data": "geom",
+            "original_field": {
+              "field_name": "geom_column",
+              "runtime_alias": "geomColumn",
+              "description": "The name of the geometry column",
+              "data_type": "string",
+              "enum_source": "current datasource columns.column_name",
+              "sample_data": "geom",
+              "required": true,
+              "embedding": "否",
+              "default_value": null,
+              "notes": "buildQuery 会把它 unshift 到被引用图表的 `groupby` 最前面。当前图的根层 datasource 应与被引用图表 datasource 一致。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "layer_configs",
+        "required": false,
+        "categories": [
+          "Map Options"
+        ],
+        "runtime_aliases": [
+          "layerConfigs"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "The configuration for the map layers"
+        ],
+        "data_types": [
+          "array[WmsLayerConf | WfsLayerConf | XyzLayerConf]"
+        ],
+        "sample_data_examples": [
+          [
+            {
+              "type": "WMS",
+              "version": "1.3.0",
+              "title": "Base Layer",
+              "url": "https://example.com/geoserver/wms",
+              "layersParam": "workspace:layer",
+              "attribution": "© Example"
+            }
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Map Options",
+            "field_name": "layer_configs",
+            "runtime_alias": "layerConfigs",
+            "required": false,
+            "embedding": "否",
+            "description": "The configuration for the map layers",
+            "data_type": "array[WmsLayerConf | WfsLayerConf | XyzLayerConf]",
+            "sample_data": [
+              {
+                "type": "WMS",
+                "version": "1.3.0",
+                "title": "Base Layer",
+                "url": "https://example.com/geoserver/wms",
+                "layersParam": "workspace:layer",
+                "attribution": "© Example"
+              }
+            ],
+            "original_field": {
+              "field_name": "layer_configs",
+              "runtime_alias": "layerConfigs",
+              "description": "The configuration for the map layers",
+              "data_type": "array[WmsLayerConf | WfsLayerConf | XyzLayerConf]",
+              "enum_values": [
+                "WMS",
+                "WFS",
+                "XYZ"
+              ],
+              "sample_data": [
+                {
+                  "type": "WMS",
+                  "version": "1.3.0",
+                  "title": "Base Layer",
+                  "url": "https://example.com/geoserver/wms",
+                  "layersParam": "workspace:layer",
+                  "attribution": "© Example"
+                }
+              ],
+              "required": false,
+              "embedding": "否",
+              "default_value": [],
+              "notes": "WMS 版本枚举来自 `serviceUtil.ts`：`1.3.0`、`1.1.1`；WFS 版本枚举是 `2.0.2`、`2.0.0`、`1.1.0`。列表越靠前的图层会被插入得越靠上。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "map_view",
+        "required": false,
+        "categories": [
+          "Map Options"
+        ],
+        "runtime_aliases": [
+          "mapView"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "The extent of the map on application start. FIT DATA automatically sets the extent so that all data points are included in the viewport. CUSTOM allows users to define the extent manually."
+        ],
+        "data_types": [
+          "object"
+        ],
+        "sample_data_examples": [
+          {
+            "mode": "FIT_DATA"
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Map Options",
+            "field_name": "map_view",
+            "runtime_alias": "mapView",
+            "required": false,
+            "embedding": "否",
+            "description": "The extent of the map on application start. FIT DATA automatically sets the extent so that all data points are included in the viewport. CUSTOM allows users to define the extent manually.",
+            "data_type": "object",
+            "sample_data": {
+              "mode": "FIT_DATA"
+            },
+            "original_field": {
+              "field_name": "map_view",
+              "runtime_alias": "mapView",
+              "description": "The extent of the map on application start. FIT DATA automatically sets the extent so that all data points are included in the viewport. CUSTOM allows users to define the extent manually.",
+              "data_type": "object",
+              "enum_values": [
+                "FIT_DATA",
+                "CUSTOM"
+              ],
+              "sample_data": {
+                "mode": "FIT_DATA"
+              },
+              "required": false,
+              "embedding": "否",
+              "default_value": {
+                "mode": "FIT_DATA"
+              },
+              "notes": "在 CUSTOM 模式下对象会使用 `fixedZoom`、`fixedLatitude`、`fixedLongitude`；运行时还会回写当前 `zoom`、`latitude`、`longitude`。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "selected_chart",
+        "required": true,
+        "categories": [
+          "Configuration"
+        ],
+        "runtime_aliases": [
+          "selectedChart"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Choose a chart for displaying on the map"
+        ],
+        "data_types": [
+          "string (JSON-serialized chart object)"
+        ],
+        "sample_data_examples": [
+          "{\"id\":321,\"slice_name\":\"Pie Chart\",\"viz_type\":\"pie\",\"params\":\"{\\\"datasource\\\":\\\"12__table\\\",\\\"viz_type\\\":\\\"pie\\\",\\\"groupby\\\":[\\\"category\\\"],\\\"metric\\\":\\\"count\\\"}\"}"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Configuration",
+            "field_name": "selected_chart",
+            "runtime_alias": "selectedChart",
+            "required": true,
+            "embedding": "否",
+            "description": "Choose a chart for displaying on the map",
+            "data_type": "string (JSON-serialized chart object)",
+            "sample_data": "{\"id\":321,\"slice_name\":\"Pie Chart\",\"viz_type\":\"pie\",\"params\":\"{\\\"datasource\\\":\\\"12__table\\\",\\\"viz_type\\\":\\\"pie\\\",\\\"groupby\\\":[\\\"category\\\"],\\\"metric\\\":\\\"count\\\"}\"}",
+            "original_field": {
+              "field_name": "selected_chart",
+              "runtime_alias": "selectedChart",
+              "description": "Choose a chart for displaying on the map",
+              "data_type": "string (JSON-serialized chart object)",
+              "enum_source": "/api/v1/chart result filtered by current datasource_id; fields id, slice_name, params, viz_type",
+              "sample_data": "{\"id\":321,\"slice_name\":\"Pie Chart\",\"viz_type\":\"pie\",\"params\":\"{\\\"datasource\\\":\\\"12__table\\\",\\\"viz_type\\\":\\\"pie\\\",\\\"groupby\\\":[\\\"category\\\"],\\\"metric\\\":\\\"count\\\"}\"}",
+              "required": true,
+              "embedding": "否",
+              "default_value": null,
+              "notes": "buildQuery 实际只读取 `viz_type` 和 `params`；但 UI 保存态来自 `/api/v1/chart` 返回对象的完整字符串。"
+            }
+          }
+        ]
+      }
+    ],
+    "required_field_names": [
+      "geom_column",
+      "selected_chart"
+    ],
+    "embedding_enabled_field_names": [],
+    "runtime_alias_index": {
+      "chart_background_border_radius": [
+        "chartBackgroundBorderRadius"
+      ],
+      "chart_background_color": [
+        "chartBackgroundColor"
+      ],
+      "chart_size": [
+        "chartSize"
+      ],
+      "geom_column": [
+        "geomColumn"
+      ],
+      "layer_configs": [
+        "layerConfigs"
+      ],
+      "map_view": [
+        "mapView"
+      ],
+      "selected_chart": [
+        "selectedChart"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "cartodiagram",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/cartodiagram-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/cartodiagram-form-data-schema.json",
+      "control-schema": "form-data-schema/cartodiagram-schema.json"
+    }
+  },
+  "fallback_online_field_categories": {
+    "Query": [],
+    "Advanced analytics": [],
+    "Annotations & Layers": [],
+    "Predictive Analytics（Forecast）": [],
+    "Chart Options": [],
+    "Chart Title": [],
+    "图表专属": [],
+    "通用图表选项": []
+  },
+  "original_control_schema": {
+    "viz_type": "cartodiagram",
+    "display_name": "Cartodiagram",
+    "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-cartodiagram/src/plugin/controlPanel.ts",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-cartodiagram/src/plugin/controlPanel.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-cartodiagram/src/plugin/buildQuery.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-cartodiagram/src/plugin/index.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-cartodiagram/src/plugin/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-cartodiagram/src/util/controlPanelUtil.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-cartodiagram/src/util/transformPropsUtil.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-cartodiagram/src/types.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-cartodiagram/test/plugin/buildQuery.test.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/components/controls/MapViewControl/MapViewControl.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/components/controls/MapViewControl/MapViewPopoverContent.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/components/controls/MapViewControl/types.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/components/controls/LayerConfigsControl/LayerConfigsControl.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/components/controls/LayerConfigsControl/LayerConfigsPopoverContent.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/components/controls/LayerConfigsControl/types.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/components/controls/LayerConfigsControl/serviceUtil.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/components/controls/ZoomConfigControl/ZoomConfigControl.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/components/controls/ZoomConfigControl/types.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/components/controls/ZoomConfigControl/zoomUtil.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+      "D:/vsx/sources/superset-6.0.0/superset/charts/schemas.py"
+    ],
+    "notes": [
+      "Cartodiagram 不是 legacy `viz.py` 图，而是现代前端插件 `plugin-chart-cartodiagram`，通过标准 chart data API 查询数据。",
+      "这个图本身不定义独立的数据分析语义，而是要求用户先选择一张已保存图表，然后把那张图的 `params` 作为底层查询模板，最后把底层图按地理位置渲染到地图上。",
+      "`selected_chart` 存的不是对象，而是一个 JSON 字符串；字符串内部又包含 `params` 字段，而 `params` 自身也是一段 JSON 字符串。",
+      "`buildQuery.ts` 只直接读取 `selected_chart`、`geom_column` 和 `extra_form_data`。真正的 query object 由被引用图表自己的 `buildQuery` 生成。",
+      "Cartodiagram 会把 `geom_column` 强制插到被引用图表 `groupby` 的第一位，因此地理字段会进入最终查询。",
+      "Cartodiagram 会把 root `extra_form_data` 浅合并进被引用图表 `chartFormData.extra_form_data`，因此 dashboard/native filters 的动态上下文会传递给被引用图表。",
+      "`transformPropsUtil.ts` 会再把被引用图表 `params` 解析成对象，并在运行时按地理位置拆分查询结果，然后调用被引用图表自己的 `transformProps` 来渲染每个小图。",
+      "如果被引用图表 `params` 里存在 `x_axis`，运行时会走 `groupByLocationGenericX()`，依赖 `queryData.label_map` 去拆出 GeoJSON 列和其余 series label；否则直接按 `geom_column` 字段对结果分组。"
+    ],
+    "query_compilation": {
+      "plugin_mode": "modern chart plugin",
+      "frontend_builder": "plugin-chart-cartodiagram/src/plugin/buildQuery.ts",
+      "selected_chart_parsing": "selectedChart = JSON.parse(form_data.selected_chart); chartFormData = JSON.parse(selectedChart.params)",
+      "geometry_injection": "chartFormData.groupby = [geom_column, ...chartFormData.groupby]",
+      "extra_form_data_passthrough": "chartFormData.extra_form_data = { ...chartFormData.extra_form_data, ...form_data.extra_form_data }",
+      "delegated_builder": "getChartBuildQueryRegistry().get(selectedChart.viz_type)(chartFormData)",
+      "backend_request_endpoint": "/api/v1/chart/data",
+      "runtime_rendering": "transformProps 会按位置拆分返回数据、去掉几何列，再调用被引用图表的 transformProps 生成每个 Feature 上的小图配置"
+    },
+    "field_categories": {
+      "Configuration": [
+        {
+          "field_name": "selected_chart",
+          "runtime_alias": "selectedChart",
+          "description": "Choose a chart for displaying on the map",
+          "data_type": "string (JSON-serialized chart object)",
+          "enum_source": "/api/v1/chart result filtered by current datasource_id; fields id, slice_name, params, viz_type",
+          "sample_data": "{\"id\":321,\"slice_name\":\"Pie Chart\",\"viz_type\":\"pie\",\"params\":\"{\\\"datasource\\\":\\\"12__table\\\",\\\"viz_type\\\":\\\"pie\\\",\\\"groupby\\\":[\\\"category\\\"],\\\"metric\\\":\\\"count\\\"}\"}",
+          "required": true,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "buildQuery 实际只读取 `viz_type` 和 `params`；但 UI 保存态来自 `/api/v1/chart` 返回对象的完整字符串。"
+        },
+        {
+          "field_name": "geom_column",
+          "runtime_alias": "geomColumn",
+          "description": "The name of the geometry column",
+          "data_type": "string",
+          "enum_source": "current datasource columns.column_name",
+          "sample_data": "geom",
+          "required": true,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "buildQuery 会把它 unshift 到被引用图表的 `groupby` 最前面。当前图的根层 datasource 应与被引用图表 datasource 一致。"
+        }
+      ],
+      "Map Options": [
+        {
+          "field_name": "map_view",
+          "runtime_alias": "mapView",
+          "description": "The extent of the map on application start. FIT DATA automatically sets the extent so that all data points are included in the viewport. CUSTOM allows users to define the extent manually.",
+          "data_type": "object",
+          "enum_values": [
+            "FIT_DATA",
+            "CUSTOM"
+          ],
+          "sample_data": {
+            "mode": "FIT_DATA"
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": {
+            "mode": "FIT_DATA"
+          },
+          "notes": "在 CUSTOM 模式下对象会使用 `fixedZoom`、`fixedLatitude`、`fixedLongitude`；运行时还会回写当前 `zoom`、`latitude`、`longitude`。"
+        },
+        {
+          "field_name": "layer_configs",
+          "runtime_alias": "layerConfigs",
+          "description": "The configuration for the map layers",
+          "data_type": "array[WmsLayerConf | WfsLayerConf | XyzLayerConf]",
+          "enum_values": [
+            "WMS",
+            "WFS",
+            "XYZ"
+          ],
+          "sample_data": [
+            {
+              "type": "WMS",
+              "version": "1.3.0",
+              "title": "Base Layer",
+              "url": "https://example.com/geoserver/wms",
+              "layersParam": "workspace:layer",
+              "attribution": "© Example"
+            }
+          ],
+          "required": false,
+          "embedding": "否",
+          "default_value": [],
+          "notes": "WMS 版本枚举来自 `serviceUtil.ts`：`1.3.0`、`1.1.1`；WFS 版本枚举是 `2.0.2`、`2.0.0`、`1.1.0`。列表越靠前的图层会被插入得越靠上。"
+        }
+      ],
+      "Chart Options": [
+        {
+          "field_name": "chart_background_color",
+          "runtime_alias": "chartBackgroundColor",
+          "description": "The background color of the charts.",
+          "data_type": "object",
+          "sample_data": {
+            "r": 255,
+            "g": 255,
+            "b": 255,
+            "a": 0.2
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": {
+            "r": 255,
+            "g": 255,
+            "b": 255,
+            "a": 0.2
+          }
+        },
+        {
+          "field_name": "chart_background_border_radius",
+          "runtime_alias": "chartBackgroundBorderRadius",
+          "description": "The corner radius of the chart background",
+          "data_type": "integer",
+          "enum_values": [
+            0,
+            1,
+            10,
+            100
+          ],
+          "sample_data": 10,
+          "required": false,
+          "embedding": "否",
+          "default_value": 10
+        },
+        {
+          "field_name": "chart_size",
+          "runtime_alias": "chartSize",
+          "description": "Configure the chart size for each zoom level",
+          "data_type": "ZoomConfigsFixed | ZoomConfigsLinear | ZoomConfigsExp",
+          "enum_values": [
+            "FIXED",
+            "LINEAR",
+            "EXP"
+          ],
+          "sample_data": {
+            "type": "FIXED",
+            "configs": {
+              "zoom": 6,
+              "width": 100,
+              "height": 100
+            },
+            "values": {
+              "0": {
+                "width": 100,
+                "height": 100
+              },
+              "6": {
+                "width": 100,
+                "height": 100
+              },
+              "28": {
+                "width": 100,
+                "height": 100
+              }
+            }
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": "FIXED zoom-size config with configs {zoom:6,width:100,height:100,slope:30,exponent:2} and generated values for zoom 0..28",
+          "notes": "controlPanel 默认是 `FIXED`；`values` 实际由 `zoomUtil.computeConfigValues()` 生成，并覆盖 0 到 28 每一个 zoom level。"
+        }
+      ]
+    }
+  }
+}

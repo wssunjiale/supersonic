@@ -1,0 +1,597 @@
+{
+  "viz_type": "table",
+  "display_name": "Table",
+  "purpose": "用于调用 API 创建或保存 Table 时填写的 form_data 模板",
+  "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/table-schema.json",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-table/src/index.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-table/src/controlPanel.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-table/src/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-table/src/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-table/src/types.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-table/src/consts.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-table/test/buildQuery.test.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-table/test/TableChart.test.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-table/test/testData.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/sections/timeComparison.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractQueryFields.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts"
+  ],
+  "notes": [
+    "Explore 导出 form_data 时走 `getFormDataFromControls()`，因此 API root 必须使用 control name 原样键名，例如 `all_columns`、`order_by_cols`、`table_timestamp_format`。",
+    "Table 的 root form_data 与最终 query_context 不是一一同名。真正的 query `columns` / `orderby` 由 `extractQueryFields()` 与 `buildQuery.ts` 组合推导。",
+    "由于 Table 同时支持 raw / aggregate 两种模式，创建图表时最稳妥的方式是显式传 `query_mode`，而不是依赖源码按 `all_columns` 自动推断。",
+    "`column_config`、`conditional_formatting`、`comparison_color_enabled` 等字段不改变 SQL，但会直接改变 runtime 表头、单元格格式、comparison columns 和渲染效果。"
+  ],
+  "naming_and_pipeline": {
+    "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写入 root form_data。",
+    "api_form_data_to_query_context": "Table/buildQuery.ts 调用 buildQueryContext(formData, ...)，raw form_data 会原样放进 query_context.form_data。",
+    "api_form_data_to_query_object": "extractQueryFields() 先做 `all_columns -> columns`、`groupby -> columns`、`order_by_cols -> orderby` 别名归并，再由 Table/buildQuery.ts 根据 query_mode / time_grain_sqla / percent_metrics / show_totals / server_pagination / time_compare 改写 query。",
+    "api_form_data_to_runtime_form_data": "ChartProps 会把 raw form_data 转成 runtime camelCase props，但构造 API 时仍应使用 root 原始键名。"
+  },
+  "global_required_fields": {
+    "datasource": {
+      "data_type": "string",
+      "required": true,
+      "sample_data": "<dataset_id>__table",
+      "source": "datasourceAndVizType hidden control"
+    },
+    "viz_type": {
+      "data_type": "string",
+      "required": true,
+      "fixed_value": "table",
+      "source": "plugin registration key"
+    }
+  },
+  "mode_specific_required_logic": {
+    "aggregate_mode": {
+      "description": "aggregate 模式至少需要提供 `groupby`、`metrics`、`percent_metrics` 中的一类。",
+      "minimum_non_empty_fields": [
+        "groupby",
+        "metrics",
+        "percent_metrics"
+      ]
+    },
+    "raw_mode": {
+      "description": "raw 模式必须至少提供 1 个 `all_columns`。",
+      "minimum_non_empty_fields": [
+        "all_columns"
+      ]
+    }
+  },
+  "global_optional_fields": {
+    "slice_id": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 0,
+      "source": "datasourceAndVizType hidden control"
+    },
+    "cache_timeout": {
+      "data_type": "integer | null",
+      "required": false,
+      "sample_data": null,
+      "source": "QueryFormData"
+    },
+    "url_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "QueryFormData"
+    },
+    "custom_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "QueryFormData"
+    },
+    "extra_form_data": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "QueryFormData"
+    },
+    "query_mode": {
+      "data_type": "string | null",
+      "required": false,
+      "sample_data": "aggregate",
+      "source": "Query section",
+      "notes": "强烈建议显式传。"
+    },
+    "groupby": {
+      "data_type": "array[string | object]",
+      "required": false,
+      "sample_data": [
+        "region"
+      ],
+      "source": "Query section"
+    },
+    "time_grain_sqla": {
+      "data_type": "string | null",
+      "required": false,
+      "sample_data": "P1D",
+      "source": "Query section",
+      "notes": "只有 aggregate 模式下，且 `groupby` 中选中了 temporal column 时才真正生效。"
+    },
+    "temporal_columns_lookup": {
+      "data_type": "object[string, boolean]",
+      "required": false,
+      "sample_data": {
+        "order_date": true
+      },
+      "source": "hidden control",
+      "notes": "手工构造 API form_data 且要使用 `time_grain_sqla` 时，建议一并带上。"
+    },
+    "metrics": {
+      "data_type": "array[string | object]",
+      "required": false,
+      "sample_data": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        }
+      ],
+      "source": "Query section"
+    },
+    "all_columns": {
+      "data_type": "array[string | object]",
+      "required": false,
+      "sample_data": [
+        "order_id",
+        "customer_name"
+      ],
+      "source": "Query section"
+    },
+    "percent_metrics": {
+      "data_type": "array[string | object]",
+      "required": false,
+      "sample_data": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        }
+      ],
+      "source": "Query section"
+    },
+    "adhoc_filters": {
+      "data_type": "array[object]",
+      "required": false,
+      "sample_data": [],
+      "source": "Query section"
+    },
+    "timeseries_limit_metric": {
+      "data_type": "string | object | null",
+      "required": false,
+      "sample_data": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "sales"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(sales)"
+      },
+      "source": "Query section"
+    },
+    "order_by_cols": {
+      "data_type": "array[string | [string, boolean]]",
+      "required": false,
+      "sample_data": [
+        "[\"order_id\",true]"
+      ],
+      "source": "Query section"
+    },
+    "order_desc": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": true,
+      "source": "Query section"
+    },
+    "server_pagination": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": false,
+      "source": "Query section"
+    },
+    "server_page_length": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 20,
+      "source": "Query section"
+    },
+    "row_limit": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 1000,
+      "source": "Query section"
+    },
+    "percent_metric_calculation": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "row_limit",
+      "source": "Query section"
+    },
+    "show_totals": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": false,
+      "source": "Query section"
+    },
+    "table_timestamp_format": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "smart_date",
+      "source": "Options section"
+    },
+    "page_length": {
+      "data_type": "integer | string | null",
+      "required": false,
+      "sample_data": 20,
+      "source": "Options section"
+    },
+    "include_search": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": false,
+      "source": "Options section"
+    },
+    "allow_rearrange_columns": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": false,
+      "source": "Options section"
+    },
+    "allow_render_html": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": true,
+      "source": "Options section"
+    },
+    "column_config": {
+      "data_type": "object[string, TableColumnConfig]",
+      "required": false,
+      "sample_data": {
+        "sum__num": {
+          "d3NumberFormat": ".3s",
+          "columnWidth": 180,
+          "customColumnName": "Sales"
+        }
+      },
+      "source": "Options section"
+    },
+    "show_cell_bars": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": true,
+      "source": "Visual formatting section"
+    },
+    "align_pn": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": false,
+      "source": "Visual formatting section"
+    },
+    "color_pn": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": true,
+      "source": "Visual formatting section"
+    },
+    "comparison_color_enabled": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": false,
+      "source": "Visual formatting section"
+    },
+    "comparison_color_scheme": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "Green",
+      "source": "Visual formatting section"
+    },
+    "conditional_formatting": {
+      "data_type": "array[object]",
+      "required": false,
+      "sample_data": [
+        {
+          "column": "sum__num",
+          "operator": ">",
+          "targetValue": 2467,
+          "colorScheme": "#ACE1C4"
+        }
+      ],
+      "source": "Visual formatting section"
+    },
+    "time_compare": {
+      "data_type": "string | null",
+      "required": false,
+      "sample_data": "1 year ago",
+      "source": "Time Comparison section"
+    },
+    "start_date_offset": {
+      "data_type": "string | null",
+      "required": false,
+      "sample_data": "1 year ago",
+      "source": "Time Comparison section"
+    },
+    "comparison_type": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "values",
+      "source": "Time Comparison section"
+    }
+  },
+  "minimal_form_data_templates": {
+    "aggregate_mode": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "table",
+      "query_mode": "aggregate",
+      "groupby": [],
+      "metrics": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        }
+      ],
+      "percent_metrics": [],
+      "adhoc_filters": [],
+      "row_limit": 1000
+    },
+    "raw_mode": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "table",
+      "query_mode": "raw",
+      "all_columns": [
+        "<raw_column>"
+      ],
+      "adhoc_filters": [],
+      "row_limit": 1000
+    }
+  },
+  "recommended_form_data_templates": {
+    "aggregate_mode": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "table",
+      "query_mode": "aggregate",
+      "groupby": [
+        "<dimension_column>"
+      ],
+      "metrics": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        }
+      ],
+      "percent_metrics": [],
+      "adhoc_filters": [],
+      "timeseries_limit_metric": null,
+      "order_desc": true,
+      "row_limit": 1000,
+      "percent_metric_calculation": "row_limit",
+      "show_totals": false,
+      "table_timestamp_format": "smart_date",
+      "page_length": 20,
+      "include_search": false,
+      "allow_rearrange_columns": false,
+      "allow_render_html": true,
+      "show_cell_bars": true,
+      "align_pn": false,
+      "color_pn": true,
+      "conditional_formatting": []
+    },
+    "raw_mode": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "table",
+      "query_mode": "raw",
+      "all_columns": [
+        "<raw_column_1>",
+        "<raw_column_2>"
+      ],
+      "adhoc_filters": [],
+      "order_by_cols": [],
+      "row_limit": 1000,
+      "table_timestamp_format": "smart_date",
+      "page_length": 20,
+      "include_search": false,
+      "allow_render_html": true,
+      "column_config": {},
+      "show_cell_bars": true,
+      "align_pn": false,
+      "color_pn": true,
+      "conditional_formatting": []
+    }
+  },
+  "conditional_blocks": {
+    "aggregate_percent_metrics": {
+      "condition": "需要在 aggregate 模式下展示总量占比列时",
+      "fields": {
+        "percent_metrics": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          }
+        ],
+        "percent_metric_calculation": "row_limit"
+      }
+    },
+    "aggregate_totals": {
+      "condition": "需要在 aggregate 模式下展示 summary totals 时",
+      "fields": {
+        "show_totals": true
+      },
+      "notes": "会额外生成 totals query。"
+    },
+    "raw_records_sorting": {
+      "condition": "raw 模式需要按字段排序时",
+      "fields": {
+        "query_mode": "raw",
+        "order_by_cols": [
+          "[\"order_id\",true]"
+        ]
+      },
+      "notes": "真正进入 query 的是 `extractQueryFields()` 解析出来的 `orderby`。"
+    },
+    "server_pagination": {
+      "condition": "需要服务端分页而不是前端分页时",
+      "fields": {
+        "server_pagination": true,
+        "server_page_length": 20,
+        "row_limit": 1000
+      },
+      "notes": "搜索词、排序列、当前页码不放在 root form_data，而由 ownState `searchText/searchColumn/sortBy/currentPage/pageSize` 驱动。"
+    },
+    "temporal_bucketization": {
+      "condition": "aggregate 模式下按时间列分桶时",
+      "fields": {
+        "query_mode": "aggregate",
+        "groupby": [
+          "order_date"
+        ],
+        "time_grain_sqla": "P1D",
+        "temporal_columns_lookup": {
+          "order_date": true
+        }
+      },
+      "notes": "`buildQuery.ts` 会把 `order_date` 改写成带 `timeGrain` 的 AdhocColumn。"
+    },
+    "time_comparison": {
+      "condition": "aggregate 模式下需要比较当前值与历史值时",
+      "fields": {
+        "time_compare": "1 year ago",
+        "comparison_type": "values",
+        "comparison_color_enabled": true,
+        "comparison_color_scheme": "Green"
+      },
+      "notes": "runtime 会把指标列展开成 `Main / # / △ / %` 四类 comparison columns。"
+    },
+    "custom_time_comparison": {
+      "condition": "使用自定义 comparison 偏移量时",
+      "fields": {
+        "time_compare": "custom",
+        "start_date_offset": "1 year ago",
+        "comparison_type": "values"
+      }
+    },
+    "column_customization": {
+      "condition": "需要改列名、列宽、格式或 comparison 子列格式时",
+      "fields": {
+        "column_config": {
+          "sum__num": {
+            "d3NumberFormat": ".3s",
+            "columnWidth": 180,
+            "customColumnName": "Sales"
+          },
+          "Main metric_1": {
+            "d3NumberFormat": ".2f"
+          },
+          "# metric_1": {
+            "d3NumberFormat": ".1f"
+          }
+        }
+      }
+    },
+    "html_rendering": {
+      "condition": "单元格值包含 HTML 且需要按 HTML 方式渲染时",
+      "fields": {
+        "allow_render_html": true
+      }
+    },
+    "conditional_formatting": {
+      "condition": "需要对数值列做阈值着色时",
+      "fields": {
+        "conditional_formatting": [
+          {
+            "column": "sum__num",
+            "operator": ">",
+            "targetValue": 2467,
+            "colorScheme": "#ACE1C4"
+          }
+        ]
+      }
+    }
+  },
+  "runtime_only_or_non_template_fields": {
+    "display_or_hidden_controls": [
+      {
+        "field_name": "comparison_range_label",
+        "reason": "UI 显示型控件，不应作为 API root form_data 主动填写。"
+      }
+    ],
+    "query_object_only_fields": [
+      {
+        "field_name": "queries[*].columns",
+        "reason": "这是 `all_columns` / `groupby` 经 alias 与 buildQuery 编译后的结果，不是 root 直接键。"
+      },
+      {
+        "field_name": "queries[*].orderby",
+        "reason": "这是 `order_by_cols` 或 `timeseries_limit_metric + order_desc` 编译后的 query 字段。"
+      },
+      {
+        "field_name": "queries[*].post_processing",
+        "reason": "这是 `percent_metrics` / `time_compare` 派生的 query 字段。"
+      },
+      {
+        "field_name": "queries[*].time_offsets",
+        "reason": "这是 `time_compare` / `start_date_offset` 派生的 query 字段。"
+      },
+      {
+        "field_name": "queries[*].row_offset / is_rowcount",
+        "reason": "这是 server pagination 运行时派生字段。"
+      }
+    ],
+    "own_state_only": [
+      {
+        "field_name": "pageSize / currentPage / sortBy / searchText / searchColumn",
+        "reason": "这些都不是 root form_data，而是 Table ownState。只有 server pagination 时才影响 buildQuery。"
+      }
+    ],
+    "runtime_aliases_generated_by_transformProps": [
+      {
+        "field_name": "alignPositiveNegative / colorPositiveNegative / showCellBars / includeSearch / allowRearrangeColumns / allowRenderHtml / comparisonColorEnabled / comparisonColorScheme",
+        "reason": "这些是 runtime camelCase props，不是 API root 键。"
+      }
+    ]
+  },
+  "api_usage_guidance": {
+    "high_confidence_required_fields": [
+      "datasource",
+      "viz_type",
+      "query_mode",
+      "aggregate 模式下：groupby / metrics / percent_metrics 三者至少一类非空",
+      "raw 模式下：all_columns 至少一项"
+    ],
+    "recommended_always_set": [
+      "adhoc_filters",
+      "row_limit",
+      "table_timestamp_format",
+      "allow_render_html",
+      "conditional_formatting"
+    ],
+    "avoid_confusion": [
+      "不要把 `all_columns` 写成 `columns`；`columns` 是 query object 字段，不是 Table root control name。",
+      "不要把 `order_by_cols` 写成 `orderby`；`orderby` 是 query object 字段，不是 Table root control name。",
+      "不要把 runtime 字段 `allowRenderHtml`、`includeSearch`、`showCellBars`、`comparisonColorEnabled` 写回 root form_data。",
+      "如果你要的是 raw 表，不要只传 `all_columns` 而省略 `query_mode`；虽然源码能推断，但显式传更稳。"
+    ]
+  }
+}

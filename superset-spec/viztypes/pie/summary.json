@@ -1,0 +1,131 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "pie",
+  "display_name": "Pie Chart",
+  "normalized_summary": {
+    "category": "composition",
+    "tags": [
+      "pie",
+      "composition",
+      "proportion",
+      "percentage"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "groupby",
+        "required": true,
+        "description": "分类维度字段，用于定义饼图的切片类别。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于计算每个类别的数值（切片大小依据）。"
+      },
+      {
+        "key": "label_type",
+        "required": false,
+        "description": "标签类型（value/percent/name），控制标签展示内容。"
+      },
+      {
+        "key": "donut",
+        "required": false,
+        "description": "是否展示为环形图（true/false），控制饼图的展示样式。"
+      }
+    ],
+    "description_zh": "Pie Chart displays categorical data as a circular graph divided into slices, with slice size representing the proportion of each category to the total.",
+    "visual_shape_zh": "饼图（构成占比型）",
+    "use_cases_zh": [
+      "类别占比分析（如各产品销售额占总销售额的比例）",
+      "部分与整体的关系展示",
+      "少类别（<8）的占比对比"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "pie",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/pie-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/pie-form-data-schema.json",
+      "control-schema": "form-data-schema/pie-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Pie Chart",
+    "viztype": "pie",
+    "详细描述": "Pie Chart displays categorical data as a circular graph divided into slices, with slice size representing the proportion of each category to the total.",
+    "表现形态": "饼图（构成占比型）",
+    "适用场景": [
+      "类别占比分析（如各产品销售额占总销售额的比例）",
+      "部分与整体的关系展示",
+      "少类别（<8）的占比对比"
+    ],
+    "vizKey": "Pie",
+    "pluginCategory": "Composition",
+    "pluginTags": [],
+    "category": "composition",
+    "tags": [
+      "pie",
+      "composition",
+      "proportion",
+      "percentage"
+    ],
+    "关键字段": [
+      {
+        "key": "groupby",
+        "required": true,
+        "description": "分类维度字段，用于定义饼图的切片类别。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于计算每个类别的数值（切片大小依据）。"
+      },
+      {
+        "key": "label_type",
+        "required": false,
+        "description": "标签类型（value/percent/name），控制标签展示内容。"
+      },
+      {
+        "key": "donut",
+        "required": false,
+        "description": "是否展示为环形图（true/false），控制饼图的展示样式。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

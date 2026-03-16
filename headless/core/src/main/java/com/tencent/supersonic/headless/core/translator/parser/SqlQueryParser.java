@@ -45,20 +45,37 @@ public class SqlQueryParser implements QueryParser {
     public void parse(QueryStatement queryStatement) throws Exception {
         // build ontologyQuery
         SqlQuery sqlQuery = queryStatement.getSqlQuery();
-        List<String> queryFields = SqlSelectHelper.getAllSelectFields(sqlQuery.getSql());
-        Set<String> queryAliases = SqlSelectHelper.getAliasFields(sqlQuery.getSql());
-        queryFields.removeAll(queryAliases);
+        // Build ontology query based on all semantic fields referenced by the SQL (SELECT / WHERE /
+        // GROUP BY).
+        // Note: historically we only used SELECT fields, which can miss filter-only dimensions
+        // (e.g. partition time),
+        // leading to unreplaced bizName leaking into physical SQL (column does not exist).
+        List<String> selectFields = SqlSelectHelper.getAllSelectFields(sqlQuery.getSql());
+        Set<String> allFields = new LinkedHashSet<>();
+        if (selectFields != null) {
+            allFields.addAll(selectFields);
+        }
+        allFields.addAll(SqlSelectHelper.getWhereFields(sqlQuery.getSql()));
+        allFields.addAll(SqlSelectHelper.getGroupByFields(sqlQuery.getSql()));
+        List<String> queryFields = new ArrayList<>(allFields);
         Ontology ontology = queryStatement.getOntology();
         OntologyQuery ontologyQuery = buildOntologyQuery(ontology, queryFields);
+        Set<String> queryFieldsSet = new HashSet<>(queryFields);
+        List<Pair<String, String>> ontologyMetricsDimensionsAndBizName = new ArrayList<>();
+        ontologyQuery.getMetrics().forEach(m -> {
+            ontologyMetricsDimensionsAndBizName.add(Pair.of(m.getName(), m.getBizName()));
+        });
+        ontologyQuery.getDimensions().forEach(d -> {
+            ontologyMetricsDimensionsAndBizName.add(Pair.of(d.getName(), d.getBizName()));
+        });
         // check if there are fields not matched with any metric or dimension
-        if (queryFields.size() > ontologyQuery.getMetrics().size()
-                + ontologyQuery.getDimensions().size()) {
+        if (!allFieldMatched(queryFieldsSet, ontologyMetricsDimensionsAndBizName)) {
             List<String> semanticFields = Lists.newArrayList();
             ontologyQuery.getMetrics().forEach(m -> semanticFields.add(m.getName()));
             ontologyQuery.getDimensions().forEach(d -> semanticFields.add(d.getName()));
             String errMsg =
                     String.format("Querying columns[%s] not matched with semantic fields[%s].",
-                            queryFields, semanticFields);
+                            selectFields, semanticFields);
             queryStatement.setErrMsg(errMsg);
             queryStatement.setStatus(QueryState.INVALID);
             return;
@@ -89,6 +106,16 @@ public class SqlQueryParser implements QueryParser {
         }
 
         log.info("parse sqlQuery [{}] ", sqlQuery);
+    }
+
+    private boolean allFieldMatched(Set<String> queryFields,
+            List<Pair<String, String>> ontologyMetricsDimensionsAndBizName) {
+        for (Pair<String, String> pair : ontologyMetricsDimensionsAndBizName) {
+            if (!(queryFields.contains(pair.getLeft()) || queryFields.contains(pair.getRight()))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void aliasesWithBackticks(QueryStatement queryStatement) {
@@ -164,6 +191,7 @@ public class SqlQueryParser implements QueryParser {
         log.debug("dataSetId:{},convert name to bizName before:{}", queryStatement.getDataSetId(),
                 sql);
         sql = SqlReplaceHelper.replaceFields(sql, fieldNameToBizNameMap, true);
+        sql = SqlReplaceHelper.replaceAliasFieldName(sql, fieldNameToBizNameMap);
         log.debug("dataSetId:{},convert name to bizName after:{}", queryStatement.getDataSetId(),
                 sql);
         sql = SqlReplaceHelper.replaceTable(sql,

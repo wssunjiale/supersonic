@@ -1,0 +1,131 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "compare",
+  "display_name": "Time-series Percent Change",
+  "normalized_summary": {
+    "category": "comparison",
+    "tags": [
+      "compare",
+      "comparison",
+      "side_by_side",
+      "difference"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "groupby",
+        "required": true,
+        "description": "维度字段列表，用于分组展示对比项。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标列表，用于对比不同维度/周期的数值。"
+      },
+      {
+        "key": "comparison_type",
+        "required": true,
+        "description": "对比类型（如 period、dimension），用于定义对比规则。"
+      },
+      {
+        "key": "show_percent_change",
+        "required": false,
+        "description": "是否展示百分比变化（true/false），控制对比结果的展示形式。"
+      }
+    ],
+    "description_zh": "Compare Chart displays side-by-side comparisons of metrics across multiple dimensions or time periods, ideal for direct value comparison.",
+    "visual_shape_zh": "对比图表（多维度/周期）",
+    "use_cases_zh": [
+      "多维度指标对比（如不同产品、不同区域）",
+      "多周期数值对比（如本周vs上周、本月vs上月）",
+      "直接数值差异展示"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "compare",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/compare-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/compare-form-data-schema.json",
+      "control-schema": "form-data-schema/compare-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Time-series Percent Change",
+    "viztype": "compare",
+    "详细描述": "Compare Chart displays side-by-side comparisons of metrics across multiple dimensions or time periods, ideal for direct value comparison.",
+    "表现形态": "对比图表（多维度/周期）",
+    "适用场景": [
+      "多维度指标对比（如不同产品、不同区域）",
+      "多周期数值对比（如本周vs上周、本月vs上月）",
+      "直接数值差异展示"
+    ],
+    "vizKey": "Compare",
+    "pluginCategory": "Comparison",
+    "pluginTags": [],
+    "category": "comparison",
+    "tags": [
+      "compare",
+      "comparison",
+      "side_by_side",
+      "difference"
+    ],
+    "关键字段": [
+      {
+        "key": "groupby",
+        "required": true,
+        "description": "维度字段列表，用于分组展示对比项。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标列表，用于对比不同维度/周期的数值。"
+      },
+      {
+        "key": "comparison_type",
+        "required": true,
+        "description": "对比类型（如 period、dimension），用于定义对比规则。"
+      },
+      {
+        "key": "show_percent_change",
+        "required": false,
+        "description": "是否展示百分比变化（true/false），控制对比结果的展示形式。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

@@ -1,7 +1,7 @@
 import { CHART_BLUE_COLOR, CHART_SECONDARY_COLOR, PREFIX_CLS } from '../../../common/constants';
 import { MsgDataType } from '../../../common/type';
 import {
-  formatByDecimalPlaces,
+  formatByDataFormatType,
   getChartLightenColor,
   getFormattedValue,
 } from '../../../utils/utils';
@@ -23,7 +23,7 @@ import { useExportByEcharts } from '../../../hooks';
 
 type Props = {
   data: MsgDataType;
-  question: string;
+  question?: string;
   triggerResize?: boolean;
   loading: boolean;
   metricField: ColumnType;
@@ -32,7 +32,7 @@ type Props = {
 
 const BarChart: React.FC<Props> = ({
   data,
-  question,
+  question="",
   triggerResize,
   loading,
   metricField,
@@ -100,7 +100,7 @@ const BarChart: React.FC<Props> = ({
             return value === 0
               ? 0
               : metricField.dataFormatType === 'percent'
-              ? `${formatByDecimalPlaces(value, metricField.dataFormat?.decimalPlaces || 2)}%`
+              ? formatByDataFormatType(value, metricField.dataFormatType, metricField.dataFormat)
               : getFormattedValue(value);
           },
         },
@@ -121,10 +121,7 @@ const BarChart: React.FC<Props> = ({
                     ? '-'
                     : metricField.dataFormatType === 'percent' ||
                       metricField.dataFormatType === 'decimal'
-                    ? `${formatByDecimalPlaces(
-                        item.value,
-                        metricField.dataFormat?.decimalPlaces || 2
-                      )}${metricField.dataFormatType === 'percent' ? '%' : ''}`
+                    ? formatByDataFormatType(item.value, metricField.dataFormatType, metricField.dataFormat)
                     : getFormattedValue(item.value)
                 }</span></div>`
             )
@@ -157,7 +154,7 @@ const BarChart: React.FC<Props> = ({
             return value === 0
               ? 0
               : metricField.dataFormatType === 'percent'
-              ? `${formatByDecimalPlaces(value, metricField.dataFormat?.decimalPlaces || 2)}%`
+              ? formatByDataFormatType(value, metricField.dataFormatType, metricField.dataFormat)
               : getFormattedValue(value);
           },
         },

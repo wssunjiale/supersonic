@@ -1,6 +1,5 @@
 import RightContent from '@/components/RightContent';
 import S2Icon, { ICON } from '@/components/S2Icon';
-import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { Space, Spin, ConfigProvider } from 'antd';
 import ScaleLoader from 'react-spinners/ScaleLoader';
 import { history, RunTimeLayoutConfig } from '@umijs/max';
@@ -9,6 +8,7 @@ import settings from '../config/themeSettings';
 import { queryCurrentUser } from './services/user';
 import { deleteUrlQuery, isMobile, getToken } from '@/utils/utils';
 import { publicPath } from '../config/defaultSettings';
+import type { DefaultSetting } from '../config/defaultSettings';
 import { Copilot } from 'supersonic-chat-sdk';
 import { configProviderTheme } from '../config/themeSettings';
 export { request } from './services/request';
@@ -42,7 +42,7 @@ const getAuthCodes = (params: any) => {
 };
 
 export async function getInitialState(): Promise<{
-  settings?: LayoutSettings;
+  settings?: DefaultSetting;
   currentUser?: API.CurrentUser;
   fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
   codeList?: string[];
@@ -117,6 +117,7 @@ export function onRouteChange() {
 
 export const layout: RunTimeLayoutConfig = (params) => {
   const { initialState } = params as any;
+  const isChatRoute = history.location.pathname.includes('/chat');
   return {
     onMenuHeaderClick: (e) => {
       e.preventDefault();
@@ -143,9 +144,18 @@ export const layout: RunTimeLayoutConfig = (params) => {
       return (
         <ConfigProvider theme={configProviderTheme}>
           <div
-            style={{
-              height: location.pathname.includes('chat') ? 'calc(100vh - 56px)' : undefined,
-            }}
+            style={
+              isChatRoute
+                ? {
+                    display: 'flex',
+                    flexDirection: 'column',
+                    minWidth: 0,
+                    minHeight: 'calc(100vh - 56px)',
+                    height: 'calc(100dvh - 56px)',
+                    overflow: 'hidden',
+                  }
+                : undefined
+            }
           >
             {/* <AppPage dom={dom} /> */}
             {dom}

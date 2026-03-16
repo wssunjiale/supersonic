@@ -1,0 +1,131 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "handlebars",
+  "display_name": "Handlebars",
+  "normalized_summary": {
+    "category": "custom",
+    "tags": [
+      "handlebars",
+      "custom",
+      "template",
+      "html"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "template",
+        "required": true,
+        "description": "Handlebars模板字符串，用于定义自定义展示内容。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标列表，用于模板中渲染数值。"
+      },
+      {
+        "key": "custom_css",
+        "required": false,
+        "description": "自定义CSS样式，用于美化模板展示效果。"
+      },
+      {
+        "key": "json_format",
+        "required": false,
+        "description": "是否输出JSON格式（true/false），控制模板的输出类型。"
+      }
+    ],
+    "description_zh": "Handlebars Template chart renders custom HTML/JSON content using Handlebars templating engine, ideal for fully customized data presentation.",
+    "visual_shape_zh": "自定义模板（HTML/JSON）",
+    "use_cases_zh": [
+      "全自定义数据展示（如定制化报表、富文本）",
+      "非标准可视化需求",
+      "结合HTML/CSS的个性化展示"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "handlebars",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/handlebars-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/handlebars-form-data-schema.json",
+      "control-schema": "form-data-schema/handlebars-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Handlebars",
+    "viztype": "handlebars",
+    "详细描述": "Handlebars Template chart renders custom HTML/JSON content using Handlebars templating engine, ideal for fully customized data presentation.",
+    "表现形态": "自定义模板（HTML/JSON）",
+    "适用场景": [
+      "全自定义数据展示（如定制化报表、富文本）",
+      "非标准可视化需求",
+      "结合HTML/CSS的个性化展示"
+    ],
+    "vizKey": "Handlebars",
+    "pluginCategory": "Custom",
+    "pluginTags": [],
+    "category": "custom",
+    "tags": [
+      "handlebars",
+      "custom",
+      "template",
+      "html"
+    ],
+    "关键字段": [
+      {
+        "key": "template",
+        "required": true,
+        "description": "Handlebars模板字符串，用于定义自定义展示内容。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标列表，用于模板中渲染数值。"
+      },
+      {
+        "key": "custom_css",
+        "required": false,
+        "description": "自定义CSS样式，用于美化模板展示效果。"
+      },
+      {
+        "key": "json_format",
+        "required": false,
+        "description": "是否输出JSON格式（true/false），控制模板的输出类型。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

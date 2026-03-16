@@ -1,0 +1,141 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "heatmap_v2",
+  "display_name": "Heatmap",
+  "normalized_summary": {
+    "category": "distribution",
+    "tags": [
+      "heatmap",
+      "distribution",
+      "2d",
+      "color_intensity"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "x_axis",
+        "required": true,
+        "description": "X轴分类维度字段，用于定义热力图的横向维度。"
+      },
+      {
+        "key": "y_axis",
+        "required": true,
+        "description": "Y轴分类维度字段，用于定义热力图的纵向维度。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于计算每个交叉点的数值（颜色依据）。"
+      },
+      {
+        "key": "show_values",
+        "required": false,
+        "description": "是否展示数值（true/false），控制交叉点数值的显示。"
+      },
+      {
+        "key": "number_format",
+        "required": false,
+        "description": "数字格式化，控制交叉点数值的展示格式。"
+      }
+    ],
+    "description_zh": "Heatmap displays two-dimensional numerical data using color intensity, with X/Y axes as categorical dimensions and color representing metric values.",
+    "visual_shape_zh": "热力图（二维分布型）",
+    "use_cases_zh": [
+      "二维维度的数值分布（如时间×区域、产品×渠道）",
+      "热点/冷点分析",
+      "多维度交叉分析"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "heatmap_v2",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/heatmap_v2-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/heatmap_v2-form-data-schema.json",
+      "control-schema": "form-data-schema/heatmap_v2-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Heatmap",
+    "viztype": "heatmap_v2",
+    "详细描述": "Heatmap displays two-dimensional numerical data using color intensity, with X/Y axes as categorical dimensions and color representing metric values.",
+    "表现形态": "热力图（二维分布型）",
+    "适用场景": [
+      "二维维度的数值分布（如时间×区域、产品×渠道）",
+      "热点/冷点分析",
+      "多维度交叉分析"
+    ],
+    "vizKey": "Heatmap",
+    "pluginCategory": "Distribution",
+    "pluginTags": [],
+    "category": "distribution",
+    "tags": [
+      "heatmap",
+      "distribution",
+      "2d",
+      "color_intensity"
+    ],
+    "关键字段": [
+      {
+        "key": "x_axis",
+        "required": true,
+        "description": "X轴分类维度字段，用于定义热力图的横向维度。"
+      },
+      {
+        "key": "y_axis",
+        "required": true,
+        "description": "Y轴分类维度字段，用于定义热力图的纵向维度。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于计算每个交叉点的数值（颜色依据）。"
+      },
+      {
+        "key": "show_values",
+        "required": false,
+        "description": "是否展示数值（true/false），控制交叉点数值的显示。"
+      },
+      {
+        "key": "number_format",
+        "required": false,
+        "description": "数字格式化，控制交叉点数值的展示格式。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

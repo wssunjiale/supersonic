@@ -148,6 +148,7 @@ public class SupersetSyncApiClient implements SupersetSyncClient {
             }
             SupersetDatasetInfo info = new SupersetDatasetInfo();
             info.setId(parseLong(resolveValue(item, "id")));
+            info.setDescription(resolveString(item, "description"));
             info.setTableName(resolveString(item, "table_name"));
             info.setSchema(resolveString(item, "schema"));
             info.setSql(resolveString(item, "sql"));
@@ -172,6 +173,7 @@ public class SupersetSyncApiClient implements SupersetSyncClient {
         }
         SupersetDatasetInfo info = new SupersetDatasetInfo();
         info.setId(parseLong(resolveValue(result, "id")));
+        info.setDescription(resolveString(result, "description"));
         info.setTableName(resolveString(result, "table_name"));
         info.setSchema(resolveString(result, "schema"));
         info.setSql(resolveString(result, "sql"));

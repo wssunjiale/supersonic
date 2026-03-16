@@ -34,16 +34,23 @@ public class LLMRequestService {
     public LLMReq getLlmReq(ChatQueryContext queryCtx, Long dataSetId) {
         Map<Long, String> dataSetIdToName = queryCtx.getSemanticSchema().getDataSetIdToName();
         String queryText = queryCtx.getRequest().getQueryText();
+        DataSetSchema dataSetSchema = queryCtx.getSemanticSchema().getDataSetSchema(dataSetId);
 
         LLMReq.LLMSchema llmSchema = new LLMReq.LLMSchema();
         int fieldCntThreshold =
                 Integer.valueOf(parserConfig.getParameterValue(PARSER_FIELDS_COUNT_THRESHOLD));
-        if (queryCtx.getMapInfo().getMatchedElements(dataSetId).size() <= fieldCntThreshold) {
-            llmSchema.setMetrics(queryCtx.getSemanticSchema().getMetrics());
-            llmSchema.setDimensions(queryCtx.getSemanticSchema().getDimensions());
+        List<SchemaElement> mappedMetrics = getMappedMetrics(queryCtx, dataSetId);
+        List<SchemaElement> mappedDimensions = getMappedDimensions(queryCtx, dataSetId);
+        int matchedFieldCount = getMatchedFieldCount(queryCtx, dataSetId);
+        if (matchedFieldCount <= fieldCntThreshold) {
+            llmSchema.setMetrics(getDataSetMetrics(dataSetSchema, queryCtx, dataSetId));
+            llmSchema.setDimensions(getDataSetDimensions(dataSetSchema, queryCtx, dataSetId));
         } else {
-            llmSchema.setMetrics(getMappedMetrics(queryCtx, dataSetId));
-            llmSchema.setDimensions(getMappedDimensions(queryCtx, dataSetId));
+            llmSchema.setMetrics(CollectionUtils.isEmpty(mappedMetrics)
+                    ? getDataSetMetrics(dataSetSchema, queryCtx, dataSetId) : mappedMetrics);
+            llmSchema.setDimensions(CollectionUtils.isEmpty(mappedDimensions)
+                    ? getDataSetDimensions(dataSetSchema, queryCtx, dataSetId)
+                    : mappedDimensions);
         }
 
         LLMReq llmReq = new LLMReq();
@@ -71,6 +78,33 @@ public class LLMRequestService {
         llmReq.setDynamicExemplars(queryCtx.getRequest().getDynamicExemplars());
 
         return llmReq;
+    }
+
+    private int getMatchedFieldCount(ChatQueryContext queryCtx, Long dataSetId) {
+        List<SchemaElementMatch> matchedElements =
+                queryCtx.getMapInfo().getMatchedElements(dataSetId);
+        if (CollectionUtils.isEmpty(matchedElements)) {
+            return 0;
+        }
+        return (int) matchedElements.stream().map(SchemaElementMatch::getElement)
+                .filter(Objects::nonNull).map(SchemaElement::getType).filter(Objects::nonNull)
+                .filter(elementType -> !SchemaElementType.DATASET.equals(elementType)).count();
+    }
+
+    private List<SchemaElement> getDataSetMetrics(DataSetSchema dataSetSchema,
+            ChatQueryContext queryCtx, Long dataSetId) {
+        if (dataSetSchema != null && !CollectionUtils.isEmpty(dataSetSchema.getMetrics())) {
+            return new ArrayList<>(dataSetSchema.getMetrics());
+        }
+        return queryCtx.getSemanticSchema().getMetrics(dataSetId);
+    }
+
+    private List<SchemaElement> getDataSetDimensions(DataSetSchema dataSetSchema,
+            ChatQueryContext queryCtx, Long dataSetId) {
+        if (dataSetSchema != null && !CollectionUtils.isEmpty(dataSetSchema.getDimensions())) {
+            return new ArrayList<>(dataSetSchema.getDimensions());
+        }
+        return queryCtx.getSemanticSchema().getDimensions(dataSetId);
     }
 
     public LLMResp runText2SQL(LLMReq llmReq) {

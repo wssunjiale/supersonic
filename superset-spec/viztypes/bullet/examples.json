@@ -1,0 +1,305 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "bullet",
+  "display_name": "Bullet Chart",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "region",
+          "operator": "IN",
+          "comparator": [
+            "East"
+          ]
+        }
+      ]
+    ],
+    "marker_labels": [
+      "Target"
+    ],
+    "marker_line_labels": [
+      "Stretch goal"
+    ],
+    "marker_lines": [
+      "90"
+    ],
+    "markers": [
+      "80"
+    ],
+    "metric": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "sales"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(sales)"
+      }
+    ],
+    "range_labels": [
+      "Bad,Satisfactory,Good"
+    ],
+    "ranges": [
+      "0,50,100"
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "bullet",
+      "metric": "<metric_or_saved_metric>",
+      "adhoc_filters": []
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "bullet",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "sales"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(sales)"
+      },
+      "adhoc_filters": [],
+      "ranges": "",
+      "range_labels": "",
+      "markers": "",
+      "marker_labels": "",
+      "marker_lines": "",
+      "marker_line_labels": ""
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "bullet",
+      "metric": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "ranges": "<copied_from_saved_chart_if_present>",
+      "range_labels": "<copied_from_saved_chart_if_present>",
+      "markers": "<copied_from_saved_chart_if_present>",
+      "marker_labels": "<copied_from_saved_chart_if_present>",
+      "marker_lines": "<copied_from_saved_chart_if_present>",
+      "marker_line_labels": "<copied_from_saved_chart_if_present>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "East"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_bullet_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "East"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters；后端会把它们并入额外过滤条件。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_bullet_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会标记为 extra 并并入查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_bullet_legacy": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；Bullet 默认不直接消费它。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_bullet_legacy": false,
+        "recommended": false,
+        "sample_data": "Last 30 days",
+        "effect": "后端 merge 逻辑支持该 override，但 Bullet 没有时间控件，也没有在当前追踪范围内确认稳定的 guest 行为。",
+        "source": "superset/constants.py + superset/utils/core.py",
+        "status": "低置信，仅在你确认底层查询实际依赖时间列时再用"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_bullet_legacy": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "后端 merge 逻辑支持该 override，但 Bullet controlPanel 没有时间粒度字段，不建议在 embedding 临时重构。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_bullet_legacy": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "通用时间列 override 键；Bullet 常规场景不应在 guest embedding 主用该键。",
+        "source": "superset/constants.py + QueryFormData.ts"
+      },
+      {
+        "field_name": "granularity",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_bullet_legacy": false,
+        "recommended": false,
+        "sample_data": "__time",
+        "effect": "底层 QueryObject 时间列 override；Bullet 常规场景不建议依赖它重构查询。",
+        "source": "superset/constants.py + QueryFormData.ts"
+      },
+      {
+        "field_name": "time_column",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_bullet_legacy": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "底层 QueryObject 时间列 override；当前图表定义里没有对应 controlPanel 正式字段。",
+        "source": "superset/constants.py + QueryFormData.ts"
+      },
+      {
+        "field_name": "time_grain",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_bullet_legacy": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "底层 QueryObject 的时间粒度 override；Bullet 常规场景通常不需要手动传。",
+        "source": "superset/constants.py + QueryFormData.ts"
+      },
+      {
+        "field_name": "relative_start",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_bullet_legacy": false,
+        "recommended": false,
+        "sample_data": "now",
+        "effect": "写入 query extras 的相对开始时间。Bullet 当前没有明确的官方时间控件链路，建议谨慎使用。",
+        "source": "superset/charts/schemas.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "relative_end",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_bullet_legacy": false,
+        "recommended": false,
+        "sample_data": "today",
+        "effect": "写入 query extras 的相对结束时间。Bullet 当前没有明确的官方时间控件链路，建议谨慎使用。",
+        "source": "superset/charts/schemas.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_bullet_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用 ExtraFormData 字段。Bullet 不直接消费它。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_bullet_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用交互字段；Bullet 默认不直接消费。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_bullet_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用交互字段；Bullet 默认不直接消费。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "time_compare",
+        "data_type": "string | array[string]",
+        "behavior": "override",
+        "safe_for_bullet_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "1 year ago"
+        ],
+        "effect": "frontend 类型声明存在，但 Superset 6.0.0 后端 constants.py 的 merge whitelist 未将其列为高置信 override。",
+        "source": "QueryFormData.ts + query/constants.ts + superset/constants.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "bullet",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/bullet-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/bullet-form-data-schema.json",
+      "control-schema": "form-data-schema/bullet-schema.json"
+    }
+  }
+}

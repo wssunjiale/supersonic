@@ -1,0 +1,1978 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "deck_arc",
+  "display_name": "deck.gl Arc",
+  "source_kind": "schema_file",
+  "normalized_control_schema": {
+    "field_category_order": [
+      "Query",
+      "Map",
+      "Arc",
+      "Advanced"
+    ],
+    "field_occurrences": [
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "start_spatial",
+        "runtime_alias": null,
+        "required": true,
+        "embedding": "否",
+        "description": "Point to your spatial columns",
+        "data_type": "object",
+        "sample_data": {
+          "type": "latlong",
+          "lonCol": "LONGITUDE",
+          "latCol": "LATITUDE"
+        },
+        "original_field": {
+          "field_name": "start_spatial",
+          "description": "Point to your spatial columns",
+          "data_type": "object",
+          "enum_values": [
+            "latlong",
+            "delimited",
+            "geohash"
+          ],
+          "sample_data": {
+            "type": "latlong",
+            "lonCol": "LONGITUDE",
+            "latCol": "LATITUDE"
+          },
+          "required": true,
+          "embedding": "否",
+          "default_value": {
+            "type": "latlong"
+          },
+          "notes": "控件是 `SpatialControl` + `validateNonEmpty`。支持三种对象形状：`latlong`、`delimited`、`geohash`。当前图标签是 `Start Longitude & Latitude`。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "end_spatial",
+        "runtime_alias": null,
+        "required": true,
+        "embedding": "否",
+        "description": "Point to your spatial columns",
+        "data_type": "object",
+        "sample_data": {
+          "type": "latlong",
+          "lonCol": "LONGITUDE_DEST",
+          "latCol": "LATITUDE_DEST"
+        },
+        "original_field": {
+          "field_name": "end_spatial",
+          "description": "Point to your spatial columns",
+          "data_type": "object",
+          "enum_values": [
+            "latlong",
+            "delimited",
+            "geohash"
+          ],
+          "sample_data": {
+            "type": "latlong",
+            "lonCol": "LONGITUDE_DEST",
+            "latCol": "LATITUDE_DEST"
+          },
+          "required": true,
+          "embedding": "否",
+          "default_value": {
+            "type": "latlong"
+          },
+          "notes": "控件是 `SpatialControl` + `validateNonEmpty`。当前图标签是 `End Longitude & Latitude`。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "row_limit",
+        "runtime_alias": "rowLimit",
+        "required": false,
+        "embedding": "否",
+        "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+        "data_type": "integer",
+        "sample_data": 5000,
+        "original_field": {
+          "field_name": "row_limit",
+          "runtime_alias": "rowLimit",
+          "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+          "data_type": "integer",
+          "enum_values": [
+            10,
+            50,
+            100,
+            250,
+            500,
+            1000,
+            5000,
+            10000,
+            50000
+          ],
+          "sample_data": 5000,
+          "required": false,
+          "embedding": "否",
+          "default_value": 10000
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "filter_nulls",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Whether to ignore locations that are null",
+        "data_type": "boolean",
+        "sample_data": true,
+        "original_field": {
+          "field_name": "filter_nulls",
+          "description": "Whether to ignore locations that are null",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true,
+          "notes": "为 true 时，`BaseDeckGLViz.query_obj()` 会自动为 start/end 空间列注入 `IS NOT NULL` 过滤条件。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "adhoc_filters",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "description": "字段标签为 Filters。legacy `/superset/explore_json/` 路径会先把 legacy filters 归并进 `adhoc_filters`，再继续 merge `extra_form_data`。",
+        "data_type": "array[object]",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "LATITUDE",
+            "operator": "IS NOT NULL",
+            "comparator": ""
+          }
+        ],
+        "original_field": {
+          "field_name": "adhoc_filters",
+          "description": "字段标签为 Filters。legacy `/superset/explore_json/` 路径会先把 legacy filters 归并进 `adhoc_filters`，再继续 merge `extra_form_data`。",
+          "data_type": "array[object]",
+          "enum_source": "datasource columns",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "LATITUDE",
+              "operator": "IS NOT NULL",
+              "comparator": ""
+            }
+          ],
+          "required": false,
+          "embedding": "extra_form_data.append",
+          "default_value": [],
+          "notes": "即便 root 不显式提供，若 `filter_nulls=true`，后端也会在查询前自动把 start/end 空间列的 `IS NOT NULL` 过滤补进来。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Map",
+        "field_name": "mapbox_style",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/ or tile server URL.",
+        "data_type": "string",
+        "sample_data": "mapbox://styles/mapbox/light-v9",
+        "original_field": {
+          "field_name": "mapbox_style",
+          "description": "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/ or tile server URL.",
+          "data_type": "string",
+          "enum_source": "bootstrap common.deckgl_tiles or DEFAULT_DECKGL_TILES",
+          "sample_data": "mapbox://styles/mapbox/light-v9",
+          "required": false,
+          "embedding": "否",
+          "default_value": "getDeckGLTiles()[0][0]"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Map",
+        "field_name": "autozoom",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "When checked, the map will zoom to your data after each query",
+        "data_type": "boolean",
+        "sample_data": true,
+        "original_field": {
+          "field_name": "autozoom",
+          "description": "When checked, the map will zoom to your data after each query",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Map",
+        "field_name": "viewport",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Parameters related to the view and perspective on the map",
+        "data_type": "object",
+        "sample_data": {
+          "longitude": -91.84340711201104,
+          "latitude": 44.596651438714254,
+          "zoom": 2.929837070560775,
+          "bearing": 8.546256357301871,
+          "pitch": 60
+        },
+        "original_field": {
+          "field_name": "viewport",
+          "description": "Parameters related to the view and perspective on the map",
+          "data_type": "object",
+          "sample_data": {
+            "longitude": -91.84340711201104,
+            "latitude": 44.596651438714254,
+            "zoom": 2.929837070560775,
+            "bearing": 8.546256357301871,
+            "pitch": 60
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": {
+            "longitude": 6.85236157047845,
+            "latitude": 31.222656842808707,
+            "zoom": 1,
+            "bearing": 0,
+            "pitch": 0
+          },
+          "notes": "运行时 `transformProps.ts` 会把当前图表的 `width`/`height` 合并进 viewport，但 root form_data 不需要自己提供宽高。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Arc",
+        "field_name": "color_scheme_type",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Select the type of color scheme to use.",
+        "data_type": "string",
+        "sample_data": "fixed_color",
+        "original_field": {
+          "field_name": "color_scheme_type",
+          "description": "Select the type of color scheme to use.",
+          "data_type": "string",
+          "enum_values": [
+            "fixed_color",
+            "categorical_palette"
+          ],
+          "sample_data": "fixed_color",
+          "required": false,
+          "embedding": "否",
+          "default_value": "fixed_color",
+          "notes": "当前图覆写了通用 DeckGL 配色类型选项，只保留 fixed color 和 categorical palette。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Arc",
+        "field_name": "color_picker",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Color of the source location",
+        "data_type": "object",
+        "sample_data": {
+          "r": 0,
+          "g": 122,
+          "b": 135,
+          "a": 1
+        },
+        "original_field": {
+          "field_name": "color_picker",
+          "description": "Color of the source location",
+          "data_type": "object",
+          "sample_data": {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          },
+          "notes": "仅当 `color_scheme_type='fixed_color'` 时可见。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Arc",
+        "field_name": "target_color_picker",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Color of the target location",
+        "data_type": "object",
+        "sample_data": {
+          "r": 0,
+          "g": 122,
+          "b": 135,
+          "a": 1
+        },
+        "original_field": {
+          "field_name": "target_color_picker",
+          "description": "Color of the target location",
+          "data_type": "object",
+          "sample_data": {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          },
+          "notes": "仅当 `color_scheme_type='fixed_color'` 时可见。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Arc",
+        "field_name": "dimension",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Pick a dimension from which categorical colors are defined",
+        "data_type": "string | object | null",
+        "sample_data": "carrier",
+        "original_field": {
+          "field_name": "dimension",
+          "description": "Pick a dimension from which categorical colors are defined",
+          "data_type": "string | object | null",
+          "enum_source": "datasource columns",
+          "sample_data": "carrier",
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "仅在 `color_scheme_type='categorical_palette'` 时可见。后端会把该列映射到 `cat_color`，前端按它生成颜色与图例。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Arc",
+        "field_name": "color_scheme",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "The color scheme for rendering chart",
+        "data_type": "string",
+        "sample_data": "SUPERSET_DEFAULT",
+        "original_field": {
+          "field_name": "color_scheme",
+          "description": "The color scheme for rendering chart",
+          "data_type": "string",
+          "enum_source": "categoricalSchemeRegistry.keys()",
+          "sample_data": "SUPERSET_DEFAULT",
+          "required": false,
+          "embedding": "否",
+          "default_value": "categoricalSchemeRegistry.getDefaultKey()",
+          "notes": "仅在 `color_scheme_type='categorical_palette'` 时可见。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Arc",
+        "field_name": "stroke_width",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "字段标签为 Stroke Width。",
+        "data_type": "integer | string | null",
+        "sample_data": 1,
+        "original_field": {
+          "field_name": "stroke_width",
+          "description": "字段标签为 Stroke Width。",
+          "data_type": "integer | string | null",
+          "enum_values": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "sample_data": 1,
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "`Arc.tsx` 运行时若未提供该字段，会回退到宽度 3。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Arc",
+        "field_name": "legend_position",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Choose the position of the legend",
+        "data_type": "string | null",
+        "sample_data": "tr",
+        "original_field": {
+          "field_name": "legend_position",
+          "description": "Choose the position of the legend",
+          "data_type": "string | null",
+          "enum_values": [
+            null,
+            "tl",
+            "tr",
+            "bl",
+            "br"
+          ],
+          "sample_data": "tr",
+          "required": false,
+          "embedding": "否",
+          "default_value": "tr"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Arc",
+        "field_name": "legend_format",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Choose the format for legend values",
+        "data_type": "string",
+        "sample_data": "SMART_NUMBER",
+        "original_field": {
+          "field_name": "legend_format",
+          "description": "Choose the format for legend values",
+          "data_type": "string",
+          "enum_source": "D3_FORMAT_OPTIONS",
+          "sample_data": "SMART_NUMBER",
+          "required": false,
+          "embedding": "否",
+          "default_value": "DEFAULT_NUMBER_FORMAT"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Advanced",
+        "field_name": "js_columns",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "List of extra columns made available in JavaScript functions",
+        "data_type": "array[string | object]",
+        "sample_data": [
+          "carrier"
+        ],
+        "original_field": {
+          "field_name": "js_columns",
+          "description": "List of extra columns made available in JavaScript functions",
+          "data_type": "array[string | object]",
+          "enum_source": "datasource columns",
+          "sample_data": [
+            "carrier"
+          ],
+          "required": false,
+          "embedding": "否",
+          "default_value": [],
+          "notes": "`BaseDeckGLViz.query_obj()` 会把它们并入 query groupby，并在返回特征中以 `extraProps` 暴露给自定义 JS。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Advanced",
+        "field_name": "js_data_mutator",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Define a javascript function that receives the data array used in the visualization and is expected to return a modified version of that array.",
+        "data_type": "string",
+        "sample_data": "data => data",
+        "original_field": {
+          "field_name": "js_data_mutator",
+          "description": "Define a javascript function that receives the data array used in the visualization and is expected to return a modified version of that array.",
+          "data_type": "string",
+          "sample_data": "data => data",
+          "required": false,
+          "embedding": "否",
+          "default_value": "",
+          "notes": "如果功能开关 `EnableJavascriptControls` 关闭，该控件会变成只读并显示安全提示。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Advanced",
+        "field_name": "js_tooltip",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Define a function that receives the input and outputs the content for a tooltip",
+        "data_type": "string",
+        "sample_data": "o => `<div>${o.object.cat_color}</div>`",
+        "original_field": {
+          "field_name": "js_tooltip",
+          "description": "Define a function that receives the input and outputs the content for a tooltip",
+          "data_type": "string",
+          "sample_data": "o => `<div>${o.object.cat_color}</div>`",
+          "required": false,
+          "embedding": "否",
+          "default_value": "",
+          "notes": "若未提供，Arc 默认 tooltip 显示起点、终点和可选的分类字段值。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Advanced",
+        "field_name": "js_onclick_href",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Define a function that returns a URL to navigate to when user clicks",
+        "data_type": "string",
+        "sample_data": "o => `https://example.com/?from=${o.object.sourcePosition}`",
+        "original_field": {
+          "field_name": "js_onclick_href",
+          "description": "Define a function that returns a URL to navigate to when user clicks",
+          "data_type": "string",
+          "sample_data": "o => `https://example.com/?from=${o.object.sourcePosition}`",
+          "required": false,
+          "embedding": "否",
+          "default_value": "",
+          "notes": "若提供，`commonLayerProps()` 会在点击时打开该 URL。"
+        }
+      }
+    ],
+    "field_inventory": [
+      {
+        "field_name": "adhoc_filters",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "字段标签为 Filters。legacy `/superset/explore_json/` 路径会先把 legacy filters 归并进 `adhoc_filters`，再继续 merge `extra_form_data`。"
+        ],
+        "data_types": [
+          "array[object]"
+        ],
+        "sample_data_examples": [
+          [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "LATITUDE",
+              "operator": "IS NOT NULL",
+              "comparator": ""
+            }
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "adhoc_filters",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "extra_form_data.append",
+            "description": "字段标签为 Filters。legacy `/superset/explore_json/` 路径会先把 legacy filters 归并进 `adhoc_filters`，再继续 merge `extra_form_data`。",
+            "data_type": "array[object]",
+            "sample_data": [
+              {
+                "expressionType": "SIMPLE",
+                "clause": "WHERE",
+                "subject": "LATITUDE",
+                "operator": "IS NOT NULL",
+                "comparator": ""
+              }
+            ],
+            "original_field": {
+              "field_name": "adhoc_filters",
+              "description": "字段标签为 Filters。legacy `/superset/explore_json/` 路径会先把 legacy filters 归并进 `adhoc_filters`，再继续 merge `extra_form_data`。",
+              "data_type": "array[object]",
+              "enum_source": "datasource columns",
+              "sample_data": [
+                {
+                  "expressionType": "SIMPLE",
+                  "clause": "WHERE",
+                  "subject": "LATITUDE",
+                  "operator": "IS NOT NULL",
+                  "comparator": ""
+                }
+              ],
+              "required": false,
+              "embedding": "extra_form_data.append",
+              "default_value": [],
+              "notes": "即便 root 不显式提供，若 `filter_nulls=true`，后端也会在查询前自动把 start/end 空间列的 `IS NOT NULL` 过滤补进来。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "autozoom",
+        "required": false,
+        "categories": [
+          "Map"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "When checked, the map will zoom to your data after each query"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          true
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Map",
+            "field_name": "autozoom",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "When checked, the map will zoom to your data after each query",
+            "data_type": "boolean",
+            "sample_data": true,
+            "original_field": {
+              "field_name": "autozoom",
+              "description": "When checked, the map will zoom to your data after each query",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": true,
+              "required": false,
+              "embedding": "否",
+              "default_value": true
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "color_picker",
+        "required": false,
+        "categories": [
+          "Arc"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Color of the source location"
+        ],
+        "data_types": [
+          "object"
+        ],
+        "sample_data_examples": [
+          {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Arc",
+            "field_name": "color_picker",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Color of the source location",
+            "data_type": "object",
+            "sample_data": {
+              "r": 0,
+              "g": 122,
+              "b": 135,
+              "a": 1
+            },
+            "original_field": {
+              "field_name": "color_picker",
+              "description": "Color of the source location",
+              "data_type": "object",
+              "sample_data": {
+                "r": 0,
+                "g": 122,
+                "b": 135,
+                "a": 1
+              },
+              "required": false,
+              "embedding": "否",
+              "default_value": {
+                "r": 0,
+                "g": 122,
+                "b": 135,
+                "a": 1
+              },
+              "notes": "仅当 `color_scheme_type='fixed_color'` 时可见。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "color_scheme",
+        "required": false,
+        "categories": [
+          "Arc"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "The color scheme for rendering chart"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "SUPERSET_DEFAULT"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Arc",
+            "field_name": "color_scheme",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "The color scheme for rendering chart",
+            "data_type": "string",
+            "sample_data": "SUPERSET_DEFAULT",
+            "original_field": {
+              "field_name": "color_scheme",
+              "description": "The color scheme for rendering chart",
+              "data_type": "string",
+              "enum_source": "categoricalSchemeRegistry.keys()",
+              "sample_data": "SUPERSET_DEFAULT",
+              "required": false,
+              "embedding": "否",
+              "default_value": "categoricalSchemeRegistry.getDefaultKey()",
+              "notes": "仅在 `color_scheme_type='categorical_palette'` 时可见。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "color_scheme_type",
+        "required": false,
+        "categories": [
+          "Arc"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select the type of color scheme to use."
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "fixed_color"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Arc",
+            "field_name": "color_scheme_type",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Select the type of color scheme to use.",
+            "data_type": "string",
+            "sample_data": "fixed_color",
+            "original_field": {
+              "field_name": "color_scheme_type",
+              "description": "Select the type of color scheme to use.",
+              "data_type": "string",
+              "enum_values": [
+                "fixed_color",
+                "categorical_palette"
+              ],
+              "sample_data": "fixed_color",
+              "required": false,
+              "embedding": "否",
+              "default_value": "fixed_color",
+              "notes": "当前图覆写了通用 DeckGL 配色类型选项，只保留 fixed color 和 categorical palette。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "dimension",
+        "required": false,
+        "categories": [
+          "Arc"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Pick a dimension from which categorical colors are defined"
+        ],
+        "data_types": [
+          "string | object | null"
+        ],
+        "sample_data_examples": [
+          "carrier"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Arc",
+            "field_name": "dimension",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Pick a dimension from which categorical colors are defined",
+            "data_type": "string | object | null",
+            "sample_data": "carrier",
+            "original_field": {
+              "field_name": "dimension",
+              "description": "Pick a dimension from which categorical colors are defined",
+              "data_type": "string | object | null",
+              "enum_source": "datasource columns",
+              "sample_data": "carrier",
+              "required": false,
+              "embedding": "否",
+              "default_value": null,
+              "notes": "仅在 `color_scheme_type='categorical_palette'` 时可见。后端会把该列映射到 `cat_color`，前端按它生成颜色与图例。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "end_spatial",
+        "required": true,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Point to your spatial columns"
+        ],
+        "data_types": [
+          "object"
+        ],
+        "sample_data_examples": [
+          {
+            "type": "latlong",
+            "lonCol": "LONGITUDE_DEST",
+            "latCol": "LATITUDE_DEST"
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "end_spatial",
+            "runtime_alias": null,
+            "required": true,
+            "embedding": "否",
+            "description": "Point to your spatial columns",
+            "data_type": "object",
+            "sample_data": {
+              "type": "latlong",
+              "lonCol": "LONGITUDE_DEST",
+              "latCol": "LATITUDE_DEST"
+            },
+            "original_field": {
+              "field_name": "end_spatial",
+              "description": "Point to your spatial columns",
+              "data_type": "object",
+              "enum_values": [
+                "latlong",
+                "delimited",
+                "geohash"
+              ],
+              "sample_data": {
+                "type": "latlong",
+                "lonCol": "LONGITUDE_DEST",
+                "latCol": "LATITUDE_DEST"
+              },
+              "required": true,
+              "embedding": "否",
+              "default_value": {
+                "type": "latlong"
+              },
+              "notes": "控件是 `SpatialControl` + `validateNonEmpty`。当前图标签是 `End Longitude & Latitude`。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "filter_nulls",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Whether to ignore locations that are null"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          true
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "filter_nulls",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Whether to ignore locations that are null",
+            "data_type": "boolean",
+            "sample_data": true,
+            "original_field": {
+              "field_name": "filter_nulls",
+              "description": "Whether to ignore locations that are null",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": true,
+              "required": false,
+              "embedding": "否",
+              "default_value": true,
+              "notes": "为 true 时，`BaseDeckGLViz.query_obj()` 会自动为 start/end 空间列注入 `IS NOT NULL` 过滤条件。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "js_columns",
+        "required": false,
+        "categories": [
+          "Advanced"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "List of extra columns made available in JavaScript functions"
+        ],
+        "data_types": [
+          "array[string | object]"
+        ],
+        "sample_data_examples": [
+          [
+            "carrier"
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Advanced",
+            "field_name": "js_columns",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "List of extra columns made available in JavaScript functions",
+            "data_type": "array[string | object]",
+            "sample_data": [
+              "carrier"
+            ],
+            "original_field": {
+              "field_name": "js_columns",
+              "description": "List of extra columns made available in JavaScript functions",
+              "data_type": "array[string | object]",
+              "enum_source": "datasource columns",
+              "sample_data": [
+                "carrier"
+              ],
+              "required": false,
+              "embedding": "否",
+              "default_value": [],
+              "notes": "`BaseDeckGLViz.query_obj()` 会把它们并入 query groupby，并在返回特征中以 `extraProps` 暴露给自定义 JS。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "js_data_mutator",
+        "required": false,
+        "categories": [
+          "Advanced"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Define a javascript function that receives the data array used in the visualization and is expected to return a modified version of that array."
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "data => data"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Advanced",
+            "field_name": "js_data_mutator",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Define a javascript function that receives the data array used in the visualization and is expected to return a modified version of that array.",
+            "data_type": "string",
+            "sample_data": "data => data",
+            "original_field": {
+              "field_name": "js_data_mutator",
+              "description": "Define a javascript function that receives the data array used in the visualization and is expected to return a modified version of that array.",
+              "data_type": "string",
+              "sample_data": "data => data",
+              "required": false,
+              "embedding": "否",
+              "default_value": "",
+              "notes": "如果功能开关 `EnableJavascriptControls` 关闭，该控件会变成只读并显示安全提示。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "js_onclick_href",
+        "required": false,
+        "categories": [
+          "Advanced"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Define a function that returns a URL to navigate to when user clicks"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "o => `https://example.com/?from=${o.object.sourcePosition}`"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Advanced",
+            "field_name": "js_onclick_href",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Define a function that returns a URL to navigate to when user clicks",
+            "data_type": "string",
+            "sample_data": "o => `https://example.com/?from=${o.object.sourcePosition}`",
+            "original_field": {
+              "field_name": "js_onclick_href",
+              "description": "Define a function that returns a URL to navigate to when user clicks",
+              "data_type": "string",
+              "sample_data": "o => `https://example.com/?from=${o.object.sourcePosition}`",
+              "required": false,
+              "embedding": "否",
+              "default_value": "",
+              "notes": "若提供，`commonLayerProps()` 会在点击时打开该 URL。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "js_tooltip",
+        "required": false,
+        "categories": [
+          "Advanced"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Define a function that receives the input and outputs the content for a tooltip"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "o => `<div>${o.object.cat_color}</div>`"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Advanced",
+            "field_name": "js_tooltip",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Define a function that receives the input and outputs the content for a tooltip",
+            "data_type": "string",
+            "sample_data": "o => `<div>${o.object.cat_color}</div>`",
+            "original_field": {
+              "field_name": "js_tooltip",
+              "description": "Define a function that receives the input and outputs the content for a tooltip",
+              "data_type": "string",
+              "sample_data": "o => `<div>${o.object.cat_color}</div>`",
+              "required": false,
+              "embedding": "否",
+              "default_value": "",
+              "notes": "若未提供，Arc 默认 tooltip 显示起点、终点和可选的分类字段值。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "legend_format",
+        "required": false,
+        "categories": [
+          "Arc"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Choose the format for legend values"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "SMART_NUMBER"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Arc",
+            "field_name": "legend_format",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Choose the format for legend values",
+            "data_type": "string",
+            "sample_data": "SMART_NUMBER",
+            "original_field": {
+              "field_name": "legend_format",
+              "description": "Choose the format for legend values",
+              "data_type": "string",
+              "enum_source": "D3_FORMAT_OPTIONS",
+              "sample_data": "SMART_NUMBER",
+              "required": false,
+              "embedding": "否",
+              "default_value": "DEFAULT_NUMBER_FORMAT"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "legend_position",
+        "required": false,
+        "categories": [
+          "Arc"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Choose the position of the legend"
+        ],
+        "data_types": [
+          "string | null"
+        ],
+        "sample_data_examples": [
+          "tr"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Arc",
+            "field_name": "legend_position",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Choose the position of the legend",
+            "data_type": "string | null",
+            "sample_data": "tr",
+            "original_field": {
+              "field_name": "legend_position",
+              "description": "Choose the position of the legend",
+              "data_type": "string | null",
+              "enum_values": [
+                null,
+                "tl",
+                "tr",
+                "bl",
+                "br"
+              ],
+              "sample_data": "tr",
+              "required": false,
+              "embedding": "否",
+              "default_value": "tr"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "mapbox_style",
+        "required": false,
+        "categories": [
+          "Map"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/ or tile server URL."
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "mapbox://styles/mapbox/light-v9"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Map",
+            "field_name": "mapbox_style",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/ or tile server URL.",
+            "data_type": "string",
+            "sample_data": "mapbox://styles/mapbox/light-v9",
+            "original_field": {
+              "field_name": "mapbox_style",
+              "description": "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/ or tile server URL.",
+              "data_type": "string",
+              "enum_source": "bootstrap common.deckgl_tiles or DEFAULT_DECKGL_TILES",
+              "sample_data": "mapbox://styles/mapbox/light-v9",
+              "required": false,
+              "embedding": "否",
+              "default_value": "getDeckGLTiles()[0][0]"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "row_limit",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [
+          "rowLimit"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Limits the number of the rows that are computed in the query that is the source of the data used for this chart."
+        ],
+        "data_types": [
+          "integer"
+        ],
+        "sample_data_examples": [
+          5000
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "row_limit",
+            "runtime_alias": "rowLimit",
+            "required": false,
+            "embedding": "否",
+            "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+            "data_type": "integer",
+            "sample_data": 5000,
+            "original_field": {
+              "field_name": "row_limit",
+              "runtime_alias": "rowLimit",
+              "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+              "data_type": "integer",
+              "enum_values": [
+                10,
+                50,
+                100,
+                250,
+                500,
+                1000,
+                5000,
+                10000,
+                50000
+              ],
+              "sample_data": 5000,
+              "required": false,
+              "embedding": "否",
+              "default_value": 10000
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "start_spatial",
+        "required": true,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Point to your spatial columns"
+        ],
+        "data_types": [
+          "object"
+        ],
+        "sample_data_examples": [
+          {
+            "type": "latlong",
+            "lonCol": "LONGITUDE",
+            "latCol": "LATITUDE"
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "start_spatial",
+            "runtime_alias": null,
+            "required": true,
+            "embedding": "否",
+            "description": "Point to your spatial columns",
+            "data_type": "object",
+            "sample_data": {
+              "type": "latlong",
+              "lonCol": "LONGITUDE",
+              "latCol": "LATITUDE"
+            },
+            "original_field": {
+              "field_name": "start_spatial",
+              "description": "Point to your spatial columns",
+              "data_type": "object",
+              "enum_values": [
+                "latlong",
+                "delimited",
+                "geohash"
+              ],
+              "sample_data": {
+                "type": "latlong",
+                "lonCol": "LONGITUDE",
+                "latCol": "LATITUDE"
+              },
+              "required": true,
+              "embedding": "否",
+              "default_value": {
+                "type": "latlong"
+              },
+              "notes": "控件是 `SpatialControl` + `validateNonEmpty`。支持三种对象形状：`latlong`、`delimited`、`geohash`。当前图标签是 `Start Longitude & Latitude`。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "stroke_width",
+        "required": false,
+        "categories": [
+          "Arc"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "字段标签为 Stroke Width。"
+        ],
+        "data_types": [
+          "integer | string | null"
+        ],
+        "sample_data_examples": [
+          1
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Arc",
+            "field_name": "stroke_width",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "字段标签为 Stroke Width。",
+            "data_type": "integer | string | null",
+            "sample_data": 1,
+            "original_field": {
+              "field_name": "stroke_width",
+              "description": "字段标签为 Stroke Width。",
+              "data_type": "integer | string | null",
+              "enum_values": [
+                1,
+                2,
+                3,
+                4,
+                5
+              ],
+              "sample_data": 1,
+              "required": false,
+              "embedding": "否",
+              "default_value": null,
+              "notes": "`Arc.tsx` 运行时若未提供该字段，会回退到宽度 3。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "target_color_picker",
+        "required": false,
+        "categories": [
+          "Arc"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Color of the target location"
+        ],
+        "data_types": [
+          "object"
+        ],
+        "sample_data_examples": [
+          {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Arc",
+            "field_name": "target_color_picker",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Color of the target location",
+            "data_type": "object",
+            "sample_data": {
+              "r": 0,
+              "g": 122,
+              "b": 135,
+              "a": 1
+            },
+            "original_field": {
+              "field_name": "target_color_picker",
+              "description": "Color of the target location",
+              "data_type": "object",
+              "sample_data": {
+                "r": 0,
+                "g": 122,
+                "b": 135,
+                "a": 1
+              },
+              "required": false,
+              "embedding": "否",
+              "default_value": {
+                "r": 0,
+                "g": 122,
+                "b": 135,
+                "a": 1
+              },
+              "notes": "仅当 `color_scheme_type='fixed_color'` 时可见。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "viewport",
+        "required": false,
+        "categories": [
+          "Map"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Parameters related to the view and perspective on the map"
+        ],
+        "data_types": [
+          "object"
+        ],
+        "sample_data_examples": [
+          {
+            "longitude": -91.84340711201104,
+            "latitude": 44.596651438714254,
+            "zoom": 2.929837070560775,
+            "bearing": 8.546256357301871,
+            "pitch": 60
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Map",
+            "field_name": "viewport",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Parameters related to the view and perspective on the map",
+            "data_type": "object",
+            "sample_data": {
+              "longitude": -91.84340711201104,
+              "latitude": 44.596651438714254,
+              "zoom": 2.929837070560775,
+              "bearing": 8.546256357301871,
+              "pitch": 60
+            },
+            "original_field": {
+              "field_name": "viewport",
+              "description": "Parameters related to the view and perspective on the map",
+              "data_type": "object",
+              "sample_data": {
+                "longitude": -91.84340711201104,
+                "latitude": 44.596651438714254,
+                "zoom": 2.929837070560775,
+                "bearing": 8.546256357301871,
+                "pitch": 60
+              },
+              "required": false,
+              "embedding": "否",
+              "default_value": {
+                "longitude": 6.85236157047845,
+                "latitude": 31.222656842808707,
+                "zoom": 1,
+                "bearing": 0,
+                "pitch": 0
+              },
+              "notes": "运行时 `transformProps.ts` 会把当前图表的 `width`/`height` 合并进 viewport，但 root form_data 不需要自己提供宽高。"
+            }
+          }
+        ]
+      }
+    ],
+    "required_field_names": [
+      "end_spatial",
+      "start_spatial"
+    ],
+    "embedding_enabled_field_names": [
+      "adhoc_filters"
+    ],
+    "runtime_alias_index": {
+      "row_limit": [
+        "rowLimit"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "deck_arc",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/deck_arc-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/deck_arc-form-data-schema.json",
+      "control-schema": "form-data-schema/deck_arc-schema.json"
+    }
+  },
+  "fallback_online_field_categories": {
+    "Query": [],
+    "Advanced analytics": [],
+    "Annotations & Layers": [],
+    "Predictive Analytics（Forecast）": [],
+    "Chart Options": [],
+    "Chart Title": [],
+    "图表专属": [],
+    "通用图表选项": []
+  },
+  "original_control_schema": {
+    "viz_type": "deck_arc",
+    "display_name": "deck.gl Arc",
+    "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Arc/controlPanel.ts",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Arc/controlPanel.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Arc/index.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Arc/Arc.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/factory.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/common.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/Shared_DeckGL.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/controls.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/utils.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utils/crossFiltersDataMask.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/components/controls/SpatialControl.jsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-demo/storybook/stories/plugins/legacy-preset-chart-deckgl/Arc/payload.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+      "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+      "D:/vsx/sources/superset-6.0.0/superset/views/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/utils/core.py"
+    ],
+    "notes": [
+      "deck_arc 位于 `legacy-preset-chart-deckgl/src/layers/Arc`，metadata 明确声明 `useLegacyApi=true`，因此真实请求路径是 `/superset/explore_json/`。",
+      "前端展示名是 `deck.gl Arc`，后端类名是 `superset/viz.py::DeckArc`。构造模板时应以 `viz_type='deck_arc'` 为准。",
+      "当前图的主查询输入不是单个 `spatial`，而是两个独立的 `SpatialControl`：`start_spatial` 和 `end_spatial`。后端 `BaseDeckGLViz.query_obj()` 会分别展开这两个空间对象对应的真实列。",
+      "Arc 没有正式指标字段。`DeckArc` 复用 `BaseDeckGLViz.query_obj()` 时不会提供 metrics，因此默认走纯 columns 查询，返回每条起点到终点的弧线记录。",
+      "`dimension` 只在分类配色模式下有意义。后端 `DeckArc.get_properties()` 会把 `data.get(dimension)` 映射成 `cat_color`，供前端 `CategoricalDeckGLContainer` 计算颜色与图例。",
+      "`color_scheme_type` 在当前图里只允许 `fixed_color` 和 `categorical_palette` 两种值，没有 `color_breakpoints` 或 `linear_palette`。",
+      "`color_picker` 和 `target_color_picker` 只在固定色模式下生效，分别控制弧线起点色与终点色；分类色模式下，`Arc.tsx` 会回退使用 `targetColor` 或 `color`。",
+      "虽然 `DeckArc.is_timeseries=True`，并且后端会在 `time_grain_sqla` 存在时把 `is_timeseries` 打开，但当前 controlPanel 并没有暴露时间 section。storyboard payload 中出现的 `granularity_sqla/time_grain_sqla/time_range` 更接近 legacy 携带字段，而不是当前图的正式可视控件。"
+    ],
+    "control_overrides": {
+      "size": {
+        "validators": []
+      },
+      "time_grain_sqla": {
+        "default": null,
+        "mapStateToProps": "state.datasource ? state.datasource.time_grain_sqla?.filter(o => o[0] !== null) : null"
+      }
+    },
+    "legacy_api_behavior": {
+      "useLegacyApi": true,
+      "frontend_request_endpoint": "/superset/explore_json/",
+      "frontend_request_payload": {
+        "form_data": "<raw form_data>"
+      },
+      "query_builder": "deck_arc 没有专属前端 buildQuery。ChartClient.ts 在 `useLegacyApi=true` 且未注册 buildQuery 时，会把原始 form_data 直接包装进 legacy payload。"
+    },
+    "query_compilation": {
+      "backend_class": "superset/viz.py::DeckArc",
+      "base_query": "继承 `BaseDeckGLViz.query_obj()` -> `BaseViz.query_obj()`，因此会先执行 `convert_legacy_filters_into_adhoc(form_data)` 与 `merge_extra_filters(form_data)`。",
+      "timeseries_toggle": "`DeckArc.query_obj()` 先做 `self.is_timeseries = bool(self.form_data.get('time_grain_sqla'))`，然后再调用 `super().query_obj()`。但当前 controlPanel 本身没有可见时间字段。",
+      "null_filter_injection": "当 `filter_nulls=true`（默认值）时，`BaseDeckGLViz.add_null_filters()` 会为 `start_spatial` 和 `end_spatial` 引用到的所有空间列自动追加 `IS NOT NULL` adhoc filter。",
+      "groupby": "`BaseDeckGLViz.query_obj()` 会把 `start_spatial`、`end_spatial` 展开的真实列全部加入 groupby；若 `dimension` 或 `js_columns` 存在，也会继续加入 groupby。",
+      "metrics": "Arc 没有正式指标字段，因此 `BaseDeckGLViz.get_metrics()` 返回空数组，最终 `query_obj['columns']=group_by`。",
+      "returned_data": "`DeckArc.get_data()` 复用 `BaseDeckGLViz.get_data()` 返回 feature 列表，每个 feature 形状是 `{ sourcePosition, targetPosition, cat_color, __timestamp }`。",
+      "runtime_rendering": "`Arc.tsx` 运行时读取 `stroke_width`、`color_scheme_type`、`color_picker`、`target_color_picker`、`dimension`、`color_scheme`、`legend_position`、`legend_format` 和 viewport 相关字段来决定弧线渲染与图例。"
+    },
+    "field_categories": {
+      "Query": [
+        {
+          "field_name": "start_spatial",
+          "description": "Point to your spatial columns",
+          "data_type": "object",
+          "enum_values": [
+            "latlong",
+            "delimited",
+            "geohash"
+          ],
+          "sample_data": {
+            "type": "latlong",
+            "lonCol": "LONGITUDE",
+            "latCol": "LATITUDE"
+          },
+          "required": true,
+          "embedding": "否",
+          "default_value": {
+            "type": "latlong"
+          },
+          "notes": "控件是 `SpatialControl` + `validateNonEmpty`。支持三种对象形状：`latlong`、`delimited`、`geohash`。当前图标签是 `Start Longitude & Latitude`。"
+        },
+        {
+          "field_name": "end_spatial",
+          "description": "Point to your spatial columns",
+          "data_type": "object",
+          "enum_values": [
+            "latlong",
+            "delimited",
+            "geohash"
+          ],
+          "sample_data": {
+            "type": "latlong",
+            "lonCol": "LONGITUDE_DEST",
+            "latCol": "LATITUDE_DEST"
+          },
+          "required": true,
+          "embedding": "否",
+          "default_value": {
+            "type": "latlong"
+          },
+          "notes": "控件是 `SpatialControl` + `validateNonEmpty`。当前图标签是 `End Longitude & Latitude`。"
+        },
+        {
+          "field_name": "row_limit",
+          "runtime_alias": "rowLimit",
+          "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+          "data_type": "integer",
+          "enum_values": [
+            10,
+            50,
+            100,
+            250,
+            500,
+            1000,
+            5000,
+            10000,
+            50000
+          ],
+          "sample_data": 5000,
+          "required": false,
+          "embedding": "否",
+          "default_value": 10000
+        },
+        {
+          "field_name": "filter_nulls",
+          "description": "Whether to ignore locations that are null",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true,
+          "notes": "为 true 时，`BaseDeckGLViz.query_obj()` 会自动为 start/end 空间列注入 `IS NOT NULL` 过滤条件。"
+        },
+        {
+          "field_name": "adhoc_filters",
+          "description": "字段标签为 Filters。legacy `/superset/explore_json/` 路径会先把 legacy filters 归并进 `adhoc_filters`，再继续 merge `extra_form_data`。",
+          "data_type": "array[object]",
+          "enum_source": "datasource columns",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "LATITUDE",
+              "operator": "IS NOT NULL",
+              "comparator": ""
+            }
+          ],
+          "required": false,
+          "embedding": "extra_form_data.append",
+          "default_value": [],
+          "notes": "即便 root 不显式提供，若 `filter_nulls=true`，后端也会在查询前自动把 start/end 空间列的 `IS NOT NULL` 过滤补进来。"
+        }
+      ],
+      "Map": [
+        {
+          "field_name": "mapbox_style",
+          "description": "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/ or tile server URL.",
+          "data_type": "string",
+          "enum_source": "bootstrap common.deckgl_tiles or DEFAULT_DECKGL_TILES",
+          "sample_data": "mapbox://styles/mapbox/light-v9",
+          "required": false,
+          "embedding": "否",
+          "default_value": "getDeckGLTiles()[0][0]"
+        },
+        {
+          "field_name": "autozoom",
+          "description": "When checked, the map will zoom to your data after each query",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true
+        },
+        {
+          "field_name": "viewport",
+          "description": "Parameters related to the view and perspective on the map",
+          "data_type": "object",
+          "sample_data": {
+            "longitude": -91.84340711201104,
+            "latitude": 44.596651438714254,
+            "zoom": 2.929837070560775,
+            "bearing": 8.546256357301871,
+            "pitch": 60
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": {
+            "longitude": 6.85236157047845,
+            "latitude": 31.222656842808707,
+            "zoom": 1,
+            "bearing": 0,
+            "pitch": 0
+          },
+          "notes": "运行时 `transformProps.ts` 会把当前图表的 `width`/`height` 合并进 viewport，但 root form_data 不需要自己提供宽高。"
+        }
+      ],
+      "Arc": [
+        {
+          "field_name": "color_scheme_type",
+          "description": "Select the type of color scheme to use.",
+          "data_type": "string",
+          "enum_values": [
+            "fixed_color",
+            "categorical_palette"
+          ],
+          "sample_data": "fixed_color",
+          "required": false,
+          "embedding": "否",
+          "default_value": "fixed_color",
+          "notes": "当前图覆写了通用 DeckGL 配色类型选项，只保留 fixed color 和 categorical palette。"
+        },
+        {
+          "field_name": "color_picker",
+          "description": "Color of the source location",
+          "data_type": "object",
+          "sample_data": {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          },
+          "notes": "仅当 `color_scheme_type='fixed_color'` 时可见。"
+        },
+        {
+          "field_name": "target_color_picker",
+          "description": "Color of the target location",
+          "data_type": "object",
+          "sample_data": {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          },
+          "notes": "仅当 `color_scheme_type='fixed_color'` 时可见。"
+        },
+        {
+          "field_name": "dimension",
+          "description": "Pick a dimension from which categorical colors are defined",
+          "data_type": "string | object | null",
+          "enum_source": "datasource columns",
+          "sample_data": "carrier",
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "仅在 `color_scheme_type='categorical_palette'` 时可见。后端会把该列映射到 `cat_color`，前端按它生成颜色与图例。"
+        },
+        {
+          "field_name": "color_scheme",
+          "description": "The color scheme for rendering chart",
+          "data_type": "string",
+          "enum_source": "categoricalSchemeRegistry.keys()",
+          "sample_data": "SUPERSET_DEFAULT",
+          "required": false,
+          "embedding": "否",
+          "default_value": "categoricalSchemeRegistry.getDefaultKey()",
+          "notes": "仅在 `color_scheme_type='categorical_palette'` 时可见。"
+        },
+        {
+          "field_name": "stroke_width",
+          "description": "字段标签为 Stroke Width。",
+          "data_type": "integer | string | null",
+          "enum_values": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "sample_data": 1,
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "`Arc.tsx` 运行时若未提供该字段，会回退到宽度 3。"
+        },
+        {
+          "field_name": "legend_position",
+          "description": "Choose the position of the legend",
+          "data_type": "string | null",
+          "enum_values": [
+            null,
+            "tl",
+            "tr",
+            "bl",
+            "br"
+          ],
+          "sample_data": "tr",
+          "required": false,
+          "embedding": "否",
+          "default_value": "tr"
+        },
+        {
+          "field_name": "legend_format",
+          "description": "Choose the format for legend values",
+          "data_type": "string",
+          "enum_source": "D3_FORMAT_OPTIONS",
+          "sample_data": "SMART_NUMBER",
+          "required": false,
+          "embedding": "否",
+          "default_value": "DEFAULT_NUMBER_FORMAT"
+        }
+      ],
+      "Advanced": [
+        {
+          "field_name": "js_columns",
+          "description": "List of extra columns made available in JavaScript functions",
+          "data_type": "array[string | object]",
+          "enum_source": "datasource columns",
+          "sample_data": [
+            "carrier"
+          ],
+          "required": false,
+          "embedding": "否",
+          "default_value": [],
+          "notes": "`BaseDeckGLViz.query_obj()` 会把它们并入 query groupby，并在返回特征中以 `extraProps` 暴露给自定义 JS。"
+        },
+        {
+          "field_name": "js_data_mutator",
+          "description": "Define a javascript function that receives the data array used in the visualization and is expected to return a modified version of that array.",
+          "data_type": "string",
+          "sample_data": "data => data",
+          "required": false,
+          "embedding": "否",
+          "default_value": "",
+          "notes": "如果功能开关 `EnableJavascriptControls` 关闭，该控件会变成只读并显示安全提示。"
+        },
+        {
+          "field_name": "js_tooltip",
+          "description": "Define a function that receives the input and outputs the content for a tooltip",
+          "data_type": "string",
+          "sample_data": "o => `<div>${o.object.cat_color}</div>`",
+          "required": false,
+          "embedding": "否",
+          "default_value": "",
+          "notes": "若未提供，Arc 默认 tooltip 显示起点、终点和可选的分类字段值。"
+        },
+        {
+          "field_name": "js_onclick_href",
+          "description": "Define a function that returns a URL to navigate to when user clicks",
+          "data_type": "string",
+          "sample_data": "o => `https://example.com/?from=${o.object.sourcePosition}`",
+          "required": false,
+          "embedding": "否",
+          "default_value": "",
+          "notes": "若提供，`commonLayerProps()` 会在点击时打开该 URL。"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,506 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "pivot_table_v2",
+  "display_name": "Pivot Table",
+  "generation_mode": "heuristic_seed",
+  "slot_candidates": [
+    {
+      "field_name": "adhoc_filters",
+      "required": false,
+      "slot_kind": "filter_list",
+      "accepted_dataset_roles": [
+        "filter_context"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [],
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [
+        "extra_form_data.append"
+      ],
+      "descriptions": [
+        "Filters"
+      ]
+    },
+    {
+      "field_name": "groupbyColumns",
+      "required": false,
+      "slot_kind": "column_dimension_list",
+      "accepted_dataset_roles": [
+        "dimension",
+        "category_dimension"
+      ],
+      "cardinality": "1..n",
+      "placeholder": [
+        "<column_dimension_column>"
+      ],
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Columns to group by on the columns"
+      ]
+    },
+    {
+      "field_name": "groupbyRows",
+      "required": false,
+      "slot_kind": "row_dimension_list",
+      "accepted_dataset_roles": [
+        "dimension",
+        "category_dimension"
+      ],
+      "cardinality": "1..n",
+      "placeholder": [
+        "<row_dimension_column>"
+      ],
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Columns to group by on the rows"
+      ]
+    },
+    {
+      "field_name": "metrics",
+      "required": true,
+      "slot_kind": "metric_list",
+      "accepted_dataset_roles": [
+        "metric",
+        "saved_metric",
+        "adhoc_metric"
+      ],
+      "cardinality": "1..n",
+      "placeholder": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        }
+      ],
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+      ]
+    },
+    {
+      "field_name": "series_limit",
+      "required": false,
+      "slot_kind": "dimension",
+      "accepted_dataset_roles": [
+        "dimension",
+        "category_dimension"
+      ],
+      "cardinality": "0..n",
+      "placeholder": "<dimension_column_or_list>",
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Limits the number of series that get displayed. A joined subquery (or an extra phase where subqueries are not supported) is applied to limit the number of series that get fetched and rendered."
+      ]
+    },
+    {
+      "field_name": "series_limit_metric",
+      "required": false,
+      "slot_kind": "metric",
+      "accepted_dataset_roles": [
+        "metric",
+        "saved_metric",
+        "adhoc_metric"
+      ],
+      "cardinality": "0..n",
+      "placeholder": "<metric_or_metric_list>",
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Metric used to define how the top series are sorted if a series or cell limit is present. If undefined reverts to the first metric (where appropriate)."
+      ]
+    },
+    {
+      "field_name": "time_grain_sqla",
+      "required": false,
+      "slot_kind": "time_grain",
+      "accepted_dataset_roles": [
+        "time_grain"
+      ],
+      "cardinality": "0..1",
+      "placeholder": "P1D",
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [
+        "extra_form_data.override（guest 下不建议）"
+      ],
+      "descriptions": [
+        "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart."
+      ]
+    }
+  ],
+  "non_binding_form_controls": [
+    {
+      "field_name": "aggregateFunction",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Options / Pivot Structure"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Aggregate function to apply when pivoting and computing the total rows and columns"
+      ]
+    },
+    {
+      "field_name": "allow_render_html",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Options / Conditional Formatting & Rendering"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Renders table cells as HTML when applicable. For example, HTML <a> tags will be rendered as hyperlinks."
+      ]
+    },
+    {
+      "field_name": "colOrder",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Options / Formatting & Sorting"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Change order of columns"
+      ]
+    },
+    {
+      "field_name": "colSubTotals",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Options / Totals"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Display column level subtotal"
+      ]
+    },
+    {
+      "field_name": "colSubtotalPosition",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Options / Totals"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Position of column level subtotal"
+      ]
+    },
+    {
+      "field_name": "colTotals",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Options / Totals"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Display column level total"
+      ]
+    },
+    {
+      "field_name": "combineMetric",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Options / Pivot Structure"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Display metrics side by side within each column, as opposed to each column being displayed side by side for each metric."
+      ]
+    },
+    {
+      "field_name": "conditional_formatting",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Options / Conditional Formatting & Rendering"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Apply conditional color formatting to metrics"
+      ]
+    },
+    {
+      "field_name": "currency_format",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Options / Formatting & Sorting"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Currency format"
+      ]
+    },
+    {
+      "field_name": "date_format",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Options / Formatting & Sorting"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "D3 time format for datetime columns"
+      ]
+    },
+    {
+      "field_name": "metricsLayout",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Use metrics as a top level group for columns or for rows"
+      ]
+    },
+    {
+      "field_name": "order_desc",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Whether to sort descending or ascending"
+      ]
+    },
+    {
+      "field_name": "rowOrder",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Options / Formatting & Sorting"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Change order of rows"
+      ]
+    },
+    {
+      "field_name": "rowSubTotals",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Options / Totals"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Display row level subtotal"
+      ]
+    },
+    {
+      "field_name": "rowSubtotalPosition",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Options / Totals"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Position of row level subtotal"
+      ]
+    },
+    {
+      "field_name": "rowTotals",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Options / Totals"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Display row level total"
+      ]
+    },
+    {
+      "field_name": "row_limit",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Limits the number of cells that get retrieved."
+      ]
+    },
+    {
+      "field_name": "temporal_columns_lookup",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "隐藏控件。把 datasource 中所有 `is_dttm=true` 的列整理成 `{ column_name: true }` 映射，供 `time_grain_sqla` 可见性与 buildQuery 时间列判断使用。"
+      ]
+    },
+    {
+      "field_name": "transposePivot",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Options / Pivot Structure"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Swap rows and columns"
+      ]
+    },
+    {
+      "field_name": "valueFormat",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Options / Formatting & Sorting"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "D3 format syntax for numbers"
+      ]
+    }
+  ],
+  "dataset_role_inventory": {
+    "adhoc_metric": [
+      "metrics",
+      "series_limit_metric"
+    ],
+    "category_dimension": [
+      "groupbyColumns",
+      "groupbyRows",
+      "series_limit"
+    ],
+    "dimension": [
+      "groupbyColumns",
+      "groupbyRows",
+      "series_limit"
+    ],
+    "filter_context": [
+      "adhoc_filters"
+    ],
+    "metric": [
+      "metrics",
+      "series_limit_metric"
+    ],
+    "saved_metric": [
+      "metrics",
+      "series_limit_metric"
+    ],
+    "time_grain": [
+      "time_grain_sqla"
+    ]
+  },
+  "binding_seed_example": {
+    "metrics": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "pivot_table_v2",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/pivot_table_v2-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/pivot_table_v2-form-data-schema.json",
+      "control-schema": "form-data-schema/pivot_table_v2-schema.json"
+    }
+  }
+}

@@ -1,0 +1,307 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "deck_grid",
+  "display_name": "deck.gl Grid",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "LAT",
+          "operator": "IS NOT NULL",
+          "comparator": ""
+        }
+      ]
+    ],
+    "autozoom": [
+      true
+    ],
+    "color_breakpoints": [
+      [
+        {
+          "minValue": 0,
+          "maxValue": 100,
+          "color": {
+            "r": 255,
+            "g": 0,
+            "b": 0,
+            "a": 1
+          }
+        }
+      ]
+    ],
+    "color_picker": [
+      {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      }
+    ],
+    "color_scheme": [
+      "SUPERSET_DEFAULT"
+    ],
+    "color_scheme_type": [
+      "categorical_palette"
+    ],
+    "deafult_breakpoint_color": [
+      {
+        "r": 158,
+        "g": 158,
+        "b": 158,
+        "a": 1
+      }
+    ],
+    "extruded": [
+      true
+    ],
+    "filter_nulls": [
+      true
+    ],
+    "grid_size": [
+      120
+    ],
+    "js_columns": [
+      [
+        "city"
+      ]
+    ],
+    "js_data_mutator": [
+      "data => data"
+    ],
+    "js_onclick_href": [
+      "o => `https://example.com/?lon=${o.coordinate[0]}&lat=${o.coordinate[1]}`"
+    ],
+    "js_tooltip": [
+      "o => `<div>${o.object.elevationValue}</div>`"
+    ],
+    "legend_position": [
+      "tr"
+    ],
+    "mapbox_style": [
+      "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+    ],
+    "row_limit": [
+      5000
+    ],
+    "size": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "count"
+        },
+        "aggregate": "COUNT",
+        "label": "COUNT(*)"
+      }
+    ],
+    "spatial": [
+      {
+        "type": "latlong",
+        "lonCol": "LON",
+        "latCol": "LAT"
+      }
+    ],
+    "viewport": [
+      {
+        "longitude": -122.42066918995666,
+        "latitude": 37.7942314882596,
+        "zoom": 12.699690845482069,
+        "bearing": 155.80099696026355,
+        "pitch": 53.470800300695146
+      }
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "deck_grid",
+      "spatial": {
+        "type": "latlong",
+        "lonCol": "LON",
+        "latCol": "LAT"
+      },
+      "size": "count",
+      "adhoc_filters": []
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "deck_grid",
+      "spatial": {
+        "type": "latlong",
+        "lonCol": "LON",
+        "latCol": "LAT"
+      },
+      "row_limit": 5000,
+      "size": "count",
+      "filter_nulls": true,
+      "adhoc_filters": [],
+      "mapbox_style": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+      "viewport": {
+        "longitude": 6.85236157047845,
+        "latitude": 31.222656842808707,
+        "zoom": 1,
+        "bearing": 0,
+        "pitch": 0
+      },
+      "color_scheme_type": "categorical_palette",
+      "color_picker": {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      },
+      "color_scheme": "SUPERSET_DEFAULT",
+      "deafult_breakpoint_color": {
+        "r": 158,
+        "g": 158,
+        "b": 158,
+        "a": 1
+      },
+      "color_breakpoints": [],
+      "legend_position": "tr",
+      "autozoom": true,
+      "grid_size": 20,
+      "extruded": true,
+      "js_columns": [],
+      "js_data_mutator": "",
+      "js_tooltip": "",
+      "js_onclick_href": ""
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "deck_grid",
+      "spatial": "<copied_from_saved_chart>",
+      "size": "<copied_from_saved_chart>",
+      "row_limit": "<copied_from_saved_chart_if_present>",
+      "filter_nulls": "<copied_from_saved_chart_if_present>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "mapbox_style": "<copied_from_saved_chart_if_present>",
+      "viewport": "<copied_from_saved_chart_if_present>",
+      "color_scheme_type": "<copied_from_saved_chart_if_present>",
+      "color_picker": "<copied_from_saved_chart_if_present>",
+      "color_scheme": "<copied_from_saved_chart_if_present>",
+      "deafult_breakpoint_color": "<copied_from_saved_chart_if_present>",
+      "color_breakpoints": "<copied_from_saved_chart_if_present>",
+      "legend_position": "<copied_from_saved_chart_if_present>",
+      "autozoom": "<copied_from_saved_chart_if_present>",
+      "grid_size": "<copied_from_saved_chart_if_present>",
+      "extruded": "<copied_from_saved_chart_if_present>",
+      "js_columns": "<copied_from_saved_chart_if_present>",
+      "js_data_mutator": "<copied_from_saved_chart_if_present>",
+      "js_tooltip": "<copied_from_saved_chart_if_present>",
+      "js_onclick_href": "<copied_from_saved_chart_if_present>",
+      "js_agg_function": "<copied_from_saved_chart_if_present>",
+      "legend_format": "<copied_from_saved_chart_if_present>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "LON",
+            "op": "IN",
+            "val": [
+              -122.4221936,
+              -122.4101989
+            ]
+          },
+          {
+            "col": "LAT",
+            "op": "IN",
+            "val": [
+              37.7786083,
+              37.7878771
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "city",
+            "operator": "IN",
+            "comparator": [
+              "San Francisco"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_deck_grid_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "LON",
+            "op": "IN",
+            "val": [
+              -122.4221936,
+              -122.4101989
+            ]
+          }
+        ],
+        "effect": "追加 simple filters；后端会把它们并入额外过滤条件。对 deck_grid 来说，这也是 `crossFiltersDataMask.ts` 交互筛选明确产出的容器。latlong 场景下，点击包含多点的 grid cell 会生成经纬度 `IN` 过滤；按拾取坐标生成包围盒时，会生成 `>=` / `<=` 范围过滤。",
+        "source": "superset/constants.py + superset/utils/core.py + crossFiltersDataMask.ts"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_deck_grid_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "city",
+            "operator": "IN",
+            "comparator": [
+              "San Francisco"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会标记为 `isExtra` 并并入查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_deck_grid_legacy": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；deck_grid 默认不直接消费它。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_deck_grid_legacy": false,
+        "recommended": false,
+        "sample_data": "Last 30 days",
+        "effect": "这是通用 extra_form_data override 字段，但当前图不是时序图，deck_grid 控制面板与后端查询路径都没有高置信业务依赖。",
+        "source": "QueryFormData.ts + superset/constants.py + superset/utils/core.py + superset/viz.py",
+        "status": "低相关，不建议在 guest embedding 中依赖"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "deck_grid",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/deck_grid-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/deck_grid-form-data-schema.json",
+      "control-schema": "form-data-schema/deck_grid-schema.json"
+    }
+  }
+}

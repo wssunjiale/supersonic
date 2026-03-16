@@ -1,0 +1,325 @@
+{
+  "viz_type": "time_table",
+  "display_name": "Time-series Table",
+  "purpose": "第三方 embedding / guest token 场景下安全传输的 form_data 模板",
+  "base_form_data_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/time_table-form-data-schema.json",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset/security/manager.py",
+    "D:/vsx/sources/superset-6.0.0/superset/constants.py",
+    "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+    "D:/vsx/sources/superset-6.0.0/superset/charts/schemas.py",
+    "D:/vsx/sources/superset-6.0.0/superset/views/core.py",
+    "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/constants.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/QueryFormData.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/processExtraFormData.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/dashboard/components/nativeFilters/utils.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataWithDashboardContext.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/visualizations/TimeTable/config/controlPanel/controlPanel.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/visualizations/TimeTable/config/transformProps/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/visualizations/TimeTable/TimeTable.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/visualizations/TimeTable/components/LeftCell/LeftCell.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/visualizations/TimeTable/utils/valueCalculations/valueCalculations.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/visualizations/TimeTable/utils/sparklineDataUtils/sparklineDataUtils.ts"
+  ],
+  "notes": [
+    "time_table 仍然是 legacy 图，前端 metadata 明确声明 `useLegacyApi=true`，真实请求路径是 `/superset/explore_json/`。",
+    "`/superset/explore_json/` 路径会读取原始 `form_data`，补 `datasource`，然后执行 `convert_legacy_filters_into_adhoc(form_data)` 与 `merge_extra_filters(form_data)`。",
+    "当前源码里 `Guest user cannot modify chart payload` 这条错误只在 `security/manager.py::raise_for_access(query_context=...)` 分支触发，核心比较器是 `query_context_modified()`。",
+    "legacy `/superset/explore_json/` 的权限检查会走 `views/utils.py::check_datasource_perms()` -> `get_viz()` -> `viz.raise_for_access()` -> `security/manager.py::raise_for_access(viz=self)`。当前 `viz` 分支会校验 `dashboardId` / `slice_id` / datasource 绑定，但没有 `query_context_modified()` 那种 columns / metrics / orderby 子集比较器。",
+    "即便如此，最稳妥的策略仍然是根层 form_data 直接复制保存态图表，只把动态时间和过滤条件放进 `extra_form_data`。",
+    "`metrics`、`groupby`、`limit`、`row_limit`、`column_collection` 会改变底层 SQL / pivot 结果；`url` 会改变左列点击行为；这些都不适合在 guest embedding 请求里临时重构。"
+  ],
+  "security_enforcement": {
+    "frontend_request_mode": "legacy explore_json",
+    "frontend_request_endpoint": "/superset/explore_json/",
+    "frontend_request_payload": {
+      "form_data": "<raw form_data>"
+    },
+    "backend_normalization_steps": [
+      "convert_legacy_filters_into_adhoc(form_data)",
+      "merge_extra_filters(form_data)"
+    ],
+    "verified_guest_payload_guard": {
+      "chart_data_api": "security/manager.py::query_context_modified",
+      "chart_data_api_error": "Guest user cannot modify chart payload",
+      "legacy_explore_json_api": "`check_datasource_perms()` 会构造 viz 并调用 `raise_for_access(viz=self)`；该分支校验 datasource / dashboard / slice 绑定，但没有 `query_context_modified()` 那种 query subset guard",
+      "confidence": "high"
+    },
+    "guest_access_binding_fields": [
+      "dashboardId",
+      "slice_id"
+    ],
+    "query_critical_root_fields": [
+      "datasource",
+      "viz_type",
+      "granularity_sqla",
+      "time_grain_sqla",
+      "time_range",
+      "metrics",
+      "groupby",
+      "limit",
+      "row_limit",
+      "column_collection"
+    ],
+    "recommended_strategy": "复制保存态 chart form_data 作为 base，仅通过 extra_form_data 追加时间范围、时间粒度和过滤条件；不要在 embedding 请求里重构 time_table 的 root 查询字段和列定义字段。"
+  },
+  "safe_base_rule": {
+    "description": "第三方 embedding 请求中的根层 form_data，应当从已保存的 Time-series Table 图表直接复制，不要自行重构。",
+    "must_be_copied_from_saved_chart": [
+      "slice_id",
+      "dashboardId",
+      "datasource",
+      "viz_type",
+      "granularity_sqla",
+      "time_grain_sqla",
+      "time_range",
+      "granularity",
+      "metrics",
+      "adhoc_filters",
+      "groupby",
+      "limit",
+      "row_limit",
+      "column_collection",
+      "url",
+      "all other saved chart-definition fields"
+    ],
+    "why": [
+      "time_table 没有专属前端 buildQuery，前端直接把 root form_data 发给 `/superset/explore_json/`。",
+      "`BaseViz.query_obj()` 会直接从 root `granularity_sqla`、`time_range`、`time_grain_sqla` 编译时间查询上下文。",
+      "`TimeTableViz.query_obj()` 会直接消费 root `metrics`、`groupby`、`limit` / `row_limit` 并生成 `orderby`。",
+      "`TimeTableViz.get_data()` 返回的数据形态会因 `groupby` 是否存在而变化。",
+      "`transformProps()` 与 `TimeTable.tsx` 会直接消费 root `column_collection` 和 `url`；这两类字段会改变列计算语义与点击行为。"
+    ]
+  },
+  "safe_embedding_form_data_template": {
+    "description": "这是 time_table embedding 下的保守安全写法。根层以保存态图表为 base，仅改 extra_form_data。",
+    "template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "time_table",
+      "granularity_sqla": "<copied_from_saved_chart>",
+      "time_grain_sqla": "<copied_from_saved_chart>",
+      "time_range": "<copied_from_saved_chart>",
+      "metrics": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "groupby": "<copied_from_saved_chart>",
+      "limit": "<copied_from_saved_chart>",
+      "row_limit": "<copied_from_saved_chart>",
+      "column_collection": "<copied_from_saved_chart>",
+      "url": "<copied_from_saved_chart>",
+      "extra_form_data": {
+        "time_range": "Last 90 days",
+        "time_grain_sqla": "P1D",
+        "filters": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "APAC"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "APAC"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    }
+  },
+  "preferred_dynamic_container": {
+    "field_name": "extra_form_data",
+    "description": "legacy `/superset/explore_json/` 路径同样会在 `merge_extra_filters()` -> `merge_extra_form_data()` 中消费它。",
+    "append_keys": [
+      "adhoc_filters",
+      "filters",
+      "interactive_groupby",
+      "interactive_highlight",
+      "interactive_drilldown",
+      "custom_form_data"
+    ],
+    "override_keys_backend_high_confidence": [
+      "granularity_sqla",
+      "time_column",
+      "time_grain",
+      "time_range",
+      "time_grain_sqla",
+      "relative_start",
+      "relative_end"
+    ],
+    "frontend_declared_but_backend_not_high_confidence": [
+      "granularity",
+      "time_compare"
+    ],
+    "notes": "对 time_table 来说，`time_range`、`time_grain_sqla` 是最稳妥的动态入口；`metrics`、`groupby`、`column_collection`、`url` 不应通过 guest 请求做动态切换。"
+  },
+  "extra_form_data_field_schema": [
+    {
+      "field_name": "time_range",
+      "data_type": "string",
+      "behavior": "override",
+      "safe_for_time_table_legacy": true,
+      "recommended": true,
+      "sample_data": "Last 90 days",
+      "effect": "覆盖保存态图表的时间范围。",
+      "source": "superset/constants.py + superset/utils/core.py"
+    },
+    {
+      "field_name": "time_grain_sqla",
+      "data_type": "string | null",
+      "behavior": "override",
+      "safe_for_time_table_legacy": true,
+      "recommended": true,
+      "sample_data": "P1D",
+      "effect": "覆盖保存态图表的时间粒度。",
+      "source": "superset/constants.py + superset/utils/core.py"
+    },
+    {
+      "field_name": "granularity_sqla",
+      "data_type": "string | null",
+      "behavior": "override",
+      "safe_for_time_table_legacy": true,
+      "recommended": false,
+      "sample_data": "order_date",
+      "effect": "覆盖 Time Column；它会改变底层时间列语义，仅在确认保存态图表与目标时间列语义完全一致时使用。",
+      "source": "superset/constants.py + frontend QueryFormData.ts"
+    },
+    {
+      "field_name": "filters",
+      "data_type": "array[QueryObjectFilterClause]",
+      "behavior": "append",
+      "safe_for_time_table_legacy": true,
+      "recommended": true,
+      "sample_data": [
+        {
+          "col": "region",
+          "op": "IN",
+          "val": [
+            "APAC"
+          ]
+        }
+      ],
+      "effect": "追加 simple filters；后端会把它们并入额外过滤条件。",
+      "source": "superset/constants.py + superset/utils/core.py"
+    },
+    {
+      "field_name": "adhoc_filters",
+      "data_type": "array[AdhocFilter]",
+      "behavior": "append",
+      "safe_for_time_table_legacy": true,
+      "recommended": true,
+      "sample_data": [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "region",
+          "operator": "IN",
+          "comparator": [
+            "APAC"
+          ]
+        }
+      ],
+      "effect": "追加 adhoc filters；后端会标记为 extra 并并入查询。",
+      "source": "superset/constants.py + superset/utils/core.py"
+    },
+    {
+      "field_name": "custom_form_data",
+      "data_type": "object",
+      "behavior": "append",
+      "safe_for_time_table_legacy": true,
+      "recommended": false,
+      "sample_data": {},
+      "effect": "传递非标准附加数据；time_table 默认不直接消费它。",
+      "source": "QueryFormData.ts + superset/constants.py"
+    },
+    {
+      "field_name": "relative_start",
+      "data_type": "string",
+      "behavior": "override",
+      "safe_for_time_table_legacy": true,
+      "recommended": false,
+      "sample_data": "now",
+      "effect": "进入 query extras 的相对开始时间。",
+      "source": "superset/charts/schemas.py + superset/utils/core.py"
+    },
+    {
+      "field_name": "relative_end",
+      "data_type": "string",
+      "behavior": "override",
+      "safe_for_time_table_legacy": true,
+      "recommended": false,
+      "sample_data": "today",
+      "effect": "进入 query extras 的相对结束时间。",
+      "source": "superset/charts/schemas.py + superset/utils/core.py"
+    }
+  ],
+  "not_recommended_guest_mutations": [
+    {
+      "field_name": "metrics",
+      "reason": "会直接改变 SQL 聚合列；并且与 `groupby` 存在数量约束。"
+    },
+    {
+      "field_name": "groupby",
+      "reason": "会把表格从 metric-row 模式切到 groupby-row 模式，后端返回 shape 也会变化。"
+    },
+    {
+      "field_name": "column_collection",
+      "reason": "会直接改变值计算 / sparkline 渲染语义，是 time_table 的核心列定义。"
+    },
+    {
+      "field_name": "limit",
+      "reason": "会改变 series 限流逻辑，影响底层 query 结果。"
+    },
+    {
+      "field_name": "row_limit",
+      "reason": "会改变底层 query 取数规模。"
+    },
+    {
+      "field_name": "url",
+      "reason": "会改变左列点击跳转行为；保守 guest 模式下应直接复制保存态。"
+    }
+  ],
+  "embedding_api_field_examples": {
+    "root_keys_should_be_copied": [
+      "slice_id",
+      "dashboardId",
+      "datasource",
+      "viz_type",
+      "granularity_sqla",
+      "time_grain_sqla",
+      "time_range",
+      "metrics",
+      "adhoc_filters",
+      "groupby",
+      "limit",
+      "row_limit",
+      "column_collection",
+      "url"
+    ],
+    "dynamic_keys_should_prefer_extra_form_data": [
+      "time_range",
+      "time_grain_sqla",
+      "granularity_sqla",
+      "filters",
+      "adhoc_filters",
+      "relative_start",
+      "relative_end"
+    ],
+    "avoid_confusion": [
+      "不要把 `time_table` 当成标准 chart data API 图表去套 `/api/v1/chart/data` 的 `query_context` guest 模板。",
+      "不要在 guest 请求里把 `column_collection` 从 `time` 改成 `spark` 或 `avg`；这会直接改变列语义。",
+      "不要在 guest 请求里切换 `groupby`；这会切换运行时 `rowType` 和后端数据 shape。",
+      "不要把运行时 `columnCollection` 当作 API root key；真正的保存态字段名仍然是 `column_collection`。"
+    ]
+  }
+}

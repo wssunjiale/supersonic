@@ -1,0 +1,335 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "paired_ttest",
+  "display_name": "Paired t-test Table",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "experiment_group",
+          "operator": "IN",
+          "comparator": [
+            "A",
+            "B"
+          ]
+        }
+      ]
+    ],
+    "contribution": [
+      false
+    ],
+    "groupby": [
+      [
+        "experiment_group"
+      ]
+    ],
+    "liftvalue_precision": [
+      4
+    ],
+    "limit": [
+      10
+    ],
+    "metrics": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        }
+      ]
+    ],
+    "order_desc": [
+      true
+    ],
+    "pvalue_precision": [
+      6
+    ],
+    "row_limit": [
+      10000
+    ],
+    "significance_level": [
+      0.05
+    ],
+    "timeseries_limit_metric": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "sales"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(sales)"
+      }
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "paired_ttest",
+      "metrics": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        }
+      ],
+      "adhoc_filters": [],
+      "groupby": [
+        "<group_dimension>"
+      ]
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "paired_ttest",
+      "metrics": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        }
+      ],
+      "adhoc_filters": [],
+      "groupby": [
+        "<group_dimension>"
+      ],
+      "limit": null,
+      "timeseries_limit_metric": null,
+      "order_desc": true,
+      "contribution": false,
+      "row_limit": 10000,
+      "significance_level": 0.05,
+      "pvalue_precision": 6,
+      "liftvalue_precision": 4
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "paired_ttest",
+      "metrics": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "groupby": "<copied_from_saved_chart>",
+      "limit": "<copied_from_saved_chart_if_present>",
+      "timeseries_limit_metric": "<copied_from_saved_chart_if_present>",
+      "order_desc": "<copied_from_saved_chart_if_present>",
+      "contribution": "<copied_from_saved_chart_if_present>",
+      "row_limit": "<copied_from_saved_chart_if_present>",
+      "significance_level": "<copied_from_saved_chart_if_present>",
+      "pvalue_precision": "<copied_from_saved_chart_if_present>",
+      "liftvalue_precision": "<copied_from_saved_chart_if_present>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "experiment_group",
+            "op": "IN",
+            "val": [
+              "A",
+              "B"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "experiment_group",
+            "operator": "IN",
+            "comparator": [
+              "A",
+              "B"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_paired_ttest_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "experiment_group",
+            "op": "IN",
+            "val": [
+              "A",
+              "B"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters；后端会把它们并入额外过滤条件。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_paired_ttest_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "experiment_group",
+            "operator": "IN",
+            "comparator": [
+              "A",
+              "B"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会把它们标记为 extra 并并入查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_paired_ttest_legacy": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；paired_ttest 默认不直接消费它。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_paired_ttest_legacy": false,
+        "recommended": false,
+        "sample_data": "Last 30 days",
+        "effect": "legacy merge 层会把它并入 root form_data.time_range，但 paired_ttest controlPanel 未显式暴露时间范围；当前图不应把它当作高置信 guest override。",
+        "source": "superset/constants.py + superset/utils/core.py + superset/viz.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_paired_ttest_legacy": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "legacy merge 层支持该 override，但 paired_ttest controlPanel 没有正式的时间粒度字段；当前图不应把它当作稳定入口。",
+        "source": "superset/constants.py + superset/utils/core.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_paired_ttest_legacy": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "legacy merge 白名单接受该 key，但其映射行为属于通用底层逻辑，paired_ttest 插件本身没有显式暴露对应时间列控件。",
+        "source": "superset/constants.py + superset/utils/core.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_column",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_paired_ttest_legacy": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "底层 QueryObject 时间列 override；paired_ttest 当前没有把它暴露为正式 controlPanel 字段。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_grain",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_paired_ttest_legacy": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "底层 QueryObject 时间粒度 override；paired_ttest 当前没有把它暴露为正式 controlPanel 字段。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "relative_start",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_paired_ttest_legacy": false,
+        "recommended": false,
+        "sample_data": "now",
+        "effect": "会写入 query extras 的相对开始时间；paired_ttest 当前没有明确的官方时间控件链路，建议谨慎使用。",
+        "source": "superset/constants.py + superset/utils/core.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "relative_end",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_paired_ttest_legacy": false,
+        "recommended": false,
+        "sample_data": "today",
+        "effect": "会写入 query extras 的相对结束时间；paired_ttest 当前没有明确的官方时间控件链路，建议谨慎使用。",
+        "source": "superset/constants.py + superset/utils/core.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_paired_ttest_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "experiment_group"
+        ],
+        "effect": "通用 ExtraFormData 字段；paired_ttest 默认不直接消费它。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_paired_ttest_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "experiment_group"
+        ],
+        "effect": "通用交互字段；paired_ttest 默认不直接消费。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_paired_ttest_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "experiment_group"
+        ],
+        "effect": "通用交互字段；paired_ttest 默认不直接消费。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "paired_ttest",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/paired_ttest-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/paired_ttest-form-data-schema.json",
+      "control-schema": "form-data-schema/paired_ttest-schema.json"
+    }
+  }
+}

@@ -1,0 +1,344 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "big_number_total",
+  "display_name": "Big Number",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      [
+        {
+          "clause": "WHERE",
+          "subject": "order_date",
+          "operator": "TEMPORAL_RANGE",
+          "comparator": "No filter",
+          "expressionType": "SIMPLE"
+        }
+      ]
+    ],
+    "conditional_formatting": [
+      [
+        {
+          "column": "value",
+          "operator": ">",
+          "targetValue": 0,
+          "colorScheme": "success.base"
+        }
+      ]
+    ],
+    "currency_format": [
+      {
+        "symbol": "$",
+        "symbolPosition": "prefix"
+      }
+    ],
+    "force_timestamp_formatting": [
+      false
+    ],
+    "header_font_size": [
+      0.4
+    ],
+    "metric": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "sales"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(sales)"
+      }
+    ],
+    "metric_name_font_size": [
+      0.15
+    ],
+    "show_metric_name": [
+      false
+    ],
+    "subtitle": [
+      "Total Sales"
+    ],
+    "subtitle_font_size": [
+      0.15
+    ],
+    "time_format": [
+      "smart_date"
+    ],
+    "y_axis_format": [
+      "SMART_NUMBER"
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "big_number_total",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "adhoc_filters": []
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "big_number_total",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "adhoc_filters": [],
+      "header_font_size": 0.4,
+      "subtitle": null,
+      "subtitle_font_size": 0.15,
+      "show_metric_name": false,
+      "metric_name_font_size": 0.15,
+      "y_axis_format": "SMART_NUMBER",
+      "currency_format": null,
+      "time_format": "smart_date",
+      "force_timestamp_formatting": false,
+      "conditional_formatting": []
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "big_number_total",
+      "metric": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "header_font_size": "<copied_from_saved_chart>",
+      "subtitle": "<copied_from_saved_chart>",
+      "subtitle_font_size": "<copied_from_saved_chart>",
+      "show_metric_name": "<copied_from_saved_chart>",
+      "metric_name_font_size": "<copied_from_saved_chart>",
+      "y_axis_format": "<copied_from_saved_chart>",
+      "currency_format": "<copied_from_saved_chart>",
+      "time_format": "<copied_from_saved_chart>",
+      "force_timestamp_formatting": "<copied_from_saved_chart>",
+      "conditional_formatting": "<copied_from_saved_chart>",
+      "extra_form_data": {
+        "time_range": "Last 30 days",
+        "filters": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_big_number_total": true,
+        "recommended": true,
+        "sample_data": "Last 30 days",
+        "effect": "覆盖保存态图表的时间范围。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_big_number_total": true,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "覆盖时间粒度。对于 big_number_total 这类单值 KPI 通常不是必需字段。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_big_number_total": true,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "覆盖时间列；只有当你明确知道保存态 KPI 需要改用另一列做时间过滤时才使用。",
+        "source": "superset/constants.py + frontend QueryFormData.ts"
+      },
+      {
+        "field_name": "granularity",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_big_number_total": false,
+        "recommended": false,
+        "sample_data": "__time",
+        "effect": "通用 SQL 时间列覆盖键；big_number_total 常规场景通常不需要手动传。",
+        "source": "superset/constants.py"
+      },
+      {
+        "field_name": "time_column",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_big_number_total": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "后端 QueryObject 允许的时间列覆盖键；big_number_total 常规场景通常优先使用保存态配置。",
+        "source": "superset/constants.py + frontend QueryFormData.ts"
+      },
+      {
+        "field_name": "time_grain",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_big_number_total": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "底层 QueryObject 的时间粒度键，big_number_total 一般不需要手动传。",
+        "source": "superset/constants.py + frontend QueryFormData.ts"
+      },
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_big_number_total": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters；后端会转成额外过滤条件。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_big_number_total": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会标记为 isExtra 并并入查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_big_number_total": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "可传非标准附加数据；big_number_total 的 buildQuery/transformProps 不直接消费它。",
+        "source": "superset/constants.py + frontend QueryFormData.ts"
+      },
+      {
+        "field_name": "relative_start",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_big_number_total": true,
+        "recommended": false,
+        "sample_data": "now",
+        "effect": "进入 query.extras.relative_start。后端 schema 对取值做了约束，示例为 `today` / `now`。",
+        "source": "superset/charts/schemas.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "relative_end",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_big_number_total": true,
+        "recommended": false,
+        "sample_data": "today",
+        "effect": "进入 query.extras.relative_end。后端 schema 对取值做了约束，示例为 `today` / `now`。",
+        "source": "superset/charts/schemas.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_big_number_total": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用 ExtraFormData 字段。big_number_total 的 buildQuery.ts 不直接消费它，通常没有实际效果。",
+        "source": "frontend QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_big_number_total": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用交互字段；big_number_total 默认不直接消费。",
+        "source": "frontend QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_big_number_total": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用交互字段；big_number_total 默认不直接消费。",
+        "source": "frontend QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "time_compare",
+        "data_type": "string | array[string]",
+        "behavior": "override",
+        "safe_for_big_number_total": false,
+        "recommended": false,
+        "sample_data": [
+          "1 year ago"
+        ],
+        "effect": "frontend 类型声明存在，但 Superset 6.0.0 后端 constants.py 的 extra_form_data merge whitelist 未将其列为高置信 override。guest embedding 下容易出现前后端行为不一致。",
+        "source": "frontend QueryFormData.ts + query/constants.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "big_number_total",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/big_number_total-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/big_number_total-form-data-schema.json",
+      "control-schema": "form-data-schema/big_number_total-schema.json"
+    }
+  }
+}

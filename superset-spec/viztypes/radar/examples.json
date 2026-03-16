@@ -1,0 +1,381 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "radar",
+  "display_name": "Radar Chart",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "region",
+          "operator": "IN",
+          "comparator": [
+            "East",
+            "West"
+          ]
+        }
+      ]
+    ],
+    "color_scheme": [
+      "supersetColors"
+    ],
+    "column_config": [
+      {
+        "SUM(sales)": {
+          "radarMetricMinValue": 0,
+          "radarMetricMaxValue": null
+        },
+        "AVG(profit_margin)": {
+          "radarMetricMinValue": -10,
+          "radarMetricMaxValue": 100
+        }
+      }
+    ],
+    "date_format": [
+      "smart_date"
+    ],
+    "groupby": [
+      [
+        "region"
+      ]
+    ],
+    "is_circle": [
+      false
+    ],
+    "label_position": [
+      "top"
+    ],
+    "label_type": [
+      "value"
+    ],
+    "legendMargin": [],
+    "legendOrientation": [
+      "top"
+    ],
+    "legendType": [
+      "scroll"
+    ],
+    "metrics": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        }
+      ]
+    ],
+    "number_format": [
+      "SMART_NUMBER"
+    ],
+    "row_limit": [
+      10
+    ],
+    "show_labels": [
+      true
+    ],
+    "show_legend": [
+      true
+    ],
+    "timeseries_limit_metric": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "sales"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(sales)"
+      }
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "radar",
+      "groupby": [
+        "<dimension_column>"
+      ],
+      "metrics": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        }
+      ],
+      "adhoc_filters": [],
+      "row_limit": 10
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "radar",
+      "groupby": [
+        "<dimension_column>"
+      ],
+      "metrics": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column_1>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column_1>)"
+        },
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column_2>"
+          },
+          "aggregate": "AVG",
+          "label": "AVG(<metric_column_2>)"
+        }
+      ],
+      "timeseries_limit_metric": null,
+      "adhoc_filters": [],
+      "row_limit": 10,
+      "color_scheme": "<categoricalSchemeRegistry.defaultKey>",
+      "show_legend": true,
+      "legendType": "scroll",
+      "legendOrientation": "top",
+      "legendMargin": null,
+      "show_labels": true,
+      "label_type": "value",
+      "label_position": "top",
+      "number_format": "SMART_NUMBER",
+      "date_format": "smart_date",
+      "column_config": {},
+      "is_circle": false
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "radar",
+      "groupby": "<copied_from_saved_chart>",
+      "metrics": "<copied_from_saved_chart>",
+      "timeseries_limit_metric": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "row_limit": "<copied_from_saved_chart>",
+      "color_scheme": "<copied_from_saved_chart>",
+      "show_legend": "<copied_from_saved_chart>",
+      "legendType": "<copied_from_saved_chart>",
+      "legendOrientation": "<copied_from_saved_chart>",
+      "legendMargin": "<copied_from_saved_chart>",
+      "show_labels": "<copied_from_saved_chart>",
+      "label_type": "<copied_from_saved_chart>",
+      "label_position": "<copied_from_saved_chart>",
+      "number_format": "<copied_from_saved_chart>",
+      "date_format": "<copied_from_saved_chart>",
+      "column_config": "<copied_from_saved_chart>",
+      "is_circle": "<copied_from_saved_chart>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_radar": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "effect": "追加普通过滤条件；Radar 点击系列做 cross-filter 时也正是产出这类结构。",
+        "source": "plugins/plugin-chart-echarts/src/utils/eventHandlers.ts + superset/constants.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[object]",
+        "behavior": "append",
+        "safe_for_radar": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会把它们标记为 extra 并并入查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_radar": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；Radar 默认 buildQuery/transformProps 不直接消费它。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_radar": false,
+        "recommended": false,
+        "sample_data": "Last 30 days",
+        "effect": "通用 extra_form_data override 白名单允许该 key，但 Radar 当前没有显式时间过滤控件链路。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_radar": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "通用时间粒度 override。Radar 当前没有对应控件，也没有专门的 buildQuery 时间处理逻辑。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_radar": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "通用时间列 override。Radar 当前没有对应控件。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_column",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_radar": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "底层 QueryObject 时间列 override；当前图没有官方时间控件闭环。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_grain",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_radar": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "底层 QueryObject 时间粒度 override；当前图没有官方时间控件闭环。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "relative_start",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_radar": false,
+        "recommended": false,
+        "sample_data": "now",
+        "effect": "进入 query extras 的相对开始时间；Radar 当前没有显式时间过滤控件。",
+        "source": "superset/constants.py + superset/utils/core.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "relative_end",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_radar": false,
+        "recommended": false,
+        "sample_data": "today",
+        "effect": "进入 query extras 的相对结束时间；Radar 当前没有显式时间过滤控件。",
+        "source": "superset/constants.py + superset/utils/core.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_radar": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用交互字段；Radar 默认 buildQuery/transformProps 不直接消费它。",
+        "source": "QueryFormData.ts + query constants"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_radar": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用交互字段；Radar 默认不直接消费。",
+        "source": "QueryFormData.ts + query constants"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_radar": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用交互字段；Radar 默认不直接消费。",
+        "source": "QueryFormData.ts + query constants"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "radar",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/radar-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/radar-form-data-schema.json",
+      "control-schema": "form-data-schema/radar-schema.json"
+    }
+  }
+}

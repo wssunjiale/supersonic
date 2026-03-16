@@ -15,10 +15,6 @@ public class SupersetPluginConfig {
 
     private String baseUrl;
 
-    private String authStrategy = "JWT_FIRST";
-
-    private String apiKey;
-
     private String jwtUsername;
 
     private String jwtPassword;
@@ -60,14 +56,13 @@ public class SupersetPluginConfig {
     /**
      * 校验 Superset 认证配置是否可用。
      *
-     * Returns: 认证关闭时返回 true，认证开启时需至少提供 JWT 或 API key。
+     * Returns: 认证关闭时返回 true，认证开启时需提供 JWT 用户名和密码。
      */
     public boolean hasValidAuthConfig() {
         if (!authEnabled) {
             return true;
         }
-        boolean hasApiKey = StringUtils.isNotBlank(apiKey);
         boolean hasJwt = StringUtils.isNotBlank(jwtUsername) && StringUtils.isNotBlank(jwtPassword);
-        return hasApiKey || hasJwt;
+        return hasJwt;
     }
 }

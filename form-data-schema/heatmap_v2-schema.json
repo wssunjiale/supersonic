@@ -1,0 +1,491 @@
+{
+  "viz_type": "heatmap_v2",
+  "display_name": "Heatmap",
+  "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Heatmap/controlPanel.tsx",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Heatmap/index.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Heatmap/controlPanel.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Heatmap/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Heatmap/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Heatmap/types.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/controls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/defaults.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/constants.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/mixins.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/operators/rankOperator.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/getXAxis.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractQueryFields.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryObject.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/standardizedFormData.ts"
+  ],
+  "notes": [
+    "插件 metadata 没有声明 `useLegacyApi=true`，因此 Heatmap 走标准 `/api/v1/chart/data`。",
+    "插件 metadata 的 category 是 `Correlation`，description 明确说明它用于“在两组维度组合上可视化单个指标强度”。",
+    "Heatmap 的根层 API form_data 应以 control name 为准，主要是 snake_case 字段；但 `xAxisLabelRotation` 这个控件名本身就是 camelCase，因此它在 root form_data 中也保持 camelCase。",
+    "`groupby` 共享控件被 override 成单选 `Y-Axis`，并额外加了 `validateNonEmpty`，因此该图的 Y 轴不是数组维度集合语义，而是单个维度语义。",
+    "`metric` 是该图的 canonical 根字段，`extractQueryFields()` 内置别名会把它归并到 query object 的 `metrics` 数组；不要把根字段误写成 `metrics` 作为首选写法。",
+    "`buildQuery.ts` 总会把 X 轴列和 Y 轴列编译成 `columns = [x_axis, groupby]`，并总是追加一个 `rank` post_processing；`normalized` 只决定前端颜色映射读原始 metric 还是读 `rank`。 ",
+    "`normalize_across` 和 `normalized` 不是一回事：前者决定 `rankOperator` 的 `group_by` 以及 tooltip 百分比分母，后者决定 visualMap 颜色维度使用 metric 还是 rank。"
+  ],
+  "form_data_overrides": {
+    "metric": "getStandardizedControls().shiftMetric()"
+  },
+  "chart_data_api_behavior": {
+    "useLegacyApi": false,
+    "frontend_request_endpoint": "/api/v1/chart/data",
+    "frontend_request_payload": {
+      "query_context": "<buildQuery(form_data)>"
+    },
+    "query_builder": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Heatmap/buildQuery.ts"
+  },
+  "query_compilation": {
+    "metric_mapping": "`extractQueryFields()` 的内置别名把 root `metric` 归并到 `query.metrics`。",
+    "columns_mapping": "`buildQuery.ts` 先用 `getXAxisColumn(formData)` 取得 X 轴字段，再把单值 `groupby` 追加进去，最终显式覆盖 `baseQueryObject.columns`。",
+    "x_axis_fallback": "`getXAxisColumn()` 在 `x_axis` 缺失但 `granularity_sqla` 存在时会回退到 `DTTM_ALIAS`；但 Heatmap controlPanel 本身要求 `x_axis` 非空，直接调 API 时仍建议显式传 `x_axis`。",
+    "orderby_mapping": "`sort_x_axis` 和 `sort_y_axis` 会分别生成一条 `orderby` 元组；`alpha_*` 排轴字段，`value_*` 排 metric label，升降序由字符串里是否包含 `asc` 决定。",
+    "post_processing": "`buildQuery.ts` 无条件追加 `rankOperator(formData, baseQueryObject, { metric, group_by })`；当前前端定义的 `rankOperator` 只返回 `{ operation: 'rank', options }`。",
+    "time_fields": "`time_grain_sqla` 由共享时间控件提供，并会被 `extractExtras()` 编译到 `query.extras.time_grain_sqla`；`time_range` 与可选的 `granularity_sqla` 也仍由通用 `buildQueryObject()`/`extractExtras()` 消费。",
+    "filters_mapping": "`adhoc_filters` 由通用 `buildQueryObject()` -> `processFilters()` 处理。"
+  },
+  "field_categories": {
+    "Query / Axes & Metric": [
+      {
+        "field_name": "x_axis",
+        "runtime_alias": "xAxis",
+        "description": "Dimension to use on x-axis.",
+        "data_type": "string | object",
+        "enum_source": "datasource columns；共享控件 `dndXAxisControl` 基于 `dndGroupByControl + xAxisMixin`，若已存在 `granularity_sqla` 可在初始化时回填。",
+        "sample_data": "order_date",
+        "required": true,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "`xAxisMixin` 规定 `multi=false` 且带 `validateNonEmpty`。"
+      },
+      {
+        "field_name": "groupby",
+        "description": "Dimension to use on y-axis.",
+        "data_type": "string | object",
+        "enum_source": "datasource columns；若列元数据带 `groupby` 标记，控件会优先只给出 groupby 列。",
+        "sample_data": "region",
+        "required": true,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "共享 `groupby` 控件在 Heatmap 中被 override 为单选 `Y-Axis`，并加了 `validateNonEmpty`。"
+      },
+      {
+        "field_name": "metric",
+        "description": "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+        "data_type": "string | object",
+        "enum_source": "saved metrics + adhoc metrics",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        },
+        "required": true,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "`extractQueryFields()` 会把 root `metric` 归并到 query `metrics`。"
+      }
+    ],
+    "Query / Sorting & Normalization": [
+      {
+        "field_name": "sort_x_axis",
+        "runtime_alias": "sortXAxis",
+        "description": "源码未额外描述；字段标签为 Sort X Axis。",
+        "data_type": "string | null",
+        "enum_values": [
+          "alpha_asc",
+          "alpha_desc",
+          "value_asc",
+          "value_desc",
+          null
+        ],
+        "sample_data": "alpha_asc",
+        "required": false,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "`alpha_*` 对 X 轴字段排序，`value_*` 对 metric label 排序。"
+      },
+      {
+        "field_name": "sort_y_axis",
+        "runtime_alias": "sortYAxis",
+        "description": "源码未额外描述；字段标签为 Sort Y Axis。",
+        "data_type": "string | null",
+        "enum_values": [
+          "alpha_asc",
+          "alpha_desc",
+          "value_asc",
+          "value_desc",
+          null
+        ],
+        "sample_data": "value_desc",
+        "required": false,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "`alpha_*` 对 Y 轴字段排序，`value_*` 对 metric label 排序。"
+      },
+      {
+        "field_name": "normalize_across",
+        "runtime_alias": "normalizeAcross",
+        "description": "Color will be shaded based the normalized (0% to 100%) value of a given cell against the other cells in the selected range.",
+        "data_type": "string",
+        "enum_values": [
+          "heatmap",
+          "x",
+          "y"
+        ],
+        "sample_data": "heatmap",
+        "required": false,
+        "embedding": "否",
+        "default_value": "heatmap",
+        "notes": "`x` 表示按列归一化，`y` 表示按行归一化，`heatmap` 表示按整张热力图归一化。"
+      }
+    ],
+    "Query / Filters, Limit & Time Context": [
+      {
+        "field_name": "adhoc_filters",
+        "description": "源码未提供额外描述；字段标签为 Filters。",
+        "data_type": "array[object]",
+        "enum_source": "dataset filterable columns + saved metrics + 当前 `metric`",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "APAC"
+            ]
+          }
+        ],
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "default_value": [],
+        "notes": "Heatmap 自身 controlPanel 行里显式暴露了该控件。"
+      },
+      {
+        "field_name": "row_limit",
+        "runtime_alias": "rowLimit",
+        "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+        "data_type": "integer",
+        "enum_values": [
+          10,
+          50,
+          100,
+          250,
+          500,
+          1000,
+          5000,
+          10000,
+          50000
+        ],
+        "sample_data": 10000,
+        "required": false,
+        "embedding": "否",
+        "default_value": 10000
+      },
+      {
+        "field_name": "granularity_sqla",
+        "description": "The time column for the visualization. Note that you can define arbitrary expression that return a DATETIME column in the table. Also note that the filter below is applied against this column or expression",
+        "data_type": "string | object | null",
+        "enum_source": "datasource temporal columns",
+        "sample_data": "ds",
+        "required": false,
+        "embedding": "extra_form_data.override",
+        "default_value": null,
+        "notes": "该字段不是 Heatmap controlPanel 行中的显式控件，但通用时间链路与 `getXAxisColumn()` 仍会消费它。直接 API 创建 Heatmap 时建议仍显式传 `x_axis`。"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "runtime_alias": "timeGrainSqla",
+        "description": "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart.",
+        "data_type": "string | null",
+        "enum_source": "datasource.time_grain_sqla",
+        "sample_data": "P1D",
+        "required": false,
+        "embedding": "extra_form_data.override",
+        "default_value": "P1D",
+        "notes": "共享控件对“新建且未保存”的图默认给 `P1D`；已保存图则保留已有值。"
+      },
+      {
+        "field_name": "time_range",
+        "description": "This control filters the whole chart based on the selected time range. All relative times, e.g. \"Last month\", \"Last 7 days\", \"now\", etc. are evaluated on the server using the server's local time (sans timezone). All tooltips and placeholder times are expressed in UTC (sans timezone). The timestamps are then evaluated by the database using the engine's local timezone. Note one can explicitly set the timezone per the ISO 8601 format if specifying either the start and/or end time.",
+        "data_type": "string",
+        "sample_data": "No filter",
+        "required": false,
+        "embedding": "extra_form_data.override",
+        "default_value": "No filter",
+        "notes": "该字段来自通用时间控件，虽然 Heatmap 的 plugin controlPanel 行里未显式列出，但 `buildQueryObject()` 仍会消费。"
+      }
+    ],
+    "Chart Options / Legend & Color": [
+      {
+        "field_name": "legend_type",
+        "runtime_alias": "legendType",
+        "description": "源码未额外描述；字段标签为 Legend Type。",
+        "data_type": "string",
+        "enum_values": [
+          "continuous",
+          "piecewise"
+        ],
+        "sample_data": "continuous",
+        "required": false,
+        "embedding": "否",
+        "default_value": "continuous"
+      },
+      {
+        "field_name": "linear_color_scheme",
+        "runtime_alias": "linearColorScheme",
+        "description": "源码未额外描述；字段标签为 Linear Color Scheme。",
+        "data_type": "string",
+        "enum_source": "sequentialSchemeRegistry values；默认值取 `sequentialSchemeRegistry.getDefaultKey()`",
+        "sample_data": "<sequential_scheme_key>",
+        "required": false,
+        "embedding": "否",
+        "default_value": "sequentialSchemeRegistry.getDefaultKey()"
+      },
+      {
+        "field_name": "border_color",
+        "runtime_alias": "borderColor",
+        "description": "The color of the elements border",
+        "data_type": "object",
+        "sample_data": {
+          "r": 0,
+          "g": 0,
+          "b": 0,
+          "a": 1
+        },
+        "required": false,
+        "embedding": "否",
+        "default_value": {
+          "r": 0,
+          "g": 0,
+          "b": 0,
+          "a": 1
+        }
+      },
+      {
+        "field_name": "border_width",
+        "runtime_alias": "borderWidth",
+        "description": "The width of the elements border",
+        "data_type": "number",
+        "enum_source": "slider 0..2, step 0.1",
+        "sample_data": 0,
+        "required": false,
+        "embedding": "否",
+        "default_value": 0
+      },
+      {
+        "field_name": "value_bounds",
+        "runtime_alias": "valueBounds",
+        "description": "Hard value bounds applied for color coding.",
+        "data_type": "array[number | null, number | null]",
+        "sample_data": [
+          0,
+          100
+        ],
+        "required": false,
+        "embedding": "否",
+        "default_value": [
+          null,
+          null
+        ],
+        "notes": "若 root `value_bounds` 留空，`transformProps.ts` 会按当前数据里的颜色列自动推导 min/max；仍推不出来时回退 `[0, 200]`。"
+      },
+      {
+        "field_name": "show_legend",
+        "runtime_alias": "showLegend",
+        "description": "Whether to display the legend (toggles)",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true
+      }
+    ],
+    "Chart Options / Layout & Formatting": [
+      {
+        "field_name": "xscale_interval",
+        "runtime_alias": "xscaleInterval",
+        "description": "Number of steps to take between ticks when displaying the X scale",
+        "data_type": "integer",
+        "enum_source": "[-1(Auto)] + 1..50",
+        "sample_data": -1,
+        "required": false,
+        "embedding": "否",
+        "default_value": -1
+      },
+      {
+        "field_name": "yscale_interval",
+        "runtime_alias": "yscaleInterval",
+        "description": "Number of steps to take between ticks when displaying the Y scale",
+        "data_type": "integer",
+        "enum_source": "[-1(Auto)] + 1..50",
+        "sample_data": -1,
+        "required": false,
+        "embedding": "否",
+        "default_value": -1
+      },
+      {
+        "field_name": "left_margin",
+        "runtime_alias": "leftMargin",
+        "description": "Left margin, in pixels, allowing for more room for axis labels",
+        "data_type": "string | number",
+        "enum_values": [
+          "auto",
+          50,
+          75,
+          100,
+          125,
+          150,
+          200
+        ],
+        "sample_data": "auto",
+        "required": false,
+        "embedding": "否",
+        "default_value": "auto"
+      },
+      {
+        "field_name": "bottom_margin",
+        "runtime_alias": "bottomMargin",
+        "description": "Bottom margin, in pixels, allowing for more room for axis labels",
+        "data_type": "string | number",
+        "enum_values": [
+          "auto",
+          50,
+          75,
+          100,
+          125,
+          150,
+          200
+        ],
+        "sample_data": "auto",
+        "required": false,
+        "embedding": "否",
+        "default_value": "auto"
+      },
+      {
+        "field_name": "y_axis_format",
+        "runtime_alias": "yAxisFormat",
+        "description": "D3 format syntax: https://github.com/d3/d3-format",
+        "data_type": "string",
+        "enum_source": "D3_FORMAT_OPTIONS",
+        "sample_data": "SMART_NUMBER",
+        "required": false,
+        "embedding": "否",
+        "default_value": "SMART_NUMBER",
+        "notes": "Heatmap 把该共享控件的标签从 `Y Axis Format` override 成了 `Value Format`。"
+      },
+      {
+        "field_name": "x_axis_time_format",
+        "runtime_alias": "xAxisTimeFormat",
+        "description": "D3 time format syntax: https://github.com/d3/d3-time-format",
+        "data_type": "string",
+        "enum_source": "D3_TIME_FORMAT_OPTIONS",
+        "sample_data": "smart_date",
+        "required": false,
+        "embedding": "否",
+        "default_value": "smart_date",
+        "notes": "仅当 X 轴是时间字段时才有意义。"
+      },
+      {
+        "field_name": "xAxisLabelRotation",
+        "description": "Input field supports custom rotation. e.g. 30 for 30°",
+        "data_type": "number",
+        "enum_values": [
+          0,
+          45,
+          90
+        ],
+        "sample_data": 0,
+        "required": false,
+        "embedding": "否",
+        "default_value": 0
+      },
+      {
+        "field_name": "currency_format",
+        "runtime_alias": "currencyFormat",
+        "description": "源码未额外描述；字段标签为 Currency format。",
+        "data_type": "object | null",
+        "enum_source": "CurrencyControl runtime options；`Currency` 类型只声明 `symbol` 与 `symbolPosition`。",
+        "sample_data": {
+          "symbol": "USD",
+          "symbolPosition": "prefix"
+        },
+        "required": false,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "该样例结构来自 `Currency` 类型定义；具体可选币种由 `CurrencyControl` 运行时决定。"
+      }
+    ],
+    "Chart Options / Values & Normalized Color Scale": [
+      {
+        "field_name": "show_percentage",
+        "runtime_alias": "showPercentage",
+        "description": "Whether to include the percentage in the tooltip",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true
+      },
+      {
+        "field_name": "show_values",
+        "runtime_alias": "showValues",
+        "description": "Whether to display the numerical values within the cells",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      },
+      {
+        "field_name": "normalized",
+        "description": "Whether to apply a normal distribution based on rank on the color scale",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false,
+        "notes": "`transformProps.ts` 在 `normalized=true` 时把颜色列切到 `rank`，否则仍使用原始 metric label。"
+      }
+    ]
+  },
+  "runtime_only_or_removed_fields": [
+    {
+      "field_name": "query_context.queries[*].columns / metrics / orderby / post_processing",
+      "reason": "这些字段由 `buildQuery.ts`、`extractQueryFields()` 和 `rankOperator()` 从 root form_data 编译生成，不是额外 root form_data 字段。"
+    },
+    {
+      "field_name": "xAxis / sortXAxis / sortYAxis / normalizeAcross / legendType / linearColorScheme / leftMargin / bottomMargin / borderColor / borderWidth / showLegend / showPercentage / showValues / valueBounds / yAxisFormat / xAxisTimeFormat / currencyFormat",
+      "reason": "这些是前端 `transformProps.ts` / `types.ts` 使用的 standardized camelCase 运行时别名，不是首选的 root API form_data 键名。"
+    },
+    {
+      "field_name": "metrics",
+      "reason": "Heatmap 的 canonical 根字段是单值 `metric`。`metrics` 属于 query 编译产物，或 standardized controls 在切图时的共享携带态。"
+    }
+  ]
+}

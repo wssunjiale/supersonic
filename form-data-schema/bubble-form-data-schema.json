@@ -1,0 +1,435 @@
+{
+  "viz_type": "bubble",
+  "display_name": "Bubble Chart (legacy)",
+  "purpose": "用于调用 API 创建或保存 Bubble Chart (legacy) 时填写的 form_data 模板",
+  "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/bubble-schema.json",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/Bubble/controlPanel.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/Bubble/index.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/NVD3Controls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/transformProps.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/QueryFormData.ts",
+    "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+    "D:/vsx/sources/superset-6.0.0/superset/views/core.py",
+    "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+    "D:/vsx/sources/superset-6.0.0/superset/examples/world_bank.py",
+    "D:/vsx/sources/superset-6.0.0/superset/examples/supported_charts_dashboard.py"
+  ],
+  "notes": [
+    "legacy Bubble 插件 metadata 显式声明 `useLegacyApi=true`，前端不是走 `/api/v1/chart/data`，而是把原始 `form_data` POST 到 `/superset/explore_json/`。",
+    "这个图没有 bubble 专属前端 `buildQuery`。ChartClient.ts 对 legacy bubble 会退回 `() => formData`，因此 API 层真正应该构造的是原始 root `form_data`。",
+    "后端 `explore_json()` 会先补 `datasource`，然后执行 `convert_legacy_filters_into_adhoc(form_data)` 与 `merge_extra_filters(form_data)`，最后把处理后的 `form_data` 交给 `BubbleViz`。",
+    "真正决定查询结构的是 `superset/viz.py::BubbleViz.query_obj()`：`groupby = [entity] + [series?]`，`metrics = [size, x, y]`，`row_limit = form_data.limit`。",
+    "legacy bubble 的正式查询上限字段是 `limit`，不是 `row_limit`。如果你用 `row_limit` 替代 `limit`，BubbleViz 不会读取它。",
+    "后端要求 `entity`、`x`、`y`、`size` 必填，同时 `x/y/size` 三个指标的最终 label 必须互不相同，否则会抛出校验错误。",
+    "当 `series` 为空时，`BubbleViz` 会让 `self.series = entity`，也就是颜色分组回退为实体列本身。",
+    "legacy bubble 的 `x_axis_format` 在 controlPanel 中被显式改成数值 D3 格式，不是时间格式控件。"
+  ],
+  "naming_and_pipeline": {
+    "control_to_api_form_data": "Explore 导出时按 control name 原样写入 form_data；legacy bubble 保持 snake_case root 键名，例如 `max_bubble_size`、`show_legend`、`x_axis_format`。",
+    "api_form_data_to_backend_request": "ChartClient.ts 在 `useLegacyApi=true` 时，把 `buildQuery(formData)` 包装成 `{ form_data }` POST 到 `/superset/explore_json/`；bubble 没有专属 buildQuery，因此等价于直接发送原始 form_data。",
+    "backend_form_data_normalization": "`explore_json()` 会先补 `datasource`，再执行 `convert_legacy_filters_into_adhoc(form_data)` 与 `merge_extra_filters(form_data)`。",
+    "backend_form_data_to_query_obj": "`BubbleViz.query_obj()` 把 `entity/series` 编译到 `query_obj.groupby`，把 `size/x/y` 编译到 `query_obj.metrics`，并把 `limit` 编译到 `query_obj.row_limit`。"
+  },
+  "global_required_fields": {
+    "datasource": {
+      "data_type": "string",
+      "required": true,
+      "sample_data": "<dataset_id>__table",
+      "source": "explore_json() + datasourceAndVizType hidden control"
+    },
+    "viz_type": {
+      "data_type": "string",
+      "required": true,
+      "fixed_value": "bubble",
+      "source": "BubbleViz.viz_type + Bubble/index.js"
+    },
+    "entity": {
+      "data_type": "string | object",
+      "required": true,
+      "sample_data": "country_name",
+      "source": "Bubble Query section + BubbleViz.query_obj()"
+    },
+    "x": {
+      "data_type": "string | object",
+      "required": true,
+      "sample_data": "sum__SP_RUR_TOTL_ZS",
+      "source": "Bubble Query section + BubbleViz.query_obj()"
+    },
+    "y": {
+      "data_type": "string | object",
+      "required": true,
+      "sample_data": "sum__SP_DYN_LE00_IN",
+      "source": "Bubble Query section + BubbleViz.query_obj()"
+    },
+    "size": {
+      "data_type": "string | object",
+      "required": true,
+      "sample_data": "sum__SP_POP_TOTL",
+      "source": "Bubble Query section + BubbleViz.query_obj()"
+    }
+  },
+  "global_optional_fields": {
+    "series": {
+      "data_type": "string | object | null",
+      "required": false,
+      "sample_data": "region",
+      "source": "Bubble Query section",
+      "notes": "可选分组维度。若省略，后端会回退成 entity。"
+    },
+    "adhoc_filters": {
+      "data_type": "array[object]",
+      "required": false,
+      "sample_data": [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "country_name",
+          "operator": "NOT IN",
+          "comparator": [
+            "TCA",
+            "MNP"
+          ]
+        }
+      ],
+      "source": "sharedControls.adhoc_filters + explore_json()",
+      "notes": "legacy 路径会先把旧 `filters` 转进 `adhoc_filters`，再合并 `extra_form_data` / `extra_filters`。"
+    },
+    "max_bubble_size": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "50",
+      "source": "Bubble Query section"
+    },
+    "limit": {
+      "data_type": "integer | null",
+      "required": false,
+      "sample_data": 0,
+      "source": "sharedControls.limit + BubbleViz.query_obj()",
+      "notes": "legacy Bubble 的 row limit 入口字段。示例代码里常见 `limit=0`。"
+    },
+    "color_scheme": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "supersetColors",
+      "source": "Bubble Chart Options section"
+    },
+    "show_legend": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": true,
+      "source": "NVD3Controls.showLegend"
+    },
+    "x_axis_label": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "Rural population (%)",
+      "source": "Bubble X Axis section"
+    },
+    "left_margin": {
+      "data_type": "string | integer",
+      "required": false,
+      "sample_data": "auto",
+      "source": "NVD3Controls.xAxisLabelMargin"
+    },
+    "x_axis_format": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "SMART_NUMBER",
+      "source": "Bubble X Axis section",
+      "notes": "这里是数值 D3 格式，不是时间格式。"
+    },
+    "x_ticks_layout": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "45°",
+      "source": "NVD3Controls.xTicksLayout"
+    },
+    "x_log_scale": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": false,
+      "source": "Bubble X Axis section"
+    },
+    "x_axis_showminmax": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": false,
+      "source": "Bubble X Axis section"
+    },
+    "y_axis_label": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "Life expectancy",
+      "source": "Bubble Y Axis section"
+    },
+    "bottom_margin": {
+      "data_type": "string | integer",
+      "required": false,
+      "sample_data": "auto",
+      "source": "NVD3Controls.yAxisLabelMargin"
+    },
+    "y_axis_format": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "SMART_NUMBER",
+      "source": "NVD3Controls.yAxisFormat"
+    },
+    "y_log_scale": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": false,
+      "source": "NVD3Controls.yLogScale"
+    },
+    "y_axis_showminmax": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": false,
+      "source": "NVD3Controls.yAxisShowMinMax"
+    },
+    "y_axis_bounds": {
+      "data_type": "array[number | null]",
+      "required": false,
+      "sample_data": [
+        0,
+        100
+      ],
+      "source": "NVD3Controls.yAxisBounds"
+    },
+    "slice_id": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 0,
+      "source": "datasourceAndVizType hidden control",
+      "notes": "新建图表时通常省略；编辑已存在图表时由服务端或上层调用方提供。"
+    },
+    "cache_timeout": {
+      "data_type": "integer | null",
+      "required": false,
+      "sample_data": null,
+      "source": "datasourceAndVizType hidden control"
+    },
+    "url_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "QueryFormData"
+    },
+    "custom_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "QueryFormData"
+    },
+    "extra_form_data": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "utils.merge_extra_form_data()",
+      "notes": "虽然不属于 controlPanel 字段，但 `explore_json()` 路径会消费它。"
+    }
+  },
+  "minimal_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "bubble",
+    "entity": "<entity_dimension>",
+    "x": "<x_metric_or_saved_metric>",
+    "y": "<y_metric_or_saved_metric>",
+    "size": "<size_metric_or_saved_metric>",
+    "adhoc_filters": []
+  },
+  "recommended_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "bubble",
+    "series": null,
+    "entity": "country_name",
+    "x": "sum__SP_RUR_TOTL_ZS",
+    "y": "sum__SP_DYN_LE00_IN",
+    "adhoc_filters": [],
+    "size": "sum__SP_POP_TOTL",
+    "max_bubble_size": "25",
+    "limit": null,
+    "color_scheme": "supersetColors",
+    "show_legend": true,
+    "x_axis_label": "",
+    "left_margin": "auto",
+    "x_axis_format": "SMART_NUMBER",
+    "x_ticks_layout": "auto",
+    "x_log_scale": false,
+    "x_axis_showminmax": false,
+    "y_axis_label": "",
+    "bottom_margin": "auto",
+    "y_axis_format": "SMART_NUMBER",
+    "y_log_scale": false,
+    "y_axis_showminmax": false,
+    "y_axis_bounds": [
+      null,
+      null
+    ]
+  },
+  "conditional_blocks": {
+    "series_grouping": {
+      "condition": "需要按某个维度给气泡着色并拆分系列时",
+      "fields": {
+        "series": "region",
+        "show_legend": true
+      }
+    },
+    "filters": {
+      "condition": "需要筛选数据时",
+      "fields": {
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East Asia & Pacific",
+              "Europe & Central Asia"
+            ]
+          }
+        ]
+      }
+    },
+    "row_limit_control": {
+      "condition": "需要限制或放开返回行数时",
+      "fields": {
+        "limit": 100
+      }
+    },
+    "unlimited_rows": {
+      "condition": "需要显式表示不限制系列数量时",
+      "fields": {
+        "limit": 0
+      }
+    },
+    "bubble_size_ceiling": {
+      "condition": "需要调大或调小气泡半径上限时",
+      "fields": {
+        "max_bubble_size": "50"
+      }
+    },
+    "axis_titles_and_formatting": {
+      "condition": "需要显式设置轴标题或数值格式时",
+      "fields": {
+        "x_axis_label": "Rural population (%)",
+        "x_axis_format": "SMART_NUMBER",
+        "x_ticks_layout": "45°",
+        "y_axis_label": "Life expectancy",
+        "y_axis_format": "SMART_NUMBER"
+      }
+    },
+    "log_axes": {
+      "condition": "需要使用对数轴时",
+      "fields": {
+        "x_log_scale": true,
+        "y_log_scale": true
+      }
+    },
+    "axis_extrema_and_bounds": {
+      "condition": "需要显式显示坐标轴最小值/最大值，或扩展 Y 轴范围时",
+      "fields": {
+        "x_axis_showminmax": true,
+        "y_axis_showminmax": true,
+        "y_axis_bounds": [
+          0,
+          100
+        ]
+      }
+    }
+  },
+  "runtime_only_or_non_template_fields": {
+    "runtime_aliases_generated_by_transformProps": [
+      {
+        "field_name": "maxBubbleSize",
+        "reason": "由 raw form_data.max_bubble_size 派生的运行时别名，不是 API root 键。"
+      },
+      {
+        "field_name": "showLegend",
+        "reason": "由 raw form_data.show_legend 派生的运行时别名，不是 API root 键。"
+      },
+      {
+        "field_name": "leftMargin",
+        "reason": "由 raw form_data.left_margin 派生的运行时别名，不是 API root 键。"
+      },
+      {
+        "field_name": "bottomMargin",
+        "reason": "由 raw form_data.bottom_margin 派生的运行时别名，不是 API root 键。"
+      },
+      {
+        "field_name": "xAxisFormat",
+        "reason": "由 raw form_data.x_axis_format 派生的运行时别名，不是 API root 键。"
+      },
+      {
+        "field_name": "yAxisBounds",
+        "reason": "由 raw form_data.y_axis_bounds 派生的运行时别名，不是 API root 键。"
+      }
+    ],
+    "backend_derived_query_fields": [
+      {
+        "field_name": "query_obj.groupby",
+        "reason": "`BubbleViz.query_obj()` 由 `entity + series` 组装；series 为空时只保留 entity。"
+      },
+      {
+        "field_name": "query_obj.metrics",
+        "reason": "`BubbleViz.query_obj()` 固定从 `size/x/y` 三个 root 字段编译。"
+      },
+      {
+        "field_name": "query_obj.row_limit",
+        "reason": "`BubbleViz.query_obj()` 从 root `limit` 读取，而不是从 `row_limit` 读取。"
+      }
+    ],
+    "viz_switch_only": [
+      {
+        "field_name": "formDataOverrides(series/entity/x/y/size)",
+        "reason": "只在切换 viz_type 时，把 standardized controls 的列和指标拆映射到 bubble 字段，不是常规 API 导出 form_data 的必经步骤。"
+      }
+    ],
+    "legacy_request_wrapper": [
+      {
+        "field_name": "payload.form_data",
+        "reason": "这是 legacy `/superset/explore_json/` 请求外层包裹字段，不是图表保存态内部的 root form_data 字段。"
+      }
+    ]
+  },
+  "api_usage_guidance": {
+    "high_confidence_required_fields": [
+      "datasource",
+      "viz_type",
+      "entity",
+      "x",
+      "y",
+      "size"
+    ],
+    "recommended_always_set": [
+      "adhoc_filters",
+      "max_bubble_size",
+      "color_scheme",
+      "show_legend",
+      "x_axis_format",
+      "y_axis_format"
+    ],
+    "api_field_examples": [
+      "series",
+      "entity",
+      "x",
+      "y",
+      "size",
+      "limit",
+      "max_bubble_size",
+      "x_axis_format",
+      "y_axis_bounds"
+    ],
+    "avoid_confusion": [
+      "不要把 legacy bubble 的 row limit 写成 `row_limit`；当前正式入口字段是 `limit`。",
+      "不要把运行时别名 `maxBubbleSize`、`showLegend`、`xAxisFormat`、`yAxisBounds` 当成 API root 键；保存态仍应使用 snake_case 字段。",
+      "不要把 `x_axis_format` 当成时间格式控件；legacy bubble 这里是数值 D3 format。",
+      "如果 `series` 为空，不需要额外补默认值；后端会回退成 `entity`。",
+      "确保 `x/y/size` 三个指标在最终标签上互不相同，否则 BubbleViz 会拒绝查询。"
+    ]
+  }
+}

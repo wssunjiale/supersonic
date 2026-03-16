@@ -4,6 +4,9 @@ import { MsgDataType } from '../../common/type';
 
 jest.mock('../ChatMsg', () => () => 'chat-msg');
 jest.mock('../ChatMsg/SupersetChart', () => () => <div title="supersetIframe" />);
+jest.mock('../ChatMsg/MarkDown', () => ({ markdown }: { markdown: string }) => (
+  <div title="markdown">{markdown}</div>
+));
 jest.mock('react-syntax-highlighter', () => ({
   Prism: () => null,
 }));
@@ -26,7 +29,6 @@ const buildSupersetData = (fallback = false): MsgDataType =>
         paramOptions: [],
         valueParams: [],
       },
-      dashboards: [],
       fallback,
     },
   }) as MsgDataType;
@@ -63,5 +65,28 @@ describe('ExecuteItem', () => {
 
     expect(queryByTitle('supersetIframe')).toBeNull();
     expect(getByText('chat-msg')).toBeInTheDocument();
+  });
+
+  it('renders text summary through markdown component', () => {
+    const data =
+      ({
+        queryMode: 'PLAIN_TEXT',
+        queryColumns: [],
+        queryResults: [],
+        textSummary: '**summary**',
+        textResult: 'plain result',
+      }) as MsgDataType;
+    const { getByTitle } = render(
+      <ExecuteItem
+        queryId={1}
+        question="test"
+        queryMode="PLAIN_TEXT"
+        executeLoading={false}
+        chartIndex={0}
+        data={data}
+      />
+    );
+
+    expect(getByTitle('markdown')).toHaveTextContent('**summary**');
   });
 });

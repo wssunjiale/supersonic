@@ -24,15 +24,13 @@ public class SupersetChartResp {
 
     private List<SupersetChartCandidate> vizTypeCandidates;
 
-    private Long chartId;
+    private Long dashboardId;
 
-    private String chartUuid;
+    private String dashboardTitle;
 
     private String guestToken;
 
     private String embeddedId;
 
     private String supersetDomain;
-
-    private List<SupersetDashboardInfo> dashboards;
 }

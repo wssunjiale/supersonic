@@ -1,0 +1,274 @@
+{
+  "viz_type": "country_map",
+  "display_name": "Country Map",
+  "purpose": "用于调用 API 创建或保存 Country Map 时填写的 form_data 模板",
+  "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/country_map-schema.json",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-country-map/src/controlPanel.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-country-map/src/index.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-country-map/src/transformProps.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-country-map/src/CountryMap.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-country-map/src/countries.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+    "D:/vsx/sources/superset-6.0.0/superset/views/core.py",
+    "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+    "D:/vsx/sources/superset-6.0.0/superset/viz.py"
+  ],
+  "notes": [
+    "Country Map 是 legacy 图，metadata 明确声明 `useLegacyApi=true`，真实请求路径仍是 `/superset/explore_json/`。",
+    "Explore 导出 form_data 时走 `getFormDataFromControls()`，它按 control name 原样写入 root form_data。API 根层必须使用 `select_country`、`entity`、`metric`、`number_format`、`linear_color_scheme` 这些原始 snake_case 键名，而不是 runtime camelCase 别名。",
+    "Country Map 没有专属前端 buildQuery。ChartClient.ts 对它会退回 `() => formData`，也就是说，API 层真正应该构造的是原始 root `form_data`，然后由 legacy `/superset/explore_json/` 包装成 `{ form_data: ... }`。",
+    "后端 `CountryMapViz.query_obj()` 会显式校验 `select_country`、`metric`、`entity`。因此这里的 `global_required_fields` 是高置信必填，不只是 UI 控件层面的 validators。",
+    "当前图不是时序图，不要无根据把 `granularity_sqla`、`time_range`、`time_grain_sqla` 之类时间字段塞进 Country Map 的创建模板。",
+    "`CountryMap.js` 运行时还会读取 `colorScheme`。如果 root form_data 恰好额外带有 `color_scheme`，前端会改用分类色对 `country_id` 着色；但这不是 controlPanel 正式字段，不应作为默认模板字段。"
+  ],
+  "naming_and_pipeline": {
+    "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写成 form_data[name]，不会自动把 snake_case 改成 camelCase。",
+    "api_form_data_to_backend_request": "ChartClient.ts 在 `useLegacyApi=true` 时，把 `buildQuery(formData)` 包成 `{ form_data }` POST 到 `/superset/explore_json/`；Country Map 没有专属 buildQuery，因此等价于直接发送原始 form_data。",
+    "backend_form_data_normalization": "`explore_json()` 会先补 `datasource`，再执行 `convert_legacy_filters_into_adhoc(form_data)` 与 `merge_extra_filters(form_data)`。",
+    "backend_form_data_to_query_obj": "`CountryMapViz.query_obj()` 在 `BaseViz.query_obj()` 的基础上，要求 `select_country`、`entity`、`metric` 必须存在，然后把 root `entity` 编成 `query_obj['groupby']`，把 root `metric` 编成 `query_obj['metrics']`。",
+    "runtime_chart_props": "`transformProps.js` 会把 raw form_data 映射成 runtime props：`country <- lower(select_country)`、`linearColorScheme <- linear_color_scheme`、`numberFormat <- number_format`，并透传可选的 runtime `colorScheme <- color_scheme`。"
+  },
+  "global_required_fields": {
+    "datasource": {
+      "data_type": "string",
+      "required": true,
+      "sample_data": "<dataset_id>__table",
+      "source": "explore_json() + datasourceAndVizType hidden control"
+    },
+    "viz_type": {
+      "data_type": "string",
+      "required": true,
+      "fixed_value": "country_map",
+      "source": "CountryMap/index.js + VizType.CountryMap"
+    },
+    "select_country": {
+      "data_type": "string",
+      "required": true,
+      "sample_data": "usa",
+      "source": "Country Map Query section + CountryMapViz.query_obj()",
+      "notes": "应传 `countries.ts::countryOptions` 中的 key，而不是展示 label。`transformProps.js` 会把它转成小写后再去加载 GeoJSON。"
+    },
+    "entity": {
+      "data_type": "string | object",
+      "required": true,
+      "sample_data": "state_code",
+      "source": "Country Map Query section + dndEntityControl validator + CountryMapViz.query_obj()",
+      "notes": "该字段应返回 ISO 3166-2 行政区代码。最终查询结果里的这一列会被重命名为 `country_id`，并与 GeoJSON feature 的 `properties.ISO` 匹配。"
+    },
+    "metric": {
+      "data_type": "string | object",
+      "required": true,
+      "sample_data": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "population"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(population)"
+      },
+      "source": "Country Map Query section + dndAdhocMetricControl validator + CountryMapViz.query_obj()",
+      "notes": "这是 Country Map 唯一的正式指标字段。后端会把它放进 `query_obj['metrics']=[metric]`。"
+    }
+  },
+  "global_optional_fields": {
+    "adhoc_filters": {
+      "data_type": "array[object]",
+      "required": false,
+      "sample_data": [],
+      "source": "Query section"
+    },
+    "number_format": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "SMART_NUMBER",
+      "source": "Chart Options section"
+    },
+    "linear_color_scheme": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "<sequential_scheme_key>",
+      "source": "Chart Options section"
+    },
+    "slice_id": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 0,
+      "source": "datasourceAndVizType hidden control",
+      "notes": "新建图表时通常省略；编辑已存在图表时由服务端或上层调用方提供。"
+    },
+    "cache_timeout": {
+      "data_type": "integer | null",
+      "required": false,
+      "sample_data": null,
+      "source": "datasourceAndVizType hidden control"
+    },
+    "url_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "QueryFormData"
+    },
+    "custom_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "QueryFormData"
+    },
+    "extra_form_data": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "utils.merge_extra_form_data()",
+      "notes": "虽然不属于 Country Map controlPanel 正式字段，但 legacy explore_json 路径会消费它。"
+    }
+  },
+  "minimal_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "country_map",
+    "select_country": "usa",
+    "entity": "<iso_3166_2_column>",
+    "metric": "<metric_or_saved_metric>",
+    "adhoc_filters": []
+  },
+  "recommended_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "country_map",
+    "select_country": "usa",
+    "entity": "state_code",
+    "metric": {
+      "expressionType": "SIMPLE",
+      "column": {
+        "column_name": "population"
+      },
+      "aggregate": "SUM",
+      "label": "SUM(population)"
+    },
+    "adhoc_filters": [],
+    "number_format": "SMART_NUMBER",
+    "linear_color_scheme": "<default_sequential_scheme_key>"
+  },
+  "conditional_blocks": {
+    "different_country": {
+      "condition": "需要切换渲染国家时",
+      "fields": {
+        "select_country": "china"
+      },
+      "notes": "必须使用 `countries.ts::countryOptions` 的 key。对于 `usa`、`uk`、`italy_regions`、`france_regions`、`france_overseas`、`turkey_regions` 等特殊值，应直接传 key，不要传展示文本。"
+    },
+    "subdivision_filters": {
+      "condition": "需要在国家内部进一步筛选部分行政区时",
+      "fields": {
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "state_code",
+            "operator": "IN",
+            "comparator": [
+              "US-CA",
+              "US-NY"
+            ]
+          }
+        ]
+      }
+    },
+    "number_display": {
+      "condition": "需要控制 hover 和底部标题的数值显示格式时",
+      "fields": {
+        "number_format": ".2f"
+      }
+    },
+    "sequential_coloring": {
+      "condition": "需要显式指定连续色带时",
+      "fields": {
+        "linear_color_scheme": "<sequential_scheme_key>"
+      }
+    }
+  },
+  "runtime_only_or_non_template_fields": {
+    "runtime_aliases_generated_by_transformProps": [
+      {
+        "field_name": "selectCountry",
+        "reason": "由 raw form_data.select_country 派生的运行时别名，不是 API root 键。"
+      },
+      {
+        "field_name": "numberFormat",
+        "reason": "由 raw form_data.number_format 派生的运行时别名，不是 API root 键。"
+      },
+      {
+        "field_name": "linearColorScheme",
+        "reason": "由 raw form_data.linear_color_scheme 派生的运行时别名，不是 API root 键。"
+      },
+      {
+        "field_name": "sliceId",
+        "reason": "这是运行时 chart props 里的 camelCase 字段，不是 root form_data 键。"
+      },
+      {
+        "field_name": "country",
+        "reason": "这是 `transformProps.js` 由 `select_country` 计算出来的小写运行时字段，不是 root form_data 键。"
+      }
+    ],
+    "non_control_panel_but_runtime_consumed_root_fields": [
+      {
+        "field_name": "color_scheme",
+        "reason": "当前图的 controlPanel 没暴露它，但 `transformProps.js` 会把 root `color_scheme` 映射成 runtime `colorScheme`，`CountryMap.js` 也会在存在时改用离散色着色。"
+      }
+    ],
+    "backend_response_only_fields": [
+      {
+        "field_name": "queriesData[0].data[*].country_id",
+        "reason": "这是后端 `CountryMapViz.get_data()` 产出的 subdivision code，不是 root form_data 字段。"
+      },
+      {
+        "field_name": "queriesData[0].data[*].metric",
+        "reason": "这是后端 `CountryMapViz.get_data()` 产出的指标值，不是 root form_data 字段。"
+      }
+    ],
+    "legacy_request_wrapper": [
+      {
+        "field_name": "payload.form_data",
+        "reason": "这是 legacy `/superset/explore_json/` 请求的外层包裹字段，不是图表保存态内部的 root form_data 字段。"
+      }
+    ],
+    "viz_switch_only": [
+      {
+        "field_name": "formDataOverrides(entity / metric)",
+        "reason": "只在 standardized form data 切换 viz_type 时触发，不是常规 API 导出 Country Map form_data 的必经步骤。"
+      }
+    ]
+  },
+  "api_usage_guidance": {
+    "high_confidence_required_fields": [
+      "datasource",
+      "viz_type",
+      "select_country",
+      "entity",
+      "metric"
+    ],
+    "recommended_always_set": [
+      "adhoc_filters",
+      "number_format",
+      "linear_color_scheme"
+    ],
+    "api_field_examples": [
+      "select_country",
+      "entity",
+      "metric",
+      "adhoc_filters",
+      "number_format",
+      "linear_color_scheme"
+    ],
+    "avoid_confusion": [
+      "不要把 Country Map 当成标准 chart data API 图表去套 `/api/v1/chart/data` 的 `query_context` 模板；当前图真实入口是 legacy `/superset/explore_json/`。",
+      "不要把 runtime 字段 `selectCountry`、`country`、`numberFormat`、`linearColorScheme`、`sliceId` 写回 root form_data。",
+      "不要把 `select_country` 误写成 `country_code`，也不要把 `entity` 误写成 `geographic_field`；当前源码正式字段名就是 `select_country`、`entity`、`metric`。",
+      "`entity` 不是国家代码列，而是行政区 subdivision code 列。它必须与所选国家 GeoJSON 中的 `properties.ISO` 编码体系一致，否则地图会出现空白区域或 hover 匹配失败。",
+      "`color_scheme` 只是当前图运行时可消费的附加 root 字段，不是 controlPanel 正式模板字段；默认创建模板不应依赖它。"
+    ]
+  }
+}

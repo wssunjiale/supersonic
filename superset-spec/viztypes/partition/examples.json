@@ -1,0 +1,355 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "partition",
+  "display_name": "Partition Chart",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "region",
+          "operator": "IN",
+          "comparator": [
+            "East",
+            "West"
+          ]
+        }
+      ]
+    ],
+    "color_scheme": [
+      "supersetColors"
+    ],
+    "comparison_type": [
+      "values"
+    ],
+    "contribution": [
+      false
+    ],
+    "date_time_format": [
+      "smart_date"
+    ],
+    "equal_date_size": [
+      true
+    ],
+    "groupby": [
+      [
+        "region",
+        "product_line"
+      ]
+    ],
+    "limit": [
+      10
+    ],
+    "log_scale": [
+      false
+    ],
+    "metrics": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        }
+      ]
+    ],
+    "min_periods": [
+      7
+    ],
+    "number_format": [
+      "SMART_NUMBER"
+    ],
+    "order_desc": [
+      true
+    ],
+    "partition_limit": [
+      "5"
+    ],
+    "partition_threshold": [
+      "0.05"
+    ],
+    "resample_method": [
+      "mean"
+    ],
+    "resample_rule": [
+      "1D"
+    ],
+    "rich_tooltip": [
+      true
+    ],
+    "rolling_periods": [
+      7
+    ],
+    "rolling_type": [
+      "None"
+    ],
+    "row_limit": [
+      10000
+    ],
+    "time_compare": [
+      [
+        "1 year"
+      ]
+    ],
+    "time_series_option": [
+      "not_time"
+    ],
+    "timeseries_limit_metric": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "sales"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(sales)"
+      }
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "partition",
+      "metrics": [
+        "<metric>"
+      ],
+      "adhoc_filters": [],
+      "groupby": [
+        "<dimension_1>"
+      ],
+      "time_series_option": "not_time"
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "partition",
+      "metrics": [
+        "<metric>"
+      ],
+      "adhoc_filters": [],
+      "groupby": [
+        "<dimension_1>",
+        "<dimension_2>"
+      ],
+      "limit": null,
+      "timeseries_limit_metric": null,
+      "order_desc": true,
+      "contribution": false,
+      "row_limit": 10000,
+      "time_series_option": "not_time",
+      "color_scheme": "supersetColors",
+      "number_format": "SMART_NUMBER",
+      "date_time_format": "smart_date",
+      "partition_limit": "5",
+      "partition_threshold": "0.05",
+      "log_scale": false,
+      "equal_date_size": true,
+      "rich_tooltip": true,
+      "rolling_type": "None",
+      "rolling_periods": null,
+      "min_periods": null,
+      "time_compare": null,
+      "comparison_type": "values",
+      "resample_rule": null,
+      "resample_method": null
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "partition",
+      "metrics": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "groupby": "<copied_from_saved_chart>",
+      "limit": "<copied_from_saved_chart_if_present>",
+      "timeseries_limit_metric": "<copied_from_saved_chart_if_present>",
+      "order_desc": "<copied_from_saved_chart_if_present>",
+      "contribution": "<copied_from_saved_chart_if_present>",
+      "row_limit": "<copied_from_saved_chart_if_present>",
+      "time_series_option": "<copied_from_saved_chart_if_present>",
+      "color_scheme": "<copied_from_saved_chart_if_present>",
+      "number_format": "<copied_from_saved_chart_if_present>",
+      "date_time_format": "<copied_from_saved_chart_if_present>",
+      "partition_limit": "<copied_from_saved_chart_if_present>",
+      "partition_threshold": "<copied_from_saved_chart_if_present>",
+      "log_scale": "<copied_from_saved_chart_if_present>",
+      "equal_date_size": "<copied_from_saved_chart_if_present>",
+      "rich_tooltip": "<copied_from_saved_chart_if_present>",
+      "rolling_type": "<copied_from_saved_chart_if_present>",
+      "rolling_periods": "<copied_from_saved_chart_if_present>",
+      "min_periods": "<copied_from_saved_chart_if_present>",
+      "time_compare": "<copied_from_saved_chart_if_present>",
+      "comparison_type": "<copied_from_saved_chart_if_present>",
+      "resample_rule": "<copied_from_saved_chart_if_present>",
+      "resample_method": "<copied_from_saved_chart_if_present>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_partition_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters；后端会把它们并入额外过滤条件。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_partition_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会把它们标记为 extra 并并入查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_partition_legacy": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；partition 默认不直接消费它。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_partition_legacy": false,
+        "recommended": false,
+        "sample_data": "Last 30 days",
+        "effect": "legacy merge 层接受该 key，但 partition controlPanel 本身没有显式时间范围字段；当前图应优先复制保存态里已有的时间字段，而不是在 guest 请求里临时改写。",
+        "source": "superset/constants.py + superset/utils/core.py + superset/viz.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_partition_legacy": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "legacy merge 层支持该 override，但 partition 当前没有正式时间粒度控件；只应保留保存态已有值。",
+        "source": "superset/constants.py + superset/utils/core.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_partition_legacy": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "legacy merge 白名单接受该 key，但 partition 当前没有显式暴露对应时间列控件。",
+        "source": "superset/constants.py + superset/utils/core.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_column",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_partition_legacy": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "底层 QueryObject 时间列 override；当前图没有正式时间 section。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_grain",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_partition_legacy": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "底层 QueryObject 时间粒度 override；当前图没有正式时间 section。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "relative_start",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_partition_legacy": false,
+        "recommended": false,
+        "sample_data": "now",
+        "effect": "会写入 query extras 的相对开始时间；当前图没有明确的官方时间控件链路，建议谨慎使用。",
+        "source": "superset/constants.py + superset/utils/core.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "relative_end",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_partition_legacy": false,
+        "recommended": false,
+        "sample_data": "today",
+        "effect": "会写入 query extras 的相对结束时间；当前图没有明确的官方时间控件链路，建议谨慎使用。",
+        "source": "superset/constants.py + superset/utils/core.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "partition",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/partition-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/partition-form-data-schema.json",
+      "control-schema": "form-data-schema/partition-schema.json"
+    }
+  }
+}

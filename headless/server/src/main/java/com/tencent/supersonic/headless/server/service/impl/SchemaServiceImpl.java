@@ -168,6 +168,8 @@ public class SchemaServiceImpl implements SchemaService {
         metaFilter.setIds(modelIds);
         List<ModelResp> modelResps = modelService.getModelList(metaFilter);
         metricService.batchFillMetricDefaultAgg(metricResps, modelResps);
+        Map<Long, ModelResp> modelIdToResp = modelResps.stream()
+                .collect(Collectors.toMap(ModelResp::getId, modelResp -> modelResp, (a, b) -> a));
         TagFilter tagFilter = new TagFilter();
         tagFilter.setModelIds(modelIds);
 
@@ -180,7 +182,9 @@ public class SchemaServiceImpl implements SchemaService {
             }
             List<MetricSchemaResp> metricSchemaResps =
                     MetricConverter.filterByDataSet(metricResps, dataSetResp).stream()
-                            .map(this::convert).collect(Collectors.toList());
+                            .map(metricResp -> convert(metricResp,
+                                    modelIdToResp.get(metricResp.getModelId())))
+                            .collect(Collectors.toList());
             List<DimSchemaResp> dimSchemaResps =
                     DimensionConverter.filterByDataSet(dimensionResps, dataSetResp).stream()
                             .map(this::convert).collect(Collectors.toList());
@@ -227,8 +231,8 @@ public class SchemaServiceImpl implements SchemaService {
             }
             List<MetricResp> metricResps =
                     metricRespMap.getOrDefault(modelId, Lists.newArrayList());
-            List<MetricSchemaResp> metricSchemaResps =
-                    metricResps.stream().map(this::convert).collect(Collectors.toList());
+            List<MetricSchemaResp> metricSchemaResps = metricResps.stream()
+                    .map(metricResp -> convert(metricResp, modelResp)).collect(Collectors.toList());
             List<DimSchemaResp> dimensionResps =
                     dimensionRespsMap.getOrDefault(modelId, Lists.newArrayList()).stream()
                             .map(this::convert).collect(Collectors.toList());
@@ -454,10 +458,61 @@ public class SchemaServiceImpl implements SchemaService {
         return dimSchemaResp;
     }
 
-    private MetricSchemaResp convert(MetricResp metricResp) {
+    private MetricSchemaResp convert(MetricResp metricResp, ModelResp modelResp) {
         MetricSchemaResp metricSchemaResp = new MetricSchemaResp();
         BeanUtils.copyProperties(metricResp, metricSchemaResp);
+        metricSchemaResp.setRelateDimension(
+                mergeRelateDimension(metricResp.getRelateDimension(), modelResp));
         return metricSchemaResp;
+    }
+
+    private RelateDimension mergeRelateDimension(RelateDimension metricRelateDimension,
+            ModelResp modelResp) {
+        Map<Long, DrillDownDimension> merged = new LinkedHashMap<>();
+
+        if (metricRelateDimension != null
+                && !CollectionUtils.isEmpty(metricRelateDimension.getDrillDownDimensions())) {
+            for (DrillDownDimension drillDownDimension : metricRelateDimension
+                    .getDrillDownDimensions()) {
+                if (drillDownDimension == null || drillDownDimension.getDimensionId() == null) {
+                    continue;
+                }
+                // align with MetricServiceImpl.getDrillDownDimension filtering
+                if (drillDownDimension.isInheritedFromModel()
+                        && !drillDownDimension.isNecessary()) {
+                    continue;
+                }
+                DrillDownDimension copy = new DrillDownDimension();
+                copy.setDimensionId(drillDownDimension.getDimensionId());
+                copy.setNecessary(drillDownDimension.isNecessary());
+                copy.setInheritedFromModel(drillDownDimension.isInheritedFromModel());
+                merged.put(copy.getDimensionId(), copy);
+            }
+        }
+
+        if (modelResp != null && !CollectionUtils.isEmpty(modelResp.getDrillDownDimensions())) {
+            for (DrillDownDimension drillDownDimension : modelResp.getDrillDownDimensions()) {
+                if (drillDownDimension == null || drillDownDimension.getDimensionId() == null) {
+                    continue;
+                }
+                if (merged.containsKey(drillDownDimension.getDimensionId())) {
+                    continue;
+                }
+                DrillDownDimension copy = new DrillDownDimension();
+                copy.setDimensionId(drillDownDimension.getDimensionId());
+                copy.setNecessary(drillDownDimension.isNecessary());
+                copy.setInheritedFromModel(true);
+                merged.put(copy.getDimensionId(), copy);
+            }
+        }
+
+        if (merged.isEmpty()) {
+            return null;
+        }
+
+        RelateDimension relateDimension = new RelateDimension();
+        relateDimension.setDrillDownDimensions(new ArrayList<>(merged.values()));
+        return relateDimension;
     }
 
     private ModelResp convert(ModelSchemaResp modelSchemaResp) {

@@ -1,0 +1,142 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "cartodiagram",
+  "display_name": "Cartodiagram",
+  "generation_mode": "heuristic_seed",
+  "slot_candidates": [
+    {
+      "field_name": "geom_column",
+      "required": true,
+      "slot_kind": "geo_geometry",
+      "accepted_dataset_roles": [
+        "geo_geometry"
+      ],
+      "cardinality": "1",
+      "placeholder": "<geometry_column>",
+      "source_categories": [
+        "Configuration"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The name of the geometry column"
+      ]
+    },
+    {
+      "field_name": "selected_chart",
+      "required": true,
+      "slot_kind": "chart_reference",
+      "accepted_dataset_roles": [
+        "chart_reference"
+      ],
+      "cardinality": "1",
+      "placeholder": "<saved_chart_reference_json>",
+      "source_categories": [
+        "Configuration"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Choose a chart for displaying on the map"
+      ]
+    }
+  ],
+  "non_binding_form_controls": [
+    {
+      "field_name": "chart_background_border_radius",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The corner radius of the chart background"
+      ]
+    },
+    {
+      "field_name": "chart_background_color",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The background color of the charts."
+      ]
+    },
+    {
+      "field_name": "chart_size",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Chart Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Configure the chart size for each zoom level"
+      ]
+    },
+    {
+      "field_name": "layer_configs",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Map Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The configuration for the map layers"
+      ]
+    },
+    {
+      "field_name": "map_view",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Map Options"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The extent of the map on application start. FIT DATA automatically sets the extent so that all data points are included in the viewport. CUSTOM allows users to define the extent manually."
+      ]
+    }
+  ],
+  "dataset_role_inventory": {
+    "chart_reference": [
+      "selected_chart"
+    ],
+    "geo_geometry": [
+      "geom_column"
+    ]
+  },
+  "binding_seed_example": {
+    "geom_column": "<geometry_column>",
+    "selected_chart": "<saved_chart_reference_json>"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "cartodiagram",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/cartodiagram-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/cartodiagram-form-data-schema.json",
+      "control-schema": "form-data-schema/cartodiagram-schema.json"
+    }
+  }
+}

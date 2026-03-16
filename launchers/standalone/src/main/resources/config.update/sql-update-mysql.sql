@@ -412,6 +412,17 @@ ALTER TABLE s2_agent add column `admin_org` varchar(3000) DEFAULT NULL COMMENT '
 ALTER TABLE s2_agent add column `view_org` varchar(3000) DEFAULT NULL COMMENT '可用组织';
 ALTER TABLE s2_agent add column `is_open` tinyint DEFAULT NULL COMMENT '是否公开';
 
+--20250309
+ALTER TABLE s2_model_rela alter column join_condition type text;
+
+--20250310
+ALTER TABLE s2_chat_model add column is_open tinyint DEFAULT NULL COMMENT '是否公开';
+ALTER TABLE s2_database add column is_open tinyint DEFAULT NULL COMMENT '是否公开';
+
+--20250321
+ALTER TABLE s2_user add column last_login datetime DEFAULT NULL;
+
+
 --20260205
 CREATE TABLE IF NOT EXISTS `s2_superset_dataset` (
     `id` BIGINT NOT NULL AUTO_INCREMENT,
@@ -430,6 +441,13 @@ CREATE TABLE IF NOT EXISTS `s2_superset_dataset` (
     `superset_dataset_id` BIGINT DEFAULT NULL,
     `columns` longtext DEFAULT NULL,
     `metrics` longtext DEFAULT NULL,
+    `source_type` varchar(50) DEFAULT NULL,
+    `sync_state` varchar(20) DEFAULT NULL,
+    `sync_attempt_at` datetime DEFAULT NULL,
+    `next_retry_at` datetime DEFAULT NULL,
+    `retry_count` int DEFAULT 0,
+    `sync_error_type` varchar(20) DEFAULT NULL,
+    `sync_error_msg` text DEFAULT NULL,
     `created_at` datetime DEFAULT NULL,
     `created_by` varchar(100) DEFAULT NULL,
     `updated_at` datetime DEFAULT NULL,
@@ -437,3 +455,12 @@ CREATE TABLE IF NOT EXISTS `s2_superset_dataset` (
     `synced_at` datetime DEFAULT NULL,
     PRIMARY KEY (`id`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--20260306
+ALTER TABLE s2_superset_dataset add column `source_type` varchar(50) DEFAULT NULL;
+ALTER TABLE s2_superset_dataset add column `sync_state` varchar(20) DEFAULT NULL;
+ALTER TABLE s2_superset_dataset add column `sync_attempt_at` datetime DEFAULT NULL;
+ALTER TABLE s2_superset_dataset add column `next_retry_at` datetime DEFAULT NULL;
+ALTER TABLE s2_superset_dataset add column `retry_count` int DEFAULT 0;
+ALTER TABLE s2_superset_dataset add column `sync_error_type` varchar(20) DEFAULT NULL;
+ALTER TABLE s2_superset_dataset add column `sync_error_msg` text DEFAULT NULL;

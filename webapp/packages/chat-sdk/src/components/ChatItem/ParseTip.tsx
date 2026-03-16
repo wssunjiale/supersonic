@@ -122,7 +122,7 @@ const ParseTip: React.FC<Props> = ({
     );
   }
 
-  if (isSimpleMode || parseInfoOptions.length === 0) {
+  if (parseInfoOptions.length === 0) {
     return null;
   }
 
@@ -231,8 +231,7 @@ const ParseTip: React.FC<Props> = ({
         )}
       </div>
     </div>,
-    // isSimpleMode ? <MarkDown markdown={textInfo} /> : queryMode === 'PLAIN_TEXT' ? null : tipNode
-    queryMode === 'PLAIN_TEXT' ? null : tipNode
+    isSimpleMode ? <MarkDown markdown={textInfo} /> : queryMode === 'PLAIN_TEXT' ? null : tipNode
   );
 };
 

@@ -1,0 +1,559 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "pie",
+  "display_name": "Pie Chart",
+  "source_kind": "schema_file",
+  "normalized_chart_form_data": {
+    "required_root_fields": [
+      "datasource",
+      "viz_type"
+    ],
+    "optional_root_fields": [
+      "adhoc_filters",
+      "cache_timeout",
+      "color_scheme",
+      "currency_format",
+      "custom_params",
+      "date_format",
+      "donut",
+      "groupby",
+      "innerRadius",
+      "label_line",
+      "label_template",
+      "label_type",
+      "labels_outside",
+      "legendMargin",
+      "legendOrientation",
+      "legendType",
+      "metric",
+      "number_format",
+      "outerRadius",
+      "roseType",
+      "row_limit",
+      "show_labels",
+      "show_labels_threshold",
+      "show_legend",
+      "show_total",
+      "slice_id",
+      "sort_by_metric",
+      "threshold_for_other",
+      "url_params"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "groupby",
+      "metric",
+      "row_limit",
+      "sort_by_metric",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "color_scheme",
+      "currency_format",
+      "datasource",
+      "date_format",
+      "donut",
+      "groupby",
+      "innerRadius",
+      "label_line",
+      "label_template",
+      "label_type",
+      "labels_outside",
+      "legendMargin",
+      "legendOrientation",
+      "legendType",
+      "metric",
+      "number_format",
+      "outerRadius",
+      "roseType",
+      "row_limit",
+      "show_labels",
+      "show_labels_threshold",
+      "show_legend",
+      "show_total",
+      "sort_by_metric",
+      "threshold_for_other",
+      "viz_type"
+    ],
+    "fallback_template_seed": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "pie",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "adhoc_filters": [],
+      "time_range": "No filter"
+    }
+  },
+  "original_chart_form_data_schema": {
+    "viz_type": "pie",
+    "display_name": "Pie Chart",
+    "purpose": "用于调用 API 创建或保存 Pie Chart 时填写的 form_data 模板",
+    "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/pie-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Pie/controlPanel.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Pie/buildQuery.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Pie/index.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Pie/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Pie/types.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/controls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/constants.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryContext.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryObject.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractQueryFields.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts"
+    ],
+    "notes": [
+      "API form_data 必须使用源码 control name 原样键名。Pie Chart 的关键根字段是 `metric` 单值，而不是 `metrics` 数组。",
+      "`getFormDataFromControls()` 会把 control state 以原始 name 写入 root form_data；真正的 query `metrics` / `columns` 是在 `extractQueryFields()` 阶段由 `metric` / `groupby` 别名推导出来的。",
+      "`buildQuery.ts` 会基于 root `metric` 追加 `contribution` post_processing，因此 `threshold_for_other` 能在前端按贡献度聚合成 `Other`。",
+      "`row_limit` 默认值不是共享控件的 10000，而是 Pie control override 的 100；并且 formDataOverrides 会把所有 `>=100` 的值压回 100。",
+      "`controlOverrides.series` 不是当前图真实可写模板字段；不要把它写进 API form_data。"
+    ],
+    "naming_and_pipeline": {
+      "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写成 form_data[name]。",
+      "api_form_data_to_query_context": "Pie/buildQuery.ts 调用 buildQueryContext(formData, ...)，buildQueryContext 会把 raw formData 原样保存在 query_context.form_data 中。",
+      "api_form_data_to_query_object": "buildQueryObject() + extractQueryFields() 会把 `metric` 别名映射成 query `metrics`，把 `groupby` 映射成 query `columns`。",
+      "api_form_data_to_runtime_form_data": "ChartProps 会把 raw form_data 转成 runtime camelCase formData；transformProps.ts 消费的是 runtime 别名。"
+    },
+    "global_required_fields": {
+      "datasource": {
+        "data_type": "string",
+        "required": true,
+        "sample_data": "<dataset_id>__table",
+        "source": "datasourceAndVizType section"
+      },
+      "viz_type": {
+        "data_type": "string",
+        "required": true,
+        "fixed_value": "pie",
+        "source": "plugin registration key"
+      }
+    },
+    "global_optional_fields": {
+      "slice_id": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 0,
+        "source": "datasourceAndVizType hidden control",
+        "notes": "新建图表时通常省略；编辑已存在图表时由服务端或上层调用方提供。"
+      },
+      "cache_timeout": {
+        "data_type": "integer | null",
+        "required": false,
+        "sample_data": null,
+        "source": "datasourceAndVizType hidden control"
+      },
+      "url_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "QueryFormData"
+      },
+      "custom_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "QueryFormData"
+      },
+      "groupby": {
+        "data_type": "array[string | object]",
+        "required": false,
+        "sample_data": [
+          "region"
+        ],
+        "source": "Query section",
+        "notes": "源码没有把它设成必填，但没有 groupby 时通常只会得到一个总计切片。"
+      },
+      "metric": {
+        "data_type": "string | object",
+        "required": true,
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        },
+        "source": "Query section"
+      },
+      "adhoc_filters": {
+        "data_type": "array[object]",
+        "required": false,
+        "sample_data": [],
+        "source": "Query section"
+      },
+      "row_limit": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 100,
+        "source": "Query section",
+        "notes": "默认值和高置信上限都是 100。"
+      },
+      "sort_by_metric": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": true,
+        "source": "Query section"
+      },
+      "color_scheme": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "supersetColors",
+        "source": "Chart Options / General"
+      },
+      "threshold_for_other": {
+        "data_type": "number",
+        "required": false,
+        "sample_data": 2.5,
+        "source": "Chart Options / General"
+      },
+      "roseType": {
+        "data_type": "string | null",
+        "required": false,
+        "sample_data": "area",
+        "source": "Chart Options / General"
+      },
+      "show_total": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": false,
+        "source": "Chart Options / General"
+      },
+      "show_legend": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": true,
+        "source": "Chart Options / Legend"
+      },
+      "legendType": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "scroll",
+        "source": "Chart Options / Legend"
+      },
+      "legendOrientation": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "top",
+        "source": "Chart Options / Legend"
+      },
+      "legendMargin": {
+        "data_type": "integer | null",
+        "required": false,
+        "sample_data": null,
+        "source": "Chart Options / Legend"
+      },
+      "show_labels_threshold": {
+        "data_type": "number",
+        "required": false,
+        "sample_data": 5,
+        "source": "Chart Options / Labels"
+      },
+      "label_type": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "key_value_percent",
+        "source": "Chart Options / Labels"
+      },
+      "label_template": {
+        "data_type": "string | null",
+        "required": false,
+        "sample_data": "{name}: {value} ({percent})",
+        "source": "Chart Options / Labels"
+      },
+      "number_format": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "SMART_NUMBER",
+        "source": "Chart Options / Labels"
+      },
+      "currency_format": {
+        "data_type": "string | object | null",
+        "required": false,
+        "sample_data": {
+          "symbol": "$",
+          "symbolPosition": "prefix"
+        },
+        "source": "Chart Options / Labels"
+      },
+      "date_format": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "smart_date",
+        "source": "Chart Options / Labels"
+      },
+      "show_labels": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": true,
+        "source": "Chart Options / Labels"
+      },
+      "labels_outside": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": true,
+        "source": "Chart Options / Labels"
+      },
+      "label_line": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": false,
+        "source": "Chart Options / Labels"
+      },
+      "outerRadius": {
+        "data_type": "number",
+        "required": false,
+        "sample_data": 70,
+        "source": "Chart Options / Pie Shape"
+      },
+      "donut": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": false,
+        "source": "Chart Options / Pie Shape"
+      },
+      "innerRadius": {
+        "data_type": "number",
+        "required": false,
+        "sample_data": 30,
+        "source": "Chart Options / Pie Shape"
+      }
+    },
+    "minimal_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "pie",
+      "groupby": [
+        "<dimension_column>"
+      ],
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "adhoc_filters": [],
+      "row_limit": 100,
+      "sort_by_metric": true
+    },
+    "recommended_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "pie",
+      "groupby": [
+        "<dimension_column>"
+      ],
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "adhoc_filters": [],
+      "row_limit": 100,
+      "sort_by_metric": true,
+      "color_scheme": "<categoricalSchemeRegistry.defaultKey>",
+      "threshold_for_other": 0,
+      "roseType": null,
+      "show_legend": true,
+      "legendType": "scroll",
+      "legendOrientation": "top",
+      "legendMargin": null,
+      "show_labels_threshold": 5,
+      "label_type": "key",
+      "label_template": null,
+      "number_format": "SMART_NUMBER",
+      "currency_format": null,
+      "date_format": "smart_date",
+      "show_labels": true,
+      "labels_outside": true,
+      "label_line": false,
+      "show_total": false,
+      "outerRadius": 70,
+      "donut": false,
+      "innerRadius": 30
+    },
+    "conditional_blocks": {
+      "multi_slice_breakdown": {
+        "condition": "需要按维度拆分多个切片时",
+        "fields": {
+          "groupby": [
+            "<dimension_column>"
+          ]
+        }
+      },
+      "other_bucket": {
+        "condition": "需要把低占比切片合并成 Other 时",
+        "fields": {
+          "threshold_for_other": 2.5
+        },
+        "notes": "阈值单位是百分比点；依赖 buildQuery 的 contribution 后处理。"
+      },
+      "template_labels": {
+        "condition": "需要自定义数据标签文案时",
+        "fields": {
+          "label_type": "template",
+          "label_template": "{name}: {value} ({percent})"
+        }
+      },
+      "donut_mode": {
+        "condition": "需要展示成 Donut 时",
+        "fields": {
+          "donut": true,
+          "innerRadius": 30,
+          "outerRadius": 70
+        }
+      },
+      "nightingale_mode": {
+        "condition": "需要展示成 Nightingale Rose 时",
+        "fields": {
+          "roseType": "area"
+        },
+        "enum_values": [
+          "area",
+          "radius"
+        ]
+      },
+      "center_total": {
+        "condition": "需要显示总计值时",
+        "fields": {
+          "show_total": true
+        }
+      },
+      "legend_layout": {
+        "condition": "需要调整图例布局时",
+        "fields": {
+          "show_legend": true,
+          "legendType": "scroll",
+          "legendOrientation": "right",
+          "legendMargin": 12
+        }
+      }
+    },
+    "runtime_only_or_non_template_fields": {
+      "runtime_aliases_generated_by_transformProps": [
+        {
+          "field_name": "colorScheme",
+          "reason": "由 raw form_data.color_scheme 派生的 runtime 别名，不是 API root 键。"
+        },
+        {
+          "field_name": "dateFormat",
+          "reason": "由 raw form_data.date_format 派生的 runtime 别名，不是 API root 键。"
+        },
+        {
+          "field_name": "labelLine",
+          "reason": "由 raw form_data.label_line 派生的 runtime 别名，不是 API root 键。"
+        },
+        {
+          "field_name": "labelTemplate",
+          "reason": "由 raw form_data.label_template 派生的 runtime 别名，不是 API root 键。"
+        },
+        {
+          "field_name": "labelType",
+          "reason": "由 raw form_data.label_type 派生的 runtime 别名，不是 API root 键。"
+        },
+        {
+          "field_name": "labelsOutside",
+          "reason": "由 raw form_data.labels_outside 派生的 runtime 别名，不是 API root 键。"
+        },
+        {
+          "field_name": "numberFormat",
+          "reason": "由 raw form_data.number_format 派生的 runtime 别名，不是 API root 键。"
+        },
+        {
+          "field_name": "showLabels",
+          "reason": "由 raw form_data.show_labels 派生的 runtime 别名，不是 API root 键。"
+        },
+        {
+          "field_name": "showLabelsThreshold",
+          "reason": "由 raw form_data.show_labels_threshold 派生的 runtime 别名，不是 API root 键。"
+        },
+        {
+          "field_name": "showLegend",
+          "reason": "由 raw form_data.show_legend 派生的 runtime 别名，不是 API root 键。"
+        },
+        {
+          "field_name": "showTotal",
+          "reason": "由 raw form_data.show_total 派生的 runtime 别名，不是 API root 键。"
+        },
+        {
+          "field_name": "thresholdForOther",
+          "reason": "由 raw form_data.threshold_for_other 派生的 runtime 别名，不是 API root 键。"
+        }
+      ],
+      "query_result_only_fields": [
+        {
+          "field_name": "Contribution(<metricLabel>)",
+          "reason": "这是 buildQuery contribution post_processing 追加出来的结果列，不是 root form_data 字段。"
+        },
+        {
+          "field_name": "labelMap / selectedValues / refs",
+          "reason": "这些是 transformProps 生成的运行时交互字段，不属于 API form_data。"
+        }
+      ],
+      "viz_switch_only": [
+        {
+          "field_name": "formDataOverrides(metric/groupby/row_limit remap)",
+          "reason": "主要用于标准化拖拽控件状态与切换 viz_type 时的字段迁移，不是日常创建 Pie Chart 时需要单独提交的 root 字段。"
+        }
+      ]
+    },
+    "api_usage_guidance": {
+      "high_confidence_required_fields": [
+        "datasource",
+        "viz_type",
+        "metric"
+      ],
+      "recommended_always_set": [
+        "groupby",
+        "adhoc_filters",
+        "row_limit",
+        "sort_by_metric",
+        "color_scheme",
+        "show_labels",
+        "show_legend",
+        "outerRadius",
+        "donut"
+      ],
+      "api_field_examples": [
+        "metric",
+        "groupby",
+        "sort_by_metric",
+        "threshold_for_other",
+        "date_format",
+        "legendOrientation",
+        "roseType"
+      ],
+      "avoid_confusion": [
+        "不要把 Pie Chart 的 root 指标字段写成 `metrics`；当前图的 control name 是 `metric`。",
+        "不要把运行时 camelCase 名称 `colorScheme`、`dateFormat`、`showLabels`、`thresholdForOther`、`showLegend` 写回 root form_data。",
+        "不要把 `row_limit` 当成共享控件的 10000；当前 Pie control override 会把它固定在 100 上限。",
+        "不要把 `series` 当成当前图必传字段；它只是 controlOverrides 里的遗留项。"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "pie",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/pie-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/pie-form-data-schema.json",
+      "control-schema": "form-data-schema/pie-schema.json"
+    }
+  }
+}

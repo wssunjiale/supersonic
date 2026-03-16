@@ -49,10 +49,10 @@ public class EmbeddingServiceImpl implements EmbeddingService {
             try {
                 EmbeddingModel embeddingModel = ModelProvider.getEmbeddingModel();
                 Embedding embedding = embeddingModel.embed(question).content();
-                boolean existSegment = existSegment(embeddingStore, query, embedding);
-                if (existSegment) {
-                    continue;
-                }
+                MetadataFilterBuilder filterBuilder =
+                        new MetadataFilterBuilder(TextSegmentConvert.QUERY_ID);
+                Filter filter = filterBuilder.isEqualTo(TextSegmentConvert.getQueryId(query));
+                embeddingStore.removeAll(filter);
                 embeddingStore.add(embedding, query);
                 cache.put(TextSegmentConvert.getQueryId(query), true);
             } catch (Exception e) {
@@ -62,14 +62,14 @@ public class EmbeddingServiceImpl implements EmbeddingService {
         }
     }
 
-    private boolean existSegment(EmbeddingStore embeddingStore, TextSegment query,
-            Embedding embedding) {
+    private boolean existSegment(String collectionName, EmbeddingStore embeddingStore,
+            TextSegment query, Embedding embedding) {
         String queryId = TextSegmentConvert.getQueryId(query);
         if (queryId == null) {
             return false;
         }
         // Check cache first
-        Boolean cachedResult = cache.getIfPresent(queryId);
+        Boolean cachedResult = cache.getIfPresent(collectionName + queryId);
         if (cachedResult != null) {
             return cachedResult;
         }
@@ -82,7 +82,7 @@ public class EmbeddingServiceImpl implements EmbeddingService {
         EmbeddingSearchResult result = embeddingStore.search(request);
         List<EmbeddingMatch<TextSegment>> relevant = result.matches();
         boolean exists = CollectionUtils.isNotEmpty(relevant);
-        cache.put(queryId, exists);
+        cache.put(collectionName + queryId, exists);
         return exists;
     }
 

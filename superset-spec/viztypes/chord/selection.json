@@ -1,0 +1,472 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "chord",
+  "display_name": "Chord Diagram",
+  "selection_summary": {
+    "category": "relationship",
+    "tags": [
+      "chord",
+      "relationship",
+      "flow",
+      "network"
+    ],
+    "description_zh": "Chord Chart displays directed relationships between entities, with chord width representing the strength of the relationship.",
+    "visual_shape_zh": "弦图（关联关系型）",
+    "use_cases_zh": [
+      "实体间的流向/关联分析（如用户来源-去向、产品流转）",
+      "多实体双向关系对比",
+      "关系强度可视化"
+    ],
+    "required_slots": [
+      {
+        "field_name": "columns",
+        "required": true,
+        "slot_kind": "dimension_list",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [
+          "<dimension_column>"
+        ],
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Choose a target"
+        ]
+      },
+      {
+        "field_name": "groupby",
+        "required": true,
+        "slot_kind": "dimension_list",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [
+          "<dimension_column>"
+        ],
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Choose a source"
+        ]
+      },
+      {
+        "field_name": "metric",
+        "required": true,
+        "slot_kind": "metric",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1",
+        "placeholder": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        },
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+        ]
+      },
+      {
+        "field_name": "source",
+        "required": true,
+        "slot_kind": "graph_source",
+        "accepted_dataset_roles": [
+          "entity_id",
+          "dimension"
+        ],
+        "cardinality": "1",
+        "placeholder": "<source_column>",
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "来源实体字段，用于定义关系的起点。"
+        ]
+      },
+      {
+        "field_name": "target",
+        "required": true,
+        "slot_kind": "graph_target",
+        "accepted_dataset_roles": [
+          "entity_id",
+          "dimension"
+        ],
+        "cardinality": "1",
+        "placeholder": "<target_column>",
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "目标实体字段，用于定义关系的终点。"
+        ]
+      },
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "关系强度指标，用于控制弦的宽度（数值越大弦越宽）。"
+        ]
+      }
+    ],
+    "optional_slots": [
+      {
+        "field_name": "adhoc_filters",
+        "required": false,
+        "slot_kind": "filter_list",
+        "accepted_dataset_roles": [
+          "filter_context"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [],
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "字段标签为 Filters。legacy explore_json 路径会先把 legacy filters 转成 adhoc_filters，再继续处理 extra filters / extra_form_data。"
+        ]
+      }
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "category_dimension",
+      "dimension",
+      "entity_id",
+      "metric",
+      "saved_metric"
+    ],
+    "optional_dataset_roles": [
+      "filter_context"
+    ],
+    "dataset_role_inventory": {
+      "adhoc_metric": [
+        "metric",
+        "metrics"
+      ],
+      "category_dimension": [
+        "columns",
+        "groupby"
+      ],
+      "dimension": [
+        "columns",
+        "groupby",
+        "source",
+        "target"
+      ],
+      "filter_context": [
+        "adhoc_filters"
+      ],
+      "metric": [
+        "metric",
+        "metrics"
+      ],
+      "saved_metric": [
+        "metric",
+        "metrics"
+      ],
+      "entity_id": [
+        "source",
+        "target"
+      ]
+    },
+    "non_binding_control_names": [
+      "color_scheme",
+      "row_limit",
+      "sort_by_metric",
+      "y_axis_format"
+    ],
+    "embedding_runtime_field_names": [
+      "adhoc_filters",
+      "custom_form_data",
+      "filters",
+      "granularity",
+      "granularity_sqla",
+      "interactive_drilldown",
+      "interactive_groupby",
+      "interactive_highlight",
+      "relative_end",
+      "relative_start",
+      "time_column",
+      "time_compare",
+      "time_grain",
+      "time_grain_sqla",
+      "time_range"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "columns",
+      "datasource",
+      "groupby",
+      "metric",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "color_scheme",
+      "columns",
+      "datasource",
+      "groupby",
+      "metric",
+      "row_limit",
+      "sort_by_metric",
+      "viz_type",
+      "y_axis_format"
+    ],
+    "structural_flags": {
+      "time_series": false,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": false,
+      "flow_like": true,
+      "distribution_like": false,
+      "supports_breakdown": true,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": false,
+      "needs_dimension": true
+    },
+    "selection_hints": [
+      "至少需要 1 个可聚合指标字段。",
+      "需要至少 1 个维度字段用于分组、拆分或定位。",
+      "适合流向、路径、节点关系或网络结构问题。",
+      "支持按维度拆分多序列或子组。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：实体间的流向/关联分析（如用户来源-去向、产品流转）；多实体双向关系对比；关系强度可视化"
+    ]
+  },
+  "selection_prompt_card": {
+    "viz_type": "chord",
+    "display_name": "Chord Diagram",
+    "category": "relationship",
+    "description_zh": "Chord Chart displays directed relationships between entities, with chord width representing the strength of the relationship.",
+    "visual_shape_zh": "弦图（关联关系型）",
+    "best_for": [
+      "实体间的流向/关联分析（如用户来源-去向、产品流转）",
+      "多实体双向关系对比",
+      "关系强度可视化"
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "category_dimension",
+      "dimension",
+      "entity_id",
+      "metric",
+      "saved_metric"
+    ],
+    "optional_dataset_roles": [
+      "filter_context"
+    ],
+    "required_slots": [
+      {
+        "field_name": "columns",
+        "required": true,
+        "slot_kind": "dimension_list",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [
+          "<dimension_column>"
+        ],
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Choose a target"
+        ]
+      },
+      {
+        "field_name": "groupby",
+        "required": true,
+        "slot_kind": "dimension_list",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [
+          "<dimension_column>"
+        ],
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Choose a source"
+        ]
+      },
+      {
+        "field_name": "metric",
+        "required": true,
+        "slot_kind": "metric",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1",
+        "placeholder": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        },
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+        ]
+      },
+      {
+        "field_name": "source",
+        "required": true,
+        "slot_kind": "graph_source",
+        "accepted_dataset_roles": [
+          "entity_id",
+          "dimension"
+        ],
+        "cardinality": "1",
+        "placeholder": "<source_column>",
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "来源实体字段，用于定义关系的起点。"
+        ]
+      },
+      {
+        "field_name": "target",
+        "required": true,
+        "slot_kind": "graph_target",
+        "accepted_dataset_roles": [
+          "entity_id",
+          "dimension"
+        ],
+        "cardinality": "1",
+        "placeholder": "<target_column>",
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "目标实体字段，用于定义关系的终点。"
+        ]
+      },
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "关系强度指标，用于控制弦的宽度（数值越大弦越宽）。"
+        ]
+      }
+    ],
+    "optional_slot_names": [
+      "adhoc_filters"
+    ],
+    "structural_flags": {
+      "time_series": false,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": false,
+      "flow_like": true,
+      "distribution_like": false,
+      "supports_breakdown": true,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": false,
+      "needs_dimension": true
+    },
+    "selection_hints": [
+      "至少需要 1 个可聚合指标字段。",
+      "需要至少 1 个维度字段用于分组、拆分或定位。",
+      "适合流向、路径、节点关系或网络结构问题。",
+      "支持按维度拆分多序列或子组。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：实体间的流向/关联分析（如用户来源-去向、产品流转）；多实体双向关系对比；关系强度可视化"
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "chord",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/chord-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/chord-form-data-schema.json",
+      "control-schema": "form-data-schema/chord-schema.json"
+    }
+  }
+}

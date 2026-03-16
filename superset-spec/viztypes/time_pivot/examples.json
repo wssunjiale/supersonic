@@ -1,0 +1,382 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "time_pivot",
+  "display_name": "Time-series Period Pivot",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "region",
+          "operator": "IN",
+          "comparator": [
+            "APAC"
+          ]
+        }
+      ]
+    ],
+    "bottom_margin": [
+      "auto"
+    ],
+    "color_picker": [
+      {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      }
+    ],
+    "freq": [
+      "W-MON"
+    ],
+    "granularity": [
+      "P1D"
+    ],
+    "granularity_sqla": [
+      "order_date"
+    ],
+    "left_margin": [
+      "auto"
+    ],
+    "line_interpolation": [
+      "linear"
+    ],
+    "metric": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "sales"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(sales)"
+      }
+    ],
+    "show_legend": [
+      true
+    ],
+    "time_grain_sqla": [
+      "P1D"
+    ],
+    "time_range": [
+      "Last 90 days"
+    ],
+    "x_axis_format": [
+      "SMART_NUMBER"
+    ],
+    "x_axis_label": [
+      "Time"
+    ],
+    "x_axis_showminmax": [
+      false
+    ],
+    "y_axis_bounds": [
+      [
+        null,
+        null
+      ]
+    ],
+    "y_axis_format": [
+      "SMART_NUMBER"
+    ],
+    "y_axis_label": [
+      "Sales"
+    ],
+    "y_axis_showminmax": [
+      false
+    ],
+    "y_log_scale": [
+      false
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "time_pivot",
+      "granularity_sqla": "<temporal_column>",
+      "time_grain_sqla": "P1D",
+      "time_range": "No filter",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "adhoc_filters": [],
+      "freq": "W-MON"
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "time_pivot",
+      "granularity_sqla": "<temporal_column>",
+      "time_grain_sqla": "P1D",
+      "time_range": "No filter",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "adhoc_filters": [],
+      "freq": "W-MON",
+      "show_legend": true,
+      "line_interpolation": "linear",
+      "color_picker": {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      },
+      "x_axis_label": "",
+      "bottom_margin": "auto",
+      "x_axis_showminmax": false,
+      "x_axis_format": "SMART_NUMBER",
+      "y_axis_label": "",
+      "left_margin": "auto",
+      "y_axis_showminmax": false,
+      "y_log_scale": false,
+      "y_axis_format": "SMART_NUMBER",
+      "y_axis_bounds": [
+        null,
+        null
+      ]
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "time_pivot",
+      "granularity_sqla": "<copied_from_saved_chart>",
+      "time_grain_sqla": "<copied_from_saved_chart>",
+      "time_range": "<copied_from_saved_chart>",
+      "metric": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "freq": "<copied_from_saved_chart>",
+      "show_legend": "<copied_from_saved_chart>",
+      "line_interpolation": "<copied_from_saved_chart>",
+      "color_picker": "<copied_from_saved_chart>",
+      "extra_form_data": {
+        "time_range": "Last 90 days",
+        "time_grain_sqla": "P1D",
+        "filters": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "APAC"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "APAC"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_time_pivot_legacy": true,
+        "recommended": true,
+        "sample_data": "Last 90 days",
+        "effect": "覆盖保存态图表的时间范围。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_time_pivot_legacy": true,
+        "recommended": true,
+        "sample_data": "P1D",
+        "effect": "覆盖保存态图表的时间粒度。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_time_pivot_legacy": true,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "覆盖 Time Column；它会改变底层时间列语义，仅在你明确确认保存态图表与目标时间列语义完全一致时使用。",
+        "source": "superset/constants.py + frontend QueryFormData.ts"
+      },
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_time_pivot_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "APAC"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters；后端会把它们并入额外过滤条件。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_time_pivot_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "APAC"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会标记为 extra 并并入查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_time_pivot_legacy": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；time_pivot 默认不直接消费它。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "relative_start",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_time_pivot_legacy": true,
+        "recommended": false,
+        "sample_data": "now",
+        "effect": "进入 query extras 的相对开始时间。",
+        "source": "superset/charts/schemas.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "relative_end",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_time_pivot_legacy": true,
+        "recommended": false,
+        "sample_data": "today",
+        "effect": "进入 query extras 的相对结束时间。",
+        "source": "superset/charts/schemas.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "granularity",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_time_pivot_legacy": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "frontend query/constants.ts 声明了该键，但 Superset 6.0.0 后端 constants.py 并未把它列为高置信 extra_form_data override 键；不建议在 guest embedding 中依赖。",
+        "source": "frontend query/constants.ts + superset/constants.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_column",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_time_pivot_legacy": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "底层 QueryObject 时间列 override 键；time_pivot 常规场景优先使用 `granularity_sqla`。",
+        "source": "superset/constants.py + QueryFormData.ts"
+      },
+      {
+        "field_name": "time_grain",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_time_pivot_legacy": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "底层 QueryObject 时间粒度键，通常不必和 `time_grain_sqla` 同时手工传。",
+        "source": "superset/constants.py + QueryFormData.ts"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_time_pivot_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用 ExtraFormData 字段。time_pivot 默认不直接消费它。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_time_pivot_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "APAC"
+        ],
+        "effect": "通用交互字段；time_pivot 默认不直接消费。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_time_pivot_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用交互字段；time_pivot 默认不直接消费。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "time_compare",
+        "data_type": "string | array[string]",
+        "behavior": "override",
+        "safe_for_time_pivot_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "1 year ago"
+        ],
+        "effect": "frontend 类型声明存在，但后端 constants.py 的 merge whitelist 未把它列为高置信 override；而且 time_pivot controlPanel 本身也没有暴露该字段。",
+        "source": "QueryFormData.ts + query/constants.ts + superset/constants.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "time_pivot",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/time_pivot-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/time_pivot-form-data-schema.json",
+      "control-schema": "form-data-schema/time_pivot-schema.json"
+    }
+  }
+}

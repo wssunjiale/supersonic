@@ -1,0 +1,194 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "histogram_v2",
+  "display_name": "Histogram",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "region",
+          "operator": "IN",
+          "comparator": [
+            "APAC"
+          ]
+        }
+      ]
+    ],
+    "bins": [
+      10
+    ],
+    "color_scheme": [
+      "<categorical_scheme_key>"
+    ],
+    "column": [
+      "price"
+    ],
+    "cumulative": [
+      false
+    ],
+    "groupby": [
+      [
+        "region"
+      ]
+    ],
+    "normalize": [
+      false
+    ],
+    "row_limit": [
+      10000
+    ],
+    "show_legend": [
+      true
+    ],
+    "show_value": [
+      false
+    ],
+    "x_axis_format": [
+      "SMART_NUMBER"
+    ],
+    "x_axis_title": [
+      "Price Range"
+    ],
+    "y_axis_format": [
+      "SMART_NUMBER"
+    ],
+    "y_axis_title": [
+      "Count"
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "histogram_v2",
+      "column": "price"
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "histogram_v2",
+      "column": "price",
+      "groupby": [
+        "region"
+      ],
+      "adhoc_filters": [],
+      "row_limit": 10000,
+      "bins": 10,
+      "normalize": false,
+      "cumulative": false,
+      "color_scheme": "<categorical_scheme_key>",
+      "show_value": false,
+      "show_legend": true,
+      "x_axis_title": "Price Range",
+      "x_axis_format": "SMART_NUMBER",
+      "y_axis_title": "Count",
+      "y_axis_format": "SMART_NUMBER"
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "histogram_v2",
+      "column": "<copied_from_saved_chart>",
+      "groupby": "<copied_from_saved_chart>",
+      "row_limit": "<copied_from_saved_chart>",
+      "bins": "<copied_from_saved_chart>",
+      "normalize": "<copied_from_saved_chart>",
+      "cumulative": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "color_scheme": "<copied_from_saved_chart>",
+      "show_value": "<copied_from_saved_chart>",
+      "show_legend": "<copied_from_saved_chart>",
+      "x_axis_title": "<copied_from_saved_chart>",
+      "x_axis_format": "<copied_from_saved_chart>",
+      "y_axis_title": "<copied_from_saved_chart>",
+      "y_axis_format": "<copied_from_saved_chart>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "APAC"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "APAC"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_histogram": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "APAC"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters；后端会把它们并入额外过滤条件。",
+        "source": "superset constants + backend extra form data merge"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_histogram": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "APAC"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会标记为 isExtra 并并入查询。",
+        "source": "superset constants + backend extra form data merge"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_histogram": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "可传非标准附加数据；Histogram 默认 buildQuery/transformProps 不直接消费它。",
+        "source": "frontend QueryFormData / backend extra form data handling"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "histogram_v2",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/histogram_v2-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/histogram_v2-form-data-schema.json",
+      "control-schema": "form-data-schema/histogram_v2-schema.json"
+    }
+  }
+}

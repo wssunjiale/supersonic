@@ -1,0 +1,549 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "sunburst_v2",
+  "display_name": "Sunburst Chart",
+  "source_kind": "schema_file",
+  "normalized_embedding_policy": {
+    "immutable_root_keys": [
+      "slice_id",
+      "datasource",
+      "viz_type",
+      "all_saved_chart_definition_fields"
+    ],
+    "allowed_runtime_fields": [
+      {
+        "field_name": "adhoc_filters",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "custom_form_data",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "filters",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "granularity",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "relative_end",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "relative_start",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_column",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_compare",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_grain",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_range",
+        "behavior": "override",
+        "source": "embedding-schema"
+      }
+    ],
+    "safe_embedding_form_data_seed": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "sunburst_v2",
+      "extra_form_data": {
+        "filters": [],
+        "adhoc_filters": []
+      }
+    }
+  },
+  "original_embedding_form_data_schema": {
+    "viz_type": "sunburst_v2",
+    "display_name": "Sunburst Chart",
+    "purpose": "第三方 embedding / guest token 场景下安全传输的 form_data 模板",
+    "base_form_data_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/sunburst_v2-form-data-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset/security/manager.py",
+      "D:/vsx/sources/superset-6.0.0/superset/constants.py",
+      "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/charts/data/api.py",
+      "D:/vsx/sources/superset-6.0.0/superset/commands/chart/data/get_data_command.py",
+      "D:/vsx/sources/superset-6.0.0/superset/charts/schemas.py",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/constants.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/QueryFormData.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/processExtraFormData.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/dashboard/components/nativeFilters/utils.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataWithDashboardContext.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Sunburst/controlPanel.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Sunburst/buildQuery.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Sunburst/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Sunburst/types.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/utils/treeBuilder.ts"
+    ],
+    "notes": [
+      "embedded guest 的核心限制不在前端，而在后端 security/manager.py 的 query_context_modified()。报错原文是 `Guest user cannot modify chart payload`。",
+      "安全做法不是重新拼装一份新的 Sunburst Chart form_data，而是以已保存图表的 form_data 原样复制为 base，只把动态条件放进 extra_form_data。",
+      "对于 Sunburst，图表定义的核心字段是 columns、metric、secondary_metric、sort_by_metric 以及颜色/标签/格式化选项；guest embedding 不应在请求里临时切换这些字段。",
+      "Sunburst/buildQuery.ts 会在 sort_by_metric=true 时把 query_context 的 orderby 写成 [[metric,false]]，因此 sort_by_metric 不是纯显示字段。",
+      "Sunburst/transformProps.ts 与 utils/treeBuilder.ts 直接依赖 columns 形成 hierarchy，并依赖 metric/secondary_metric 计算扇区大小与着色。",
+      "Sunburst controlPanel 没有时间列、时间粒度、时间范围控件；因此 embedding 下虽然 extra_form_data 白名单允许时间相关 override，但它们不属于这个 viztype 的常规推荐动态入口。",
+      "frontend 的 superset-ui-core 声明了 extra_form_data.time_compare，但 Superset 6.0.0 后端 constants.py 的 merge whitelist 并没有把它纳入高置信覆盖列表。guest embedding 下应视为不稳定/高风险字段。"
+    ],
+    "security_enforcement": {
+      "backend_check_function": "superset/security/manager.py::query_context_modified",
+      "checked_when": "ChartDataCommand.validate() -> QueryContext.raise_for_access()",
+      "error_message": "Guest user cannot modify chart payload",
+      "hard_block_fields": [
+        "slice_id",
+        "metrics",
+        "columns",
+        "groupby",
+        "orderby"
+      ],
+      "indirectly_sensitive_fields_for_sunburst": [
+        "metric",
+        "secondary_metric",
+        "columns",
+        "sort_by_metric"
+      ],
+      "recommended_strategy": "复制保存态 chart form_data 作为 base，仅通过 extra_form_data 追加过滤条件；时间相关 override 仅在你明确确认保存态图表存在时间上下文时谨慎使用。"
+    },
+    "safe_base_rule": {
+      "description": "第三方 embedding 请求中的根层 form_data，应当从已保存图表的 form_data 直接复制，不要重构。",
+      "must_be_copied_from_saved_chart": [
+        "slice_id",
+        "datasource",
+        "viz_type",
+        "columns",
+        "metric",
+        "secondary_metric",
+        "adhoc_filters",
+        "row_limit",
+        "sort_by_metric",
+        "all other chart-definition fields"
+      ],
+      "why": [
+        "query_context_modified() 会把请求中的 metrics、columns/groupby、orderby 与保存态图表对比。",
+        "Sunburst 的 metric 和 secondary_metric 会进入查询指标集合；修改后会改变 query_context.queries.metrics。",
+        "Sunburst 的 columns 既决定 hierarchy，又会进入 query_context 的 columns/groupby 对比链路。",
+        "Sunburst/buildQuery.ts 会在 sort_by_metric=true 时写入 orderby，因此改它会改变 guest 请求的排序语义。"
+      ]
+    },
+    "safe_embedding_form_data_template": {
+      "description": "这是 guest embedding 下的安全写法。根层以保存态图表为 base，仅改 extra_form_data。",
+      "template": {
+        "slice_id": "<saved_chart_id>",
+        "dashboardId": "<dashboard_id>",
+        "datasource": "<copied_from_saved_chart>",
+        "viz_type": "sunburst_v2",
+        "columns": "<copied_from_saved_chart>",
+        "metric": "<copied_from_saved_chart>",
+        "secondary_metric": "<copied_from_saved_chart>",
+        "adhoc_filters": "<copied_from_saved_chart>",
+        "row_limit": "<copied_from_saved_chart>",
+        "sort_by_metric": "<copied_from_saved_chart>",
+        "extra_form_data": {
+          "filters": [
+            {
+              "col": "region",
+              "op": "IN",
+              "val": [
+                "APAC"
+              ]
+            }
+          ],
+          "adhoc_filters": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "region",
+              "operator": "IN",
+              "comparator": [
+                "APAC"
+              ]
+            }
+          ],
+          "custom_form_data": {}
+        }
+      }
+    },
+    "preferred_dynamic_container": {
+      "field_name": "extra_form_data",
+      "description": "第三方 embedding 允许动态传入的上下文容器；后端会在 merge_extra_form_data() 中把它并入实际查询。",
+      "append_keys": [
+        "adhoc_filters",
+        "filters",
+        "interactive_groupby",
+        "interactive_highlight",
+        "interactive_drilldown",
+        "custom_form_data"
+      ],
+      "override_keys_backend_high_confidence": [
+        "granularity_sqla",
+        "granularity",
+        "time_column",
+        "time_grain",
+        "time_range",
+        "time_grain_sqla",
+        "relative_start",
+        "relative_end"
+      ],
+      "frontend_declared_but_backend_not_high_confidence": [
+        "time_compare"
+      ]
+    },
+    "extra_form_data_field_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_sunburst": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "APAC"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters；后端会把它们转成额外过滤条件。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_sunburst": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "APAC"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会标记为 isExtra 并并入查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_sunburst": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "可传非标准附加数据；Sunburst/buildQuery.ts、transformProps.ts、treeBuilder.ts 默认不直接消费它。",
+        "source": "superset/constants.py + frontend QueryFormData.ts"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_sunburst": false,
+        "recommended": false,
+        "sample_data": "Last 30 days",
+        "effect": "后端允许覆盖，但 Sunburst controlPanel 没有时间范围控件。只有当保存态图表本身就依赖时间上下文，或者由 dashboard/native filters 注入时间语义时才考虑使用。",
+        "source": "superset/constants.py + superset/utils/core.py",
+        "status": "条件可用，常规不推荐"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_sunburst": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "后端允许覆盖时间粒度，但 Sunburst controlPanel 不暴露对应控件；常规 guest embedding 不建议手动传。",
+        "source": "superset/constants.py + superset/utils/core.py",
+        "status": "条件可用，常规不推荐"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_sunburst": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "后端允许覆盖时间列，但 Sunburst 不是时间轴驱动图；除非你明确确认保存态查询本身带时间列语义，否则不要传。",
+        "source": "superset/constants.py + frontend QueryFormData.ts"
+      },
+      {
+        "field_name": "granularity",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_sunburst": false,
+        "recommended": false,
+        "sample_data": "__time",
+        "effect": "通用 SQL 时间列覆盖键；Sunburst 常规场景不需要。",
+        "source": "superset/constants.py"
+      },
+      {
+        "field_name": "time_column",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_sunburst": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "后端 QueryObject 允许的时间列覆盖键；Sunburst 常规场景不建议手动传。",
+        "source": "superset/constants.py + frontend QueryFormData.ts"
+      },
+      {
+        "field_name": "time_grain",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_sunburst": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "底层 QueryObject 的时间粒度键；Sunburst 常规场景通常不必传。",
+        "source": "superset/constants.py + frontend QueryFormData.ts"
+      },
+      {
+        "field_name": "relative_start",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_sunburst": false,
+        "recommended": false,
+        "sample_data": "now",
+        "effect": "进入 query.extras.relative_start。后端 schema 对取值做了约束，但 Sunburst 自身没有显式时间控件，常规不建议依赖。",
+        "source": "superset/charts/schemas.py + superset/utils/core.py",
+        "status": "条件可用，常规不推荐"
+      },
+      {
+        "field_name": "relative_end",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_sunburst": false,
+        "recommended": false,
+        "sample_data": "today",
+        "effect": "进入 query.extras.relative_end。后端 schema 对取值做了约束，但 Sunburst 自身没有显式时间控件，常规不建议依赖。",
+        "source": "superset/charts/schemas.py + superset/utils/core.py",
+        "status": "条件可用，常规不推荐"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_sunburst": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用 ExtraFormData 字段。Sunburst/buildQuery.ts 与 transformProps.ts 不直接消费它，通常没有实际效果。",
+        "source": "frontend QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_sunburst": false,
+        "recommended": false,
+        "sample_data": [
+          "APAC"
+        ],
+        "effect": "通用交互字段；Sunburst 默认不直接消费。",
+        "source": "frontend QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_sunburst": false,
+        "recommended": false,
+        "sample_data": [
+          "country"
+        ],
+        "effect": "通用交互字段；Sunburst 默认不直接消费。",
+        "source": "frontend QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "time_compare",
+        "data_type": "string | array[string]",
+        "behavior": "override",
+        "safe_for_sunburst": false,
+        "recommended": false,
+        "sample_data": [
+          "1 year ago"
+        ],
+        "effect": "frontend 类型声明存在，但 Superset 6.0.0 后端 constants.py 的 extra_form_data merge whitelist 未将其列为高置信 override。guest embedding 下容易出现前后端行为不一致。",
+        "source": "frontend QueryFormData.ts + query/constants.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      }
+    ],
+    "minimal_extra_form_data_template": {
+      "filters": [
+        {
+          "col": "region",
+          "op": "IN",
+          "val": [
+            "APAC"
+          ]
+        }
+      ]
+    },
+    "recommended_extra_form_data_template": {
+      "filters": [
+        {
+          "col": "region",
+          "op": "IN",
+          "val": [
+            "APAC"
+          ]
+        }
+      ],
+      "adhoc_filters": [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "region",
+          "operator": "IN",
+          "comparator": [
+            "APAC"
+          ]
+        }
+      ],
+      "custom_form_data": {}
+    },
+    "unsafe_root_form_data_changes": [
+      {
+        "field_name": "slice_id",
+        "reason": "与保存态图表 id 不一致会被后端立即判定为请求了另一张图。"
+      },
+      {
+        "field_name": "metric",
+        "reason": "Primary Metric 会决定扇区大小，并会进入查询指标集合；改动后既改变图表定义，也可能触发 guest payload 差异。"
+      },
+      {
+        "field_name": "secondary_metric",
+        "reason": "它会改变查询指标集合以及线性着色比值逻辑；guest 场景下不要在请求里临时切换。"
+      },
+      {
+        "field_name": "columns",
+        "reason": "它既决定 hierarchy，又会进入 query_context 的 columns/groupby 对比链路；改动后容易直接报 Guest user cannot modify chart payload。"
+      },
+      {
+        "field_name": "sort_by_metric",
+        "reason": "buildQuery.ts 会据此改写 orderby；这不是安全的 guest 动态字段。"
+      },
+      {
+        "field_name": "viz_type",
+        "reason": "embedded guest 不应把已分享图表改成另一种图。"
+      },
+      {
+        "field_name": "datasource",
+        "reason": "embedded guest 不应改图表绑定数据集。"
+      },
+      {
+        "field_name": "row_limit",
+        "reason": "虽然 query_context_modified() 不直接按这个键做白名单比较，但它会改变查询结果规模；为了保持保存态图表定义，guest 请求里不要临时改。"
+      },
+      {
+        "field_name": "color_scheme",
+        "reason": "属于图表定义字段；guest 场景下不要把保存态 Sunburst 的分类配色改成另一套。"
+      },
+      {
+        "field_name": "linear_color_scheme",
+        "reason": "属于图表定义字段；guest 场景下不要在请求里临时改写线性色带。"
+      },
+      {
+        "field_name": "show_labels",
+        "reason": "属于图表定义字段；guest 场景下不要临时切换标签显示。"
+      },
+      {
+        "field_name": "show_labels_threshold",
+        "reason": "属于图表定义字段；guest 场景下不要临时改写标签阈值。"
+      },
+      {
+        "field_name": "show_total",
+        "reason": "属于图表定义字段；会改变中心文本展示，guest 场景下不要临时切换。"
+      },
+      {
+        "field_name": "label_type",
+        "reason": "属于图表定义字段；会改变标签展示内容，guest 场景下不要临时改写。"
+      },
+      {
+        "field_name": "number_format",
+        "reason": "属于图表定义字段；会改变数值展示语义，guest 场景下不要临时改写。"
+      },
+      {
+        "field_name": "currency_format",
+        "reason": "属于图表定义字段；会改变数值展示语义，guest 场景下不要临时改写。"
+      },
+      {
+        "field_name": "date_format",
+        "reason": "属于图表定义字段；会改变标签和 tooltip 的时间格式，guest 场景下不要临时改写。"
+      }
+    ],
+    "practical_guidance": {
+      "best_practice": [
+        "先从保存态图表读取完整 form_data。",
+        "根层字段保持不变。",
+        "Sunburst 优先只在 extra_form_data 中放 filters / adhoc_filters / custom_form_data。",
+        "如果页面需要 guest 联动筛选，优先使用 filters 或 adhoc_filters，而不是改 columns、metric、secondary_metric、sort_by_metric。"
+      ],
+      "avoid": [
+        "不要在 guest embedding 请求里手工重写 metric、secondary_metric、columns、sort_by_metric。",
+        "不要把运行时 camelCase 字段名当成 API 键名使用。",
+        "不要依赖 frontend 有定义但 backend whitelist 不稳定的 extra_form_data.time_compare。",
+        "Sunburst 常规场景不要把 time_range、time_grain_sqla、relative_start、relative_end 当成首选动态入口，因为该图 controlPanel 没有时间控件。"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "sunburst_v2",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/sunburst_v2-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/sunburst_v2-form-data-schema.json",
+      "control-schema": "form-data-schema/sunburst_v2-schema.json"
+    }
+  }
+}

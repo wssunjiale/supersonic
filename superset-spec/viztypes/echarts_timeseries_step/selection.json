@@ -1,0 +1,515 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "echarts_timeseries_step",
+  "display_name": "Stepped Line",
+  "selection_summary": {
+    "category": "time_series",
+    "tags": [
+      "step_line",
+      "time_series",
+      "discrete",
+      "step"
+    ],
+    "description_zh": "Step Line Time Series Chart displays metric values over time with a step-wise line, highlighting discrete value changes at time intervals.",
+    "visual_shape_zh": "阶梯线时序图（时间轴离散型）",
+    "use_cases_zh": [
+      "离散型时间节点的数值变化（如版本发布后的指标变化）",
+      "阶段性指标展示（如按周统计的库存变化）",
+      "非连续型趋势的精准呈现"
+    ],
+    "required_slots": [
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "Query",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+          "聚合指标，用于计算每个时间点的阶梯数值。"
+        ]
+      },
+      {
+        "field_name": "x_axis",
+        "required": true,
+        "slot_kind": "x_axis",
+        "accepted_dataset_roles": [
+          "time_dimension",
+          "dimension"
+        ],
+        "cardinality": "1",
+        "placeholder": "<x_axis_column>",
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Dimension to use on x-axis."
+        ]
+      },
+      {
+        "field_name": "granularity_sqla",
+        "required": true,
+        "slot_kind": "time_column",
+        "accepted_dataset_roles": [
+          "time_dimension"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<time_column>",
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "时间粒度字段，定义时序图的时间轴维度（如小时、天、月）。"
+        ]
+      }
+    ],
+    "optional_slots": [
+      {
+        "field_name": "adhoc_filters",
+        "required": false,
+        "slot_kind": "filter_list",
+        "accepted_dataset_roles": [
+          "filter_context"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [],
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "源码未提供额外描述；字段标签为 Filters。"
+        ]
+      },
+      {
+        "field_name": "groupby",
+        "required": false,
+        "slot_kind": "dimension_list",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [
+          "<dimension_column>"
+        ],
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Dimensions contain qualitative values such as names, dates, or geographical data. Use dimensions to categorize, segment, and reveal the details in your data. Dimensions affect the level of detail in the view."
+        ]
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "required": false,
+        "slot_kind": "time_grain",
+        "accepted_dataset_roles": [
+          "time_grain"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "P1D",
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [
+          "extra_form_data.override"
+        ],
+        "descriptions": [
+          "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart."
+        ]
+      }
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "dimension",
+      "metric",
+      "saved_metric",
+      "time_dimension"
+    ],
+    "optional_dataset_roles": [
+      "category_dimension",
+      "dimension",
+      "filter_context",
+      "time_grain"
+    ],
+    "dataset_role_inventory": {
+      "adhoc_metric": [
+        "metrics"
+      ],
+      "category_dimension": [
+        "groupby"
+      ],
+      "dimension": [
+        "groupby",
+        "x_axis"
+      ],
+      "filter_context": [
+        "adhoc_filters"
+      ],
+      "metric": [
+        "metrics"
+      ],
+      "saved_metric": [
+        "metrics"
+      ],
+      "time_dimension": [
+        "granularity_sqla",
+        "x_axis"
+      ],
+      "time_grain": [
+        "time_grain_sqla"
+      ]
+    },
+    "non_binding_control_names": [
+      "annotation_layers",
+      "area",
+      "color_scheme",
+      "comparison_type",
+      "contributionMode",
+      "currency_format",
+      "forecastEnabled",
+      "forecastInterval",
+      "forecastPeriods",
+      "forecastSeasonalityDaily",
+      "forecastSeasonalityWeekly",
+      "forecastSeasonalityYearly",
+      "group_others_when_limit_reached",
+      "legendMargin",
+      "legendOrientation",
+      "legendType",
+      "limit",
+      "logAxis",
+      "markerEnabled",
+      "markerSize",
+      "min_periods",
+      "minorSplitLine",
+      "minorTicks",
+      "only_total",
+      "opacity",
+      "order_desc",
+      "percentage_threshold",
+      "resample_method",
+      "resample_rule",
+      "rich_tooltip",
+      "rolling_periods",
+      "rolling_type",
+      "row_limit",
+      "seriesType",
+      "showTooltipPercentage",
+      "showTooltipTotal",
+      "show_empty_columns",
+      "show_legend",
+      "show_value",
+      "sort_series_ascending",
+      "sort_series_type",
+      "stack",
+      "time_compare",
+      "time_shift_color",
+      "timeseries_limit_metric",
+      "tooltipSortByMetric",
+      "tooltipTimeFormat",
+      "truncateXAxis",
+      "truncateYAxis",
+      "truncate_metric",
+      "xAxisBounds",
+      "xAxisForceCategorical",
+      "xAxisLabelInterval",
+      "xAxisLabelRotation",
+      "x_axis_sort",
+      "x_axis_sort_asc",
+      "x_axis_time_format",
+      "x_axis_title",
+      "x_axis_title_margin",
+      "y_axis_bounds",
+      "y_axis_format",
+      "y_axis_title",
+      "y_axis_title_margin",
+      "y_axis_title_position",
+      "zoomable"
+    ],
+    "embedding_runtime_field_names": [
+      "adhoc_filters",
+      "custom_form_data",
+      "filters",
+      "granularity",
+      "granularity_sqla",
+      "interactive_drilldown",
+      "interactive_groupby",
+      "interactive_highlight",
+      "relative_end",
+      "relative_start",
+      "time_column",
+      "time_compare",
+      "time_grain",
+      "time_grain_sqla",
+      "time_range"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "groupby",
+      "metrics",
+      "order_desc",
+      "row_limit",
+      "time_range",
+      "viz_type",
+      "x_axis"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "annotation_layers",
+      "area",
+      "color_scheme",
+      "comparison_type",
+      "contributionMode",
+      "currency_format",
+      "datasource",
+      "forecastEnabled",
+      "forecastInterval",
+      "forecastPeriods",
+      "forecastSeasonalityDaily",
+      "forecastSeasonalityWeekly",
+      "forecastSeasonalityYearly",
+      "group_others_when_limit_reached",
+      "groupby",
+      "legendMargin",
+      "legendOrientation",
+      "legendType",
+      "limit",
+      "logAxis",
+      "markerEnabled",
+      "markerSize",
+      "metrics",
+      "min_periods",
+      "minorSplitLine",
+      "minorTicks",
+      "only_total",
+      "opacity",
+      "order_desc",
+      "percentage_threshold",
+      "resample_method",
+      "resample_rule",
+      "rich_tooltip",
+      "rolling_periods",
+      "rolling_type",
+      "row_limit",
+      "seriesType",
+      "showTooltipPercentage",
+      "showTooltipTotal",
+      "show_empty_columns",
+      "show_legend",
+      "show_value",
+      "sort_series_ascending",
+      "sort_series_type",
+      "stack",
+      "time_compare",
+      "time_grain_sqla",
+      "time_range",
+      "time_shift_color",
+      "timeseries_limit_metric",
+      "tooltipSortByMetric",
+      "tooltipTimeFormat",
+      "truncateXAxis",
+      "truncateYAxis",
+      "truncate_metric",
+      "viz_type",
+      "xAxisBounds",
+      "xAxisForceCategorical",
+      "xAxisLabelInterval",
+      "xAxisLabelRotation",
+      "x_axis",
+      "x_axis_sort",
+      "x_axis_sort_asc",
+      "x_axis_time_format",
+      "x_axis_title",
+      "x_axis_title_margin",
+      "y_axis_bounds",
+      "y_axis_format",
+      "y_axis_title",
+      "y_axis_title_margin",
+      "y_axis_title_position",
+      "zoomable"
+    ],
+    "structural_flags": {
+      "time_series": true,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": false,
+      "flow_like": false,
+      "distribution_like": false,
+      "supports_breakdown": true,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": true,
+      "needs_dimension": true
+    },
+    "selection_hints": [
+      "优先用于趋势、演化、时间对比类问题。",
+      "至少需要 1 个可聚合指标字段。",
+      "需要时间字段，通常还应结合时间粒度或时间范围。",
+      "需要至少 1 个维度字段用于分组、拆分或定位。",
+      "支持按维度拆分多序列或子组。",
+      "可结合时间粒度控制趋势聚合窗口。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：离散型时间节点的数值变化（如版本发布后的指标变化）；阶段性指标展示（如按周统计的库存变化）；非连续型趋势的精准呈现"
+    ]
+  },
+  "selection_prompt_card": {
+    "viz_type": "echarts_timeseries_step",
+    "display_name": "Stepped Line",
+    "category": "time_series",
+    "description_zh": "Step Line Time Series Chart displays metric values over time with a step-wise line, highlighting discrete value changes at time intervals.",
+    "visual_shape_zh": "阶梯线时序图（时间轴离散型）",
+    "best_for": [
+      "离散型时间节点的数值变化（如版本发布后的指标变化）",
+      "阶段性指标展示（如按周统计的库存变化）",
+      "非连续型趋势的精准呈现"
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "dimension",
+      "metric",
+      "saved_metric",
+      "time_dimension"
+    ],
+    "optional_dataset_roles": [
+      "category_dimension",
+      "dimension",
+      "filter_context",
+      "time_grain"
+    ],
+    "required_slots": [
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "Query",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+          "聚合指标，用于计算每个时间点的阶梯数值。"
+        ]
+      },
+      {
+        "field_name": "x_axis",
+        "required": true,
+        "slot_kind": "x_axis",
+        "accepted_dataset_roles": [
+          "time_dimension",
+          "dimension"
+        ],
+        "cardinality": "1",
+        "placeholder": "<x_axis_column>",
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Dimension to use on x-axis."
+        ]
+      },
+      {
+        "field_name": "granularity_sqla",
+        "required": true,
+        "slot_kind": "time_column",
+        "accepted_dataset_roles": [
+          "time_dimension"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<time_column>",
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "时间粒度字段，定义时序图的时间轴维度（如小时、天、月）。"
+        ]
+      }
+    ],
+    "optional_slot_names": [
+      "adhoc_filters",
+      "groupby",
+      "time_grain_sqla"
+    ],
+    "structural_flags": {
+      "time_series": true,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": false,
+      "flow_like": false,
+      "distribution_like": false,
+      "supports_breakdown": true,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": true,
+      "needs_dimension": true
+    },
+    "selection_hints": [
+      "优先用于趋势、演化、时间对比类问题。",
+      "至少需要 1 个可聚合指标字段。",
+      "需要时间字段，通常还应结合时间粒度或时间范围。",
+      "需要至少 1 个维度字段用于分组、拆分或定位。",
+      "支持按维度拆分多序列或子组。",
+      "可结合时间粒度控制趋势聚合窗口。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：离散型时间节点的数值变化（如版本发布后的指标变化）；阶段性指标展示（如按周统计的库存变化）；非连续型趋势的精准呈现"
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "echarts_timeseries_step",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/echarts_timeseries_step-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/echarts_timeseries_step-form-data-schema.json",
+      "control-schema": "form-data-schema/echarts_timeseries_step-schema.json"
+    }
+  }
+}

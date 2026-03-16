@@ -14,6 +14,7 @@ import com.tencent.supersonic.chat.server.plugin.build.superset.SupersetDashboar
 import com.tencent.supersonic.chat.server.plugin.build.superset.SupersetPluginConfig;
 import com.tencent.supersonic.chat.server.plugin.build.superset.SupersetPluginProperties;
 import com.tencent.supersonic.chat.server.service.PluginService;
+import com.tencent.supersonic.chat.server.service.SupersetDashboardRegistryService;
 import com.tencent.supersonic.common.pojo.User;
 import com.tencent.supersonic.common.pojo.exception.InvalidArgumentException;
 import com.tencent.supersonic.common.util.JsonUtil;
@@ -31,7 +32,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping({"/api/chat/superset", "/openapi/chat/superset"})
@@ -42,6 +42,9 @@ public class SupersetController {
 
     @Autowired
     private SupersetPluginProperties supersetProperties;
+
+    @Autowired
+    private SupersetDashboardRegistryService supersetDashboardRegistryService;
 
     @PostMapping("dashboards")
     public List<SupersetDashboardInfo> dashboards(@RequestBody SupersetDashboardListReq req) {
@@ -61,13 +64,9 @@ public class SupersetController {
             HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         User user = UserHolder.findUser(httpServletRequest, httpServletResponse);
         ChatPlugin plugin = resolveSupersetPlugin(req == null ? null : req.getPluginId());
-        String accessToken = req == null ? null : req.getAccessToken();
-        SupersetPluginConfig config = buildConfig(plugin, StringUtils.isNotBlank(accessToken));
-        SupersetApiClient client = new SupersetApiClient(config);
-        List<SupersetDashboardInfo> dashboards =
-                StringUtils.isNotBlank(accessToken) ? client.listDashboards(accessToken)
-                        : client.listDashboards();
-        List<SupersetDashboardInfo> filtered = filterManualDashboards(dashboards, user);
+        SupersetPluginConfig config = buildConfig(plugin);
+        List<SupersetDashboardInfo> filtered =
+                supersetDashboardRegistryService.listManualDashboards(plugin.getId(), user);
         String supersetDomain = normalizeBaseUrl(config.getBaseUrl());
         for (SupersetDashboardInfo dashboard : filtered) {
             dashboard.setSupersetDomain(supersetDomain);
@@ -92,6 +91,7 @@ public class SupersetController {
         SupersetApiClient client = new SupersetApiClient(config);
         List<String> tags = SupersetDashboardTagHelper.buildManualTags(user);
         SupersetDashboardInfo info = client.createEmptyDashboard(req.getTitle(), tags);
+        info = supersetDashboardRegistryService.registerManualDashboard(plugin.getId(), info, user);
         String supersetDomain = normalizeBaseUrl(config.getBaseUrl());
         info.setSupersetDomain(supersetDomain);
         info.setEditUrl(buildDashboardEditUrl(supersetDomain, info.getId()));
@@ -106,19 +106,17 @@ public class SupersetController {
         }
         User user = UserHolder.findUser(httpServletRequest, httpServletResponse);
         ChatPlugin plugin = resolveSupersetPlugin(req.getPluginId());
-        SupersetApiClient client = new SupersetApiClient(buildConfig(plugin));
-        SupersetDashboardInfo dashboard = resolveDashboard(client, req.getDashboardId());
+        SupersetDashboardInfo dashboard = supersetDashboardRegistryService
+                .getManualDashboard(plugin.getId(), req.getDashboardId());
         if (dashboard == null) {
             throw new InvalidArgumentException("dashboard not found");
         }
-        if (!SupersetDashboardTagHelper.isManualDashboard(dashboard)) {
-            throw new InvalidArgumentException("dashboard not managed");
-        }
-        if (user == null
-                || (!user.isSuperAdmin() && !SupersetDashboardTagHelper.isOwner(user, dashboard))) {
+        if (user == null || (!user.isSuperAdmin() && !isDashboardOwner(user, dashboard))) {
             throw new InvalidArgumentException("dashboard permission denied");
         }
+        SupersetApiClient client = new SupersetApiClient(buildConfig(plugin));
         client.deleteDashboard(req.getDashboardId());
+        supersetDashboardRegistryService.markDeleted(plugin.getId(), req.getDashboardId(), user);
         return true;
     }
 
@@ -128,8 +126,13 @@ public class SupersetController {
             throw new InvalidArgumentException("dashboardId/chartId required");
         }
         ChatPlugin plugin = resolveSupersetPlugin(req.getPluginId());
+        SupersetDashboardInfo dashboard = supersetDashboardRegistryService
+                .getManualDashboard(plugin.getId(), req.getDashboardId());
+        if (dashboard == null) {
+            throw new InvalidArgumentException("dashboard not found");
+        }
         SupersetApiClient client = new SupersetApiClient(buildConfig(plugin));
-        client.addChartToDashboard(req.getDashboardId(), req.getChartId());
+        client.appendChartToDashboard(req.getDashboardId(), req.getChartId());
         return true;
     }
 
@@ -207,8 +210,6 @@ public class SupersetController {
         config.setEnabled(supersetProperties.isEnabled());
         config.setBaseUrl(supersetProperties.getBaseUrl());
         config.setAuthEnabled(supersetProperties.isAuthEnabled());
-        config.setAuthStrategy(supersetProperties.getAuthStrategy());
-        config.setApiKey(supersetProperties.getApiKey());
         config.setJwtUsername(supersetProperties.getJwtUsername());
         config.setJwtPassword(supersetProperties.getJwtPassword());
         config.setJwtProvider(supersetProperties.getJwtProvider());
@@ -266,27 +267,15 @@ public class SupersetController {
         return accessToken;
     }
 
-    private List<SupersetDashboardInfo> filterManualDashboards(
-            List<SupersetDashboardInfo> dashboards, User user) {
-        if (dashboards == null || dashboards.isEmpty() || user == null) {
-            return java.util.Collections.emptyList();
+    private boolean isDashboardOwner(User user, SupersetDashboardInfo dashboard) {
+        if (user == null || dashboard == null) {
+            return false;
         }
-        return dashboards.stream().filter(SupersetDashboardTagHelper::isManualDashboard)
-                .filter(dashboard -> user.isSuperAdmin()
-                        || SupersetDashboardTagHelper.isOwner(user, dashboard))
-                .collect(Collectors.toList());
-    }
-
-    private SupersetDashboardInfo resolveDashboard(SupersetApiClient client, Long dashboardId) {
-        if (client == null || dashboardId == null) {
-            return null;
+        if (user.getId() != null && dashboard.getOwnerId() != null) {
+            return user.getId().equals(dashboard.getOwnerId());
         }
-        List<SupersetDashboardInfo> dashboards = client.listDashboards();
-        if (dashboards == null || dashboards.isEmpty()) {
-            return null;
-        }
-        return dashboards.stream().filter(dashboard -> dashboardId.equals(dashboard.getId()))
-                .findFirst().orElse(null);
+        return StringUtils.isNotBlank(user.getName())
+                && StringUtils.equalsIgnoreCase(user.getName(), dashboard.getOwnerName());
     }
 
     private String normalizeBaseUrl(String baseUrl) {

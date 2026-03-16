@@ -2,6 +2,7 @@ package com.tencent.supersonic.headless.server.service;
 
 import com.github.pagehelper.PageInfo;
 import com.tencent.supersonic.common.pojo.User;
+import com.tencent.supersonic.common.pojo.QueryColumn;
 import com.tencent.supersonic.headless.api.pojo.SemanticParseInfo;
 import com.tencent.supersonic.headless.api.pojo.request.SupersetDatasetQueryReq;
 import com.tencent.supersonic.headless.api.pojo.response.SupersetDatasetResp;
@@ -13,7 +14,8 @@ import java.util.Set;
 
 public interface SupersetDatasetRegistryService {
 
-    SupersetDatasetDO registerDataset(SemanticParseInfo parseInfo, String sql, User user);
+    SupersetDatasetDO registerDataset(SemanticParseInfo parseInfo, String sql,
+            List<QueryColumn> queryColumns, User user);
 
     SupersetDatasetDO getBySqlHash(String sqlHash);
 
@@ -21,9 +23,18 @@ public interface SupersetDatasetRegistryService {
 
     SupersetDatasetDO getById(Long id);
 
+    List<SupersetDatasetDO> listAvailablePersistentDatasets(Long dataSetId);
+
     List<SupersetDatasetDO> listForSync(Set<Long> ids);
 
     void updateSyncInfo(Long id, Long supersetDatasetId, Date syncedAt);
+
+    void updateSyncAttempt(Long id, Date attemptAt);
+
+    void markSyncFailed(Long id, String errorType, String errorMsg, Date attemptAt,
+            Date nextRetryAt, Integer retryCount);
+
+    void markSyncPending(Long id, User user);
 
     PageInfo<SupersetDatasetResp> querySupersetDataset(SupersetDatasetQueryReq queryReq, User user);
 

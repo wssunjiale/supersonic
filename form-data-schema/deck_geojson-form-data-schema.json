@@ -1,0 +1,423 @@
+{
+  "viz_type": "deck_geojson",
+  "display_name": "deck.gl Geojson",
+  "purpose": "用于调用 API 创建或保存 deck.gl Geojson 时填写的 form_data 模板",
+  "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/deck_geojson-schema.json",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Geojson/controlPanel.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Geojson/index.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Geojson/Geojson.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/common.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/Shared_DeckGL.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/sharedDndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utils/crossFiltersDataMask.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+    "D:/vsx/sources/superset-6.0.0/superset/views/core.py",
+    "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+    "D:/vsx/sources/superset-6.0.0/superset/viz.py"
+  ],
+  "notes": [
+    "deck_geojson 是 legacy 图，metadata 明确声明 `useLegacyApi=true`，真实请求路径仍是 `/superset/explore_json/`。",
+    "Explore 导出 form_data 时走 `getFormDataFromControls()`，它按 control name 原样写入 root form_data。API 根层必须使用 `geojson`、`fill_color_picker`、`stroke_color_picker`、`line_width_unit`、`point_radius_scale` 等原始键名。",
+    "deck_geojson 没有专属前端 buildQuery。ChartClient.ts 对它会退回 `() => formData`，也就是说，API 层真正应该构造的是原始 root `form_data`，然后由 legacy `/superset/explore_json/` 包装成 `{ form_data: ... }`。",
+    "当前图没有正式指标字段。`geojson` 传的是“列名”，不是 GeoJSON 对象；后端会读取这列的 JSON 字符串并执行 `json.loads()`。",
+    "`Geojson.tsx` 会直接读取 `fill_color_picker` 和 `stroke_color_picker`，因此手工模板应显式带上这两个对象，而不是假设前端会帮你补默认值。",
+    "`filter_nulls` 在当前图上是 no-op，但既然 controlPanel 仍然导出它，保存态里通常也会出现。创建模板里可保留该字段，同时在解释层注明它不影响查询。",
+    "`filters` 不是当前 controlPanel 正式字段。虽然 legacy payload 或老保存态可能出现它，但当前创建模板应优先使用 `adhoc_filters`。"
+  ],
+  "naming_and_pipeline": {
+    "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写成 form_data[name]，不会自动把 snake_case 改成 camelCase。",
+    "api_form_data_to_backend_request": "ChartClient.ts 在 `useLegacyApi=true` 时，把 `buildQuery(formData)` 包成 `{ form_data }` POST 到 `/superset/explore_json/`；deck_geojson 没有专属 buildQuery，因此等价于直接发送原始 form_data。",
+    "backend_form_data_normalization": "`explore_json()` 会先补 `datasource`，再执行 `convert_legacy_filters_into_adhoc(form_data)` 与 `merge_extra_filters(form_data)`。",
+    "backend_form_data_to_query_obj": "`BaseDeckGLViz.query_obj()` 先处理 legacy filters / extra filters，并收集可选 `js_columns`；随后 `DeckGeoJson.query_obj()` 追加 `geojson` 列，强制清空 `metrics=[]` 和 `groupby=[]`。",
+    "runtime_chart_props": "`transformProps.ts` 直接把 `rawFormData` 透传成 runtime `formData`，把 `queriesData[0]` 透传成 runtime `payload`，并把 `viewport` 与 `width`/`height` 合并。"
+  },
+  "global_required_fields": {
+    "datasource": {
+      "data_type": "string",
+      "required": true,
+      "sample_data": "<dataset_id>__table",
+      "source": "explore_json() + datasourceAndVizType hidden control"
+    },
+    "viz_type": {
+      "data_type": "string",
+      "required": true,
+      "fixed_value": "deck_geojson",
+      "source": "Geojson/index.ts + VizType.DeckGeoJson"
+    },
+    "geojson": {
+      "data_type": "string | object",
+      "required": true,
+      "sample_data": "geom",
+      "source": "dndGeojsonColumn + DeckGeoJson.query_obj() + DeckGeoJson.get_properties()",
+      "notes": "这里必须传列名，不是原始 GeoJSON 对象。"
+    },
+    "fill_color_picker": {
+      "data_type": "object",
+      "required": true,
+      "sample_data": {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      },
+      "source": "Geojson.tsx direct property access",
+      "notes": "运行时会直接读取 `fd.fill_color_picker.r/g/b/a`。"
+    },
+    "stroke_color_picker": {
+      "data_type": "object",
+      "required": true,
+      "sample_data": {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      },
+      "source": "Geojson.tsx direct property access",
+      "notes": "运行时会直接读取 `fd.stroke_color_picker.r/g/b/a`。"
+    }
+  },
+  "global_optional_fields": {
+    "row_limit": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 5000,
+      "source": "Query section"
+    },
+    "filter_nulls": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": true,
+      "source": "Query section",
+      "notes": "当前图上实际不影响查询，但保存态里通常会保留。"
+    },
+    "adhoc_filters": {
+      "data_type": "array[object]",
+      "required": false,
+      "sample_data": [],
+      "source": "Query section"
+    },
+    "mapbox_style": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+      "source": "Map section"
+    },
+    "viewport": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {
+        "longitude": 6.85236157047845,
+        "latitude": 31.222656842808707,
+        "zoom": 1,
+        "bearing": 0,
+        "pitch": 0
+      },
+      "source": "Map section"
+    },
+    "autozoom": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": true,
+      "source": "Map section"
+    },
+    "filled": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": true,
+      "source": "GeoJson Settings section"
+    },
+    "stroked": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": false,
+      "source": "GeoJson Settings section"
+    },
+    "extruded": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": true,
+      "source": "GeoJson Settings section"
+    },
+    "line_width": {
+      "data_type": "integer | string",
+      "required": false,
+      "sample_data": 1,
+      "source": "GeoJson Settings section"
+    },
+    "line_width_unit": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "pixels",
+      "source": "GeoJson Settings section"
+    },
+    "point_radius_scale": {
+      "data_type": "integer | string | null",
+      "required": false,
+      "sample_data": 100,
+      "source": "GeoJson Settings section"
+    },
+    "js_columns": {
+      "data_type": "array[string | object]",
+      "required": false,
+      "sample_data": [],
+      "source": "Advanced section"
+    },
+    "js_data_mutator": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "data => data",
+      "source": "Advanced section"
+    },
+    "js_tooltip": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "o => `<div>${o.object.extraProps?.name}</div>`",
+      "source": "Advanced section"
+    },
+    "js_onclick_href": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "o => `https://example.com/?id=${o.object.extraProps?.id}`",
+      "source": "Advanced section"
+    },
+    "slice_id": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 0,
+      "source": "datasourceAndVizType hidden control",
+      "notes": "新建图表时通常省略；编辑已存在图表时由服务端或上层调用方提供。"
+    },
+    "cache_timeout": {
+      "data_type": "integer | null",
+      "required": false,
+      "sample_data": null,
+      "source": "datasourceAndVizType hidden control"
+    },
+    "url_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "QueryFormData"
+    },
+    "custom_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "QueryFormData"
+    },
+    "extra_form_data": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "utils.merge_extra_form_data()",
+      "notes": "虽然不属于 deck_geojson controlPanel 正式字段，但 legacy explore_json 路径会消费它。"
+    }
+  },
+  "minimal_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "deck_geojson",
+    "geojson": "geom",
+    "adhoc_filters": [],
+    "fill_color_picker": {
+      "r": 0,
+      "g": 122,
+      "b": 135,
+      "a": 1
+    },
+    "stroke_color_picker": {
+      "r": 0,
+      "g": 122,
+      "b": 135,
+      "a": 1
+    },
+    "mapbox_style": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    "viewport": {
+      "longitude": 6.85236157047845,
+      "latitude": 31.222656842808707,
+      "zoom": 1,
+      "bearing": 0,
+      "pitch": 0
+    },
+    "filled": true,
+    "stroked": false,
+    "extruded": true
+  },
+  "recommended_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "deck_geojson",
+    "geojson": "geom",
+    "row_limit": 5000,
+    "filter_nulls": true,
+    "adhoc_filters": [],
+    "mapbox_style": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    "viewport": {
+      "longitude": 6.85236157047845,
+      "latitude": 31.222656842808707,
+      "zoom": 1,
+      "bearing": 0,
+      "pitch": 0
+    },
+    "autozoom": true,
+    "fill_color_picker": {
+      "r": 0,
+      "g": 122,
+      "b": 135,
+      "a": 1
+    },
+    "stroke_color_picker": {
+      "r": 0,
+      "g": 122,
+      "b": 135,
+      "a": 1
+    },
+    "filled": true,
+    "stroked": false,
+    "extruded": true,
+    "line_width": 1,
+    "line_width_unit": "pixels",
+    "point_radius_scale": null,
+    "js_columns": [],
+    "js_data_mutator": "",
+    "js_tooltip": "",
+    "js_onclick_href": ""
+  },
+  "conditional_blocks": {
+    "keep_geojson_native_colors": {
+      "condition": "不想覆盖 GeoJSON 自带颜色时",
+      "fields": {
+        "fill_color_picker": {
+          "r": 0,
+          "g": 122,
+          "b": 135,
+          "a": 0
+        },
+        "stroke_color_picker": {
+          "r": 0,
+          "g": 122,
+          "b": 135,
+          "a": 0
+        }
+      },
+      "notes": "共享控件描述和 `Geojson.tsx` 都证明：alpha 为 0 时不会写入颜色覆盖。"
+    },
+    "line_width_in_meters": {
+      "condition": "线宽需要按真实距离单位解释时",
+      "fields": {
+        "line_width": 5,
+        "line_width_unit": "meters"
+      }
+    },
+    "point_radius_scale_for_point_features": {
+      "condition": "GeoJSON 中包含点要素且需要调整点半径比例时",
+      "fields": {
+        "point_radius_scale": 200
+      }
+    },
+    "custom_js": {
+      "condition": "需要自定义 GeoJSON 数据加工、tooltip 或点击跳转行为时",
+      "fields": {
+        "js_columns": [
+          "name",
+          "id"
+        ],
+        "js_data_mutator": "data => data",
+        "js_tooltip": "o => `<div>${o.object.extraProps?.name}</div>`",
+        "js_onclick_href": "o => `https://example.com/?id=${o.object.extraProps?.id}`"
+      }
+    }
+  },
+  "runtime_only_or_non_template_fields": {
+    "runtime_props_generated_by_transformProps": [
+      {
+        "field_name": "payload",
+        "reason": "这是运行时从 `queriesData[0]` 注入的对象，不是 API root form_data 字段。"
+      },
+      {
+        "field_name": "formData",
+        "reason": "这是 runtime 对 `rawFormData` 的整体透传容器，不是额外的 API root 字段。"
+      },
+      {
+        "field_name": "viewport.width",
+        "reason": "运行时由图表尺寸补入，不需要写到 root form_data。"
+      },
+      {
+        "field_name": "viewport.height",
+        "reason": "运行时由图表尺寸补入，不需要写到 root form_data。"
+      },
+      {
+        "field_name": "emitCrossFilters",
+        "reason": "这是 ChartProps/hook 层运行时能力，不是 API root 字段。"
+      },
+      {
+        "field_name": "filterState",
+        "reason": "这是 runtime 交互状态，不是 API root 字段。"
+      }
+    ],
+    "backend_response_only_fields": [
+      {
+        "field_name": "queriesData[0].data.features[*]",
+        "reason": "这是后端把 `geojson` 列执行 `json.loads()` 后返回的 GeoJSON 对象，不是 root form_data 字段。"
+      },
+      {
+        "field_name": "queriesData[0].data.mapboxApiKey",
+        "reason": "这是后端 payload 附带的运行时地图密钥，不是 root form_data 字段。"
+      },
+      {
+        "field_name": "queriesData[0].data.metricLabels",
+        "reason": "当前图没有正式指标字段；该返回值通常为空或无业务意义，不是 root form_data 字段。"
+      }
+    ],
+    "legacy_or_generated_non_primary_fields": [
+      {
+        "field_name": "filters",
+        "reason": "这不是当前 controlPanel 正式字段。它可能在旧保存态或 legacy 兼容处理中出现，但当前创建模板应优先使用 `adhoc_filters`。"
+      },
+      {
+        "field_name": "payload.form_data",
+        "reason": "这是 legacy `/superset/explore_json/` 请求的外层包裹字段，不是图表保存态内部的 root form_data 字段。"
+      }
+    ]
+  },
+  "api_usage_guidance": {
+    "high_confidence_required_fields": [
+      "datasource",
+      "viz_type",
+      "geojson",
+      "fill_color_picker",
+      "stroke_color_picker"
+    ],
+    "recommended_always_set": [
+      "adhoc_filters",
+      "row_limit",
+      "mapbox_style",
+      "viewport",
+      "autozoom",
+      "filled",
+      "stroked",
+      "extruded"
+    ],
+    "api_field_examples": [
+      "geojson",
+      "fill_color_picker",
+      "stroke_color_picker",
+      "line_width",
+      "line_width_unit",
+      "point_radius_scale",
+      "mapbox_style",
+      "viewport"
+    ],
+    "avoid_confusion": [
+      "不要把 deck_geojson 当成标准 chart data API 图表去套 `/api/v1/chart/data` 的 `query_context` 模板；当前图真实入口是 legacy `/superset/explore_json/`。",
+      "`geojson` 这里传的是列名，不是 GeoJSON 文档本身。",
+      "不要给 deck_geojson 人为添加并不存在的 `metric` / `metrics` 字段；后端会强制清空它们。",
+      "`filter_nulls` 虽然在 controlPanel 里存在，但当前后端实现里对这个图没有实际效果。",
+      "`fill_color_picker` 和 `stroke_color_picker` 不是可有可无的装饰字段；运行时会直接读取它们。"
+    ]
+  }
+}

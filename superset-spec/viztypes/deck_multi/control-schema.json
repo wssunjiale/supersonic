@@ -1,0 +1,540 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "deck_multi",
+  "display_name": "deck.gl Multiple Layers",
+  "source_kind": "schema_file",
+  "normalized_control_schema": {
+    "field_category_order": [
+      "Map",
+      "Query"
+    ],
+    "field_occurrences": [
+      {
+        "source_name": "control-schema",
+        "category": "Map",
+        "field_name": "mapbox_style",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/ or tile server URL.",
+        "data_type": "string",
+        "sample_data": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+        "original_field": {
+          "field_name": "mapbox_style",
+          "description": "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/ or tile server URL.",
+          "data_type": "string",
+          "enum_source": "bootstrap common.deckgl_tiles or DEFAULT_DECKGL_TILES",
+          "sample_data": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+          "required": false,
+          "embedding": "否",
+          "default_value": "getDeckGLTiles()[0][0]"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Map",
+        "field_name": "viewport",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Parameters related to the view and perspective on the map",
+        "data_type": "object",
+        "sample_data": {
+          "longitude": 6.85236157047845,
+          "latitude": 31.222656842808707,
+          "zoom": 1,
+          "bearing": 0,
+          "pitch": 0
+        },
+        "original_field": {
+          "field_name": "viewport",
+          "description": "Parameters related to the view and perspective on the map",
+          "data_type": "object",
+          "sample_data": {
+            "longitude": 6.85236157047845,
+            "latitude": 31.222656842808707,
+            "zoom": 1,
+            "bearing": 0,
+            "pitch": 0
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": {
+            "longitude": 6.85236157047845,
+            "latitude": 31.222656842808707,
+            "zoom": 1,
+            "bearing": 0,
+            "pitch": 0
+          },
+          "notes": "运行时 `transformProps.ts` 会把当前图表的 `width`/`height` 合并进 viewport，但 root form_data 不需要自己提供宽高。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Map",
+        "field_name": "deck_slices",
+        "runtime_alias": null,
+        "required": true,
+        "embedding": "否",
+        "description": "Pick a set of deck.gl charts to layer on top of one another",
+        "data_type": "array[integer]",
+        "sample_data": [
+          101,
+          102
+        ],
+        "original_field": {
+          "field_name": "deck_slices",
+          "description": "Pick a set of deck.gl charts to layer on top of one another",
+          "data_type": "array[integer]",
+          "enum_source": "api/v1/chart/?q=(filters:!((col:viz_type,opr:sw,value:deck)))",
+          "sample_data": [
+            101,
+            102
+          ],
+          "required": true,
+          "embedding": "否",
+          "default_value": [],
+          "notes": "control 是 `SelectAsyncControl` + `validateNonEmpty`。后端和前端都把它当成 slice id 数组。实际应只引用 `layerGenerators` 支持的单层 deck 图，不要嵌套 `deck_multi`。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "adhoc_filters",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "description": "根层 Filters。对 deck_multi 而言，它不是作用于自身 SQL，而是被转发到各个子图层。若存在 layer scope，则会按图层索引筛选后再分发。",
+        "data_type": "array[object]",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "country",
+            "operator": "IN",
+            "comparator": [
+              "US"
+            ]
+          }
+        ],
+        "original_field": {
+          "field_name": "adhoc_filters",
+          "description": "根层 Filters。对 deck_multi 而言，它不是作用于自身 SQL，而是被转发到各个子图层。若存在 layer scope，则会按图层索引筛选后再分发。",
+          "data_type": "array[object]",
+          "enum_source": "dashboard/explore adhoc filters",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "country",
+              "operator": "IN",
+              "comparator": [
+                "US"
+              ]
+            }
+          ],
+          "required": false,
+          "embedding": "extra_form_data.append",
+          "default_value": [],
+          "notes": "在 explore dashboard context 下，额外的 adhoc filters 还可能带 `deck_slices` 与 `layerFilterScope` 元数据，用于子图层范围控制。"
+        }
+      }
+    ],
+    "field_inventory": [
+      {
+        "field_name": "adhoc_filters",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "根层 Filters。对 deck_multi 而言，它不是作用于自身 SQL，而是被转发到各个子图层。若存在 layer scope，则会按图层索引筛选后再分发。"
+        ],
+        "data_types": [
+          "array[object]"
+        ],
+        "sample_data_examples": [
+          [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "country",
+              "operator": "IN",
+              "comparator": [
+                "US"
+              ]
+            }
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "adhoc_filters",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "extra_form_data.append",
+            "description": "根层 Filters。对 deck_multi 而言，它不是作用于自身 SQL，而是被转发到各个子图层。若存在 layer scope，则会按图层索引筛选后再分发。",
+            "data_type": "array[object]",
+            "sample_data": [
+              {
+                "expressionType": "SIMPLE",
+                "clause": "WHERE",
+                "subject": "country",
+                "operator": "IN",
+                "comparator": [
+                  "US"
+                ]
+              }
+            ],
+            "original_field": {
+              "field_name": "adhoc_filters",
+              "description": "根层 Filters。对 deck_multi 而言，它不是作用于自身 SQL，而是被转发到各个子图层。若存在 layer scope，则会按图层索引筛选后再分发。",
+              "data_type": "array[object]",
+              "enum_source": "dashboard/explore adhoc filters",
+              "sample_data": [
+                {
+                  "expressionType": "SIMPLE",
+                  "clause": "WHERE",
+                  "subject": "country",
+                  "operator": "IN",
+                  "comparator": [
+                    "US"
+                  ]
+                }
+              ],
+              "required": false,
+              "embedding": "extra_form_data.append",
+              "default_value": [],
+              "notes": "在 explore dashboard context 下，额外的 adhoc filters 还可能带 `deck_slices` 与 `layerFilterScope` 元数据，用于子图层范围控制。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "deck_slices",
+        "required": true,
+        "categories": [
+          "Map"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Pick a set of deck.gl charts to layer on top of one another"
+        ],
+        "data_types": [
+          "array[integer]"
+        ],
+        "sample_data_examples": [
+          [
+            101,
+            102
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Map",
+            "field_name": "deck_slices",
+            "runtime_alias": null,
+            "required": true,
+            "embedding": "否",
+            "description": "Pick a set of deck.gl charts to layer on top of one another",
+            "data_type": "array[integer]",
+            "sample_data": [
+              101,
+              102
+            ],
+            "original_field": {
+              "field_name": "deck_slices",
+              "description": "Pick a set of deck.gl charts to layer on top of one another",
+              "data_type": "array[integer]",
+              "enum_source": "api/v1/chart/?q=(filters:!((col:viz_type,opr:sw,value:deck)))",
+              "sample_data": [
+                101,
+                102
+              ],
+              "required": true,
+              "embedding": "否",
+              "default_value": [],
+              "notes": "control 是 `SelectAsyncControl` + `validateNonEmpty`。后端和前端都把它当成 slice id 数组。实际应只引用 `layerGenerators` 支持的单层 deck 图，不要嵌套 `deck_multi`。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "mapbox_style",
+        "required": false,
+        "categories": [
+          "Map"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/ or tile server URL."
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Map",
+            "field_name": "mapbox_style",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/ or tile server URL.",
+            "data_type": "string",
+            "sample_data": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+            "original_field": {
+              "field_name": "mapbox_style",
+              "description": "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/ or tile server URL.",
+              "data_type": "string",
+              "enum_source": "bootstrap common.deckgl_tiles or DEFAULT_DECKGL_TILES",
+              "sample_data": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+              "required": false,
+              "embedding": "否",
+              "default_value": "getDeckGLTiles()[0][0]"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "viewport",
+        "required": false,
+        "categories": [
+          "Map"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Parameters related to the view and perspective on the map"
+        ],
+        "data_types": [
+          "object"
+        ],
+        "sample_data_examples": [
+          {
+            "longitude": 6.85236157047845,
+            "latitude": 31.222656842808707,
+            "zoom": 1,
+            "bearing": 0,
+            "pitch": 0
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Map",
+            "field_name": "viewport",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Parameters related to the view and perspective on the map",
+            "data_type": "object",
+            "sample_data": {
+              "longitude": 6.85236157047845,
+              "latitude": 31.222656842808707,
+              "zoom": 1,
+              "bearing": 0,
+              "pitch": 0
+            },
+            "original_field": {
+              "field_name": "viewport",
+              "description": "Parameters related to the view and perspective on the map",
+              "data_type": "object",
+              "sample_data": {
+                "longitude": 6.85236157047845,
+                "latitude": 31.222656842808707,
+                "zoom": 1,
+                "bearing": 0,
+                "pitch": 0
+              },
+              "required": false,
+              "embedding": "否",
+              "default_value": {
+                "longitude": 6.85236157047845,
+                "latitude": 31.222656842808707,
+                "zoom": 1,
+                "bearing": 0,
+                "pitch": 0
+              },
+              "notes": "运行时 `transformProps.ts` 会把当前图表的 `width`/`height` 合并进 viewport，但 root form_data 不需要自己提供宽高。"
+            }
+          }
+        ]
+      }
+    ],
+    "required_field_names": [
+      "deck_slices"
+    ],
+    "embedding_enabled_field_names": [
+      "adhoc_filters"
+    ],
+    "runtime_alias_index": {}
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "deck_multi",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/deck_multi-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/deck_multi-form-data-schema.json",
+      "control-schema": "form-data-schema/deck_multi-schema.json"
+    }
+  },
+  "fallback_online_field_categories": {
+    "Query": [],
+    "Advanced analytics": [],
+    "Annotations & Layers": [],
+    "Predictive Analytics（Forecast）": [],
+    "Chart Options": [],
+    "Chart Title": [],
+    "图表专属": [],
+    "通用图表选项": []
+  },
+  "original_control_schema": {
+    "viz_type": "deck_multi",
+    "display_name": "deck.gl Multiple Layers",
+    "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/Multi/controlPanel.ts",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/Multi/controlPanel.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/Multi/index.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/Multi/Multi.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utils/explore.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/index.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/Shared_DeckGL.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/dashboard/util/charts/getFormDataWithExtraFilters.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataWithDashboardContext.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+      "D:/vsx/sources/superset-6.0.0/superset/views/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+      "D:/vsx/sources/superset-6.0.0/tests/integration_tests/viz_tests.py"
+    ],
+    "supported_sublayer_viztypes": [
+      "deck_arc",
+      "deck_contour",
+      "deck_geojson",
+      "deck_grid",
+      "deck_heatmap",
+      "deck_hex",
+      "deck_path",
+      "deck_polygon",
+      "deck_scatter",
+      "deck_screengrid"
+    ],
+    "notes": [
+      "deck_multi 不在 `src/layers/*` 下，而在 `src/Multi`。它不是普通的单层 deck.gl 图，而是一个组合器，用来叠加多个已保存的 deck.gl 子图层。",
+      "metadata 明确声明 `useLegacyApi=true`，因此真实请求路径是 `/superset/explore_json/`。",
+      "前端展示名是 `deck.gl Multiple Layers`，后端类名是 `superset/viz.py::DeckGLMultiLayer`。构造模板时应以 `viz_type='deck_multi'` 为准。",
+      "当前图的正式 controlPanel 字段很少，只有 `mapbox_style`、`viewport`、`deck_slices`、`adhoc_filters`。其中 `deck_slices` 通过 `validateNonEmpty` 强制必填。",
+      "`deck_slices` 的 async 选择接口是 `api/v1/chart/?q=(filters:!((col:viz_type,opr:sw,value:deck)))`，也就是说它会抓所有 `viz_type` 以 `deck` 开头的图表；但前端 `src/layers/index.ts` 的 `layerGenerators` 只支持 10 个具体子图层类型，不包含 `deck_multi` 本身。",
+      "因此，虽然下拉接口会返回所有 deck* 图，规范模板里的 `deck_slices` 应只引用 `layerGenerators` 明确支持的单层 deck.gl 图表，而不要嵌套 `deck_multi`。",
+      "后端 `DeckGLMultiLayer.query_obj()` 直接返回空对象 `{}`。这意味着根图本身不编译出常规 SQL query；真正的数据获取发生在 `get_data()` 中，通过 `deck_slices` 找到每个子切片，再分别执行对应子图的 `get_payload()`。",
+      "根层 `adhoc_filters`、`extra_filters`、`extra_form_data`、`layer_filter_scope`、`filter_data_mapping` 不属于当前 controlPanel 正式字段，但它们会在 dashboard/explore 上下文里被注入，并在 `DeckGLMultiLayer.get_data()` 与 `Multi.tsx` 中转发到各个子图层。",
+      "`layer_filter_scope` 的值是图层索引，不是 slice id。索引顺序与 `deck_slices` 数组顺序一致，后端 `enumerate(slices)` 与前端 `getLayerIndex()` 都按这个规则工作。"
+    ],
+    "legacy_api_behavior": {
+      "useLegacyApi": true,
+      "frontend_request_endpoint": "/superset/explore_json/",
+      "frontend_request_payload": {
+        "form_data": "<raw form_data>"
+      },
+      "query_builder": "deck_multi 没有专属前端 buildQuery。ChartClient.ts 在 `useLegacyApi=true` 且未注册 buildQuery 时，会把原始 form_data 直接包装进 legacy payload。"
+    },
+    "query_compilation": {
+      "backend_class": "superset/viz.py::DeckGLMultiLayer",
+      "base_query": "`DeckGLMultiLayer.query_obj()` 直接返回 `{}`，根图本身不生成常规 query_obj。",
+      "subslice_resolution": "`DeckGLMultiLayer.get_data()` 读取 `form_data.deck_slices`，再通过 `db.session.query(Slice).filter(Slice.id.in_(slice_ids)).all()` 拉取对应子切片。",
+      "layer_filter_forwarding": "后端 `_apply_layer_filtering()` 会把根层的 `extra_filters`、`adhoc_filters`、`extra_form_data` 转发到每个子切片；若存在 `layer_filter_scope`，则会按图层索引做过滤，并用 `filter_data_mapping` 重写 `extra_form_data.filters`。",
+      "subslice_execution": "后端会对每个子切片读取 `slc.form_data`，套用 layer filtering 后，通过 `viz_types.get(viz_type_name)` 实例化对应子图，再调用 `viz_instance.get_payload()`。",
+      "returned_data": "根图返回的 payload 形状是 `{ features: {<sub_viz_type>: [...]}, mapboxApiKey, slices }`。其中 `slices` 来自 `slc.data`，`features` 则是把各子图 payload.data.features 依 viz_type 聚合后的结果。",
+      "frontend_runtime_loading": "`Multi.tsx` 不直接用根图 payload 完成渲染，而是遍历 `payload.data.slices`，给每个子切片重新构造 `explore_json` URL，再通过 `layerGenerators[subslice.form_data.viz_type]` 生成真正的 deck.gl layer。根图 payload.data.features 主要用于初始 viewport 拟合。"
+    },
+    "field_categories": {
+      "Map": [
+        {
+          "field_name": "mapbox_style",
+          "description": "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/ or tile server URL.",
+          "data_type": "string",
+          "enum_source": "bootstrap common.deckgl_tiles or DEFAULT_DECKGL_TILES",
+          "sample_data": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+          "required": false,
+          "embedding": "否",
+          "default_value": "getDeckGLTiles()[0][0]"
+        },
+        {
+          "field_name": "viewport",
+          "description": "Parameters related to the view and perspective on the map",
+          "data_type": "object",
+          "sample_data": {
+            "longitude": 6.85236157047845,
+            "latitude": 31.222656842808707,
+            "zoom": 1,
+            "bearing": 0,
+            "pitch": 0
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": {
+            "longitude": 6.85236157047845,
+            "latitude": 31.222656842808707,
+            "zoom": 1,
+            "bearing": 0,
+            "pitch": 0
+          },
+          "notes": "运行时 `transformProps.ts` 会把当前图表的 `width`/`height` 合并进 viewport，但 root form_data 不需要自己提供宽高。"
+        },
+        {
+          "field_name": "deck_slices",
+          "description": "Pick a set of deck.gl charts to layer on top of one another",
+          "data_type": "array[integer]",
+          "enum_source": "api/v1/chart/?q=(filters:!((col:viz_type,opr:sw,value:deck)))",
+          "sample_data": [
+            101,
+            102
+          ],
+          "required": true,
+          "embedding": "否",
+          "default_value": [],
+          "notes": "control 是 `SelectAsyncControl` + `validateNonEmpty`。后端和前端都把它当成 slice id 数组。实际应只引用 `layerGenerators` 支持的单层 deck 图，不要嵌套 `deck_multi`。"
+        }
+      ],
+      "Query": [
+        {
+          "field_name": "adhoc_filters",
+          "description": "根层 Filters。对 deck_multi 而言，它不是作用于自身 SQL，而是被转发到各个子图层。若存在 layer scope，则会按图层索引筛选后再分发。",
+          "data_type": "array[object]",
+          "enum_source": "dashboard/explore adhoc filters",
+          "sample_data": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "country",
+              "operator": "IN",
+              "comparator": [
+                "US"
+              ]
+            }
+          ],
+          "required": false,
+          "embedding": "extra_form_data.append",
+          "default_value": [],
+          "notes": "在 explore dashboard context 下，额外的 adhoc filters 还可能带 `deck_slices` 与 `layerFilterScope` 元数据，用于子图层范围控制。"
+        }
+      ]
+    }
+  }
+}

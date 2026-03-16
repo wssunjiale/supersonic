@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,8 +24,15 @@ import java.util.stream.Collectors;
 public class ChatModelServiceImpl extends ServiceImpl<ChatModelMapper, ChatModelDO>
         implements ChatModelService {
     @Override
-    public List<ChatModel> getChatModels() {
-        return list().stream().map(this::convert).collect(Collectors.toList());
+    public List<ChatModel> getChatModels(User user) {
+        return list().stream().map(this::convert).filter(chatModel -> {
+            if (chatModel.isPublic() || user.isSuperAdmin()
+                    || chatModel.getCreatedBy().equals(user.getName())
+                    || chatModel.getViewers().contains(user.getName())) {
+                return true;
+            }
+            return false;
+        }).sorted(Comparator.comparingLong(ChatModel::getId)).collect(Collectors.toList());
     }
 
     @Override
@@ -41,9 +49,13 @@ public class ChatModelServiceImpl extends ServiceImpl<ChatModelMapper, ChatModel
         chatModelDO.setCreatedBy(user.getName());
         chatModelDO.setCreatedAt(new Date());
         chatModelDO.setUpdatedBy(user.getName());
-        chatModelDO.setUpdatedAt(new Date());
+        chatModelDO.setUpdatedAt(chatModelDO.getCreatedAt());
+        chatModelDO.setIsOpen(chatModel.getIsOpen());
         if (StringUtils.isBlank(chatModel.getAdmin())) {
             chatModelDO.setAdmin(user.getName());
+        }
+        if (!chatModel.getViewers().isEmpty()) {
+            chatModelDO.setViewer(JsonUtil.toString(chatModel.getViewers()));
         }
         save(chatModelDO);
         chatModel.setId(chatModelDO.getId());
@@ -55,15 +67,24 @@ public class ChatModelServiceImpl extends ServiceImpl<ChatModelMapper, ChatModel
         ChatModelDO chatModelDO = convert(chatModel);
         chatModelDO.setUpdatedBy(user.getName());
         chatModelDO.setUpdatedAt(new Date());
+        chatModelDO.setIsOpen(chatModel.getIsOpen());
         if (StringUtils.isBlank(chatModel.getAdmin())) {
             chatModel.setAdmin(user.getName());
+        }
+        if (!chatModel.getViewers().isEmpty()) {
+            chatModelDO.setViewer(JsonUtil.toString(chatModel.getViewers()));
         }
         updateById(chatModelDO);
         return chatModel;
     }
 
     @Override
-    public void deleteChatModel(Integer id) {
+    public void deleteChatModel(Integer id, User user) {
+        ChatModel chatModel = getChatModel(id);
+        if (!checkAdminPermission(user, chatModel)) {
+            throw new RuntimeException("没有权限删除该大模型");
+        }
+
         removeById(id);
     }
 
@@ -74,6 +95,7 @@ public class ChatModelServiceImpl extends ServiceImpl<ChatModelMapper, ChatModel
         ChatModel chatModel = new ChatModel();
         BeanUtils.copyProperties(chatModelDO, chatModel);
         chatModel.setConfig(JsonUtil.toObject(chatModelDO.getConfig(), ChatModelConfig.class));
+        chatModel.setViewers(JsonUtil.toList(chatModelDO.getViewer(), String.class));
         return chatModel;
     }
 
@@ -85,5 +107,14 @@ public class ChatModelServiceImpl extends ServiceImpl<ChatModelMapper, ChatModel
         BeanUtils.copyProperties(chatModel, chatModelDO);
         chatModelDO.setConfig(JsonUtil.toString(chatModel.getConfig()));
         return chatModelDO;
+    }
+
+    private boolean checkAdminPermission(User user, ChatModel chatModel) {
+        String admin = chatModel.getAdmin();
+        if (user.isSuperAdmin()) {
+            return true;
+        }
+        return admin != null && admin.equals(user.getName())
+                || chatModel.getCreatedBy().equals(user.getName());
     }
 }

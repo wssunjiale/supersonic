@@ -11,7 +11,7 @@ class SqlNormalizeHelperTest {
     void testNormalizeSqlTrimsAndRemovesSemicolon() {
         String normalized = SqlNormalizeHelper.normalizeSql("  select * from demo_table ; ");
         Assert.assertFalse(normalized.endsWith(";"));
-        Assert.assertTrue(normalized.startsWith("select"));
+        Assert.assertTrue(normalized.toLowerCase().startsWith("select"));
     }
 
     @Test

@@ -1,0 +1,480 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "sankey_v2",
+  "display_name": "Sankey Chart",
+  "source_kind": "schema_file",
+  "normalized_embedding_policy": {
+    "immutable_root_keys": [
+      "slice_id",
+      "datasource",
+      "viz_type",
+      "all_saved_chart_definition_fields"
+    ],
+    "allowed_runtime_fields": [
+      {
+        "field_name": "adhoc_filters",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "custom_form_data",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "filters",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "relative_end",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "relative_start",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_column",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_grain",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_range",
+        "behavior": "override",
+        "source": "embedding-schema"
+      }
+    ],
+    "safe_embedding_form_data_seed": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "sankey_v2",
+      "extra_form_data": {
+        "filters": [],
+        "adhoc_filters": []
+      }
+    }
+  },
+  "original_embedding_form_data_schema": {
+    "viz_type": "sankey_v2",
+    "display_name": "Sankey Chart",
+    "purpose": "第三方 embedding / guest token 场景下安全传输的 Sankey Chart form_data 模板",
+    "base_form_data_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/sankey_v2-form-data-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset/security/manager.py",
+      "D:/vsx/sources/superset-6.0.0/superset/charts/data/api.py",
+      "D:/vsx/sources/superset-6.0.0/superset/commands/chart/data/get_data_command.py",
+      "D:/vsx/sources/superset-6.0.0/superset/charts/schemas.py",
+      "D:/vsx/sources/superset-6.0.0/superset/constants.py",
+      "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Sankey/buildQuery.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Sankey/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Sankey/index.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryContext.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryObject.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/QueryFormData.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/processExtraFormData.ts"
+    ],
+    "notes": [
+      "embedded guest 的核心限制在后端 `security/manager.py::query_context_modified()`。报错原文是 `Guest user cannot modify chart payload`。",
+      "Sankey 走 chart data API 的 query context。`buildQueryContext()` 会把 raw form_data 原样保存在 `query_context.form_data`，同时 `Sankey/buildQuery.ts` 会把 `source` 与 `target` 编译进 query `groupby`。",
+      "当前 Sankey 插件 metadata 中直接写了 `TODO: Implement cross filtering`，因此它不像 radar 一样从图形点击事件发出 `extraFormData.filters`。embedding 场景里如果要做动态过滤，需要调用方自己传 `extra_form_data.filters` / `adhoc_filters`。",
+      "`sort_by_metric=true` 会改变 query `orderby`，guest 场景不应动态修改它。"
+    ],
+    "security_enforcement": {
+      "backend_check_function": "superset/security/manager.py::query_context_modified",
+      "checked_when": "ChartDataCommand.validate() -> QueryContext.raise_for_access()",
+      "error_message": "Guest user cannot modify chart payload",
+      "directly_compared_root_fields": [
+        "slice_id",
+        "metrics",
+        "columns",
+        "groupby",
+        "orderby"
+      ],
+      "sankey_specific_query_sensitive_fields": [
+        "source",
+        "target",
+        "metric",
+        "adhoc_filters",
+        "row_limit",
+        "sort_by_metric"
+      ],
+      "recommended_strategy": "复制保存态 Sankey Chart 的完整 form_data 作为 base，只通过 extra_form_data 追加动态过滤条件；不要在 guest 请求里重构 `source/target/metric` 或排序字段。"
+    },
+    "safe_base_rule": {
+      "description": "第三方 embedding 请求中的根层 form_data，应当从已保存 Sankey Chart 的 form_data 直接复制，不要重构。",
+      "must_be_copied_from_saved_chart": [
+        "slice_id",
+        "dashboardId",
+        "datasource",
+        "viz_type",
+        "source",
+        "target",
+        "metric",
+        "adhoc_filters",
+        "row_limit",
+        "sort_by_metric",
+        "color_scheme",
+        "all other saved chart-definition fields"
+      ],
+      "why": [
+        "`buildQueryContext()` 会把 raw formData 直接放进 `query_context.form_data`。",
+        "`Sankey/buildQuery.ts` 会把 `source` 与 `target` 组装成 query `groupby`，而 `metric` 会进入 query `metrics`。",
+        "`sort_by_metric=true` 时会生成 query `orderby`，属于 guest payload 校验关注的敏感查询字段。",
+        "颜色方案虽然不改 SQL，但属于图表定义的一部分。复制保存态是最稳妥的 guest 访问策略。"
+      ]
+    },
+    "safe_embedding_form_data_template": {
+      "description": "这是 Sankey Chart guest embedding 下的安全写法。根层以保存态图表为 base，仅改 extra_form_data。",
+      "template": {
+        "slice_id": "<saved_chart_id>",
+        "dashboardId": "<dashboard_id>",
+        "datasource": "<copied_from_saved_chart>",
+        "viz_type": "sankey_v2",
+        "source": "<copied_from_saved_chart>",
+        "target": "<copied_from_saved_chart>",
+        "metric": "<copied_from_saved_chart>",
+        "adhoc_filters": "<copied_from_saved_chart>",
+        "row_limit": "<copied_from_saved_chart>",
+        "sort_by_metric": "<copied_from_saved_chart>",
+        "color_scheme": "<copied_from_saved_chart>",
+        "extra_form_data": {
+          "filters": [
+            {
+              "col": "country",
+              "op": "IN",
+              "val": [
+                "CN",
+                "US"
+              ]
+            }
+          ],
+          "adhoc_filters": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "country",
+              "operator": "IN",
+              "comparator": [
+                "CN",
+                "US"
+              ]
+            }
+          ],
+          "custom_form_data": {}
+        }
+      }
+    },
+    "preferred_dynamic_container": {
+      "field_name": "extra_form_data",
+      "description": "第三方 embedding 推荐把动态上下文放在这里；后端会在 merge_extra_form_data() 中合并它。",
+      "append_keys": [
+        "adhoc_filters",
+        "filters",
+        "interactive_groupby",
+        "interactive_highlight",
+        "interactive_drilldown",
+        "custom_form_data"
+      ],
+      "override_keys_backend_high_confidence": [
+        "granularity_sqla",
+        "time_column",
+        "time_grain",
+        "time_range",
+        "time_grain_sqla",
+        "relative_start",
+        "relative_end"
+      ],
+      "notes": "Sankey 当前没有时间控件链路，也没有 cross-filter 实现。对当前图而言，高置信动态入口仍然只有 `filters` / `adhoc_filters`。"
+    },
+    "extra_form_data_field_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_sankey_v2": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "country",
+            "op": "IN",
+            "val": [
+              "CN",
+              "US"
+            ]
+          }
+        ],
+        "effect": "追加普通过滤条件。Sankey 本身没有交互 cross-filter，但调用方可以在 guest 请求里显式传入。",
+        "source": "superset/constants.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[object]",
+        "behavior": "append",
+        "safe_for_sankey_v2": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "country",
+            "operator": "IN",
+            "comparator": [
+              "CN",
+              "US"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会把它们标记为 extra 并并入查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_sankey_v2": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；Sankey 默认 buildQuery/transformProps 不直接消费它。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_sankey_v2": false,
+        "recommended": false,
+        "sample_data": "Last 30 days",
+        "effect": "通用 extra_form_data override 白名单允许该 key，但 Sankey 当前没有显式时间过滤控件链路。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_sankey_v2": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "通用时间粒度 override；当前图没有对应控件。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_sankey_v2": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "通用时间列 override；当前图没有对应控件。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_column",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_sankey_v2": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "底层 QueryObject 时间列 override；当前图没有官方时间控件闭环。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_grain",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_sankey_v2": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "底层 QueryObject 时间粒度 override；当前图没有官方时间控件闭环。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "relative_start",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_sankey_v2": false,
+        "recommended": false,
+        "sample_data": "now",
+        "effect": "进入 query extras 的相对开始时间；当前图没有显式时间过滤控件。",
+        "source": "superset/constants.py + superset/utils/core.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "relative_end",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_sankey_v2": false,
+        "recommended": false,
+        "sample_data": "today",
+        "effect": "进入 query extras 的相对结束时间；当前图没有显式时间过滤控件。",
+        "source": "superset/constants.py + superset/utils/core.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_sankey_v2": false,
+        "recommended": false,
+        "sample_data": [
+          "source_stage"
+        ],
+        "effect": "通用交互字段；当前 Sankey 默认 buildQuery/transformProps 不直接消费它。",
+        "source": "QueryFormData.ts + query constants"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_sankey_v2": false,
+        "recommended": false,
+        "sample_data": [
+          "target_stage"
+        ],
+        "effect": "通用交互字段；当前 Sankey 默认不直接消费。",
+        "source": "QueryFormData.ts + query constants"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_sankey_v2": false,
+        "recommended": false,
+        "sample_data": [
+          "source_stage"
+        ],
+        "effect": "通用交互字段；当前 Sankey 默认不直接消费。",
+        "source": "QueryFormData.ts + query constants"
+      }
+    ],
+    "minimal_extra_form_data_template": {
+      "filters": [
+        {
+          "col": "country",
+          "op": "IN",
+          "val": [
+            "CN"
+          ]
+        }
+      ]
+    },
+    "recommended_extra_form_data_template": {
+      "filters": [
+        {
+          "col": "country",
+          "op": "IN",
+          "val": [
+            "CN",
+            "US"
+          ]
+        }
+      ],
+      "adhoc_filters": [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "country",
+          "operator": "IN",
+          "comparator": [
+            "CN",
+            "US"
+          ]
+        }
+      ],
+      "custom_form_data": {}
+    },
+    "unsafe_root_form_data_changes": [
+      {
+        "field_name": "slice_id",
+        "reason": "与保存态图表 id 不一致会被后端立即判定为请求了另一张图。"
+      },
+      {
+        "field_name": "datasource / viz_type",
+        "reason": "guest embedding 不应修改图表绑定的数据集或图表类型。"
+      },
+      {
+        "field_name": "source / target",
+        "reason": "它们会被 `buildQuery.ts` 编译成 query `groupby`。"
+      },
+      {
+        "field_name": "metric",
+        "reason": "`extractQueryFields()` 会把它折叠成 query `metrics`。"
+      },
+      {
+        "field_name": "adhoc_filters / row_limit",
+        "reason": "会改变实际查询条件和返回结果规模。"
+      },
+      {
+        "field_name": "sort_by_metric",
+        "reason": "会决定 `buildQuery.ts` 是否生成 query `orderby`。"
+      },
+      {
+        "field_name": "color_scheme",
+        "reason": "虽然不改 SQL，但会改变图表定义与节点配色。"
+      }
+    ],
+    "practical_guidance": {
+      "best_practice": [
+        "先从保存态 Sankey Chart 读取完整 form_data。",
+        "根层字段保持不变，尤其保留 `source`、`target`、`metric`、`adhoc_filters`、`row_limit`、`sort_by_metric` 和 `color_scheme`。",
+        "只在 `extra_form_data` 中放动态 `filters` / `adhoc_filters`。",
+        "如果第三方页面需要联动筛选，不要期待 Sankey 自己从图上点击发出 cross-filter；当前插件还没实现。"
+      ],
+      "avoid": [
+        "不要在 guest embedding 请求里重构 Sankey 的 `source` / `target` / `metric`。",
+        "不要给 root form_data 额外补一个 `groupby` 试图替代 `source` / `target`。",
+        "不要把 runtime 别名 `colorScheme` 当成 root 键。"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "sankey_v2",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/sankey_v2-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/sankey_v2-form-data-schema.json",
+      "control-schema": "form-data-schema/sankey_v2-schema.json"
+    }
+  }
+}

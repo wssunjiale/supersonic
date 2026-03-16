@@ -1,0 +1,502 @@
+{
+  "viz_type": "pivot_table_v2",
+  "display_name": "Pivot Table",
+  "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-pivot-table/src/plugin/controlPanel.tsx",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-pivot-table/src/plugin/controlPanel.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-pivot-table/src/plugin/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-pivot-table/src/plugin/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-pivot-table/src/plugin/index.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-pivot-table/src/PivotTableChart.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-pivot-table/src/react-pivottable/PivotTable.jsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-pivot-table/src/react-pivottable/TableRenderers.jsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-pivot-table/src/types.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/utils/getColorFormatters.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/types.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryContext.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryObject.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractQueryFields.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts"
+  ],
+  "notes": [
+    "Pivot Table 是 chart data API 图，前端通过 `buildQueryContext()` 构造 query context，而不是 legacy `/superset/explore_json/`。",
+    "当前图的 API root form_data 键名混合了 camelCase 与 snake_case。必须按 control name 原样提交，例如 `groupbyRows`、`groupbyColumns`、`metricsLayout`、`aggregateFunction`、`valueFormat` 是 camelCase，而 `time_grain_sqla`、`date_format`、`currency_format`、`conditional_formatting`、`allow_render_html` 是源码中的真实 root 键。",
+    "`metrics` 控件显式带有 `validateNonEmpty`，这是当前图最高置信的必填字段；`groupbyRows` 与 `groupbyColumns` 没有 validator，因此源码层面它们是可选的。",
+    "`buildQuery.ts` 会把 `groupbyColumns` 与 `groupbyRows` 合并成 query `columns`，并在 `time_grain_sqla` 存在且列为 temporal 时，把物理列重写成带 `timeGrain` 的 AdhocColumn。",
+    "`series_limit_metric`、`metrics[0]` 与 `order_desc` 会共同决定 query `orderby`。这也是 embedding 场景下最敏感的几个 root 字段之一。",
+    "`transformProps.ts` 虽然消费了 `tableRenderer`，但当前 controlPanel 没有暴露该控件，而且 `PivotTable.jsx` 最终固定渲染 `TableRenderer`；`tableRenderer` 不应写入 API 模板。",
+    "`conditional_formatting` 的值类型来自 `ConditionalFormattingConfig[]`。`getColorFormatters()` 只认 `column`、`operator`、`colorScheme`、`targetValue` 或 `targetValueLeft/targetValueRight` 这几类键。"
+  ],
+  "metadata_summary": {
+    "description": "Used to summarize a set of data by grouping together multiple statistics along two axes. Examples: Sales numbers by region and month, tasks by status and assignee, active users by age and location.",
+    "category": "Table",
+    "tags": [
+      "Additive",
+      "Report",
+      "Tabular",
+      "Featured"
+    ]
+  },
+  "query_compilation": {
+    "frontend_builder": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-pivot-table/src/plugin/buildQuery.ts",
+    "query_context_builder": "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryContext.ts",
+    "base_query_effect": "`buildQueryObject()` 会从 raw form_data 提取 `metrics`、`adhoc_filters`、`row_limit`、`series_limit`、`series_limit_metric`、`order_desc` 等字段，形成基础 query object。",
+    "pivot_build_query_effect": "`buildQuery.ts` 会把 `groupbyColumns + groupbyRows` 合并为 query `columns`；如列是 temporal physical column 且设置了 `time_grain_sqla`，会重写为带 `timeGrain` 的 SQL AdhocColumn。随后它根据 `series_limit_metric` 或 `metrics[0]` 生成 `orderby`。",
+    "frontend_post_processing": "`transformProps.ts` 会把 raw form_data 映射成组件 props，并基于 `date_format` / `time_grain_sqla` 生成 `dateFormatters`，基于 `conditional_formatting` 生成 `metricColorFormatters`。",
+    "query_sensitive_fields": [
+      "groupbyRows",
+      "groupbyColumns",
+      "metrics",
+      "time_grain_sqla",
+      "series_limit_metric",
+      "order_desc"
+    ]
+  },
+  "form_data_overrides": {
+    "metrics": "getStandardizedControls().popAllMetrics()",
+    "groupbyColumns": "从 standardized columns 中剥离 `groupbyRows` 已占用的列，剩余部分写入 `groupbyColumns`。"
+  },
+  "field_categories": {
+    "Query": [
+      {
+        "field_name": "groupbyColumns",
+        "description": "Columns to group by on the columns",
+        "data_type": "array[string | object]",
+        "enum_source": "datasource columns",
+        "sample_data": [
+          "order_month"
+        ],
+        "required": false,
+        "embedding": "否",
+        "default_value": []
+      },
+      {
+        "field_name": "groupbyRows",
+        "description": "Columns to group by on the rows",
+        "data_type": "array[string | object]",
+        "enum_source": "datasource columns",
+        "sample_data": [
+          "region"
+        ],
+        "required": false,
+        "embedding": "否",
+        "default_value": []
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "runtime_alias": "timeGrainSqla",
+        "description": "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart.",
+        "data_type": "string | null",
+        "enum_source": "datasource.time_grain_sqla",
+        "sample_data": "P1D",
+        "required": false,
+        "embedding": "extra_form_data.override（guest 下不建议）",
+        "default_value": "新建未保存图且 metadata 为空时初始为 P1D，否则沿用已有值",
+        "notes": "仅当 `groupbyColumns` 或 `groupbyRows` 中选中了 temporal 列，或选中了 adhoc column 时才显示。`buildQuery.ts` 会在 temporal physical column 上把它编译进 query `columns`。"
+      },
+      {
+        "field_name": "temporal_columns_lookup",
+        "description": "隐藏控件。把 datasource 中所有 `is_dttm=true` 的列整理成 `{ column_name: true }` 映射，供 `time_grain_sqla` 可见性与 buildQuery 时间列判断使用。",
+        "data_type": "object[string, boolean]",
+        "sample_data": {
+          "order_date": true,
+          "ship_date": true
+        },
+        "required": false,
+        "embedding": "否",
+        "default_value": "由 datasource columns 自动生成"
+      },
+      {
+        "field_name": "metrics",
+        "description": "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+        "data_type": "array[string | object]",
+        "enum_source": "saved metrics + adhoc metrics",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "sales"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(sales)"
+          }
+        ],
+        "required": true,
+        "embedding": "否",
+        "default_value": [],
+        "notes": "源码显式设置了 `validators: [validateNonEmpty]`。"
+      },
+      {
+        "field_name": "metricsLayout",
+        "description": "Use metrics as a top level group for columns or for rows",
+        "data_type": "string",
+        "enum_values": [
+          "COLUMNS",
+          "ROWS"
+        ],
+        "sample_data": "COLUMNS",
+        "required": false,
+        "embedding": "否",
+        "default_value": "COLUMNS"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "description": "Filters",
+        "data_type": "array[object]",
+        "enum_source": "dataset filterable columns + saved metrics + current metrics",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "default_value": []
+      },
+      {
+        "field_name": "series_limit",
+        "description": "Limits the number of series that get displayed. A joined subquery (or an extra phase where subqueries are not supported) is applied to limit the number of series that get fetched and rendered.",
+        "data_type": "integer | null",
+        "enum_values": [
+          5,
+          10,
+          25,
+          50,
+          100,
+          500
+        ],
+        "sample_data": 25,
+        "required": false,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "row_limit",
+        "description": "Limits the number of cells that get retrieved.",
+        "data_type": "integer",
+        "enum_values": [
+          10,
+          50,
+          100,
+          250,
+          500,
+          1000,
+          5000,
+          10000,
+          50000
+        ],
+        "sample_data": 10000,
+        "required": false,
+        "embedding": "否",
+        "default_value": 10000,
+        "notes": "当前图只是改了 label/description，没有覆盖共享控件默认值，所以仍沿用 `sharedControls.row_limit.default = 10000`。"
+      },
+      {
+        "field_name": "series_limit_metric",
+        "description": "Metric used to define how the top series are sorted if a series or cell limit is present. If undefined reverts to the first metric (where appropriate).",
+        "data_type": "string | object | null",
+        "enum_source": "saved metrics + adhoc metrics",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        },
+        "required": false,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "`buildQuery.ts` 优先用它生成 `orderby=[[series_limit_metric, !order_desc]]`。"
+      },
+      {
+        "field_name": "order_desc",
+        "description": "Whether to sort descending or ascending",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true
+      }
+    ],
+    "Options / Pivot Structure": [
+      {
+        "field_name": "aggregateFunction",
+        "description": "Aggregate function to apply when pivoting and computing the total rows and columns",
+        "data_type": "string",
+        "enum_values": [
+          "Count",
+          "Count Unique Values",
+          "List Unique Values",
+          "Sum",
+          "Average",
+          "Median",
+          "Sample Variance",
+          "Sample Standard Deviation",
+          "Minimum",
+          "Maximum",
+          "First",
+          "Last",
+          "Sum as Fraction of Total",
+          "Sum as Fraction of Rows",
+          "Sum as Fraction of Columns",
+          "Count as Fraction of Total",
+          "Count as Fraction of Rows",
+          "Count as Fraction of Columns"
+        ],
+        "sample_data": "Sum",
+        "required": false,
+        "embedding": "否",
+        "default_value": "Sum"
+      },
+      {
+        "field_name": "transposePivot",
+        "description": "Swap rows and columns",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      },
+      {
+        "field_name": "combineMetric",
+        "description": "Display metrics side by side within each column, as opposed to each column being displayed side by side for each metric.",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      }
+    ],
+    "Options / Totals": [
+      {
+        "field_name": "rowTotals",
+        "description": "Display row level total",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      },
+      {
+        "field_name": "rowSubTotals",
+        "description": "Display row level subtotal",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      },
+      {
+        "field_name": "colTotals",
+        "description": "Display column level total",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      },
+      {
+        "field_name": "colSubTotals",
+        "description": "Display column level subtotal",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      },
+      {
+        "field_name": "rowSubtotalPosition",
+        "description": "Position of row level subtotal",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "enum_labels": {
+          "true": "Top",
+          "false": "Bottom"
+        },
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      },
+      {
+        "field_name": "colSubtotalPosition",
+        "description": "Position of column level subtotal",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "enum_labels": {
+          "true": "Left",
+          "false": "Right"
+        },
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      }
+    ],
+    "Options / Formatting & Sorting": [
+      {
+        "field_name": "valueFormat",
+        "description": "D3 format syntax for numbers",
+        "data_type": "string",
+        "enum_source": "D3_FORMAT_OPTIONS + freeForm",
+        "sample_data": "SMART_NUMBER",
+        "required": false,
+        "embedding": "否",
+        "default_value": "SMART_NUMBER",
+        "notes": "虽然复用了 `sharedControls.y_axis_format`，但当前 root 键名仍是 camelCase 的 `valueFormat`。"
+      },
+      {
+        "field_name": "currency_format",
+        "runtime_alias": "currencyFormat",
+        "description": "Currency format",
+        "data_type": "string | object | null",
+        "sample_data": {
+          "symbol": "$",
+          "symbolPosition": "prefix"
+        },
+        "required": false,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "date_format",
+        "runtime_alias": "dateFormat",
+        "description": "D3 time format for datetime columns",
+        "data_type": "string",
+        "enum_source": "D3_TIME_FORMAT_OPTIONS + freeForm",
+        "sample_data": "smart_date",
+        "required": false,
+        "embedding": "否",
+        "default_value": "smart_date"
+      },
+      {
+        "field_name": "rowOrder",
+        "description": "Change order of rows",
+        "data_type": "string",
+        "enum_values": [
+          "key_a_to_z",
+          "key_z_to_a",
+          "value_a_to_z",
+          "value_z_to_a"
+        ],
+        "sample_data": "key_a_to_z",
+        "required": false,
+        "embedding": "否",
+        "default_value": "key_a_to_z"
+      },
+      {
+        "field_name": "colOrder",
+        "description": "Change order of columns",
+        "data_type": "string",
+        "enum_values": [
+          "key_a_to_z",
+          "key_z_to_a",
+          "value_a_to_z",
+          "value_z_to_a"
+        ],
+        "sample_data": "key_a_to_z",
+        "required": false,
+        "embedding": "否",
+        "default_value": "key_a_to_z"
+      }
+    ],
+    "Options / Conditional Formatting & Rendering": [
+      {
+        "field_name": "conditional_formatting",
+        "runtime_alias": "conditionalFormatting",
+        "description": "Apply conditional color formatting to metrics",
+        "data_type": "array[object]",
+        "sample_data": [
+          {
+            "column": "SUM(sales)",
+            "operator": ">",
+            "targetValue": 1000,
+            "colorScheme": "rgba(0, 122, 135, 1)"
+          }
+        ],
+        "required": false,
+        "embedding": "否",
+        "default_value": [],
+        "object_schema": {
+          "column": "string",
+          "operator": [
+            "None",
+            ">",
+            "<",
+            "≥",
+            "≤",
+            "=",
+            "≠",
+            "< x <",
+            "≤ x ≤",
+            "≤ x <",
+            "< x ≤"
+          ],
+          "targetValue": "number",
+          "targetValueLeft": "number",
+          "targetValueRight": "number",
+          "colorScheme": "string"
+        },
+        "notes": "`getColorFormatters()` 会忽略缺少 `column` / `operator` / `colorScheme` 或缺少阈值的项。区间比较运算符使用 `targetValueLeft + targetValueRight`，单阈值比较使用 `targetValue`。"
+      },
+      {
+        "field_name": "allow_render_html",
+        "runtime_alias": "allowRenderHtml",
+        "description": "Renders table cells as HTML when applicable. For example, HTML <a> tags will be rendered as hyperlinks.",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,131 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "bubble_v2",
+  "display_name": "Bubble Chart",
+  "normalized_summary": {
+    "category": "relationship",
+    "tags": [
+      "bubble",
+      "relationship",
+      "3d",
+      "correlation"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "x_axis",
+        "required": true,
+        "description": "X 轴数值型字段，用于气泡的水平位置。"
+      },
+      {
+        "key": "y_axis",
+        "required": true,
+        "description": "Y 轴数值型字段，用于气泡的垂直位置。"
+      },
+      {
+        "key": "size",
+        "required": true,
+        "description": "气泡大小对应的指标，用于表示第三个维度的数值。"
+      },
+      {
+        "key": "bubble_max_size",
+        "required": false,
+        "description": "气泡最大尺寸，控制气泡大小的上限。"
+      }
+    ],
+    "description_zh": "Bubble Chart displays three dimensions of data: x-axis, y-axis, and bubble size (representing a third metric), with optional color coding for categories.",
+    "visual_shape_zh": "气泡图（关联型）",
+    "use_cases_zh": [
+      "三维数据关系分析（X/Y轴+大小）",
+      "多维度指标关联对比",
+      "分类气泡聚类展示"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "bubble_v2",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/bubble_v2-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/bubble_v2-form-data-schema.json",
+      "control-schema": "form-data-schema/bubble_v2-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Bubble Chart",
+    "viztype": "bubble_v2",
+    "详细描述": "Bubble Chart displays three dimensions of data: x-axis, y-axis, and bubble size (representing a third metric), with optional color coding for categories.",
+    "表现形态": "气泡图（关联型）",
+    "适用场景": [
+      "三维数据关系分析（X/Y轴+大小）",
+      "多维度指标关联对比",
+      "分类气泡聚类展示"
+    ],
+    "vizKey": "Bubble",
+    "pluginCategory": "Relationship",
+    "pluginTags": [],
+    "category": "relationship",
+    "tags": [
+      "bubble",
+      "relationship",
+      "3d",
+      "correlation"
+    ],
+    "关键字段": [
+      {
+        "key": "x_axis",
+        "required": true,
+        "description": "X 轴数值型字段，用于气泡的水平位置。"
+      },
+      {
+        "key": "y_axis",
+        "required": true,
+        "description": "Y 轴数值型字段，用于气泡的垂直位置。"
+      },
+      {
+        "key": "size",
+        "required": true,
+        "description": "气泡大小对应的指标，用于表示第三个维度的数值。"
+      },
+      {
+        "key": "bubble_max_size",
+        "required": false,
+        "description": "气泡最大尺寸，控制气泡大小的上限。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

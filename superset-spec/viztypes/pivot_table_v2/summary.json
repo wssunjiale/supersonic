@@ -1,0 +1,151 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "pivot_table_v2",
+  "display_name": "Pivot Table",
+  "normalized_summary": {
+    "category": "table",
+    "tags": [
+      "pivot",
+      "table",
+      "multi_dimensional",
+      "tabular"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "rows",
+        "required": true,
+        "description": "行维度字段列表，用于定义透视表的行。"
+      },
+      {
+        "key": "columns",
+        "required": true,
+        "description": "列维度字段列表，用于定义透视表的列。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标列表，用于计算单元格的数值。"
+      },
+      {
+        "key": "agg_func",
+        "required": false,
+        "description": "聚合函数（sum/avg/count），用于定义指标的聚合方式。"
+      },
+      {
+        "key": "sort_by",
+        "required": false,
+        "description": "排序字段（行/列/值），控制透视表的排序方式。"
+      },
+      {
+        "key": "number_format",
+        "required": false,
+        "description": "数字格式化，控制单元格数值的展示格式。"
+      }
+    ],
+    "description_zh": "Pivot Table (v2) displays multi-dimensional aggregated data in a tabular format, with rows/columns as dimensions and cells as metric values, supporting sorting/filtering.",
+    "visual_shape_zh": "透视表（多维表格型）",
+    "use_cases_zh": [
+      "多维数据交叉分析（如行：区域、列：时间、值：销售额）",
+      "结构化数据明细展示",
+      "可交互的表格分析（排序/过滤/钻取）"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "pivot_table_v2",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/pivot_table_v2-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/pivot_table_v2-form-data-schema.json",
+      "control-schema": "form-data-schema/pivot_table_v2-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Pivot Table",
+    "viztype": "pivot_table_v2",
+    "详细描述": "Pivot Table (v2) displays multi-dimensional aggregated data in a tabular format, with rows/columns as dimensions and cells as metric values, supporting sorting/filtering.",
+    "表现形态": "透视表（多维表格型）",
+    "适用场景": [
+      "多维数据交叉分析（如行：区域、列：时间、值：销售额）",
+      "结构化数据明细展示",
+      "可交互的表格分析（排序/过滤/钻取）"
+    ],
+    "vizKey": "PivotTable",
+    "pluginCategory": "Table",
+    "pluginTags": [],
+    "category": "table",
+    "tags": [
+      "pivot",
+      "table",
+      "multi_dimensional",
+      "tabular"
+    ],
+    "关键字段": [
+      {
+        "key": "rows",
+        "required": true,
+        "description": "行维度字段列表，用于定义透视表的行。"
+      },
+      {
+        "key": "columns",
+        "required": true,
+        "description": "列维度字段列表，用于定义透视表的列。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标列表，用于计算单元格的数值。"
+      },
+      {
+        "key": "agg_func",
+        "required": false,
+        "description": "聚合函数（sum/avg/count），用于定义指标的聚合方式。"
+      },
+      {
+        "key": "sort_by",
+        "required": false,
+        "description": "排序字段（行/列/值），控制透视表的排序方式。"
+      },
+      {
+        "key": "number_format",
+        "required": false,
+        "description": "数字格式化，控制单元格数值的展示格式。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

@@ -13,14 +13,6 @@ public class SupersetPluginConfigTest {
     }
 
     @Test
-    public void testAuthConfigApiKey() {
-        SupersetPluginConfig config = new SupersetPluginConfig();
-        config.setAuthEnabled(true);
-        config.setApiKey("token-123");
-        Assertions.assertTrue(config.hasValidAuthConfig());
-    }
-
-    @Test
     public void testAuthConfigJwt() {
         SupersetPluginConfig config = new SupersetPluginConfig();
         config.setAuthEnabled(true);

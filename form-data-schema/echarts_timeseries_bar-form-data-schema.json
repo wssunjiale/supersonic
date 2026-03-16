@@ -1,0 +1,348 @@
+{
+  "viz_type": "echarts_timeseries_bar",
+  "display_name": "Bar Chart",
+  "purpose": "用于调用 API 创建或保存 Bar Chart 时填写的 form_data 模板",
+  "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/echarts_timeseries_bar-schema.json",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Timeseries/Regular/Bar/controlPanel.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Timeseries/Regular/Bar/index.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Timeseries/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Timeseries/constants.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Timeseries/types.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/controls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/sections/echartsTimeSeriesQuery.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/sections/advancedAnalytics.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/sections/annotationsAndLayers.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/sections/forecastInterval.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/customControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/mixins.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/store.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getControlState.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/reducers/exploreReducer.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/components/ExploreViewContainer/index.jsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/components/Chart/chartAction.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/models/ChartProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/standardizedFormData.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryObject.ts"
+  ],
+  "notes": [
+    "API form_data 的键名必须保留源码中的原始 control name。Bar Chart 的键名是 mixed-case：既有 snake_case，也有 camelCase。",
+    "Explore 导出 form_data 时走 getFormDataFromControls()，它只会按 controlName 原样取 value，不会统一改名。",
+    "transformProps 中看到的 camelCase formData 来自 ChartProps.convertKeysToCamelCase(formData)，是运行时形态，不是构造 API form_data 的主依据。",
+    "datasource 和 viz_type 来自通用的 datasourceAndVizType section，不是 Bar 专属控件，但创建图表时必须提供。",
+    "time_range 不在 Bar 专属 Query section 中，但 buildQueryObject 接受该字段；hydrateExplore 缺省时也会补默认时间范围，因此模板中保留为可选全局字段。",
+    "Bar/index.ts 在运行时包装 transformProps 时注入 seriesType=bar；seriesType 不应作为 API 创建图表时主动提交的字段。",
+    "show_extra_controls 虽然是 controlPanel 字段，但当前未在 buildQuery.ts 和 transformProps.ts 中找到直接消费；模板里保留它的默认值，同时标记为低优先级字段。",
+    "formDataOverrides 在 standardizedFormData.transform() 中主要用于切换 viz_type 时做字段迁移，不是常规编辑和查询时导出 form_data 的必经步骤。"
+  ],
+  "naming_and_pipeline": {
+    "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写成 form_data[name]",
+    "api_form_data_to_query_context": "Timeseries/buildQuery.ts 使用原始 form_data 构建 query context",
+    "api_form_data_to_runtime_form_data": "ChartProps.ts 会把 form_data 转成 camelCase 的 runtime formData，同时保留 rawFormData"
+  },
+  "global_required_fields": {
+    "datasource": {
+      "data_type": "string",
+      "required": true,
+      "sample_data": "<dataset_id>__table",
+      "source": "datasourceAndVizType section"
+    },
+    "viz_type": {
+      "data_type": "string",
+      "required": true,
+      "fixed_value": "echarts_timeseries_bar",
+      "source": "datasourceAndVizType section"
+    }
+  },
+  "global_optional_fields": {
+    "time_range": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "No filter",
+      "source": "generic QueryFormData + hydrateExplore default"
+    },
+    "slice_id": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 0,
+      "source": "datasourceAndVizType hidden control",
+      "notes": "新建图表时通常省略；编辑已存在图表时由服务端或上层调用方提供。"
+    },
+    "cache_timeout": {
+      "data_type": "integer | null",
+      "required": false,
+      "sample_data": null,
+      "source": "datasourceAndVizType hidden control"
+    },
+    "url_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "datasourceAndVizType hidden control"
+    },
+    "custom_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "datasourceAndVizType hidden control"
+    }
+  },
+  "minimal_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "echarts_timeseries_bar",
+    "time_range": "No filter",
+    "x_axis": "<time_column_or_dimension>",
+    "metrics": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      }
+    ],
+    "groupby": [],
+    "adhoc_filters": [],
+    "row_limit": 10000,
+    "order_desc": true
+  },
+  "recommended_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "echarts_timeseries_bar",
+    "time_range": "No filter",
+    "x_axis": "<time_column_or_dimension>",
+    "time_grain_sqla": "P1D",
+    "xAxisForceCategorical": false,
+    "x_axis_sort": null,
+    "x_axis_sort_asc": true,
+    "metrics": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      }
+    ],
+    "groupby": [],
+    "contributionMode": null,
+    "adhoc_filters": [],
+    "limit": null,
+    "group_others_when_limit_reached": false,
+    "timeseries_limit_metric": null,
+    "order_desc": true,
+    "row_limit": 10000,
+    "truncate_metric": true,
+    "show_empty_columns": true,
+    "rolling_type": null,
+    "rolling_periods": null,
+    "min_periods": null,
+    "time_compare": null,
+    "comparison_type": "values",
+    "resample_rule": null,
+    "resample_method": null,
+    "annotation_layers": [],
+    "forecastEnabled": false,
+    "forecastPeriods": 10,
+    "forecastInterval": 0.8,
+    "forecastSeasonalityYearly": null,
+    "forecastSeasonalityWeekly": null,
+    "forecastSeasonalityDaily": null,
+    "orientation": "vertical",
+    "x_axis_title": "",
+    "x_axis_title_margin": 15,
+    "y_axis_title": "",
+    "y_axis_title_margin": 30,
+    "y_axis_title_position": "Left",
+    "sort_series_type": "sum",
+    "sort_series_ascending": false,
+    "color_scheme": "<categoricalSchemeRegistry.defaultKey>",
+    "time_shift_color": true,
+    "show_value": false,
+    "stack": null,
+    "only_total": true,
+    "percentage_threshold": 0,
+    "stackDimension": null,
+    "show_extra_controls": false,
+    "minorTicks": false,
+    "zoomable": false,
+    "show_legend": true,
+    "legendType": "scroll",
+    "legendOrientation": "top",
+    "legendMargin": null,
+    "x_axis_time_format": "smart_date",
+    "xAxisLabelRotation": 0,
+    "xAxisLabelInterval": "auto",
+    "truncateXAxis": true,
+    "xAxisBounds": null,
+    "rich_tooltip": true,
+    "showTooltipTotal": true,
+    "showTooltipPercentage": false,
+    "tooltipSortByMetric": false,
+    "tooltipTimeFormat": "smart_date",
+    "y_axis_format": "SMART_NUMBER",
+    "currency_format": null,
+    "logAxis": false,
+    "minorSplitLine": false,
+    "truncateYAxis": false,
+    "y_axis_bounds": [
+      null,
+      null
+    ]
+  },
+  "conditional_blocks": {
+    "multi_series": {
+      "condition": "需要按维度拆分多组 bar series 时",
+      "fields": {
+        "groupby": [
+          "<dimension_column>"
+        ]
+      }
+    },
+    "sort_x_axis_series": {
+      "condition": "需要按名称、求和、均值等规则对基础轴系列排序时",
+      "fields": {
+        "x_axis_sort": "<metric_label_or_sort_choice>",
+        "x_axis_sort_asc": true
+      },
+      "notes": "orientation=horizontal 时 Explore 中显示为 Y-Axis Sort，但 API 键名仍是 x_axis_sort。"
+    },
+    "limit_series": {
+      "condition": "需要限制 series 数量时",
+      "fields": {
+        "limit": 10,
+        "timeseries_limit_metric": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        },
+        "order_desc": true,
+        "group_others_when_limit_reached": false
+      }
+    },
+    "forecast": {
+      "condition": "需要 Prophet 预测时",
+      "fields": {
+        "forecastEnabled": true,
+        "forecastPeriods": 10,
+        "forecastInterval": 0.8,
+        "forecastSeasonalityYearly": null,
+        "forecastSeasonalityWeekly": null,
+        "forecastSeasonalityDaily": null
+      }
+    },
+    "stacking": {
+      "condition": "需要堆叠柱或 stream 柱时",
+      "fields": {
+        "stack": "Stack"
+      },
+      "enum_values": [
+        null,
+        "Stack",
+        "Stream"
+      ]
+    },
+    "stack_by_dimension": {
+      "condition": "需要在 Stack 模式下按某个 groupby 维度拆分 stack 组时",
+      "fields": {
+        "stack": "Stack",
+        "stackDimension": "<groupby_column>"
+      }
+    },
+    "horizontal_bar": {
+      "condition": "需要横向条形图时",
+      "fields": {
+        "orientation": "horizontal"
+      }
+    },
+    "force_categorical": {
+      "condition": "x_axis 是数值列但希望按离散类目处理时",
+      "fields": {
+        "xAxisForceCategorical": true
+      }
+    },
+    "axis_bounds": {
+      "condition": "需要显式指定坐标轴上下界时",
+      "fields": {
+        "truncateXAxis": true,
+        "xAxisBounds": [
+          0,
+          null
+        ],
+        "truncateYAxis": true,
+        "y_axis_bounds": [
+          0,
+          null
+        ]
+      }
+    },
+    "advanced_analytics": {
+      "condition": "需要 rolling、time compare 或 resample 时",
+      "fields": {
+        "rolling_type": null,
+        "rolling_periods": null,
+        "min_periods": null,
+        "time_compare": null,
+        "comparison_type": "values",
+        "resample_rule": null,
+        "resample_method": null
+      }
+    }
+  },
+  "runtime_only_or_non_template_fields": {
+    "runtime_injected": [
+      {
+        "field_name": "seriesType",
+        "reason": "Regular/Bar/index.ts 在运行时包装 transformProps 时注入 seriesType='bar'，不是 controlPanel 导出的 API 模板字段。"
+      }
+    ],
+    "runtime_defaults_only": [
+      {
+        "field_name": "area",
+        "reason": "Timeseries/DEFAULT_FORM_DATA 里存在 area=false 的运行时默认值，但 Bar controlPanel 没有导出该字段。"
+      }
+    ],
+    "viz_switch_only": [
+      {
+        "field_name": "formDataOverrides(metrics/groupby remap)",
+        "reason": "只在 standardizedFormData.transform() 切换 viz_type 时触发，不是常规导出 Bar form_data 的必经步骤。"
+      }
+    ]
+  },
+  "api_usage_guidance": {
+    "high_confidence_required_fields": [
+      "datasource",
+      "viz_type",
+      "x_axis",
+      "metrics"
+    ],
+    "recommended_always_set": [
+      "time_range",
+      "groupby",
+      "adhoc_filters",
+      "row_limit",
+      "orientation"
+    ],
+    "mixed_case_examples": [
+      "x_axis",
+      "time_grain_sqla",
+      "xAxisForceCategorical",
+      "forecastEnabled",
+      "legendOrientation",
+      "xAxisLabelRotation",
+      "showTooltipTotal"
+    ],
+    "excluded_runtime_fields": [
+      "seriesType",
+      "area"
+    ]
+  }
+}

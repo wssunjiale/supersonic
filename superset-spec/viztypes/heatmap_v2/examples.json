@@ -1,0 +1,341 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "heatmap_v2",
+  "display_name": "Heatmap",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "region",
+          "operator": "IN",
+          "comparator": [
+            "APAC"
+          ]
+        }
+      ]
+    ],
+    "border_color": [
+      {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 1
+      }
+    ],
+    "border_width": [
+      0
+    ],
+    "bottom_margin": [
+      "auto"
+    ],
+    "currency_format": [
+      {
+        "symbol": "USD",
+        "symbolPosition": "prefix"
+      }
+    ],
+    "granularity_sqla": [
+      "ds"
+    ],
+    "groupby": [
+      "region"
+    ],
+    "left_margin": [
+      "auto"
+    ],
+    "legend_type": [
+      "continuous"
+    ],
+    "linear_color_scheme": [
+      "<sequential_scheme_key>"
+    ],
+    "metric": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "sales"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(sales)"
+      }
+    ],
+    "normalize_across": [
+      "heatmap"
+    ],
+    "normalized": [
+      false
+    ],
+    "row_limit": [
+      10000
+    ],
+    "show_legend": [
+      true
+    ],
+    "show_percentage": [
+      true
+    ],
+    "show_values": [
+      false
+    ],
+    "sort_x_axis": [
+      "alpha_asc"
+    ],
+    "sort_y_axis": [
+      "value_desc"
+    ],
+    "time_grain_sqla": [
+      "P1D"
+    ],
+    "time_range": [
+      "No filter"
+    ],
+    "value_bounds": [
+      [
+        0,
+        100
+      ]
+    ],
+    "xAxisLabelRotation": [
+      0
+    ],
+    "x_axis": [
+      "order_date"
+    ],
+    "x_axis_time_format": [
+      "smart_date"
+    ],
+    "xscale_interval": [
+      -1
+    ],
+    "y_axis_format": [
+      "SMART_NUMBER"
+    ],
+    "yscale_interval": [
+      -1
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "heatmap_v2",
+      "x_axis": "<x_axis_column>",
+      "groupby": "<y_axis_column>",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      }
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "heatmap_v2",
+      "x_axis": "order_date",
+      "groupby": "region",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "sales"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(sales)"
+      },
+      "row_limit": 10000,
+      "time_range": "No filter",
+      "adhoc_filters": [],
+      "normalize_across": "heatmap",
+      "legend_type": "continuous",
+      "linear_color_scheme": "<sequential_scheme_key>",
+      "border_color": {
+        "r": 0,
+        "g": 0,
+        "b": 0,
+        "a": 1
+      },
+      "border_width": 0,
+      "xscale_interval": -1,
+      "yscale_interval": -1,
+      "left_margin": "auto",
+      "bottom_margin": "auto",
+      "value_bounds": [
+        null,
+        null
+      ],
+      "y_axis_format": "SMART_NUMBER",
+      "x_axis_time_format": "smart_date",
+      "xAxisLabelRotation": 0,
+      "show_legend": true,
+      "show_percentage": true,
+      "show_values": false,
+      "normalized": false
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "heatmap_v2",
+      "x_axis": "<copied_from_saved_chart>",
+      "groupby": "<copied_from_saved_chart>",
+      "metric": "<copied_from_saved_chart>",
+      "sort_x_axis": "<copied_from_saved_chart>",
+      "sort_y_axis": "<copied_from_saved_chart>",
+      "normalize_across": "<copied_from_saved_chart>",
+      "row_limit": "<copied_from_saved_chart>",
+      "granularity_sqla": "<copied_from_saved_chart>",
+      "time_grain_sqla": "<copied_from_saved_chart>",
+      "time_range": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "legend_type": "<copied_from_saved_chart>",
+      "linear_color_scheme": "<copied_from_saved_chart>",
+      "border_color": "<copied_from_saved_chart>",
+      "border_width": "<copied_from_saved_chart>",
+      "xscale_interval": "<copied_from_saved_chart>",
+      "yscale_interval": "<copied_from_saved_chart>",
+      "left_margin": "<copied_from_saved_chart>",
+      "bottom_margin": "<copied_from_saved_chart>",
+      "value_bounds": "<copied_from_saved_chart>",
+      "y_axis_format": "<copied_from_saved_chart>",
+      "x_axis_time_format": "<copied_from_saved_chart>",
+      "xAxisLabelRotation": "<copied_from_saved_chart>",
+      "currency_format": "<copied_from_saved_chart>",
+      "show_legend": "<copied_from_saved_chart>",
+      "show_percentage": "<copied_from_saved_chart>",
+      "show_values": "<copied_from_saved_chart>",
+      "normalized": "<copied_from_saved_chart>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "APAC"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "APAC"
+            ]
+          }
+        ],
+        "time_range": "Last 30 days",
+        "time_grain_sqla": "P1D",
+        "custom_form_data": {}
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_heatmap": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "APAC"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters；后端会把它们并入额外过滤条件。",
+        "source": "superset constants + backend extra form data merge"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_heatmap": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "APAC"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会标记为 isExtra 并并入查询。",
+        "source": "superset constants + backend extra form data merge"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_heatmap": true,
+        "recommended": true,
+        "sample_data": "Last 30 days",
+        "effect": "覆盖 query.time_range。",
+        "source": "backend extra form data override keys + shared time field"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_heatmap": true,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "覆盖 query.extras.time_grain_sqla；只在图表本身使用时间型 X 轴时才有意义。",
+        "source": "backend extra form data override keys + Heatmap shared time grain control"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_heatmap": true,
+        "recommended": false,
+        "sample_data": "ds",
+        "effect": "覆盖 query.granularity；仅在时间链路存在时才有意义。",
+        "source": "backend extra form data override keys + shared time control"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_heatmap": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "可传非标准附加数据；Heatmap 默认 buildQuery/transformProps 不直接消费它。",
+        "source": "frontend QueryFormData / backend extra form data handling"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_heatmap": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用 ExtraFormData 字段；当前 Heatmap buildQuery 没有专门读取它。",
+        "source": "frontend QueryFormData shared definition"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "heatmap_v2",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/heatmap_v2-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/heatmap_v2-form-data-schema.json",
+      "control-schema": "form-data-schema/heatmap_v2-schema.json"
+    }
+  }
+}

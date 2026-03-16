@@ -1,0 +1,493 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "mixed_timeseries",
+  "display_name": "Mixed Chart",
+  "source_kind": "schema_file",
+  "normalized_embedding_policy": {
+    "immutable_root_keys": [
+      "slice_id",
+      "datasource",
+      "viz_type",
+      "all_saved_chart_definition_fields"
+    ],
+    "allowed_runtime_fields": [
+      {
+        "field_name": "adhoc_filters",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "adhoc_filters_b",
+        "behavior": "extra_form_data.append",
+        "source": "field-categories"
+      },
+      {
+        "field_name": "custom_form_data",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "filters",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "relative_end",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "relative_start",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_compare",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_range",
+        "behavior": "override",
+        "source": "embedding-schema"
+      }
+    ],
+    "safe_embedding_form_data_seed": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "mixed_timeseries",
+      "extra_form_data": {
+        "filters": [],
+        "adhoc_filters": []
+      }
+    }
+  },
+  "original_embedding_form_data_schema": {
+    "viz_type": "mixed_timeseries",
+    "display_name": "Mixed Chart",
+    "purpose": "第三方 embedding / guest token 场景下安全传输的 Mixed Chart form_data 模板",
+    "base_form_data_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/mixed_timeseries-form-data-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset/security/manager.py",
+      "D:/vsx/sources/superset-6.0.0/superset/constants.py",
+      "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/charts/data/api.py",
+      "D:/vsx/sources/superset-6.0.0/superset/commands/chart/data/get_data_command.py",
+      "D:/vsx/sources/superset-6.0.0/superset/charts/schemas.py",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/constants.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/QueryFormData.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/processExtraFormData.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/dashboard/components/nativeFilters/utils.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataWithDashboardContext.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/MixedTimeseries/buildQuery.ts"
+    ],
+    "notes": [
+      "embedded guest 的核心限制仍在后端 security/manager.py 的 query_context_modified()；报错原文是 `Guest user cannot modify chart payload`。",
+      "Mixed Chart 会生成两个 query object。即使 Query B 的根层字段写成 metrics_b / groupby_b，它们最终也会影响第二个 query 的 metrics / columns / orderby，对 guest 来说同样属于图表定义，不应临时改写。",
+      "安全做法仍然是：以已保存图表的 form_data 作为 base 原样复制，只把动态时间和过滤条件放进 extra_form_data。",
+      "extra_form_data 是根层容器，不存在 Query B 专属的安全动态入口；像 metrics_b、groupby_b、time_compare_b、seriesTypeB 这类字段都不应在 guest 请求里临时改。",
+      "frontend QueryFormData.ts 虽声明了 extra_form_data.time_compare，但 Superset 6.0.0 后端 merge whitelist 对它不是高置信入口；Mixed Chart 的 time_compare_b 更没有对应的安全 guest override 机制。"
+    ],
+    "security_enforcement": {
+      "backend_check_function": "superset/security/manager.py::query_context_modified",
+      "checked_when": "ChartDataCommand.validate() -> QueryContext.raise_for_access()",
+      "error_message": "Guest user cannot modify chart payload",
+      "hard_block_fields": [
+        "slice_id",
+        "metrics",
+        "groupby",
+        "columns",
+        "orderby"
+      ],
+      "indirectly_sensitive_fields_for_mixed_chart": [
+        "x_axis",
+        "metrics_b",
+        "groupby_b",
+        "timeseries_limit_metric",
+        "timeseries_limit_metric_b",
+        "order_desc",
+        "order_desc_b",
+        "limit",
+        "limit_b"
+      ],
+      "recommended_strategy": "复制保存态 Mixed Chart form_data 作为 base，仅通过 extra_form_data 追加时间范围、粒度和过滤条件。"
+    },
+    "safe_base_rule": {
+      "description": "第三方 embedding 请求中的根层 form_data，应当直接复制保存态 Mixed Chart 的 form_data，不要重构两套查询字段。",
+      "must_be_copied_from_saved_chart": [
+        "slice_id",
+        "datasource",
+        "viz_type",
+        "x_axis",
+        "metrics",
+        "groupby",
+        "adhoc_filters",
+        "timeseries_limit_metric",
+        "order_desc",
+        "row_limit",
+        "metrics_b",
+        "groupby_b",
+        "adhoc_filters_b",
+        "timeseries_limit_metric_b",
+        "order_desc_b",
+        "row_limit_b",
+        "all query A / query B chart option fields"
+      ],
+      "why": [
+        "query_context_modified() 会把请求中的 query_context 与保存态图表对比。",
+        "Mixed Chart 的第二个查询由 _b 字段构造，改 metrics_b / groupby_b / order_desc_b 仍会反映到第二个 query 的 metrics / columns / orderby。",
+        "Query B 没有单独的 guest-safe extra_form_data override 入口。"
+      ]
+    },
+    "safe_embedding_form_data_template": {
+      "description": "这是 guest embedding 下的安全写法。根层以保存态图表为 base，仅改 extra_form_data。",
+      "template": {
+        "slice_id": "<saved_chart_id>",
+        "dashboardId": "<dashboard_id>",
+        "datasource": "<copied_from_saved_chart>",
+        "viz_type": "mixed_timeseries",
+        "x_axis": "<copied_from_saved_chart>",
+        "metrics": "<copied_from_saved_chart>",
+        "groupby": "<copied_from_saved_chart>",
+        "adhoc_filters": "<copied_from_saved_chart>",
+        "order_desc": "<copied_from_saved_chart>",
+        "row_limit": "<copied_from_saved_chart>",
+        "metrics_b": "<copied_from_saved_chart>",
+        "groupby_b": "<copied_from_saved_chart>",
+        "adhoc_filters_b": "<copied_from_saved_chart>",
+        "order_desc_b": "<copied_from_saved_chart>",
+        "row_limit_b": "<copied_from_saved_chart>",
+        "seriesType": "<copied_from_saved_chart>",
+        "seriesTypeB": "<copied_from_saved_chart>",
+        "yAxisIndex": "<copied_from_saved_chart>",
+        "yAxisIndexB": "<copied_from_saved_chart>",
+        "extra_form_data": {
+          "time_range": "Last 7 days",
+          "time_grain_sqla": "P1D",
+          "filters": [
+            {
+              "col": "region",
+              "op": "IN",
+              "val": [
+                "East",
+                "West"
+              ]
+            }
+          ],
+          "adhoc_filters": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "region",
+              "operator": "IN",
+              "comparator": [
+                "East",
+                "West"
+              ]
+            }
+          ],
+          "custom_form_data": {}
+        }
+      }
+    },
+    "preferred_dynamic_container": {
+      "field_name": "extra_form_data",
+      "description": "第三方 embedding 允许动态传入的上下文容器；后端会在 merge_extra_form_data() 中把它并入实际查询。",
+      "append_keys": [
+        "adhoc_filters",
+        "filters",
+        "interactive_groupby",
+        "interactive_highlight",
+        "interactive_drilldown",
+        "custom_form_data"
+      ],
+      "override_keys_backend_high_confidence": [
+        "granularity_sqla",
+        "granularity",
+        "time_column",
+        "time_grain",
+        "time_range",
+        "time_grain_sqla",
+        "relative_start",
+        "relative_end"
+      ],
+      "frontend_declared_but_backend_not_high_confidence": [
+        "time_compare"
+      ]
+    },
+    "extra_form_data_field_schema": [
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_mixed_chart": true,
+        "recommended": true,
+        "sample_data": "Last 7 days",
+        "effect": "同时覆盖 Query A / Query B 的时间范围。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_mixed_chart": true,
+        "recommended": true,
+        "sample_data": "P1D",
+        "effect": "同时覆盖两条查询的时间粒度。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_mixed_chart": true,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "覆盖时间列；属于高影响字段，只在你确认保存态图表就是同一时间列语义时使用。",
+        "source": "superset/constants.py + frontend QueryFormData.ts"
+      },
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_mixed_chart": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters；会同时作用于两条查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_mixed_chart": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；会同时作用于两条查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_mixed_chart": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "可传非标准附加数据；MixedTimeseries/buildQuery.ts 和 transformProps.ts 默认不直接消费。",
+        "source": "superset/constants.py + frontend QueryFormData.ts"
+      },
+      {
+        "field_name": "relative_start",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_mixed_chart": true,
+        "recommended": false,
+        "sample_data": "now",
+        "effect": "进入 query.extras.relative_start。",
+        "source": "superset/charts/schemas.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "relative_end",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_mixed_chart": true,
+        "recommended": false,
+        "sample_data": "today",
+        "effect": "进入 query.extras.relative_end。",
+        "source": "superset/charts/schemas.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_mixed_chart": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用 ExtraFormData 字段；MixedTimeseries/buildQuery.ts 不直接消费。",
+        "source": "frontend QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_mixed_chart": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用交互字段；Mixed Chart 默认不直接消费。",
+        "source": "frontend QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_mixed_chart": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用交互字段；Mixed Chart 默认不直接消费。",
+        "source": "frontend QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "time_compare",
+        "data_type": "string | array[string]",
+        "behavior": "override",
+        "safe_for_mixed_chart": false,
+        "recommended": false,
+        "sample_data": [
+          "1 year ago"
+        ],
+        "effect": "frontend 类型声明存在，但 Superset 6.0.0 后端 whitelist 未将其列为高置信 override。对 Mixed Chart 更不能替代 time_compare_b。",
+        "source": "frontend QueryFormData.ts + query/constants.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      }
+    ],
+    "minimal_extra_form_data_template": {
+      "time_range": "Last 7 days"
+    },
+    "recommended_extra_form_data_template": {
+      "time_range": "Last 7 days",
+      "time_grain_sqla": "P1D",
+      "filters": [
+        {
+          "col": "region",
+          "op": "IN",
+          "val": [
+            "East",
+            "West"
+          ]
+        }
+      ],
+      "adhoc_filters": [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "region",
+          "operator": "IN",
+          "comparator": [
+            "East",
+            "West"
+          ]
+        }
+      ],
+      "custom_form_data": {}
+    },
+    "unsafe_root_form_data_changes": [
+      {
+        "field_name": "slice_id",
+        "reason": "与保存态图表 id 不一致会被后端立即判定为请求了另一张图。"
+      },
+      {
+        "field_name": "metrics",
+        "reason": "第一条查询的核心定义字段；改动后会反映到请求 query_context。"
+      },
+      {
+        "field_name": "groupby",
+        "reason": "第一条查询的分组字段；改动后会反映到 query.columns / series_columns。"
+      },
+      {
+        "field_name": "metrics_b",
+        "reason": "第二条查询的核心定义字段；改动后会反映到第二个 query 的 metrics。"
+      },
+      {
+        "field_name": "groupby_b",
+        "reason": "第二条查询的分组字段；改动后会反映到第二个 query 的 columns / series_columns。"
+      },
+      {
+        "field_name": "columns",
+        "reason": "security manager 显式比较；Mixed Chart 的两个 query 都会产出 columns。"
+      },
+      {
+        "field_name": "orderby",
+        "reason": "security manager 显式比较；timeseries_limit_metric / order_desc / _b 变体都会影响它。"
+      },
+      {
+        "field_name": "x_axis",
+        "reason": "虽然不是单独白名单字段，但会进入两个 query 的 columns / pivot index。"
+      },
+      {
+        "field_name": "timeseries_limit_metric / timeseries_limit_metric_b",
+        "reason": "会影响 query orderby，guest 请求里不应临时改。"
+      },
+      {
+        "field_name": "seriesType / seriesTypeB / yAxisIndex / yAxisIndexB",
+        "reason": "属于已保存图表的定义字段；guest 场景下应复制保存态，而不是临时切换图表形态。"
+      }
+    ],
+    "practical_guidance": {
+      "best_practice": [
+        "先从保存态 Mixed Chart 读取完整 form_data。",
+        "根层字段保持不变，包括 Query B 的 _b 查询字段和 B 样式字段。",
+        "只在 extra_form_data 中放时间范围、粒度和附加过滤条件。",
+        "如果只是做第三方筛选联动，优先使用 filters / adhoc_filters / time_range / time_grain_sqla。"
+      ],
+      "avoid": [
+        "不要在 guest embedding 请求里手工重写 metrics、groupby、metrics_b、groupby_b、x_axis。",
+        "不要试图通过 extra_form_data 去单独改写 Query B。",
+        "不要把 runtime camelCase 键名当成 API 键名。",
+        "不要依赖 extra_form_data.time_compare 去模拟 Query A / Query B 的时间对比设置。"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "mixed_timeseries",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/mixed_timeseries-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/mixed_timeseries-form-data-schema.json",
+      "control-schema": "form-data-schema/mixed_timeseries-schema.json"
+    }
+  }
+}

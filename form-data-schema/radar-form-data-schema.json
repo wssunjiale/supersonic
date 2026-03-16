@@ -1,0 +1,433 @@
+{
+  "viz_type": "radar",
+  "display_name": "Radar Chart",
+  "purpose": "用于调用 API 创建或保存 Radar Chart 时填写的 form_data 模板",
+  "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/radar-schema.json",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Radar/controlPanel.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Radar/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Radar/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Radar/types.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Radar/EchartsRadar.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Radar/utils.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/controls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/constants.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/utils/eventHandlers.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryContext.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryObject.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractQueryFields.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/components/controls/ColumnConfigControl/ColumnConfigControl.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/test/Radar/transformProps.test.ts"
+  ],
+  "notes": [
+    "Explore 导出 form_data 时走 `getFormDataFromControls()`，它按 control name 原样写入 root form_data。",
+    "Radar 的 root form_data 不是纯 snake_case。`legendType`、`legendOrientation`、`legendMargin` 是 camelCase；`show_legend`、`label_type`、`label_position`、`number_format`、`date_format`、`column_config`、`is_circle` 是 snake_case。",
+    "`row_limit` 在当前图的 controlPanel 中被覆盖为默认 10。",
+    "当前图官方 controlPanel 暴露的是 `timeseries_limit_metric`，但 `Radar/buildQuery.ts` 读取的是 `series_limit_metric`。因此创建 API 模板时，官方保存态仍应使用 `timeseries_limit_metric`；同时要明确，从当前源码看它并不会稳定影响 query `orderby`。",
+    "`column_config` 的 key 应使用 metric label，而不是原始列名。"
+  ],
+  "naming_and_pipeline": {
+    "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写成 form_data[name]。",
+    "api_form_data_to_query_context": "Radar/buildQuery.ts 调用 buildQueryContext(formData, ...)，raw formData 会原样保存在 query_context.form_data 中。",
+    "api_form_data_to_query_object": "buildQueryObject() + extractQueryFields() 会把 `groupby` 映射成 query `columns`，并提取 `metrics`、`adhoc_filters`、`row_limit`。随后 Radar/buildQuery.ts 再计算 `orderby`。",
+    "api_form_data_to_runtime_form_data": "ChartProps 会把 raw form_data 转成 runtime alias；`color_scheme -> colorScheme`、`show_legend -> showLegend`、`label_type -> labelType`、`label_position -> labelPosition`、`number_format -> numberFormat`、`date_format -> dateFormat`、`column_config -> columnConfig`、`is_circle -> isCircle`。"
+  },
+  "global_required_fields": {
+    "datasource": {
+      "data_type": "string",
+      "required": true,
+      "sample_data": "<dataset_id>__table",
+      "source": "datasourceAndVizType hidden control"
+    },
+    "viz_type": {
+      "data_type": "string",
+      "required": true,
+      "fixed_value": "radar",
+      "source": "plugin registration key"
+    },
+    "metrics": {
+      "data_type": "array[string | object]",
+      "required": true,
+      "sample_data": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        }
+      ],
+      "source": "Query section validators"
+    }
+  },
+  "global_optional_fields": {
+    "slice_id": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 0,
+      "source": "datasourceAndVizType hidden control"
+    },
+    "cache_timeout": {
+      "data_type": "integer | null",
+      "required": false,
+      "sample_data": null,
+      "source": "QueryFormData"
+    },
+    "url_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "QueryFormData"
+    },
+    "custom_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "QueryFormData"
+    },
+    "groupby": {
+      "data_type": "array[string | object]",
+      "required": false,
+      "sample_data": [
+        "<dimension_column>"
+      ],
+      "source": "Query section",
+      "notes": "源码没有把它设为必填；若为空，图仍可能绘制单个匿名系列，但 cross-filter / drill 不再有可靠维度。"
+    },
+    "metrics": {
+      "data_type": "array[string | object]",
+      "required": true,
+      "sample_data": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        }
+      ],
+      "source": "Query section"
+    },
+    "timeseries_limit_metric": {
+      "data_type": "string | object | null",
+      "required": false,
+      "sample_data": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<sort_metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<sort_metric_column>)"
+      },
+      "source": "Query section",
+      "notes": "这是 controlPanel 暴露的正式字段，但从当前源码看，它不会稳定改写 Radar query `orderby`。"
+    },
+    "adhoc_filters": {
+      "data_type": "array[object]",
+      "required": false,
+      "sample_data": [],
+      "source": "Query section"
+    },
+    "row_limit": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 10,
+      "source": "Query section"
+    },
+    "color_scheme": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "supersetColors",
+      "source": "Chart Options / General"
+    },
+    "show_legend": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": true,
+      "source": "Chart Options / Legend"
+    },
+    "legendType": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "scroll",
+      "source": "Chart Options / Legend"
+    },
+    "legendOrientation": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "top",
+      "source": "Chart Options / Legend"
+    },
+    "legendMargin": {
+      "data_type": "integer | null",
+      "required": false,
+      "sample_data": null,
+      "source": "Chart Options / Legend"
+    },
+    "show_labels": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": true,
+      "source": "Chart Options / Labels"
+    },
+    "label_type": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "value",
+      "source": "Chart Options / Labels"
+    },
+    "label_position": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "top",
+      "source": "Chart Options / Labels"
+    },
+    "number_format": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "SMART_NUMBER",
+      "source": "Chart Options / Labels"
+    },
+    "date_format": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "smart_date",
+      "source": "Chart Options / Labels"
+    },
+    "column_config": {
+      "data_type": "object[string, object]",
+      "required": false,
+      "sample_data": {
+        "SUM(sales)": {
+          "radarMetricMinValue": 0,
+          "radarMetricMaxValue": null
+        }
+      },
+      "source": "Chart Options / Radar"
+    },
+    "is_circle": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": false,
+      "source": "Chart Options / Radar"
+    }
+  },
+  "minimal_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "radar",
+    "groupby": [
+      "<dimension_column>"
+    ],
+    "metrics": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      }
+    ],
+    "adhoc_filters": [],
+    "row_limit": 10
+  },
+  "recommended_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "radar",
+    "groupby": [
+      "<dimension_column>"
+    ],
+    "metrics": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column_1>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column_1>)"
+      },
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column_2>"
+        },
+        "aggregate": "AVG",
+        "label": "AVG(<metric_column_2>)"
+      }
+    ],
+    "timeseries_limit_metric": null,
+    "adhoc_filters": [],
+    "row_limit": 10,
+    "color_scheme": "<categoricalSchemeRegistry.defaultKey>",
+    "show_legend": true,
+    "legendType": "scroll",
+    "legendOrientation": "top",
+    "legendMargin": null,
+    "show_labels": true,
+    "label_type": "value",
+    "label_position": "top",
+    "number_format": "SMART_NUMBER",
+    "date_format": "smart_date",
+    "column_config": {},
+    "is_circle": false
+  },
+  "conditional_blocks": {
+    "legend_layout": {
+      "condition": "需要调整图例布局时",
+      "fields": {
+        "show_legend": true,
+        "legendType": "scroll",
+        "legendOrientation": "right",
+        "legendMargin": 12
+      }
+    },
+    "label_content": {
+      "condition": "需要在点位标签里展示分类名和值时",
+      "fields": {
+        "show_labels": true,
+        "label_type": "key_value",
+        "label_position": "top"
+      }
+    },
+    "custom_metric_bounds": {
+      "condition": "需要给某些指标设置专属最大/最小值时",
+      "fields": {
+        "column_config": {
+          "SUM(sales)": {
+            "radarMetricMinValue": 0,
+            "radarMetricMaxValue": 5000
+          },
+          "AVG(profit_margin)": {
+            "radarMetricMinValue": -10,
+            "radarMetricMaxValue": 100
+          }
+        }
+      },
+      "notes": "key 必须使用 metric label。"
+    },
+    "circle_shape": {
+      "condition": "需要圆形雷达坐标系时",
+      "fields": {
+        "is_circle": true
+      }
+    },
+    "sort_metric_control": {
+      "condition": "需要使用 UI 暴露的 Sort by metric 保存态字段时",
+      "fields": {
+        "timeseries_limit_metric": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        }
+      },
+      "notes": "这是 controlPanel 暴露的字段，但当前 `Radar/buildQuery.ts` 实际读取的是 `series_limit_metric`。因此这一字段对 query `orderby` 的真实作用是低置信的。"
+    }
+  },
+  "runtime_only_or_non_template_fields": {
+    "runtime_aliases_generated_by_transformProps": [
+      {
+        "field_name": "colorScheme",
+        "reason": "由 raw form_data.color_scheme 派生的 runtime 别名，不是 API root 键。"
+      },
+      {
+        "field_name": "showLegend",
+        "reason": "由 raw form_data.show_legend 派生的 runtime 别名，不是 API root 键。"
+      },
+      {
+        "field_name": "showLabels",
+        "reason": "由 raw form_data.show_labels 派生的 runtime 别名，不是 API root 键。"
+      },
+      {
+        "field_name": "labelType",
+        "reason": "由 raw form_data.label_type 派生的 runtime 别名，不是 API root 键。"
+      },
+      {
+        "field_name": "labelPosition",
+        "reason": "由 raw form_data.label_position 派生的 runtime 别名，不是 API root 键。"
+      },
+      {
+        "field_name": "numberFormat",
+        "reason": "由 raw form_data.number_format 派生的 runtime 别名，不是 API root 键。"
+      },
+      {
+        "field_name": "dateFormat",
+        "reason": "由 raw form_data.date_format 派生的 runtime 别名，不是 API root 键。"
+      },
+      {
+        "field_name": "columnConfig",
+        "reason": "由 raw form_data.column_config 派生的 runtime 别名，不是 API root 键。"
+      },
+      {
+        "field_name": "isCircle",
+        "reason": "由 raw form_data.is_circle 派生的 runtime 别名，不是 API root 键。"
+      },
+      {
+        "field_name": "sliceId",
+        "reason": "这是隐藏字段 `slice_id` 的 runtime camelCase 别名，不是 API root 键。"
+      }
+    ],
+    "query_object_only_fields": [
+      {
+        "field_name": "queries[*].columns",
+        "reason": "这是 `groupby` 经过 `extractQueryFields()` 折叠后的 query 字段，不是 root form_data 单独提交的别名字段。"
+      },
+      {
+        "field_name": "queries[*].orderby",
+        "reason": "这是 `Radar/buildQuery.ts` 生成的 query 字段。默认回退为第一个 metric 的降序排序。"
+      }
+    ],
+    "non_template_fields": [
+      {
+        "field_name": "series_limit_metric",
+        "reason": "`Radar/buildQuery.ts` 虽然读取它，但它不是当前 controlPanel 暴露字段，也不会由 Explore 的 `getFormDataFromControls()` 从 UI 自动导出。"
+      },
+      {
+        "field_name": "labelMap / selectedValues / refs / echartOptions",
+        "reason": "这些是 `transformProps.ts` 在运行时生成的组件 props，不是 root form_data。"
+      }
+    ]
+  },
+  "api_usage_guidance": {
+    "high_confidence_required_fields": [
+      "datasource",
+      "viz_type",
+      "metrics"
+    ],
+    "recommended_always_set": [
+      "groupby",
+      "adhoc_filters",
+      "row_limit",
+      "color_scheme",
+      "show_legend",
+      "show_labels",
+      "label_type",
+      "label_position",
+      "number_format",
+      "date_format",
+      "is_circle"
+    ],
+    "api_field_examples": [
+      "groupby",
+      "metrics",
+      "timeseries_limit_metric",
+      "color_scheme",
+      "show_legend",
+      "label_type",
+      "column_config",
+      "is_circle"
+    ],
+    "avoid_confusion": [
+      "不要把 runtime 别名 `colorScheme`、`showLegend`、`showLabels`、`labelType`、`labelPosition`、`numberFormat`、`dateFormat`、`columnConfig`、`isCircle` 写回 root form_data。",
+      "不要把 `timeseries_limit_metric` 和 `series_limit_metric` 混为一谈；前者是 controlPanel 字段，后者是当前 buildQuery 里误读到的非 control 字段。",
+      "不要用原始列名当 `column_config` 的 key；这里要求的是 metric label。"
+    ]
+  }
+}

@@ -1,0 +1,460 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "mapbox",
+  "display_name": "MapBox",
+  "selection_summary": {
+    "category": "geospatial",
+    "tags": [
+      "mapbox",
+      "geospatial",
+      "interactive",
+      "map"
+    ],
+    "description_zh": "MapBox Chart integrates MapBox maps with custom geospatial data, supporting interactive zoom/pan and advanced spatial visualizations (e.g., clusters, heatmaps).",
+    "visual_shape_zh": "MapBox地图（高级地理空间）",
+    "use_cases_zh": [
+      "高精度地理空间分析（如经纬度级别的点位展示）",
+      "交互式地图探索（缩放/平移/聚类）",
+      "自定义地图样式与图层叠加"
+    ],
+    "required_slots": [
+      {
+        "field_name": "all_columns_x",
+        "required": true,
+        "slot_kind": "x_dimension_list",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [
+          "<x_dimension_column>"
+        ],
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Column containing longitude data"
+        ]
+      },
+      {
+        "field_name": "all_columns_y",
+        "required": true,
+        "slot_kind": "y_dimension_list",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [
+          "<y_dimension_column>"
+        ],
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Column containing latitude data"
+        ]
+      },
+      {
+        "field_name": "lat",
+        "required": true,
+        "slot_kind": "latitude",
+        "accepted_dataset_roles": [
+          "geo_latitude"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<latitude_column>",
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "纬度字段，用于定义地理点位的纬度坐标。"
+        ]
+      },
+      {
+        "field_name": "lon",
+        "required": true,
+        "slot_kind": "longitude",
+        "accepted_dataset_roles": [
+          "geo_longitude"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<longitude_column>",
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "经度字段，用于定义地理点位的经度坐标。"
+        ]
+      },
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "聚合指标，用于计算每个地理点位的数值（大小/颜色依据）。"
+        ]
+      }
+    ],
+    "optional_slots": [
+      {
+        "field_name": "adhoc_filters",
+        "required": false,
+        "slot_kind": "filter_list",
+        "accepted_dataset_roles": [
+          "filter_context"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [],
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "字段标签为 Filters。legacy explore_json 路径会先把 legacy filters 转成 adhoc_filters，再继续处理 extra filters / extra_form_data。"
+        ]
+      },
+      {
+        "field_name": "groupby",
+        "required": false,
+        "slot_kind": "dimension_list",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [
+          "<dimension_column>"
+        ],
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "One or many controls to group by. If grouping, latitude and longitude columns must be present."
+        ]
+      }
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "category_dimension",
+      "dimension",
+      "geo_latitude",
+      "geo_longitude",
+      "metric",
+      "saved_metric"
+    ],
+    "optional_dataset_roles": [
+      "category_dimension",
+      "dimension",
+      "filter_context"
+    ],
+    "dataset_role_inventory": {
+      "category_dimension": [
+        "all_columns_x",
+        "all_columns_y",
+        "groupby"
+      ],
+      "dimension": [
+        "all_columns_x",
+        "all_columns_y",
+        "groupby"
+      ],
+      "filter_context": [
+        "adhoc_filters"
+      ],
+      "geo_latitude": [
+        "lat"
+      ],
+      "geo_longitude": [
+        "lon"
+      ],
+      "metric": [
+        "metrics"
+      ],
+      "saved_metric": [
+        "metrics"
+      ],
+      "adhoc_metric": [
+        "metrics"
+      ]
+    },
+    "non_binding_control_names": [
+      "clustering_radius",
+      "global_opacity",
+      "mapbox_color",
+      "mapbox_label",
+      "mapbox_style",
+      "pandas_aggfunc",
+      "point_radius",
+      "point_radius_unit",
+      "render_while_dragging",
+      "row_limit",
+      "viewport_latitude",
+      "viewport_longitude",
+      "viewport_zoom"
+    ],
+    "embedding_runtime_field_names": [
+      "adhoc_filters",
+      "custom_form_data",
+      "filters",
+      "granularity",
+      "granularity_sqla",
+      "interactive_drilldown",
+      "interactive_groupby",
+      "interactive_highlight",
+      "relative_end",
+      "relative_start",
+      "time_column",
+      "time_compare",
+      "time_grain",
+      "time_grain_sqla",
+      "time_range"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "all_columns_x",
+      "all_columns_y",
+      "datasource",
+      "groupby",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "all_columns_x",
+      "all_columns_y",
+      "clustering_radius",
+      "datasource",
+      "global_opacity",
+      "groupby",
+      "mapbox_color",
+      "mapbox_label",
+      "mapbox_style",
+      "pandas_aggfunc",
+      "point_radius",
+      "point_radius_unit",
+      "render_while_dragging",
+      "row_limit",
+      "viewport_latitude",
+      "viewport_longitude",
+      "viewport_zoom",
+      "viz_type"
+    ],
+    "structural_flags": {
+      "time_series": false,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": true,
+      "flow_like": false,
+      "distribution_like": false,
+      "supports_breakdown": true,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": false,
+      "needs_dimension": true
+    },
+    "selection_hints": [
+      "至少需要 1 个可聚合指标字段。",
+      "需要至少 1 个维度字段用于分组、拆分或定位。",
+      "需要地理信息字段；点位地图优先经纬度，区域地图优先行政区维度。",
+      "支持按维度拆分多序列或子组。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：高精度地理空间分析（如经纬度级别的点位展示）；交互式地图探索（缩放/平移/聚类）；自定义地图样式与图层叠加"
+    ]
+  },
+  "selection_prompt_card": {
+    "viz_type": "mapbox",
+    "display_name": "MapBox",
+    "category": "geospatial",
+    "description_zh": "MapBox Chart integrates MapBox maps with custom geospatial data, supporting interactive zoom/pan and advanced spatial visualizations (e.g., clusters, heatmaps).",
+    "visual_shape_zh": "MapBox地图（高级地理空间）",
+    "best_for": [
+      "高精度地理空间分析（如经纬度级别的点位展示）",
+      "交互式地图探索（缩放/平移/聚类）",
+      "自定义地图样式与图层叠加"
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "category_dimension",
+      "dimension",
+      "geo_latitude",
+      "geo_longitude",
+      "metric",
+      "saved_metric"
+    ],
+    "optional_dataset_roles": [
+      "category_dimension",
+      "dimension",
+      "filter_context"
+    ],
+    "required_slots": [
+      {
+        "field_name": "all_columns_x",
+        "required": true,
+        "slot_kind": "x_dimension_list",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [
+          "<x_dimension_column>"
+        ],
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Column containing longitude data"
+        ]
+      },
+      {
+        "field_name": "all_columns_y",
+        "required": true,
+        "slot_kind": "y_dimension_list",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [
+          "<y_dimension_column>"
+        ],
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Column containing latitude data"
+        ]
+      },
+      {
+        "field_name": "lat",
+        "required": true,
+        "slot_kind": "latitude",
+        "accepted_dataset_roles": [
+          "geo_latitude"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<latitude_column>",
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "纬度字段，用于定义地理点位的纬度坐标。"
+        ]
+      },
+      {
+        "field_name": "lon",
+        "required": true,
+        "slot_kind": "longitude",
+        "accepted_dataset_roles": [
+          "geo_longitude"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<longitude_column>",
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "经度字段，用于定义地理点位的经度坐标。"
+        ]
+      },
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "聚合指标，用于计算每个地理点位的数值（大小/颜色依据）。"
+        ]
+      }
+    ],
+    "optional_slot_names": [
+      "adhoc_filters",
+      "groupby"
+    ],
+    "structural_flags": {
+      "time_series": false,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": true,
+      "flow_like": false,
+      "distribution_like": false,
+      "supports_breakdown": true,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": false,
+      "needs_dimension": true
+    },
+    "selection_hints": [
+      "至少需要 1 个可聚合指标字段。",
+      "需要至少 1 个维度字段用于分组、拆分或定位。",
+      "需要地理信息字段；点位地图优先经纬度，区域地图优先行政区维度。",
+      "支持按维度拆分多序列或子组。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：高精度地理空间分析（如经纬度级别的点位展示）；交互式地图探索（缩放/平移/聚类）；自定义地图样式与图层叠加"
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "mapbox",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/mapbox-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/mapbox-form-data-schema.json",
+      "control-schema": "form-data-schema/mapbox-schema.json"
+    }
+  }
+}

@@ -1,0 +1,417 @@
+{
+  "viz_type": "gantt_chart",
+  "display_name": "Gantt Chart",
+  "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Gantt/controlPanel.tsx",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Gantt/controlPanel.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Gantt/index.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Gantt/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Gantt/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Gantt/EchartsGantt.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Gantt/types.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Gantt/constants.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/controls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/constants.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Timeseries/constants.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/mixins.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/sections/chartTitle.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/test/Gantt/buildQuery.test.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/test/Gantt/transformProps.test.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryContext.ts"
+  ],
+  "notes": [
+    "gantt_chart 位于 `plugin-chart-echarts/src/Gantt`，metadata 没有声明 `useLegacyApi=true`，因此走标准 `/api/v1/chart/data`。",
+    "API root form_data 必须保留 controlPanel 原始键名。当前 Gantt 同时存在 snake_case 与 camelCase：例如 `start_time`、`end_time`、`y_axis`、`tooltip_metrics`、`x_axis_time_bounds`、`x_axis_time_format`、`show_extra_controls`，以及 `legendType`、`legendOrientation`、`legendMargin`、`tooltipTimeFormat`、`tooltipValuesFormat`。",
+    "`start_time` 与 `end_time` 复用了 `sharedControls.entity`，并在 Gantt controlPanel 中限制为 Temporal 列；`sharedControls.entity` 来自 `dndEntityControl`，带 `validateNonEmpty`，因此它们是源码级必填字段。",
+    "`y_axis` 复用了 `sharedControls.x_axis`。`xAxisMixin` 自带 `validateNonEmpty`，因此 `y_axis` 也是源码级必填字段。",
+    "`buildQuery.ts` 会把 `start_time`、`end_time`、`y_axis`、`series`、`tooltip_columns` 和 `order_by_cols` 里涉及的列统一编译到 `query_context.queries[*].columns`；`tooltip_metrics` 则编译到 `query_context.queries[*].metrics`。",
+    "`order_by_cols` 在 root form_data 中不是数组元组，而是数组字符串。`buildQuery.ts` 会对每一项执行 `JSON.parse(expr)`，把它还原成 `[column_name, is_ascending]`。",
+    "`series` 不是普通装饰字段。它既决定颜色分组，又会被 `buildQuery.ts` 写到 `series_columns`，并参与 `transformProps.ts` 的 `groupData(data, dimensionLabel)` 分组。",
+    "`subcategories` 是正式 controlPanel 字段，只在 `series` 有值时可见；`show_extra_controls` 则只决定图表顶部是否再显示一个运行时切换 `Plain/Subcategories` 的 RadioButtonControl。",
+    "`sections.titleControls` 原本还定义了 `y_axis_title_position`，但 `Gantt/controlPanel.tsx` 通过 `controlSetRows.slice(0, -1)` 移除了最后一行。Gantt 当前不正式暴露这个公共字段，`transformProps.ts` 也没有消费它。",
+    "`x_axis_time_bounds` 文案说会和数据 min/max date 合并，但当前源码上界实现实际使用了 `Math.min(...end_time)`，而不是 `Math.max(...)`。这里应按源码行为理解，而不是按文案理想行为理解。"
+  ],
+  "chart_data_api_behavior": {
+    "useLegacyApi": false,
+    "frontend_request_endpoint": "/api/v1/chart/data",
+    "frontend_request_payload": {
+      "query_context": "<buildQuery(form_data)>"
+    },
+    "query_builder": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Gantt/buildQuery.ts"
+  },
+  "query_compilation": {
+    "query_context_builder": "`buildQuery(formData)` 使用 `buildQueryContext(formData, baseQueryObject => [ ... ])` 构造单查询 query_context。",
+    "metrics_mapping": "`tooltip_metrics` 经 `ensureIsArray()` 进入 `query.metrics`。它不只是 tooltip 展示字段，也会改变最终查询列集。",
+    "columns_mapping": "`start_time`、`end_time`、`y_axis`、`series`、`tooltip_columns`，以及 `order_by_cols` 中的排序列都会被去重后写入 `query.columns`。",
+    "orderby_mapping": "`order_by_cols` 先从 `array[string]` 解析为 `[column_name, is_ascending]` 元组数组，再写入 `query.orderby`。",
+    "series_mapping": "`series` 经 `ensureIsArray(series)` 写入 `query.series_columns`，并在运行时成为颜色分组维度。",
+    "runtime_rendering": "`transformProps.ts` 从 `queriesData[0]` 读取结果后，按 `series` 分组、按 `y_axis` 聚合 category 行，并在 `subcategories=true` 时把每个 category 再按 series 拆成子行。`x_axis_time_bounds` 经过 `dayjs('HH:mm:ss')` 解析后映射为 x 轴 `min/max`。",
+    "legend_and_runtime_controls": "`EchartsGantt.tsx` 只额外处理 legend state 持久化和顶部 `Plain/Subcategories` 开关。当前 Gantt 源码里没有像 Funnel/Pie 那样的专属 cross-filter click serializer。"
+  },
+  "field_categories": {
+    "Query": [
+      {
+        "field_name": "start_time",
+        "runtime_alias": "startTime",
+        "description": "Start timestamp column for each gantt bar. The control reuses `sharedControls.entity` and restricts choices to Temporal columns.",
+        "data_type": "string | object",
+        "enum_source": "datasource temporal columns",
+        "sample_data": "start_time",
+        "required": true,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "end_time",
+        "runtime_alias": "endTime",
+        "description": "End timestamp column for each gantt bar. The control reuses `sharedControls.entity` and restricts choices to Temporal columns.",
+        "data_type": "string | object",
+        "enum_source": "datasource temporal columns",
+        "sample_data": "end_time",
+        "required": true,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "y_axis",
+        "runtime_alias": "yAxis",
+        "description": "Dimension to use on y-axis.",
+        "data_type": "string | object",
+        "enum_source": "datasource columns",
+        "sample_data": "task_name",
+        "required": true,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "series",
+        "description": "Defines the grouping of entities. Each series is represented by a specific color in the chart.",
+        "data_type": "string | object | null",
+        "enum_source": "datasource columns",
+        "sample_data": "owner",
+        "required": false,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "若提供，`buildQuery.ts` 会把它写入 `series_columns`，`transformProps.ts` 也会按它做颜色分组。"
+      },
+      {
+        "field_name": "tooltip_metrics",
+        "runtime_alias": "tooltipMetrics",
+        "description": "Metrics to show in the tooltip.",
+        "data_type": "array[string | object]",
+        "enum_source": "saved metrics + adhoc metrics",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "duration_sec"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(duration_sec)"
+          }
+        ],
+        "required": false,
+        "embedding": "否",
+        "default_value": [],
+        "notes": "共享控件本身没有显式 default，但 `buildQuery.ts` 使用 `ensureIsArray(tooltip_metrics)`，缺省时按空数组处理。"
+      },
+      {
+        "field_name": "tooltip_columns",
+        "runtime_alias": "tooltipColumns",
+        "description": "Columns to show in the tooltip.",
+        "data_type": "array[string | object]",
+        "enum_source": "datasource columns",
+        "sample_data": [
+          "status"
+        ],
+        "required": false,
+        "embedding": "否",
+        "default_value": []
+      },
+      {
+        "field_name": "adhoc_filters",
+        "description": "源码未提供额外描述；字段标签为 Filters。",
+        "data_type": "array[object]",
+        "enum_source": "dataset columns + saved metrics + 当前 tooltip_metrics",
+        "sample_data": [],
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "default_value": []
+      },
+      {
+        "field_name": "order_by_cols",
+        "description": "Order results by selected columns",
+        "data_type": "array[string]",
+        "enum_source": "datasource columns × [asc, desc]；每一项都是 JSON 字符串化后的 `[column_name, is_ascending]`",
+        "sample_data": [
+          "[\"start_time\",true]"
+        ],
+        "required": false,
+        "embedding": "否",
+        "default_value": [],
+        "notes": "`buildQuery.ts` 会对每一项执行 `JSON.parse()`。这是 Gantt 最容易误传错的数据形状之一。"
+      },
+      {
+        "field_name": "row_limit",
+        "runtime_alias": "rowLimit",
+        "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+        "data_type": "integer",
+        "enum_values": [
+          10,
+          50,
+          100,
+          250,
+          500,
+          1000,
+          5000,
+          10000,
+          50000
+        ],
+        "sample_data": 10000,
+        "required": false,
+        "embedding": "否",
+        "default_value": 10000
+      }
+    ],
+    "Advanced analytics": [],
+    "Annotations & Layers": [],
+    "Predictive Analytics（Forecast）": [],
+    "Chart Options": [
+      {
+        "field_name": "x_axis_time_bounds",
+        "runtime_alias": "xAxisTimeBounds",
+        "description": "Bounds for the X-axis. Selected time merges with min/max date of the data. When left empty, bounds dynamically defined based on the min/max of the data.",
+        "data_type": "array[string | null, string | null] | null",
+        "sample_data": [
+          null,
+          "19:00:00"
+        ],
+        "required": false,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "当前 Gantt 运行时按 `HH:mm:ss` 解析两端时间，再套用到数据日期上。源码上界实现当前用的是 `Math.min(...end_time)`。"
+      },
+      {
+        "field_name": "x_axis_time_format",
+        "runtime_alias": "xAxisTimeFormat",
+        "description": "D3 time format syntax: https://github.com/d3/d3-time-format. When using other than adaptive formatting, labels may overlap",
+        "data_type": "string",
+        "enum_source": "D3_TIME_FORMAT_OPTIONS",
+        "sample_data": "smart_date",
+        "required": false,
+        "embedding": "否",
+        "default_value": "smart_date"
+      },
+      {
+        "field_name": "tooltipTimeFormat",
+        "description": "Tooltip time format; shared control derives from `x_axis_time_format`.",
+        "data_type": "string",
+        "enum_source": "D3_TIME_FORMAT_OPTIONS",
+        "sample_data": "smart_date",
+        "required": false,
+        "embedding": "否",
+        "default_value": "smart_date"
+      },
+      {
+        "field_name": "tooltipValuesFormat",
+        "description": "Number format; shared control derives from `y_axis_format`.",
+        "data_type": "string",
+        "enum_source": "D3_FORMAT_OPTIONS",
+        "sample_data": "SMART_NUMBER",
+        "required": false,
+        "embedding": "否",
+        "default_value": "SMART_NUMBER"
+      }
+    ],
+    "Chart Title": [
+      {
+        "field_name": "x_axis_title",
+        "runtime_alias": "xAxisTitle",
+        "description": "源码未提供额外描述；字段标签为 X Axis Title。",
+        "data_type": "string",
+        "sample_data": "Time",
+        "required": false,
+        "embedding": "否",
+        "default_value": ""
+      },
+      {
+        "field_name": "x_axis_title_margin",
+        "runtime_alias": "xAxisTitleMargin",
+        "description": "源码未提供额外描述；字段标签为 X Axis Title Margin。",
+        "data_type": "number | null",
+        "enum_values": [
+          15,
+          30,
+          50,
+          75,
+          100,
+          125,
+          150,
+          200
+        ],
+        "sample_data": 15,
+        "required": false,
+        "embedding": "否",
+        "default_value": 15,
+        "notes": "controlPanel 默认值是 15；若 root form_data 完全不传，`DEFAULT_FORM_DATA` 的 runtime fallback 是 0。"
+      },
+      {
+        "field_name": "y_axis_title",
+        "runtime_alias": "yAxisTitle",
+        "description": "源码未提供额外描述；字段标签为 Y Axis Title。",
+        "data_type": "string",
+        "sample_data": "Task",
+        "required": false,
+        "embedding": "否",
+        "default_value": ""
+      },
+      {
+        "field_name": "y_axis_title_margin",
+        "runtime_alias": "yAxisTitleMargin",
+        "description": "源码未提供额外描述；字段标签为 Y Axis Title Margin。",
+        "data_type": "number | null",
+        "enum_values": [
+          15,
+          30,
+          50,
+          75,
+          100,
+          125,
+          150,
+          200
+        ],
+        "sample_data": 30,
+        "required": false,
+        "embedding": "否",
+        "default_value": 30,
+        "notes": "controlPanel 默认值是 30；若 root form_data 完全不传，`DEFAULT_FORM_DATA` 的 runtime fallback 是 0。"
+      }
+    ],
+    "图表专属": [
+      {
+        "field_name": "subcategories",
+        "description": "Divides each category into subcategories based on the values in the dimension. It can be used to exclude intersections.",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false,
+        "notes": "只有当 `series` 已选择时才在 controlPanel 中可见。"
+      },
+      {
+        "field_name": "show_extra_controls",
+        "runtime_alias": "showExtraControls",
+        "description": "源码未提供额外描述；字段标签为 Extra Controls。",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false,
+        "notes": "它不改变查询，只决定图表顶部是否显示运行时 `Plain/Subcategories` 切换按钮。"
+      }
+    ],
+    "通用图表选项": [
+      {
+        "field_name": "color_scheme",
+        "runtime_alias": "colorScheme",
+        "description": "The color scheme for rendering chart",
+        "data_type": "string",
+        "enum_source": "categoricalSchemeRegistry.keys()",
+        "sample_data": "supersetColors",
+        "required": false,
+        "embedding": "否",
+        "default_value": "categoricalSchemeRegistry.getDefaultKey()"
+      },
+      {
+        "field_name": "show_legend",
+        "runtime_alias": "showLegend",
+        "description": "Whether to display a legend for the chart",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true
+      },
+      {
+        "field_name": "legendType",
+        "description": "Legend type",
+        "data_type": "string",
+        "enum_values": [
+          "scroll",
+          "plain"
+        ],
+        "sample_data": "scroll",
+        "required": false,
+        "embedding": "否",
+        "default_value": "scroll"
+      },
+      {
+        "field_name": "legendOrientation",
+        "description": "Legend Orientation",
+        "data_type": "string",
+        "enum_values": [
+          "top",
+          "bottom",
+          "left",
+          "right"
+        ],
+        "sample_data": "top",
+        "required": false,
+        "embedding": "否",
+        "default_value": "top"
+      },
+      {
+        "field_name": "legendMargin",
+        "description": "Additional padding for legend.",
+        "data_type": "integer | null",
+        "sample_data": 0,
+        "required": false,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "控件类型是 `TextControl` 且 `isInt=true`；`transformProps.ts` 运行时再通过 `convertInteger()` 规范化。"
+      },
+      {
+        "field_name": "zoomable",
+        "description": "Enable data zooming controls",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      }
+    ]
+  },
+  "runtime_only_or_removed_fields": [
+    {
+      "field_name": "startTime / endTime / yAxis / tooltipMetrics / tooltipColumns / xAxisTimeBounds / xAxisTimeFormat / showExtraControls / colorScheme / showLegend",
+      "reason": "这些是 runtime camelCase 别名，不是 API root form_data 的 canonical 键名。"
+    },
+    {
+      "field_name": "y_axis_title_position",
+      "reason": "`chartTitle.tsx` 定义了这个公共字段，但 Gantt controlPanel 已移除，且 `transformProps.ts` 没有消费它。"
+    },
+    {
+      "field_name": "query_context.queries[*].columns / metrics / orderby / series_columns",
+      "reason": "这些字段由 `buildQuery.ts` 从 root form_data 编译生成，不是额外 root form_data 字段。"
+    }
+  ]
+}

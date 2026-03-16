@@ -26,7 +26,11 @@ public interface MetricService {
 
     void createMetricBatch(List<MetricReq> metricReqs, User user) throws Exception;
 
+    void alterMetricBatch(List<MetricReq> metricReqs, Long modelId, User user) throws Exception;
+
     MetricResp updateMetric(MetricReq metricReq, User user) throws Exception;
+
+    void updateMetricBatch(List<MetricReq> metricReqs, User user) throws Exception;
 
     void batchUpdateStatus(MetaBatchReq metaBatchReq, User user);
 
@@ -39,6 +43,8 @@ public interface MetricService {
     void batchUpdateSensitiveLevel(MetaBatchReq metaBatchReq, User user);
 
     void deleteMetric(Long id, User user) throws Exception;
+
+    void deleteMetricBatch(List<Long> idList, User user);
 
     PageInfo<MetricResp> queryMetricMarket(PageMetricReq pageMetricReq, User user);
 
@@ -64,7 +70,7 @@ public interface MetricService {
 
     MetricQueryDefaultConfig getMetricQueryDefaultConfig(Long metricId, User user);
 
-    void sendMetricEventBatch(List<Long> modelIds, EventType eventType);
+    void sendMetricEventBatch(List<Long> modelIds, EventType eventType, User user);
 
     List<MetricResp> queryMetrics(MetricsFilter metricsFilter);
 

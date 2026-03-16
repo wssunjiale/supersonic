@@ -1,0 +1,192 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "country_map",
+  "display_name": "Country Map",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "state_code",
+          "operator": "IN",
+          "comparator": [
+            "US-CA"
+          ]
+        }
+      ]
+    ],
+    "entity": [
+      "state_code"
+    ],
+    "linear_color_scheme": [
+      "<sequential_scheme_key>"
+    ],
+    "metric": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "population"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(population)"
+      }
+    ],
+    "number_format": [
+      "SMART_NUMBER"
+    ],
+    "select_country": [
+      "usa"
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "country_map",
+      "select_country": "usa",
+      "entity": "<iso_3166_2_column>",
+      "metric": "<metric_or_saved_metric>",
+      "adhoc_filters": []
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "country_map",
+      "select_country": "usa",
+      "entity": "state_code",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "population"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(population)"
+      },
+      "adhoc_filters": [],
+      "number_format": "SMART_NUMBER",
+      "linear_color_scheme": "<default_sequential_scheme_key>"
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "country_map",
+      "select_country": "<copied_from_saved_chart>",
+      "entity": "<copied_from_saved_chart>",
+      "metric": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "number_format": "<copied_from_saved_chart_if_present>",
+      "linear_color_scheme": "<copied_from_saved_chart_if_present>",
+      "color_scheme": "<copied_from_saved_chart_if_present>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "state_code",
+            "op": "IN",
+            "val": [
+              "US-CA",
+              "US-NY"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "state_code",
+            "operator": "IN",
+            "comparator": [
+              "US-CA",
+              "US-NY"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_country_map_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "state_code",
+            "op": "IN",
+            "val": [
+              "US-CA"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters；后端会把它们并入额外过滤条件。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_country_map_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "state_code",
+            "operator": "IN",
+            "comparator": [
+              "US-CA"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会标记为 `isExtra` 并并入查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_country_map_legacy": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；Country Map 默认不直接消费它。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_country_map_legacy": false,
+        "recommended": false,
+        "sample_data": "Last 30 days",
+        "effect": "这是通用 extra_form_data override 字段，但当前图不是时序图，Country Map 控制面板与后端查询路径都没有高置信业务依赖。",
+        "source": "QueryFormData.ts + superset/constants.py + superset/utils/core.py + superset/viz.py",
+        "status": "低相关，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_country_map_legacy": false,
+        "recommended": false,
+        "sample_data": "ds",
+        "effect": "这是通用 time column override 字段，但 Country Map 不是时序图，当前 controlPanel/后端也不读取它作为正式查询输入。",
+        "source": "QueryFormData.ts + superset/constants.py + superset/utils/core.py + superset/viz.py",
+        "status": "低相关，不建议在 guest embedding 中依赖"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "country_map",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/country_map-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/country_map-form-data-schema.json",
+      "control-schema": "form-data-schema/country_map-schema.json"
+    }
+  }
+}

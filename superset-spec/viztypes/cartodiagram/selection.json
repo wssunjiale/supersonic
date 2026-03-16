@@ -1,0 +1,222 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "cartodiagram",
+  "display_name": "Cartodiagram",
+  "selection_summary": {
+    "category": "geospatial",
+    "tags": [
+      "cartodiagram",
+      "geospatial",
+      "chart overlay",
+      "map layer",
+      "spatial analysis"
+    ],
+    "description_zh": "CartoDiagram overlays arbitrary Superset charts onto a customizable geographic map (supporting WMS/WFS/XYZ layers), enabling combined visualization of chart metrics and spatial data.",
+    "visual_shape_zh": "地图叠加图表（复合地理空间型）",
+    "use_cases_zh": [
+      "地理空间与多维度指标的联合分析（如地图上叠加柱状图/折线图展示区域趋势）",
+      "自定义底图（WMS/WFS/XYZ）+ 业务图表的融合展示",
+      "多尺度地理视角下的精细化指标对比"
+    ],
+    "required_slots": [
+      {
+        "field_name": "geom_column",
+        "required": true,
+        "slot_kind": "geo_geometry",
+        "accepted_dataset_roles": [
+          "geo_geometry"
+        ],
+        "cardinality": "1",
+        "placeholder": "<geometry_column>",
+        "source_categories": [
+          "Configuration"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "The name of the geometry column"
+        ]
+      },
+      {
+        "field_name": "selected_chart",
+        "required": true,
+        "slot_kind": "chart_reference",
+        "accepted_dataset_roles": [
+          "chart_reference"
+        ],
+        "cardinality": "1",
+        "placeholder": "<saved_chart_reference_json>",
+        "source_categories": [
+          "Configuration"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Choose a chart for displaying on the map"
+        ]
+      }
+    ],
+    "optional_slots": [],
+    "required_dataset_roles": [
+      "chart_reference",
+      "geo_geometry"
+    ],
+    "optional_dataset_roles": [],
+    "dataset_role_inventory": {
+      "chart_reference": [
+        "selected_chart"
+      ],
+      "geo_geometry": [
+        "geom_column"
+      ]
+    },
+    "non_binding_control_names": [
+      "chart_background_border_radius",
+      "chart_background_color",
+      "chart_size",
+      "layer_configs",
+      "map_view"
+    ],
+    "embedding_runtime_field_names": [
+      "adhoc_filters",
+      "custom_form_data",
+      "filters",
+      "granularity",
+      "granularity_sqla",
+      "interactive_drilldown",
+      "interactive_groupby",
+      "interactive_highlight",
+      "relative_end",
+      "relative_start",
+      "time_column",
+      "time_compare",
+      "time_grain",
+      "time_grain_sqla",
+      "time_range"
+    ],
+    "minimal_template_keys": [
+      "chart_background_border_radius",
+      "chart_background_color",
+      "chart_size",
+      "datasource",
+      "geom_column",
+      "layer_configs",
+      "map_view",
+      "selected_chart",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "chart_background_border_radius",
+      "chart_background_color",
+      "chart_size",
+      "datasource",
+      "extra_form_data",
+      "geom_column",
+      "layer_configs",
+      "map_view",
+      "selected_chart",
+      "viz_type"
+    ],
+    "structural_flags": {
+      "time_series": false,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": true,
+      "flow_like": false,
+      "distribution_like": false,
+      "supports_breakdown": false,
+      "supports_filters": false,
+      "supports_runtime_filters": false,
+      "needs_metric": false,
+      "needs_time": false,
+      "needs_dimension": false
+    },
+    "selection_hints": [
+      "需要地理信息字段；点位地图优先经纬度，区域地图优先行政区维度。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：地理空间与多维度指标的联合分析（如地图上叠加柱状图/折线图展示区域趋势）；自定义底图（WMS/WFS/XYZ）+ 业务图表的融合展示；多尺度地理视角下的精细化指标对比"
+    ]
+  },
+  "selection_prompt_card": {
+    "viz_type": "cartodiagram",
+    "display_name": "Cartodiagram",
+    "category": "geospatial",
+    "description_zh": "CartoDiagram overlays arbitrary Superset charts onto a customizable geographic map (supporting WMS/WFS/XYZ layers), enabling combined visualization of chart metrics and spatial data.",
+    "visual_shape_zh": "地图叠加图表（复合地理空间型）",
+    "best_for": [
+      "地理空间与多维度指标的联合分析（如地图上叠加柱状图/折线图展示区域趋势）",
+      "自定义底图（WMS/WFS/XYZ）+ 业务图表的融合展示",
+      "多尺度地理视角下的精细化指标对比"
+    ],
+    "required_dataset_roles": [
+      "chart_reference",
+      "geo_geometry"
+    ],
+    "optional_dataset_roles": [],
+    "required_slots": [
+      {
+        "field_name": "geom_column",
+        "required": true,
+        "slot_kind": "geo_geometry",
+        "accepted_dataset_roles": [
+          "geo_geometry"
+        ],
+        "cardinality": "1",
+        "placeholder": "<geometry_column>",
+        "source_categories": [
+          "Configuration"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "The name of the geometry column"
+        ]
+      },
+      {
+        "field_name": "selected_chart",
+        "required": true,
+        "slot_kind": "chart_reference",
+        "accepted_dataset_roles": [
+          "chart_reference"
+        ],
+        "cardinality": "1",
+        "placeholder": "<saved_chart_reference_json>",
+        "source_categories": [
+          "Configuration"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Choose a chart for displaying on the map"
+        ]
+      }
+    ],
+    "optional_slot_names": [],
+    "structural_flags": {
+      "time_series": false,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": true,
+      "flow_like": false,
+      "distribution_like": false,
+      "supports_breakdown": false,
+      "supports_filters": false,
+      "supports_runtime_filters": false,
+      "needs_metric": false,
+      "needs_time": false,
+      "needs_dimension": false
+    },
+    "selection_hints": [
+      "需要地理信息字段；点位地图优先经纬度，区域地图优先行政区维度。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：地理空间与多维度指标的联合分析（如地图上叠加柱状图/折线图展示区域趋势）；自定义底图（WMS/WFS/XYZ）+ 业务图表的融合展示；多尺度地理视角下的精细化指标对比"
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "cartodiagram",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/cartodiagram-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/cartodiagram-form-data-schema.json",
+      "control-schema": "form-data-schema/cartodiagram-schema.json"
+    }
+  }
+}

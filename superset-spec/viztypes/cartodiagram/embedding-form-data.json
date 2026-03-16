@@ -1,0 +1,537 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "cartodiagram",
+  "display_name": "Cartodiagram",
+  "source_kind": "schema_file",
+  "normalized_embedding_policy": {
+    "immutable_root_keys": [
+      "slice_id",
+      "datasource",
+      "viz_type",
+      "all_saved_chart_definition_fields"
+    ],
+    "allowed_runtime_fields": [
+      {
+        "field_name": "adhoc_filters",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "custom_form_data",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "filters",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "granularity",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "relative_end",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "relative_start",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_column",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_compare",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_grain",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_range",
+        "behavior": "override",
+        "source": "embedding-schema"
+      }
+    ],
+    "safe_embedding_form_data_seed": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "cartodiagram",
+      "extra_form_data": {
+        "filters": [],
+        "adhoc_filters": []
+      }
+    }
+  },
+  "original_embedding_form_data_schema": {
+    "viz_type": "cartodiagram",
+    "display_name": "Cartodiagram",
+    "purpose": "第三方 embedding / guest token 场景下安全传输的 Cartodiagram form_data 模板",
+    "base_form_data_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/cartodiagram-form-data-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-cartodiagram/src/plugin/buildQuery.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-cartodiagram/src/plugin/controlPanel.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-cartodiagram/src/plugin/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-cartodiagram/src/util/transformPropsUtil.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-cartodiagram/test/plugin/buildQuery.test.ts",
+      "D:/vsx/sources/superset-6.0.0/superset/security/manager.py",
+      "D:/vsx/sources/superset-6.0.0/superset/constants.py",
+      "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/charts/data/api.py",
+      "D:/vsx/sources/superset-6.0.0/superset/commands/chart/data/get_data_command.py",
+      "D:/vsx/sources/superset-6.0.0/superset/charts/schemas.py",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/constants.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/QueryFormData.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/processExtraFormData.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/dashboard/components/nativeFilters/utils.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataWithDashboardContext.ts"
+    ],
+    "notes": [
+      "Cartodiagram 走标准 chart data API，因此 embedded guest 的核心限制仍在后端 `security/manager.py::query_context_modified()`；报错原文是 `Guest user cannot modify chart payload`。",
+      "Cartodiagram 的特殊点在于：真正的 query context 不是由它自己的 root form_data 直接生成，而是由 `selected_chart.params` 里的被引用图表 form_data，经 `geom_column` 注入和 `extra_form_data` 透传后，再调用被引用图表的 buildQuery 生成。",
+      "这意味着 guest 模式下最敏感的不是 root 上的 metrics/groupby 字段，而是 `selected_chart` 与 `geom_column`。它们虽然不是 security manager 直接显式比对的 root 字段，却会间接改变 `query_context.queries.columns/groupby/metrics/orderby`。",
+      "Cartodiagram 自己提供的动态入口是 root `extra_form_data`。源码高置信保证的是：它会被原样浅合并到被引用图表 `chartFormData.extra_form_data`；至于最终哪些 override 真正生效，要看被引用图表自己的 buildQuery。",
+      "因此，Cartodiagram embedding 的安全策略不是重构 root form_data，而是复制保存态 Cartodiagram 图表的根层配置，只在 root `extra_form_data` 中传入动态筛选上下文。"
+    ],
+    "security_enforcement": {
+      "backend_check_function": "superset/security/manager.py::query_context_modified",
+      "checked_when": "ChartDataCommand.validate() -> QueryContext.raise_for_access()",
+      "error_message": "Guest user cannot modify chart payload",
+      "hard_block_fields": [
+        "slice_id",
+        "metrics",
+        "groupby",
+        "columns",
+        "orderby"
+      ],
+      "indirectly_sensitive_fields_for_cartodiagram": [
+        "selected_chart",
+        "geom_column"
+      ],
+      "query_critical_root_fields": [
+        "slice_id",
+        "datasource",
+        "viz_type",
+        "selected_chart",
+        "geom_column"
+      ],
+      "recommended_strategy": "复制保存态 Cartodiagram 图表的完整 root form_data 作为 base，只通过 root extra_form_data 向被引用图表注入动态过滤与时间上下文。"
+    },
+    "safe_base_rule": {
+      "description": "第三方 embedding 请求中的根层 form_data，应当从已保存的 Cartodiagram 图表直接复制，不要自行重构。",
+      "must_be_copied_from_saved_chart": [
+        "slice_id",
+        "dashboardId",
+        "datasource",
+        "viz_type",
+        "selected_chart",
+        "geom_column",
+        "map_view",
+        "layer_configs",
+        "chart_background_color",
+        "chart_background_border_radius",
+        "chart_size",
+        "all other saved chart-definition fields"
+      ],
+      "why": [
+        "query_context_modified() 会比对最终 query_context 中的 metrics/groupby/columns/orderby。",
+        "`selected_chart` 变了，就等于底层图表 form_data 模板变了，最终 queries.metrics/groupby/columns 很容易整体变化。",
+        "`geom_column` 会被强制插到被引用图表 `groupby` 第一位，因此它直接影响最终 query_context.queries.groupby。",
+        "Cartodiagram 自身提供了 `extra_form_data` 透传入口，动态筛选场景不需要靠改根层 `selected_chart` 或 `geom_column` 来实现。",
+        "`map_view`、`layer_configs`、`chart_size` 等虽然不一定触发 guest 查询越权报错，但它们属于图表定义字段；保守 embedding 模式也应直接复制保存态。"
+      ]
+    },
+    "safe_embedding_form_data_template": {
+      "description": "这是 guest embedding 下的安全写法。根层以保存态 Cartodiagram 为 base，仅改 extra_form_data。",
+      "template": {
+        "slice_id": "<saved_chart_id>",
+        "dashboardId": "<dashboard_id>",
+        "datasource": "<copied_from_saved_chart>",
+        "viz_type": "cartodiagram",
+        "selected_chart": "<copied_from_saved_chart>",
+        "geom_column": "<copied_from_saved_chart>",
+        "map_view": "<copied_from_saved_chart>",
+        "layer_configs": "<copied_from_saved_chart>",
+        "chart_background_color": "<copied_from_saved_chart>",
+        "chart_background_border_radius": "<copied_from_saved_chart>",
+        "chart_size": "<copied_from_saved_chart>",
+        "extra_form_data": {
+          "filters": [
+            {
+              "col": "region",
+              "op": "IN",
+              "val": [
+                "East"
+              ]
+            }
+          ],
+          "adhoc_filters": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "region",
+              "operator": "IN",
+              "comparator": [
+                "East"
+              ]
+            }
+          ],
+          "time_range": "Last 30 days",
+          "custom_form_data": {}
+        }
+      }
+    },
+    "preferred_dynamic_container": {
+      "field_name": "extra_form_data",
+      "description": "Cartodiagram buildQuery 会把 root `extra_form_data` 浅合并进被引用图表 form_data.extra_form_data，然后再委托给被引用图表自己的 buildQuery。",
+      "append_keys": [
+        "adhoc_filters",
+        "filters",
+        "interactive_groupby",
+        "interactive_highlight",
+        "interactive_drilldown",
+        "custom_form_data"
+      ],
+      "override_keys_backend_high_confidence": [
+        "granularity_sqla",
+        "granularity",
+        "time_column",
+        "time_grain",
+        "time_range",
+        "time_grain_sqla",
+        "relative_start",
+        "relative_end"
+      ],
+      "frontend_declared_but_backend_not_high_confidence": [
+        "time_compare"
+      ],
+      "delegation_note": "上述 keys 在 Cartodiagram 层面的高置信仅表示“会被透传给被引用图表 form_data”；最终是否被底层图表实际消费，要看 selected_chart.viz_type 对应的 buildQuery。"
+    },
+    "extra_form_data_field_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_cartodiagram": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "East"
+            ]
+          }
+        ],
+        "effect": "Cartodiagram 会把它透传给被引用图表；如果被引用图表走标准 extra_form_data merge，它会作为追加 simple filters 生效。",
+        "source": "plugin-chart-cartodiagram/buildQuery.ts + superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_cartodiagram": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East"
+            ]
+          }
+        ],
+        "effect": "Cartodiagram 会把它透传给被引用图表；如果被引用图表走标准 extra_form_data merge，它会作为追加 adhoc filters 生效。",
+        "source": "plugin-chart-cartodiagram/buildQuery.ts + superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_cartodiagram": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "Cartodiagram 只负责透传；是否被底层图表消费取决于 selected_chart.viz_type。",
+        "source": "plugin-chart-cartodiagram/buildQuery.ts + QueryFormData.ts"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_cartodiagram": true,
+        "recommended": false,
+        "sample_data": "Last 30 days",
+        "effect": "Cartodiagram 会把它透传给被引用图表；如果底层图表有时间语义，通常会覆盖时间范围；如果底层图表不是时序图，则可能无实际效果。",
+        "source": "plugin-chart-cartodiagram/buildQuery.ts + superset/constants.py + superset/utils/core.py",
+        "status": "有条件推荐，仅当 selected_chart 本身是时间相关图表时使用"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_cartodiagram": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "Cartodiagram 只做透传；最终是否安全、是否生效，完全取决于 selected_chart.viz_type。",
+        "source": "plugin-chart-cartodiagram/buildQuery.ts + superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议把 Cartodiagram 当成统一的时间粒度覆盖入口"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_cartodiagram": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "Cartodiagram 只做透传；更换时间列是否被底层图表接受、是否影响 guest payload 校验，取决于 selected_chart.viz_type。",
+        "source": "plugin-chart-cartodiagram/buildQuery.ts + superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "granularity",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_cartodiagram": false,
+        "recommended": false,
+        "sample_data": "__time",
+        "effect": "Cartodiagram 只做透传；不同底层图表对该键的使用并不统一。",
+        "source": "plugin-chart-cartodiagram/buildQuery.ts + superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_column",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_cartodiagram": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "Cartodiagram 只做透传；是否被底层图表 buildQuery 转为实际 query object 字段，取决于 selected_chart.viz_type。",
+        "source": "plugin-chart-cartodiagram/buildQuery.ts + superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_grain",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_cartodiagram": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "Cartodiagram 只做透传；不同底层图表对该键的消费并不统一。",
+        "source": "plugin-chart-cartodiagram/buildQuery.ts + superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "relative_start",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_cartodiagram": false,
+        "recommended": false,
+        "sample_data": "now",
+        "effect": "Cartodiagram 只做透传；是否进入最终 query extras 取决于底层图表 buildQuery。",
+        "source": "plugin-chart-cartodiagram/buildQuery.ts + superset/charts/schemas.py + superset/utils/core.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "relative_end",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_cartodiagram": false,
+        "recommended": false,
+        "sample_data": "today",
+        "effect": "Cartodiagram 只做透传；是否进入最终 query extras 取决于底层图表 buildQuery。",
+        "source": "plugin-chart-cartodiagram/buildQuery.ts + superset/charts/schemas.py + superset/utils/core.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_cartodiagram": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "Cartodiagram 不直接消费它；底层图表若不专门处理，也通常不会有实际效果。",
+        "source": "plugin-chart-cartodiagram/buildQuery.ts + QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_cartodiagram": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "Cartodiagram 不直接消费它；底层图表是否处理取决于 selected_chart.viz_type。",
+        "source": "plugin-chart-cartodiagram/buildQuery.ts + QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_cartodiagram": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "Cartodiagram 不直接消费它；底层图表是否处理取决于 selected_chart.viz_type。",
+        "source": "plugin-chart-cartodiagram/buildQuery.ts + QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "time_compare",
+        "data_type": "string | array[string]",
+        "behavior": "override",
+        "safe_for_cartodiagram": false,
+        "recommended": false,
+        "sample_data": [
+          "1 year ago"
+        ],
+        "effect": "frontend 类型声明存在，但后端 constants.py 的 extra_form_data merge whitelist 未把它列为高置信 override；再加上 Cartodiagram 只做透传，因此不应依赖。",
+        "source": "QueryFormData.ts + query/constants.ts + superset/constants.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      }
+    ],
+    "minimal_extra_form_data_template": {
+      "filters": [
+        {
+          "col": "region",
+          "op": "IN",
+          "val": [
+            "East"
+          ]
+        }
+      ]
+    },
+    "recommended_extra_form_data_template": {
+      "filters": [
+        {
+          "col": "region",
+          "op": "IN",
+          "val": [
+            "East",
+            "West"
+          ]
+        }
+      ],
+      "adhoc_filters": [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "region",
+          "operator": "IN",
+          "comparator": [
+            "East",
+            "West"
+          ]
+        }
+      ],
+      "time_range": "Last 30 days",
+      "custom_form_data": {}
+    },
+    "unsafe_root_form_data_changes": [
+      {
+        "field_name": "slice_id",
+        "reason": "与保存态图表 id 不一致会被后端立即判定为请求了另一张图。"
+      },
+      {
+        "field_name": "selected_chart",
+        "reason": "它决定底层委托给哪张图以及底层图表的 `params`；改动后最终 query_context.queries.columns/groupby/metrics 很容易整体变化。"
+      },
+      {
+        "field_name": "geom_column",
+        "reason": "buildQuery 会把它插入底层图表 `groupby` 第一位；改动后最终 query_context.queries.groupby 会变化。"
+      },
+      {
+        "field_name": "datasource",
+        "reason": "embedded guest 不应改 Cartodiagram 自身绑定的数据集；它还决定 UI 允许选择哪些底层图表和几何列。"
+      },
+      {
+        "field_name": "viz_type",
+        "reason": "embedded guest 不应把已分享图表改成另一种图。"
+      },
+      {
+        "field_name": "map_view",
+        "reason": "虽然通常不触发 query_context_modified，但它属于地图定义字段；保守 embedding 模式不建议临时改根层图表配置。"
+      },
+      {
+        "field_name": "layer_configs",
+        "reason": "虽然通常不触发 query_context_modified，但它属于地图图层定义字段；保守 embedding 模式不建议临时改根层图表配置。"
+      },
+      {
+        "field_name": "chart_background_color",
+        "reason": "属于图表定义字段；guest 动态联动场景不应拿它当上下文入口。"
+      },
+      {
+        "field_name": "chart_background_border_radius",
+        "reason": "属于图表定义字段；guest 动态联动场景不应拿它当上下文入口。"
+      },
+      {
+        "field_name": "chart_size",
+        "reason": "属于图表定义字段；guest 动态联动场景不应拿它当上下文入口。"
+      }
+    ],
+    "practical_guidance": {
+      "best_practice": [
+        "先从保存态 Cartodiagram 图表读取完整 root form_data。",
+        "根层保持不变，尤其保留 `selected_chart` 与 `geom_column`。",
+        "只在 root `extra_form_data` 中放动态 filters / adhoc_filters / time_range。",
+        "如果 selected_chart 指向的底层图是时间相关图，再考虑传 `time_range` 一类 override；否则优先只用 filters。"
+      ],
+      "avoid": [
+        "不要手工重写 `selected_chart.params`，也不要把 `selected_chart` 从字符串改成对象。",
+        "不要把 `geom_column` 当成动态筛选入口，它会直接改变最终 delegated query 的 groupby。",
+        "不要假设所有 extra_form_data override 在 Cartodiagram 下都和普通时序图一样稳定；Cartodiagram 只保证透传，不保证底层统一语义。",
+        "不要把 runtime 字段 `selectedChart`、`geomColumn`、`mapView`、`layerConfigs`、`chartSize` 写回 root form_data。"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "cartodiagram",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/cartodiagram-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/cartodiagram-form-data-schema.json",
+      "control-schema": "form-data-schema/cartodiagram-schema.json"
+    }
+  }
+}

@@ -1,0 +1,368 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "tree_chart",
+  "display_name": "Tree Chart",
+  "source_kind": "schema_file",
+  "normalized_chart_form_data": {
+    "required_root_fields": [
+      "datasource",
+      "id",
+      "parent",
+      "viz_type"
+    ],
+    "optional_root_fields": [
+      "adhoc_filters",
+      "cache_timeout",
+      "child_label_position",
+      "custom_params",
+      "emphasis",
+      "extra_form_data",
+      "layout",
+      "metric",
+      "name",
+      "node_label_position",
+      "orient",
+      "roam",
+      "root_node_id",
+      "row_limit",
+      "slice_id",
+      "symbol",
+      "symbolSize",
+      "url_params"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "id",
+      "parent",
+      "row_limit",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "child_label_position",
+      "datasource",
+      "emphasis",
+      "id",
+      "layout",
+      "metric",
+      "name",
+      "node_label_position",
+      "orient",
+      "parent",
+      "roam",
+      "root_node_id",
+      "row_limit",
+      "symbol",
+      "symbolSize",
+      "viz_type"
+    ],
+    "fallback_template_seed": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "tree_chart",
+      "id": "<id_column>",
+      "parent": "<parent_id_column>",
+      "adhoc_filters": [],
+      "time_range": "No filter"
+    }
+  },
+  "original_chart_form_data_schema": {
+    "viz_type": "tree_chart",
+    "display_name": "Tree Chart",
+    "purpose": "用于调用 API 创建或保存 Tree Chart 时填写的 form_data 模板",
+    "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/tree_chart-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Tree/controlPanel.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Tree/index.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Tree/buildQuery.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Tree/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Tree/types.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Tree/constants.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/test/Tree/buildQuery.test.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/test/Tree/transformProps.test.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/models/ChartProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryContext.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryObject.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractQueryFields.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/QueryFormData.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/utils/getStandardizedControls.ts"
+    ],
+    "notes": [
+      "API form_data 的根字段必须保留源码里的原始 control name。Tree Chart 同时包含 snake_case 字段（如 `root_node_id`、`node_label_position`）和 camelCase 字段（如 `symbolSize`）。",
+      "Explore 导出 form_data 时走 `getFormDataFromControls()`，它只会按 controlName 原样取值，不会统一改名。",
+      "transformProps 里看到的 `rootNodeId`、`nodeLabelPosition`、`childLabelPosition` 是运行时 camelCase 形态，不是构造 API form_data 时唯一可信来源。",
+      "Tree Chart 的 query 由 `buildQueryContext(buildQueryObject(...))` 生成。`id`、`parent`、`name` 明确映射到 query.columns；`metric` 则依赖 core 的 `metric -> metrics` 预置别名进入 query.metrics。",
+      "datasource 和 viz_type 来自通用 datasourceAndVizType section，不是 Tree Chart 专属控件，但创建图表时必须提供。",
+      "metric 不是必填。省略它时仍可请求树结构，只是节点 value 与 tooltip 数值部分不会参与渲染。",
+      "row_limit、adhoc_filters 会直接改变 query_context；`root_node_id/layout/...` 等布局字段不会改 query，但会改变最终显示的树。"
+    ],
+    "naming_and_pipeline": {
+      "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写成 form_data[name]。",
+      "api_form_data_to_query_context": "Tree/buildQuery.ts 调用 buildQueryContext(formData, { queryFields: { id:'columns', parent:'columns', name:'columns' } })。",
+      "core_metric_aliasing": "extractQueryFields() 预置 `metric -> metrics`，因此 root `metric` 会自动进入 query.metrics。",
+      "api_form_data_to_runtime_form_data": "ChartProps 会把 form_data 转成 camelCase 的 runtime formData，同时保留 rawFormData。"
+    },
+    "global_required_fields": {
+      "datasource": {
+        "data_type": "string",
+        "required": true,
+        "sample_data": "<dataset_id>__table",
+        "source": "datasourceAndVizType section"
+      },
+      "viz_type": {
+        "data_type": "string",
+        "required": true,
+        "fixed_value": "tree_chart",
+        "source": "datasourceAndVizType section + Tree/index.ts"
+      },
+      "id": {
+        "data_type": "string | object",
+        "required": true,
+        "sample_data": "id_column",
+        "source": "Tree Query section + sharedControls.entity"
+      },
+      "parent": {
+        "data_type": "string | object",
+        "required": true,
+        "sample_data": "relation_column",
+        "source": "Tree Query section + sharedControls.entity"
+      }
+    },
+    "global_optional_fields": {
+      "name": {
+        "data_type": "string | object | null",
+        "required": false,
+        "sample_data": "name_column",
+        "source": "Tree Query section",
+        "notes": "为空时运行时回退到 `id` 列。"
+      },
+      "root_node_id": {
+        "data_type": "string | number",
+        "required": false,
+        "sample_data": "1",
+        "source": "Tree Query section",
+        "notes": "为空时，`transformProps()` 会先构造 `parent -> children` 映射，筛出“只有 1 个 child 的 parent 节点”，再为每个候选 child 调用 `createTree()` 建树，并选择 `getTotalChildren()` 最大的那棵树作为最终 root。"
+      },
+      "metric": {
+        "data_type": "string | object | null",
+        "required": false,
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "count"
+          },
+          "aggregate": "COUNT",
+          "label": "COUNT(*)"
+        },
+        "source": "Tree Query section + extractQueryFields(metric -> metrics alias)"
+      },
+      "adhoc_filters": {
+        "data_type": "array[object]",
+        "required": false,
+        "sample_data": [],
+        "source": "Tree Query section"
+      },
+      "row_limit": {
+        "data_type": "integer | string",
+        "required": false,
+        "sample_data": 10000,
+        "source": "Tree Query section"
+      },
+      "layout": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "orthogonal",
+        "source": "Chart options section"
+      },
+      "orient": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "LR",
+        "source": "Chart options section"
+      },
+      "node_label_position": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "left",
+        "source": "Chart options section"
+      },
+      "child_label_position": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "bottom",
+        "source": "Chart options section"
+      },
+      "emphasis": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "descendant",
+        "source": "Chart options section"
+      },
+      "symbol": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "emptyCircle",
+        "source": "Chart options section"
+      },
+      "symbolSize": {
+        "data_type": "number",
+        "required": false,
+        "sample_data": 7,
+        "source": "Chart options section"
+      },
+      "roam": {
+        "data_type": "boolean | string",
+        "required": false,
+        "sample_data": true,
+        "source": "Chart options section"
+      },
+      "slice_id": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 0,
+        "source": "datasourceAndVizType hidden control",
+        "notes": "新建图表时通常省略；编辑已存在图表时由服务端或上层调用方提供。"
+      },
+      "cache_timeout": {
+        "data_type": "integer | null",
+        "required": false,
+        "sample_data": null,
+        "source": "datasourceAndVizType hidden control"
+      },
+      "url_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "datasourceAndVizType hidden control"
+      },
+      "custom_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "datasourceAndVizType hidden control"
+      },
+      "extra_form_data": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "QueryFormData.extra_form_data",
+        "notes": "现代 chart data API 和 dashboard filter context 都会消费它。"
+      }
+    },
+    "minimal_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "tree_chart",
+      "id": "<node_id_column>",
+      "parent": "<parent_id_column>",
+      "adhoc_filters": [],
+      "row_limit": 10000
+    },
+    "recommended_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "tree_chart",
+      "id": "<node_id_column>",
+      "parent": "<parent_id_column>",
+      "name": "<node_name_column>",
+      "root_node_id": "",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "adhoc_filters": [],
+      "row_limit": 10000,
+      "layout": "orthogonal",
+      "orient": "LR",
+      "node_label_position": "left",
+      "child_label_position": "bottom",
+      "emphasis": "descendant",
+      "symbol": "emptyCircle",
+      "symbolSize": 7,
+      "roam": true
+    },
+    "conditional_blocks": {
+      "structural_only_tree": {
+        "condition": "只需要显示树形结构，不需要节点数值时",
+        "fields": {
+          "metric": null
+        },
+        "notes": "此时 query 不会再请求指标列。"
+      },
+      "explicit_subtree_root": {
+        "condition": "只展示某个根节点下的子树时",
+        "fields": {
+          "root_node_id": "<root_id>"
+        }
+      },
+      "radial_layout": {
+        "condition": "需要放射状树布局时",
+        "fields": {
+          "layout": "radial"
+        },
+        "notes": "`orient` 和 `emphasis` 在当前 controlPanel 中只对 orthogonal 可见。"
+      }
+    },
+    "runtime_only_or_non_template_fields": {
+      "standardized_or_viz_switch_only": [
+        {
+          "field_name": "formDataOverrides(metric shiftMetric)",
+          "reason": "只在 standardizedFormData.transform() 切换 viz_type 时触发，不是常规导出 Tree Chart form_data 的必经步骤。"
+        }
+      ],
+      "runtime_aliases_only": [
+        {
+          "field_name": "rootNodeId",
+          "reason": "这是 `root_node_id` 的运行时 camelCase 别名，不是 API root form_data 键名。"
+        },
+        {
+          "field_name": "nodeLabelPosition",
+          "reason": "这是 `node_label_position` 的运行时 camelCase 别名。"
+        },
+        {
+          "field_name": "childLabelPosition",
+          "reason": "这是 `child_label_position` 的运行时 camelCase 别名。"
+        }
+      ]
+    },
+    "api_usage_guidance": {
+      "high_confidence_required_fields": [
+        "datasource",
+        "viz_type",
+        "id",
+        "parent"
+      ],
+      "recommended_always_set": [
+        "name",
+        "metric",
+        "adhoc_filters",
+        "row_limit",
+        "layout",
+        "symbol",
+        "symbolSize",
+        "roam"
+      ],
+      "do_not_send_as_root_form_data": [
+        "rootNodeId",
+        "nodeLabelPosition",
+        "childLabelPosition"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "tree_chart",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/tree_chart-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/tree_chart-form-data-schema.json",
+      "control-schema": "form-data-schema/tree_chart-schema.json"
+    }
+  }
+}

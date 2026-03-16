@@ -1,0 +1,710 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "mixed_timeseries",
+  "display_name": "Mixed Chart",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "order_date",
+          "operator": "TEMPORAL_RANGE",
+          "comparator": "No filter"
+        }
+      ]
+    ],
+    "adhoc_filters_b": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "region",
+          "operator": "IN",
+          "comparator": [
+            "East",
+            "West"
+          ]
+        }
+      ]
+    ],
+    "annotation_layers": [
+      []
+    ],
+    "area": [
+      false
+    ],
+    "areaB": [
+      false
+    ],
+    "color_scheme": [
+      "supersetColors"
+    ],
+    "comparison_type": [
+      "values"
+    ],
+    "comparison_type_b": [
+      "difference"
+    ],
+    "currency_format": [
+      {
+        "symbol": "$",
+        "symbolPosition": "prefix"
+      }
+    ],
+    "currency_format_secondary": [
+      {
+        "symbol": "¥",
+        "symbolPosition": "prefix"
+      }
+    ],
+    "groupby": [
+      [
+        "region"
+      ]
+    ],
+    "groupby_b": [
+      [
+        "region"
+      ]
+    ],
+    "legendMargin": [
+      120
+    ],
+    "legendOrientation": [
+      "top"
+    ],
+    "legendType": [
+      "scroll"
+    ],
+    "limit": [
+      10
+    ],
+    "limit_b": [
+      5
+    ],
+    "logAxis": [
+      false
+    ],
+    "logAxisSecondary": [
+      false
+    ],
+    "markerEnabled": [
+      false
+    ],
+    "markerEnabledB": [
+      false
+    ],
+    "markerSize": [
+      6
+    ],
+    "markerSizeB": [
+      6
+    ],
+    "metrics": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        }
+      ]
+    ],
+    "metrics_b": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "profit"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(profit)"
+        }
+      ]
+    ],
+    "min_periods": [
+      7
+    ],
+    "min_periods_b": [
+      7
+    ],
+    "minorSplitLine": [
+      false
+    ],
+    "minorTicks": [
+      false
+    ],
+    "only_total": [
+      true
+    ],
+    "only_totalB": [
+      true
+    ],
+    "opacity": [
+      0.2
+    ],
+    "opacityB": [
+      0.2
+    ],
+    "order_desc": [
+      true
+    ],
+    "order_desc_b": [
+      true
+    ],
+    "resample_method": [
+      "asfreq"
+    ],
+    "resample_method_b": [
+      "asfreq"
+    ],
+    "resample_rule": [
+      "1D"
+    ],
+    "resample_rule_b": [
+      "1A"
+    ],
+    "rich_tooltip": [
+      true
+    ],
+    "rolling_periods": [
+      7
+    ],
+    "rolling_periods_b": [
+      7
+    ],
+    "rolling_type": [
+      "mean"
+    ],
+    "rolling_type_b": [
+      "sum"
+    ],
+    "row_limit": [
+      10000
+    ],
+    "row_limit_b": [
+      10000
+    ],
+    "seriesType": [
+      "line"
+    ],
+    "seriesTypeB": [
+      "bar"
+    ],
+    "show_legend": [
+      true
+    ],
+    "show_query_identifiers": [
+      false
+    ],
+    "show_value": [
+      false
+    ],
+    "show_valueB": [
+      false
+    ],
+    "sort_series_ascending": [
+      false
+    ],
+    "sort_series_ascendingB": [
+      false
+    ],
+    "sort_series_type": [
+      "sum"
+    ],
+    "sort_series_typeB": [
+      "sum"
+    ],
+    "stack": [
+      false
+    ],
+    "stackB": [
+      false
+    ],
+    "time_compare": [
+      [
+        "1 year ago"
+      ]
+    ],
+    "time_compare_b": [
+      [
+        "3 years ago"
+      ]
+    ],
+    "time_grain_sqla": [
+      "P1D"
+    ],
+    "time_shift_color": [
+      true
+    ],
+    "timeseries_limit_metric": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "sales"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(sales)"
+      }
+    ],
+    "timeseries_limit_metric_b": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "profit"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(profit)"
+      }
+    ],
+    "tooltipSortByMetric": [
+      false
+    ],
+    "tooltipTimeFormat": [
+      "smart_date"
+    ],
+    "truncateXAxis": [
+      true
+    ],
+    "truncateYAxis": [
+      false
+    ],
+    "truncate_metric": [
+      true
+    ],
+    "truncate_metric_b": [
+      true
+    ],
+    "xAxisBounds": [
+      [
+        0,
+        100
+      ]
+    ],
+    "xAxisLabelInterval": [
+      "auto"
+    ],
+    "xAxisLabelRotation": [
+      0
+    ],
+    "x_axis": [
+      "order_date"
+    ],
+    "x_axis_time_format": [
+      "smart_date"
+    ],
+    "x_axis_title": [
+      "Order Date"
+    ],
+    "x_axis_title_margin": [
+      15
+    ],
+    "yAxisIndex": [
+      0
+    ],
+    "yAxisIndexB": [
+      1
+    ],
+    "yAxisTitleSecondary": [
+      "Profit"
+    ],
+    "y_axis_bounds": [
+      [
+        null,
+        null
+      ]
+    ],
+    "y_axis_bounds_secondary": [
+      [
+        null,
+        null
+      ]
+    ],
+    "y_axis_format": [
+      "SMART_NUMBER"
+    ],
+    "y_axis_format_secondary": [
+      "SMART_NUMBER"
+    ],
+    "y_axis_title": [
+      "Sales"
+    ],
+    "y_axis_title_margin": [
+      30
+    ],
+    "y_axis_title_position": [
+      "Left"
+    ],
+    "zoomable": [
+      false
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "mixed_timeseries",
+      "time_range": "No filter",
+      "x_axis": "<time_column>",
+      "metrics": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column_a>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column_a>)"
+        }
+      ],
+      "groupby": [],
+      "adhoc_filters": [],
+      "order_desc": true,
+      "row_limit": 10000,
+      "metrics_b": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column_b>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column_b>)"
+        }
+      ],
+      "groupby_b": [],
+      "adhoc_filters_b": [],
+      "order_desc_b": true,
+      "row_limit_b": 10000
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "mixed_timeseries",
+      "time_range": "No filter",
+      "x_axis": "<time_column>",
+      "time_grain_sqla": "P1D",
+      "metrics": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column_a>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column_a>)"
+        }
+      ],
+      "groupby": [],
+      "adhoc_filters": [],
+      "limit": null,
+      "timeseries_limit_metric": null,
+      "order_desc": true,
+      "row_limit": 10000,
+      "truncate_metric": true,
+      "rolling_type": null,
+      "rolling_periods": null,
+      "min_periods": null,
+      "time_compare": null,
+      "comparison_type": "values",
+      "resample_rule": null,
+      "resample_method": null,
+      "metrics_b": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column_b>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column_b>)"
+        }
+      ],
+      "groupby_b": [],
+      "adhoc_filters_b": [],
+      "limit_b": null,
+      "timeseries_limit_metric_b": null,
+      "order_desc_b": true,
+      "row_limit_b": 10000,
+      "truncate_metric_b": true,
+      "rolling_type_b": null,
+      "rolling_periods_b": null,
+      "min_periods_b": null,
+      "time_compare_b": null,
+      "comparison_type_b": "values",
+      "resample_rule_b": null,
+      "resample_method_b": null,
+      "annotation_layers": [],
+      "x_axis_title": "",
+      "x_axis_title_margin": 15,
+      "y_axis_title": "",
+      "y_axis_title_margin": 30,
+      "y_axis_title_position": "Left",
+      "color_scheme": "<categoricalSchemeRegistry.defaultKey>",
+      "time_shift_color": true,
+      "seriesType": "line",
+      "stack": false,
+      "area": false,
+      "show_value": false,
+      "only_total": true,
+      "opacity": 0.2,
+      "markerEnabled": false,
+      "markerSize": 6,
+      "yAxisIndex": 0,
+      "sort_series_type": "sum",
+      "sort_series_ascending": false,
+      "seriesTypeB": "line",
+      "stackB": false,
+      "areaB": false,
+      "show_valueB": false,
+      "only_totalB": true,
+      "opacityB": 0.2,
+      "markerEnabledB": false,
+      "markerSizeB": 6,
+      "yAxisIndexB": 0,
+      "sort_series_typeB": "sum",
+      "sort_series_ascendingB": false,
+      "zoomable": false,
+      "minorTicks": false,
+      "show_legend": true,
+      "legendType": "scroll",
+      "legendOrientation": "top",
+      "legendMargin": null,
+      "x_axis_time_format": "smart_date",
+      "xAxisLabelRotation": 0,
+      "xAxisLabelInterval": "auto",
+      "show_query_identifiers": false,
+      "rich_tooltip": true,
+      "tooltipSortByMetric": false,
+      "tooltipTimeFormat": "smart_date",
+      "minorSplitLine": false,
+      "truncateXAxis": true,
+      "xAxisBounds": null,
+      "truncateYAxis": false,
+      "y_axis_bounds": [
+        null,
+        null
+      ],
+      "y_axis_format": "SMART_NUMBER",
+      "currency_format": null,
+      "logAxis": false,
+      "y_axis_bounds_secondary": [
+        null,
+        null
+      ],
+      "y_axis_format_secondary": "SMART_NUMBER",
+      "currency_format_secondary": null,
+      "yAxisTitleSecondary": "",
+      "logAxisSecondary": false
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "mixed_timeseries",
+      "x_axis": "<copied_from_saved_chart>",
+      "metrics": "<copied_from_saved_chart>",
+      "groupby": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "order_desc": "<copied_from_saved_chart>",
+      "row_limit": "<copied_from_saved_chart>",
+      "metrics_b": "<copied_from_saved_chart>",
+      "groupby_b": "<copied_from_saved_chart>",
+      "adhoc_filters_b": "<copied_from_saved_chart>",
+      "order_desc_b": "<copied_from_saved_chart>",
+      "row_limit_b": "<copied_from_saved_chart>",
+      "seriesType": "<copied_from_saved_chart>",
+      "seriesTypeB": "<copied_from_saved_chart>",
+      "yAxisIndex": "<copied_from_saved_chart>",
+      "yAxisIndexB": "<copied_from_saved_chart>",
+      "extra_form_data": {
+        "time_range": "Last 7 days",
+        "time_grain_sqla": "P1D",
+        "filters": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_mixed_chart": true,
+        "recommended": true,
+        "sample_data": "Last 7 days",
+        "effect": "同时覆盖 Query A / Query B 的时间范围。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_mixed_chart": true,
+        "recommended": true,
+        "sample_data": "P1D",
+        "effect": "同时覆盖两条查询的时间粒度。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_mixed_chart": true,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "覆盖时间列；属于高影响字段，只在你确认保存态图表就是同一时间列语义时使用。",
+        "source": "superset/constants.py + frontend QueryFormData.ts"
+      },
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_mixed_chart": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters；会同时作用于两条查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_mixed_chart": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；会同时作用于两条查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_mixed_chart": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "可传非标准附加数据；MixedTimeseries/buildQuery.ts 和 transformProps.ts 默认不直接消费。",
+        "source": "superset/constants.py + frontend QueryFormData.ts"
+      },
+      {
+        "field_name": "relative_start",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_mixed_chart": true,
+        "recommended": false,
+        "sample_data": "now",
+        "effect": "进入 query.extras.relative_start。",
+        "source": "superset/charts/schemas.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "relative_end",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_mixed_chart": true,
+        "recommended": false,
+        "sample_data": "today",
+        "effect": "进入 query.extras.relative_end。",
+        "source": "superset/charts/schemas.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_mixed_chart": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用 ExtraFormData 字段；MixedTimeseries/buildQuery.ts 不直接消费。",
+        "source": "frontend QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_mixed_chart": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用交互字段；Mixed Chart 默认不直接消费。",
+        "source": "frontend QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_mixed_chart": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用交互字段；Mixed Chart 默认不直接消费。",
+        "source": "frontend QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "time_compare",
+        "data_type": "string | array[string]",
+        "behavior": "override",
+        "safe_for_mixed_chart": false,
+        "recommended": false,
+        "sample_data": [
+          "1 year ago"
+        ],
+        "effect": "frontend 类型声明存在，但 Superset 6.0.0 后端 whitelist 未将其列为高置信 override。对 Mixed Chart 更不能替代 time_compare_b。",
+        "source": "frontend QueryFormData.ts + query/constants.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "mixed_timeseries",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/mixed_timeseries-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/mixed_timeseries-form-data-schema.json",
+      "control-schema": "form-data-schema/mixed_timeseries-schema.json"
+    }
+  }
+}

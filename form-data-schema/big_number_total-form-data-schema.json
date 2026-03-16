@@ -1,0 +1,257 @@
+{
+  "viz_type": "big_number_total",
+  "display_name": "Big Number",
+  "purpose": "用于调用 API 创建或保存 Big Number 时填写的 form_data 模板",
+  "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/big_number_total-schema.json",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/BigNumberTotal/controlPanel.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/BigNumberTotal/index.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/BigNumberTotal/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/BigNumberTotal/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/sharedControls.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/types.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/utils.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/types.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/store.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getControlState.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/reducers/exploreReducer.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/components/ExploreViewContainer/index.jsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/components/Chart/chartAction.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/models/ChartProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/standardizedFormData.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryObject.ts"
+  ],
+  "notes": [
+    "API form_data 的键名必须保留源码中的原始 control name。big_number_total 这组字段基本都是 snake_case。",
+    "Explore 导出 form_data 时走 getFormDataFromControls()，它只会按 controlName 原样取 value，不会统一改名。",
+    "transformProps 中看到的 camelCase formData 来自 ChartProps.convertKeysToCamelCase(formData)，是运行时形态，不是构造 API form_data 的主依据。",
+    "这个图表使用 singular `metric`，不是 `metrics` 数组；创建模板时不要套用时序图的多指标结构。",
+    "BigNumberTotal/buildQuery.ts 没有再做额外 post-processing，只是把 buildQueryContext(formData, baseQueryObject => [baseQueryObject]) 返回出去。",
+    "subtitle 是当前 controlPanel 的正式字段；transformProps.ts 仍兼容 legacy 的 subheader / subheader_font_size 作为回退，但新模板不应优先使用 legacy 字段。",
+    "time filtering 在这个图表里通常通过 adhoc_filters 中的 TEMPORAL_RANGE 过滤器表达，而不是单独的 time_range 控件。"
+  ],
+  "naming_and_pipeline": {
+    "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写成 form_data[name]",
+    "api_form_data_to_query_context": "BigNumberTotal/buildQuery.ts 直接把 baseQueryObject 作为唯一 query 返回",
+    "api_form_data_to_runtime_form_data": "ChartProps.ts 会把 form_data 转成 camelCase 的 runtime formData，同时保留 rawFormData"
+  },
+  "global_required_fields": {
+    "datasource": {
+      "data_type": "string",
+      "required": true,
+      "sample_data": "<dataset_id>__table",
+      "source": "datasourceAndVizType section"
+    },
+    "viz_type": {
+      "data_type": "string",
+      "required": true,
+      "fixed_value": "big_number_total",
+      "source": "datasourceAndVizType section"
+    },
+    "metric": {
+      "data_type": "string | object",
+      "required": true,
+      "sample_data": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "source": "BigNumberTotal Query section"
+    }
+  },
+  "global_optional_fields": {
+    "adhoc_filters": {
+      "data_type": "array[object]",
+      "required": false,
+      "sample_data": [],
+      "source": "BigNumberTotal Query section"
+    },
+    "slice_id": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 0,
+      "source": "datasourceAndVizType hidden control",
+      "notes": "新建图表时通常省略；编辑已存在图表时由服务端或上层调用方提供。"
+    },
+    "cache_timeout": {
+      "data_type": "integer | null",
+      "required": false,
+      "sample_data": null,
+      "source": "datasourceAndVizType hidden control"
+    },
+    "url_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "datasourceAndVizType hidden control"
+    },
+    "custom_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "datasourceAndVizType hidden control"
+    },
+    "time_range": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "No filter",
+      "source": "generic QueryFormData / dashboard context",
+      "notes": "这个图表没有独立 time_range 控件；通常优先在 adhoc_filters 或 extra_form_data 中表达时间筛选。"
+    }
+  },
+  "minimal_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "big_number_total",
+    "metric": {
+      "expressionType": "SIMPLE",
+      "column": {
+        "column_name": "<metric_column>"
+      },
+      "aggregate": "SUM",
+      "label": "SUM(<metric_column>)"
+    },
+    "adhoc_filters": []
+  },
+  "recommended_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "big_number_total",
+    "metric": {
+      "expressionType": "SIMPLE",
+      "column": {
+        "column_name": "<metric_column>"
+      },
+      "aggregate": "SUM",
+      "label": "SUM(<metric_column>)"
+    },
+    "adhoc_filters": [],
+    "header_font_size": 0.4,
+    "subtitle": null,
+    "subtitle_font_size": 0.15,
+    "show_metric_name": false,
+    "metric_name_font_size": 0.15,
+    "y_axis_format": "SMART_NUMBER",
+    "currency_format": null,
+    "time_format": "smart_date",
+    "force_timestamp_formatting": false,
+    "conditional_formatting": []
+  },
+  "conditional_blocks": {
+    "temporal_filter_in_adhoc_filters": {
+      "condition": "需要按时间范围过滤单值 KPI 时",
+      "fields": {
+        "adhoc_filters": [
+          {
+            "clause": "WHERE",
+            "subject": "<temporal_column>",
+            "operator": "TEMPORAL_RANGE",
+            "comparator": "Last 30 days",
+            "expressionType": "SIMPLE"
+          }
+        ]
+      }
+    },
+    "show_metric_name": {
+      "condition": "需要在大数字上方显示指标名时",
+      "fields": {
+        "show_metric_name": true,
+        "metric_name_font_size": 0.15
+      }
+    },
+    "subtitle": {
+      "condition": "需要在大数字下方显示补充说明时",
+      "fields": {
+        "subtitle": "Total Sales",
+        "subtitle_font_size": 0.15
+      }
+    },
+    "format_as_date": {
+      "condition": "查询结果不是时间列类型，但仍希望按日期格式渲染时",
+      "fields": {
+        "time_format": "smart_date",
+        "force_timestamp_formatting": true
+      }
+    },
+    "currency_or_number_format": {
+      "condition": "需要控制数值格式或货币符号时",
+      "fields": {
+        "y_axis_format": "SMART_NUMBER",
+        "currency_format": {
+          "symbol": "$",
+          "symbolPosition": "prefix"
+        }
+      }
+    },
+    "conditional_formatting": {
+      "condition": "需要根据阈值给单值指标着色时",
+      "fields": {
+        "conditional_formatting": [
+          {
+            "column": "value",
+            "operator": ">",
+            "targetValue": 0,
+            "colorScheme": "success.base"
+          }
+        ]
+      }
+    }
+  },
+  "runtime_only_or_non_template_fields": {
+    "legacy_accepted_by_transform_props": [
+      {
+        "field_name": "subheader",
+        "reason": "transformProps.ts 在 subtitle 为空时会回退使用旧字段 subheader，但当前 controlPanel 已不再暴露该字段。"
+      },
+      {
+        "field_name": "subheader_font_size",
+        "reason": "transformProps.ts 在 subtitle 为空时会回退使用旧字段 subheaderFontSize，但当前 controlPanel 已不再暴露该字段。"
+      }
+    ],
+    "runtime_derived_fields": [
+      {
+        "field_name": "metricName",
+        "reason": "运行时通过 getOriginalLabel(metric, datasource.metrics) 计算，用于显示友好指标名，不是 API 模板字段。"
+      },
+      {
+        "field_name": "bigNumber",
+        "reason": "运行时从查询结果解析得到，不是 form_data 字段。"
+      }
+    ],
+    "viz_switch_only": [
+      {
+        "field_name": "formDataOverrides(metric remap)",
+        "reason": "只在 standardizedFormData.transform() 切换 viz_type 时触发，不是常规导出 Big Number form_data 的必经步骤。"
+      }
+    ]
+  },
+  "api_usage_guidance": {
+    "high_confidence_required_fields": [
+      "datasource",
+      "viz_type",
+      "metric"
+    ],
+    "recommended_always_set": [
+      "adhoc_filters",
+      "y_axis_format",
+      "time_format",
+      "show_metric_name"
+    ],
+    "api_field_examples": [
+      "metric",
+      "adhoc_filters",
+      "header_font_size",
+      "show_metric_name",
+      "force_timestamp_formatting",
+      "conditional_formatting"
+    ],
+    "avoid_confusion": [
+      "不要把 big_number_total 的 metric 写成 metrics 数组。",
+      "不要优先使用 legacy 的 subheader / subheader_font_size；新模板优先使用 subtitle / subtitle_font_size。"
+    ]
+  }
+}

@@ -1,0 +1,228 @@
+{
+  "viz_type": "big_number_total",
+  "display_name": "Big Number",
+  "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/BigNumberTotal/controlPanel.ts",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/BigNumberTotal/controlPanel.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/BigNumberTotal/index.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/BigNumberTotal/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/BigNumberTotal/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/BigNumberViz.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/sharedControls.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/types.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BigNumber/utils.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/types.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/utils/getColorFormatters.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/components/controls/ConditionalFormattingControl/types.ts"
+  ],
+  "notes": [
+    "big_number_total 走 Big Number 专属目录，不复用时序图 controlPanel；它的查询层也非常直接，只是把 QueryFormData 原样送进 buildQueryContext()。",
+    "字段名优先取 controlPanel 配置中的 name；如 transformProps 中确认了 camelCase 运行时别名，则补充 runtime_alias。",
+    "这个图表的核心查询字段是 singular `metric`，不是 `metrics` 数组；这与 Area/Bar 等时序图不同。",
+    "subtitle 是当前 controlPanel 里的正式字段；transformProps.ts 仍兼容读取 legacy 的 subheader / subheaderFontSize 作为回退。",
+    "conditional_formatting 的字段结构可以从 chart-controls/types.ts 和 Explore 的 ConditionalFormattingControl/types.ts 确认，不需要猜测。",
+    "y_axis_format 在 controlPanel 中被重命名为 Number format，但底层 form_data 键名仍然是 y_axis_format。"
+  ],
+  "control_overrides": {
+    "y_axis_format": {
+      "label": "Number format"
+    }
+  },
+  "form_data_overrides": {
+    "metric": "getStandardizedControls().shiftMetric()"
+  },
+  "field_categories": {
+    "Query": [
+      {
+        "field_name": "metric",
+        "description": "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+        "data_type": "string | object",
+        "enum_source": "saved metrics + adhoc metrics",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        },
+        "required": true,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "adhoc_filters",
+        "description": "字段标签为 Filters。这个图表没有单独的 time_range 控件，时间筛选通常也通过此字段中的 TEMPORAL_RANGE 过滤条件表达。",
+        "data_type": "array[object]",
+        "enum_source": "dataset columns + saved metrics + 当前 metric",
+        "sample_data": [
+          {
+            "clause": "WHERE",
+            "subject": "order_date",
+            "operator": "TEMPORAL_RANGE",
+            "comparator": "No filter",
+            "expressionType": "SIMPLE"
+          }
+        ],
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "default_value": []
+      }
+    ],
+    "Chart Options / Typography": [
+      {
+        "field_name": "header_font_size",
+        "runtime_alias": "headerFontSize",
+        "description": "Big Number Font Size",
+        "data_type": "number",
+        "enum_values": [
+          0.2,
+          0.3,
+          0.4,
+          0.5,
+          0.6
+        ],
+        "sample_data": 0.4,
+        "required": false,
+        "embedding": "否",
+        "default_value": 0.4
+      },
+      {
+        "field_name": "subtitle_font_size",
+        "runtime_alias": "subtitleFontSize",
+        "description": "Subtitle Font Size",
+        "data_type": "number",
+        "enum_values": [
+          0.125,
+          0.15,
+          0.2,
+          0.3,
+          0.4
+        ],
+        "sample_data": 0.15,
+        "required": false,
+        "embedding": "否",
+        "default_value": 0.15
+      },
+      {
+        "field_name": "show_metric_name",
+        "runtime_alias": "showMetricName",
+        "description": "Whether to display the metric name",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      },
+      {
+        "field_name": "metric_name_font_size",
+        "runtime_alias": "metricNameFontSize",
+        "description": "Metric Name Font Size",
+        "data_type": "number",
+        "enum_values": [
+          0.125,
+          0.15,
+          0.2,
+          0.3,
+          0.4
+        ],
+        "sample_data": 0.15,
+        "required": false,
+        "embedding": "否",
+        "default_value": 0.15,
+        "notes": "仅在 show_metric_name=true 时显示，且 resetOnHide=false。"
+      }
+    ],
+    "Chart Options / Display Text": [
+      {
+        "field_name": "subtitle",
+        "description": "Description text that shows up below your Big Number",
+        "data_type": "string | null",
+        "sample_data": "Total Sales",
+        "required": false,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "transformProps.ts 会优先使用 subtitle；若为空则回退到 legacy 的 subheader。"
+      }
+    ],
+    "Chart Options / Number & Date Formatting": [
+      {
+        "field_name": "y_axis_format",
+        "runtime_alias": "yAxisFormat",
+        "description": "D3 format syntax: https://github.com/d3/d3-format",
+        "data_type": "string",
+        "enum_source": "D3_FORMAT_OPTIONS",
+        "sample_data": "SMART_NUMBER",
+        "required": false,
+        "embedding": "否",
+        "default_value": "SMART_NUMBER",
+        "notes": "controlOverrides 把显示标签从 Y Axis Format 改成了 Number format。"
+      },
+      {
+        "field_name": "currency_format",
+        "runtime_alias": "currencyFormat",
+        "description": "Currency format",
+        "data_type": "string | object | null",
+        "sample_data": {
+          "symbol": "$",
+          "symbolPosition": "prefix"
+        },
+        "required": false,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "time_format",
+        "runtime_alias": "timeFormat",
+        "description": "D3 format syntax: https://github.com/d3/d3-format",
+        "data_type": "string",
+        "enum_source": "D3_TIME_FORMAT_OPTIONS",
+        "sample_data": "smart_date",
+        "required": false,
+        "embedding": "否",
+        "default_value": "smart_date"
+      },
+      {
+        "field_name": "force_timestamp_formatting",
+        "runtime_alias": "forceTimestampFormatting",
+        "description": "Use date formatting even when metric value is not a timestamp",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      }
+    ],
+    "Chart Options / Conditional Formatting": [
+      {
+        "field_name": "conditional_formatting",
+        "runtime_alias": "conditionalFormatting",
+        "description": "Apply conditional color formatting to metric",
+        "data_type": "array[ConditionalFormattingConfig]",
+        "enum_source": "ConditionalFormattingConfig.operator 取值来自 Comparator 枚举；column 取值来自当前查询结果中的数值列；colorScheme 可为主题色 token 或颜色字符串",
+        "sample_data": [
+          {
+            "column": "value",
+            "operator": ">",
+            "targetValue": 0,
+            "colorScheme": "success.base"
+          }
+        ],
+        "required": false,
+        "embedding": "否",
+        "default_value": [],
+        "notes": "ConditionalFormattingConfig 已在 chart-controls/types.ts 和 Explore 控件类型文件中明确定义：operator、targetValue、targetValueLeft、targetValueRight、column、colorScheme。"
+      }
+    ]
+  }
+}

@@ -1,0 +1,564 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "box_plot",
+  "display_name": "Box Plot",
+  "source_kind": "schema_file",
+  "normalized_embedding_policy": {
+    "immutable_root_keys": [
+      "slice_id",
+      "datasource",
+      "viz_type",
+      "all_saved_chart_definition_fields"
+    ],
+    "allowed_runtime_fields": [
+      {
+        "field_name": "adhoc_filters",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "custom_form_data",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "filters",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "granularity",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "relative_end",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "relative_start",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_column",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_compare",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_grain",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_range",
+        "behavior": "override",
+        "source": "embedding-schema"
+      }
+    ],
+    "safe_embedding_form_data_seed": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "box_plot",
+      "extra_form_data": {
+        "filters": [],
+        "adhoc_filters": []
+      }
+    }
+  },
+  "original_embedding_form_data_schema": {
+    "viz_type": "box_plot",
+    "display_name": "Box Plot",
+    "purpose": "第三方 embedding / guest token 场景下安全传输的 form_data 模板",
+    "base_form_data_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/box_plot-form-data-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset/security/manager.py",
+      "D:/vsx/sources/superset-6.0.0/superset/constants.py",
+      "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/charts/data/api.py",
+      "D:/vsx/sources/superset-6.0.0/superset/commands/chart/data/get_data_command.py",
+      "D:/vsx/sources/superset-6.0.0/superset/charts/schemas.py",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/constants.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/QueryFormData.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/processExtraFormData.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BoxPlot/controlPanel.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BoxPlot/buildQuery.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/BoxPlot/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/operators/boxplotOperator.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/PostProcessing.ts"
+    ],
+    "notes": [
+      "embedded guest 的核心限制仍然在后端 security/manager.py 的 `query_context_modified()`。报错原文是 `Guest user cannot modify chart payload`。",
+      "对 box_plot 来说，guest 最敏感的不是单个渲染开关，而是 `columns / groupby / metrics / orderby` 这组字段及其派生查询结构。manager.py 明确会比较 form_data 与 query_context 中这几类集合值。",
+      "box_plot 的 buildQuery.ts 会把 root form_data 的 `columns + groupby` 组合成最终 query.columns，并把 `groupby` 复制到 `series_columns`；若修改 `columns`、`groupby`、`time_grain_sqla`、`series_limit_metric` 等字段，最终 query_context 很容易与已保存图表不一致。",
+      "虽然 `whiskerOptions`、`color_scheme`、`x_ticks_layout`、标题等字段不在 manager.py 的显式比较名单里，但 `whiskerOptions` 会改变 boxplot post_processing 语义，因此 embedding 最稳妥的方式仍是整份根层 form_data 原样复制，只把动态过滤条件放进 extra_form_data。",
+      "当前正式须线字段是 `whiskerOptions`，不是 `whisker_options`。embedding 时也不应继续依赖旧键名。",
+      "frontend 的 superset-ui-core 声明了 extra_form_data.time_compare，但 Superset 6.0.0 后端 constants.py 的 merge whitelist 并没有把它列为高置信 override。guest embedding 下应视为不稳定字段。"
+    ],
+    "security_enforcement": {
+      "backend_check_function": "superset/security/manager.py::query_context_modified",
+      "checked_when": "ChartDataCommand.validate() -> QueryContext.raise_for_access()",
+      "error_message": "Guest user cannot modify chart payload",
+      "hard_block_fields": [
+        "slice_id",
+        "metrics",
+        "groupby",
+        "columns",
+        "orderby"
+      ],
+      "directly_compared_or_query_critical_root_fields_for_box_plot": [
+        "columns",
+        "groupby",
+        "metrics",
+        "series_limit_metric",
+        "time_grain_sqla",
+        "temporal_columns_lookup",
+        "adhoc_filters",
+        "row_limit",
+        "series_limit"
+      ],
+      "post_processing_or_presentation_fields_not_compared_directly": [
+        "whiskerOptions",
+        "color_scheme",
+        "x_ticks_layout",
+        "number_format",
+        "date_format",
+        "x_axis_title",
+        "x_axis_title_margin",
+        "y_axis_title",
+        "y_axis_title_margin",
+        "y_axis_title_position"
+      ],
+      "recommended_strategy": "复制保存态 chart form_data 作为 base，仅通过 extra_form_data 追加过滤与时间上下文。"
+    },
+    "safe_base_rule": {
+      "description": "第三方 embedding 请求中的根层 form_data，应当从已保存图表的 form_data 直接复制，不要重构。",
+      "must_be_copied_from_saved_chart": [
+        "slice_id",
+        "datasource",
+        "viz_type",
+        "columns",
+        "time_grain_sqla",
+        "temporal_columns_lookup",
+        "groupby",
+        "metrics",
+        "adhoc_filters",
+        "series_limit",
+        "series_limit_metric",
+        "row_limit",
+        "whiskerOptions",
+        "color_scheme",
+        "x_ticks_layout",
+        "number_format",
+        "date_format",
+        "x_axis_title",
+        "x_axis_title_margin",
+        "y_axis_title",
+        "y_axis_title_margin",
+        "y_axis_title_position",
+        "all other chart-definition fields"
+      ],
+      "why": [
+        "manager.py 会比较 form_data 中的 metrics / columns / groupby 与 query_context 中的 metrics / columns / groupby / orderby。",
+        "box_plot 的 buildQuery.ts 会把 columns、groupby、time_grain_sqla 和 series_limit_metric 等字段编译成最终 query 结构。",
+        "boxplotOperator.ts 会根据 whiskerOptions 生成不同的 whisker_type / percentiles 后处理语义；即使 manager.py 不直接比较它，也不应在 guest 请求里临时改写。"
+      ]
+    },
+    "safe_embedding_form_data_template": {
+      "description": "这是 guest embedding 下的安全写法。根层以保存态图表为 base，仅改 extra_form_data。",
+      "template": {
+        "slice_id": "<saved_chart_id>",
+        "dashboardId": "<dashboard_id>",
+        "datasource": "<copied_from_saved_chart>",
+        "viz_type": "box_plot",
+        "columns": "<copied_from_saved_chart>",
+        "time_grain_sqla": "<copied_from_saved_chart>",
+        "temporal_columns_lookup": "<copied_from_saved_chart>",
+        "groupby": "<copied_from_saved_chart>",
+        "metrics": "<copied_from_saved_chart>",
+        "adhoc_filters": "<copied_from_saved_chart>",
+        "series_limit": "<copied_from_saved_chart>",
+        "series_limit_metric": "<copied_from_saved_chart>",
+        "row_limit": "<copied_from_saved_chart>",
+        "whiskerOptions": "<copied_from_saved_chart>",
+        "color_scheme": "<copied_from_saved_chart>",
+        "x_ticks_layout": "<copied_from_saved_chart>",
+        "number_format": "<copied_from_saved_chart>",
+        "date_format": "<copied_from_saved_chart>",
+        "x_axis_title": "<copied_from_saved_chart>",
+        "x_axis_title_margin": "<copied_from_saved_chart>",
+        "y_axis_title": "<copied_from_saved_chart>",
+        "y_axis_title_margin": "<copied_from_saved_chart>",
+        "y_axis_title_position": "<copied_from_saved_chart>",
+        "extra_form_data": {
+          "time_range": "Last 30 days",
+          "filters": [
+            {
+              "col": "region",
+              "op": "IN",
+              "val": [
+                "East",
+                "West"
+              ]
+            }
+          ],
+          "adhoc_filters": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "region",
+              "operator": "IN",
+              "comparator": [
+                "East",
+                "West"
+              ]
+            }
+          ],
+          "custom_form_data": {}
+        }
+      }
+    },
+    "preferred_dynamic_container": {
+      "field_name": "extra_form_data",
+      "description": "第三方 embedding 允许动态传入的上下文容器；后端会在 merge_extra_form_data() 中把它并入实际查询。",
+      "append_keys": [
+        "adhoc_filters",
+        "filters",
+        "interactive_groupby",
+        "interactive_highlight",
+        "interactive_drilldown",
+        "custom_form_data"
+      ],
+      "override_keys_backend_high_confidence": [
+        "granularity_sqla",
+        "granularity",
+        "time_column",
+        "time_grain",
+        "time_range",
+        "time_grain_sqla",
+        "relative_start",
+        "relative_end"
+      ],
+      "frontend_declared_but_backend_not_high_confidence": [
+        "time_compare"
+      ]
+    },
+    "extra_form_data_field_schema": [
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_box_plot": true,
+        "recommended": true,
+        "sample_data": "Last 30 days",
+        "effect": "覆盖保存态图表的时间范围。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_box_plot": true,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "覆盖时间粒度。若 columns 里存在时间列，会改变 query.columns 中的时间列包装方式及分布粒度，因此 guest embedding 中应谨慎使用。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_box_plot": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "这是后端高置信 override 键，但对当前 box_plot 来说它只是 legacy fallback，不是正式主字段。",
+        "source": "superset/constants.py + BoxPlot/buildQuery.ts"
+      },
+      {
+        "field_name": "granularity",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_box_plot": false,
+        "recommended": false,
+        "sample_data": "__time",
+        "effect": "通用 SQL 时间列覆盖键；box_plot 当前正式主字段是 columns，不建议 guest embedding 主用该键。",
+        "source": "superset/constants.py"
+      },
+      {
+        "field_name": "time_column",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_box_plot": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "后端 QueryObject 允许的时间列覆盖键；box_plot 常规场景通常优先使用保存态配置。",
+        "source": "superset/constants.py + frontend QueryFormData.ts"
+      },
+      {
+        "field_name": "time_grain",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_box_plot": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "底层 QueryObject 的时间粒度键；box_plot 一般不需要手动传。",
+        "source": "superset/constants.py + frontend QueryFormData.ts"
+      },
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_box_plot": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters；后端会转成额外过滤条件。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_box_plot": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "East",
+              "West"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会标记为 isExtra 并并入查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_box_plot": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "可传非标准附加数据；box_plot 的 buildQuery / transformProps 不直接消费它。",
+        "source": "superset/constants.py + frontend QueryFormData.ts"
+      },
+      {
+        "field_name": "relative_start",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_box_plot": true,
+        "recommended": false,
+        "sample_data": "now",
+        "effect": "进入 query.extras.relative_start。后端 schema 对取值做了约束，示例为 today / now。",
+        "source": "superset/charts/schemas.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "relative_end",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_box_plot": true,
+        "recommended": false,
+        "sample_data": "today",
+        "effect": "进入 query.extras.relative_end。后端 schema 对取值做了约束，示例为 today / now。",
+        "source": "superset/charts/schemas.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_box_plot": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用 ExtraFormData 字段。box_plot 的 buildQuery.ts 不直接消费它，通常没有实际效果。",
+        "source": "frontend QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_box_plot": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用交互字段；box_plot 默认不直接消费。",
+        "source": "frontend QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_box_plot": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用交互字段；box_plot 默认不直接消费。",
+        "source": "frontend QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "time_compare",
+        "data_type": "string | array[string]",
+        "behavior": "override",
+        "safe_for_box_plot": false,
+        "recommended": false,
+        "sample_data": [
+          "1 year ago"
+        ],
+        "effect": "frontend 类型声明存在，但 Superset 6.0.0 后端 constants.py 的 extra_form_data merge whitelist 未将其列为高置信 override。guest embedding 下容易出现前后端行为不一致。",
+        "source": "frontend QueryFormData.ts + query/constants.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      }
+    ],
+    "minimal_extra_form_data_template": {
+      "time_range": "Last 30 days"
+    },
+    "recommended_extra_form_data_template": {
+      "time_range": "Last 30 days",
+      "filters": [
+        {
+          "col": "region",
+          "op": "IN",
+          "val": [
+            "East",
+            "West"
+          ]
+        }
+      ],
+      "adhoc_filters": [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "region",
+          "operator": "IN",
+          "comparator": [
+            "East",
+            "West"
+          ]
+        }
+      ],
+      "custom_form_data": {}
+    },
+    "unsafe_root_form_data_changes": [
+      {
+        "field_name": "slice_id",
+        "reason": "与保存态图表 id 不一致会被后端立即判定为请求了另一张图。"
+      },
+      {
+        "field_name": "columns",
+        "reason": "manager.py 会直接比较 form_data.columns，并且 buildQuery.ts 也会把它编译到 query.columns。"
+      },
+      {
+        "field_name": "groupby",
+        "reason": "manager.py 会直接比较 form_data.groupby，并且 buildQuery.ts 还会把它追加进 query.columns 与 series_columns。"
+      },
+      {
+        "field_name": "metrics",
+        "reason": "manager.py 会直接比较 form_data.metrics 与 query.metrics。"
+      },
+      {
+        "field_name": "series_limit_metric",
+        "reason": "会影响 query.orderby，最终可能触发 guest payload 比对失败。"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "reason": "若 columns 包含时间列，会改变 query.columns 中的时间列包装方式与粒度。"
+      },
+      {
+        "field_name": "temporal_columns_lookup",
+        "reason": "会影响 buildQuery.ts 对物理时间列的判断逻辑，不应在 guest 请求里临时改写。"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "reason": "不建议在根层直接改。动态筛选条件应放进 extra_form_data.append。"
+      },
+      {
+        "field_name": "whiskerOptions",
+        "reason": "虽然 manager.py 不直接比较它，但它会改变 boxplot post_processing 语义，不应在 guest 请求里临时改写。"
+      },
+      {
+        "field_name": "viz_type",
+        "reason": "embedded guest 不应把已分享图表改成另一种图。"
+      },
+      {
+        "field_name": "datasource",
+        "reason": "embedded guest 不应改图表绑定数据集。"
+      },
+      {
+        "field_name": "time_range",
+        "reason": "不建议在根层直接改。动态时间条件应放进 extra_form_data.override。"
+      }
+    ],
+    "practical_guidance": {
+      "best_practice": [
+        "先从保存态图表读取完整 form_data。",
+        "根层字段保持不变。",
+        "只在 extra_form_data 中放时间范围和附加过滤条件。",
+        "如果只是想做第三方筛选联动，优先使用 filters / adhoc_filters / time_range。"
+      ],
+      "avoid": [
+        "不要在 guest embedding 请求里手工重写 columns、groupby、metrics、series_limit_metric、slice_id、viz_type、datasource。",
+        "不要把当前正式字段 whiskerOptions 错写成 whisker_options。",
+        "不要把 box_plot 的正式分布字段写成 granularity_sqla；后者只是 legacy fallback。",
+        "不要依赖 frontend 有定义但 backend whitelist 不稳定的 extra_form_data.time_compare。"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "box_plot",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/box_plot-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/box_plot-form-data-schema.json",
+      "control-schema": "form-data-schema/box_plot-schema.json"
+    }
+  }
+}

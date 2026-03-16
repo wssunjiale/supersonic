@@ -1,0 +1,562 @@
+{
+  "viz_type": "compare",
+  "display_name": "Time-series Percent Change",
+  "purpose": "用于调用 API 创建或保存 Time-series Percent Change 时填写的 form_data 模板",
+  "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/compare-schema.json",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/Compare/controlPanel.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/Compare/index.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/transformProps.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/NVD3Controls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/sections/sections.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/mixins.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+    "D:/vsx/sources/superset-6.0.0/superset/views/core.py",
+    "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+    "D:/vsx/sources/superset-6.0.0/superset/viz.py"
+  ],
+  "notes": [
+    "Compare 是 legacy 图，metadata 显式声明 `useLegacyApi=true`，真实请求路径仍是 `/superset/explore_json/`。",
+    "Explore 导出 form_data 时走 `getFormDataFromControls()`，它按 control name 原样写入 root form_data。API 根层必须使用 `granularity_sqla`、`time_grain_sqla`、`time_range`、`metrics`、`groupby`、`comparison_type` 等原始键名，而不是 runtime camelCase 别名。",
+    "Compare 没有专属前端 buildQuery。ChartClient.ts 对它会退回 `() => formData`，也就是说，API 层真正应该构造的是原始 root `form_data`，然后由 legacy `/superset/explore_json/` 包装成 `{ form_data: ... }`。",
+    "这里的 `global_required_fields` 表示“构造可靠 compare 模板时的高置信必填”，不等同于每个控件源码里的 validators。字段层级的 `required` 信息仍以 `compare-schema.json` 为准。",
+    "当前图的 Time section 同时暴露 `granularity` 和 `granularity_sqla`。为了稳定调用 SQLA datasource，推荐显式传 `granularity_sqla`；`granularity` 只作为 legacy datasource 兼容字段保留。",
+    "如果启用了 `time_compare`，后端 `run_extra_queries()` 要求最终时间范围必须是封闭区间，因此模板里最好显式传一个可解析的 `time_range`，不要只依赖 `No filter`。"
+  ],
+  "naming_and_pipeline": {
+    "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写成 form_data[name]，不会自动把 snake_case 改成 camelCase。",
+    "api_form_data_to_backend_request": "ChartClient.ts 在 `useLegacyApi=true` 时，把 `buildQuery(formData)` 包成 `{ form_data }` POST 到 `/superset/explore_json/`；Compare 没有专属 buildQuery，因此等价于直接发送原始 form_data。",
+    "backend_form_data_normalization": "`explore_json()` 会先补 `datasource`，再执行 `convert_legacy_filters_into_adhoc(form_data)` 与 `merge_extra_filters(form_data)`。",
+    "backend_form_data_to_query_obj": "`NVD3TimeSeriesViz.query_obj()` 在 `BaseViz.query_obj()` 的基础上，根据 `timeseries_limit_metric` 和 `order_desc` 写入 `orderby`；`time_compare`、`comparison_type`、`rolling_*`、`resample_*` 则在后端后处理阶段消费。"
+  },
+  "global_required_fields": {
+    "datasource": {
+      "data_type": "string",
+      "required": true,
+      "sample_data": "<dataset_id>__table",
+      "source": "explore_json() + datasourceAndVizType hidden control"
+    },
+    "viz_type": {
+      "data_type": "string",
+      "required": true,
+      "fixed_value": "compare",
+      "source": "Compare/index.js + VizType.Compare"
+    },
+    "granularity_sqla": {
+      "data_type": "string | object",
+      "required": true,
+      "sample_data": "ds",
+      "source": "Time section + BaseViz/NVD3TimeSeriesViz query path",
+      "notes": "这是 SQLA datasource 下最稳定的主时间列入口。若你处理的是旧 datasource，才需要额外考虑 `granularity`。"
+    },
+    "time_range": {
+      "data_type": "string",
+      "required": true,
+      "sample_data": "2025-01-01 : 2025-01-31",
+      "source": "Time section + BaseViz time parsing + NVD3TimeSeriesViz.run_extra_queries()",
+      "notes": "即便 UI 控件源码没有显式 validator，实际要稳定复现 compare 图，最好显式传一个可解析且封闭的时间范围。"
+    },
+    "metrics": {
+      "data_type": "array[string | object]",
+      "required": true,
+      "sample_data": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        }
+      ],
+      "source": "Query section + dndAdhocMetricsControl validator"
+    }
+  },
+  "global_optional_fields": {
+    "granularity": {
+      "data_type": "string | null",
+      "required": false,
+      "sample_data": "P1D",
+      "source": "legacyTimeseriesTime section",
+      "notes": "legacy 时间粒度字段。SQLA datasource 构造模板时通常不必显式传它。"
+    },
+    "time_grain_sqla": {
+      "data_type": "string | null",
+      "required": false,
+      "sample_data": "P1D",
+      "source": "Time section"
+    },
+    "adhoc_filters": {
+      "data_type": "array[object]",
+      "required": false,
+      "sample_data": [],
+      "source": "Query section"
+    },
+    "groupby": {
+      "data_type": "array[string | object]",
+      "required": false,
+      "sample_data": [
+        "region"
+      ],
+      "source": "Query section"
+    },
+    "limit": {
+      "data_type": "integer | null",
+      "required": false,
+      "sample_data": 10,
+      "source": "sharedControls.limit"
+    },
+    "timeseries_limit_metric": {
+      "data_type": "string | object | null",
+      "required": false,
+      "sample_data": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "sales"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(sales)"
+      },
+      "source": "sharedControls.timeseries_limit_metric"
+    },
+    "order_desc": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": true,
+      "source": "sharedControls.order_desc"
+    },
+    "contribution": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": false,
+      "source": "Compare Query section inline control"
+    },
+    "row_limit": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 10000,
+      "source": "sharedControls.row_limit"
+    },
+    "color_scheme": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "SUPERSET_DEFAULT",
+      "source": "Chart Options section"
+    },
+    "x_axis_label": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "Order Date",
+      "source": "X Axis section"
+    },
+    "bottom_margin": {
+      "data_type": "string | integer",
+      "required": false,
+      "sample_data": "auto",
+      "source": "X Axis section"
+    },
+    "x_ticks_layout": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "auto",
+      "source": "X Axis section"
+    },
+    "x_axis_format": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "smart_date",
+      "source": "X Axis section"
+    },
+    "x_axis_showminmax": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": false,
+      "source": "X Axis section"
+    },
+    "y_axis_label": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "Percent Change",
+      "source": "Y Axis section"
+    },
+    "left_margin": {
+      "data_type": "string | integer",
+      "required": false,
+      "sample_data": "auto",
+      "source": "Y Axis section"
+    },
+    "y_axis_showminmax": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": false,
+      "source": "Y Axis section"
+    },
+    "y_log_scale": {
+      "data_type": "boolean",
+      "required": false,
+      "sample_data": false,
+      "source": "Y Axis section"
+    },
+    "y_axis_format": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "SMART_NUMBER",
+      "source": "Y Axis section"
+    },
+    "y_axis_bounds": {
+      "data_type": "array[number | null]",
+      "required": false,
+      "sample_data": [
+        0,
+        1
+      ],
+      "source": "Y Axis section"
+    },
+    "rolling_type": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "None",
+      "source": "Advanced Analytics section"
+    },
+    "rolling_periods": {
+      "data_type": "integer | string | null",
+      "required": false,
+      "sample_data": 7,
+      "source": "Advanced Analytics section"
+    },
+    "min_periods": {
+      "data_type": "integer | string | null",
+      "required": false,
+      "sample_data": 7,
+      "source": "Advanced Analytics section"
+    },
+    "time_compare": {
+      "data_type": "array[string]",
+      "required": false,
+      "sample_data": [
+        "1 year"
+      ],
+      "source": "Advanced Analytics section"
+    },
+    "comparison_type": {
+      "data_type": "string",
+      "required": false,
+      "sample_data": "values",
+      "source": "Advanced Analytics section"
+    },
+    "resample_rule": {
+      "data_type": "string | null",
+      "required": false,
+      "sample_data": "1D",
+      "source": "Advanced Analytics section"
+    },
+    "resample_method": {
+      "data_type": "string | null",
+      "required": false,
+      "sample_data": "mean",
+      "source": "Advanced Analytics section"
+    },
+    "annotation_layers": {
+      "data_type": "array[object]",
+      "required": false,
+      "sample_data": [],
+      "source": "Annotations and Layers section"
+    },
+    "slice_id": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 0,
+      "source": "datasourceAndVizType hidden control",
+      "notes": "新建图表时通常省略；编辑已存在图表时由服务端或上层调用方提供。"
+    },
+    "cache_timeout": {
+      "data_type": "integer | null",
+      "required": false,
+      "sample_data": null,
+      "source": "datasourceAndVizType hidden control"
+    },
+    "url_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "QueryFormData"
+    },
+    "custom_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "QueryFormData"
+    },
+    "extra_form_data": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "utils.merge_extra_form_data()",
+      "notes": "虽然不属于 Compare controlPanel 字段，但 legacy explore_json 路径会消费它。"
+    }
+  },
+  "minimal_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "compare",
+    "granularity_sqla": "<temporal_column>",
+    "time_range": "2025-01-01 : 2025-01-31",
+    "metrics": [
+      "<metric_or_saved_metric>"
+    ],
+    "adhoc_filters": []
+  },
+  "recommended_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "compare",
+    "granularity_sqla": "ds",
+    "time_grain_sqla": "P1D",
+    "time_range": "2025-01-01 : 2025-01-31",
+    "metrics": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "sales"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(sales)"
+      }
+    ],
+    "adhoc_filters": [],
+    "groupby": [],
+    "limit": null,
+    "timeseries_limit_metric": null,
+    "order_desc": true,
+    "contribution": false,
+    "row_limit": 10000,
+    "color_scheme": "SUPERSET_DEFAULT",
+    "x_axis_label": "",
+    "bottom_margin": "auto",
+    "x_ticks_layout": "auto",
+    "x_axis_format": "smart_date",
+    "x_axis_showminmax": false,
+    "y_axis_label": "",
+    "left_margin": "auto",
+    "y_axis_showminmax": false,
+    "y_log_scale": false,
+    "y_axis_format": "SMART_NUMBER",
+    "y_axis_bounds": [
+      null,
+      null
+    ],
+    "rolling_type": "None",
+    "rolling_periods": null,
+    "min_periods": null,
+    "time_compare": [],
+    "comparison_type": "values",
+    "resample_rule": null,
+    "resample_method": null,
+    "annotation_layers": []
+  },
+  "conditional_blocks": {
+    "dimension_grouping": {
+      "condition": "需要按维度拆分多条对比序列时",
+      "fields": {
+        "groupby": [
+          "region"
+        ],
+        "limit": 10,
+        "timeseries_limit_metric": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "sales"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(sales)"
+        },
+        "order_desc": true
+      }
+    },
+    "time_shift_overlay": {
+      "condition": "需要把过去周期叠加成额外折线时",
+      "fields": {
+        "time_compare": [
+          "1 year"
+        ],
+        "comparison_type": "values",
+        "time_range": "2025-01-01 : 2025-01-31"
+      }
+    },
+    "time_shift_difference": {
+      "condition": "需要显示当前序列与 time shift 的差值、百分比变化或比值时",
+      "fields": {
+        "time_compare": [
+          "1 year"
+        ],
+        "comparison_type": "percentage",
+        "y_axis_format": ".1%"
+      }
+    },
+    "rolling_window": {
+      "condition": "需要先做 rolling window 再绘图时",
+      "fields": {
+        "rolling_type": "mean",
+        "rolling_periods": 7,
+        "min_periods": 7
+      }
+    },
+    "resample": {
+      "condition": "需要先按固定频率重采样再比较时",
+      "fields": {
+        "resample_rule": "1D",
+        "resample_method": "mean"
+      }
+    },
+    "contribution_view": {
+      "condition": "需要把每个时间点的序列值转换成总量占比时",
+      "fields": {
+        "contribution": true,
+        "y_axis_format": ".1%"
+      }
+    },
+    "annotations": {
+      "condition": "需要在 compare 图上叠加事件、区间或时间序列注释层时",
+      "fields": {
+        "annotation_layers": [
+          {
+            "name": "release-window"
+          }
+        ]
+      }
+    },
+    "axis_formatting": {
+      "condition": "需要显式配置坐标轴标题、时间格式、数值格式和边界时",
+      "fields": {
+        "x_axis_label": "Order Date",
+        "x_axis_format": "smart_date",
+        "y_axis_label": "Percent Change",
+        "y_axis_format": ".1%",
+        "y_axis_bounds": [
+          -1,
+          1
+        ]
+      }
+    },
+    "legacy_datasource_granularity": {
+      "condition": "如果底层仍是 legacy datasource 且需要显式传旧时间粒度字段时",
+      "fields": {
+        "granularity": "P1D"
+      }
+    }
+  },
+  "runtime_only_or_non_template_fields": {
+    "runtime_aliases_generated_by_transformProps": [
+      {
+        "field_name": "comparisonType",
+        "reason": "由 raw form_data.comparison_type 派生的运行时别名，不是 API root 键。"
+      },
+      {
+        "field_name": "colorScheme",
+        "reason": "由 raw form_data.color_scheme 派生的运行时别名，不是 API root 键。"
+      },
+      {
+        "field_name": "xAxisLabel",
+        "reason": "由 raw form_data.x_axis_label 派生的运行时别名，不是 API root 键。"
+      },
+      {
+        "field_name": "xAxisFormat",
+        "reason": "由 raw form_data.x_axis_format 派生的运行时别名，不是 API root 键。"
+      },
+      {
+        "field_name": "xAxisShowMinMax",
+        "reason": "由 raw form_data.x_axis_showminmax 派生的运行时别名，不是 API root 键。"
+      },
+      {
+        "field_name": "xTicksLayout",
+        "reason": "由 raw form_data.x_ticks_layout 派生的运行时别名，不是 API root 键。"
+      },
+      {
+        "field_name": "yAxisLabel",
+        "reason": "由 raw form_data.y_axis_label 派生的运行时别名，不是 API root 键。"
+      },
+      {
+        "field_name": "yAxisFormat",
+        "reason": "由 raw form_data.y_axis_format 派生的运行时别名，不是 API root 键。"
+      },
+      {
+        "field_name": "yAxisBounds",
+        "reason": "由 raw form_data.y_axis_bounds 派生的运行时别名，不是 API root 键。"
+      },
+      {
+        "field_name": "annotationLayers",
+        "reason": "由 raw form_data.annotation_layers 派生的运行时别名，不是 API root 键。"
+      },
+      {
+        "field_name": "sliceId",
+        "reason": "这是运行时 chart props 里的 camelCase 字段，不是 root form_data 键。"
+      }
+    ],
+    "backend_response_only_fields": [
+      {
+        "field_name": "queriesData[0].data[*].key",
+        "reason": "这是后端 `get_data()` 产出的序列标题，不是 root form_data 字段。"
+      },
+      {
+        "field_name": "queriesData[0].data[*].values",
+        "reason": "这是后端 `get_data()` 产出的 `[x, y]` 点位列表，不是 root form_data 字段。"
+      },
+      {
+        "field_name": "queriesData[0].data[*].classed",
+        "reason": "这是 time shift 差异线在运行时附带的 CSS class 标记，不是 root form_data 字段。"
+      }
+    ],
+    "legacy_request_wrapper": [
+      {
+        "field_name": "payload.form_data",
+        "reason": "这是 legacy `/superset/explore_json/` 请求的外层包裹字段，不是图表保存态内部的 root form_data 字段。"
+      }
+    ],
+    "viz_switch_only": [
+      {
+        "field_name": "formDataOverrides(groupby / metrics)",
+        "reason": "只在 standardized form data 切换 viz_type 时触发，不是常规 API 导出 Compare form_data 的必经步骤。"
+      }
+    ]
+  },
+  "api_usage_guidance": {
+    "high_confidence_required_fields": [
+      "datasource",
+      "viz_type",
+      "granularity_sqla",
+      "time_range",
+      "metrics"
+    ],
+    "recommended_always_set": [
+      "time_grain_sqla",
+      "adhoc_filters",
+      "groupby",
+      "row_limit",
+      "comparison_type",
+      "color_scheme",
+      "y_axis_format",
+      "annotation_layers"
+    ],
+    "api_field_examples": [
+      "granularity_sqla",
+      "time_grain_sqla",
+      "metrics",
+      "groupby",
+      "timeseries_limit_metric",
+      "time_compare",
+      "comparison_type",
+      "rolling_type",
+      "resample_rule",
+      "annotation_layers"
+    ],
+    "avoid_confusion": [
+      "不要把 Compare 当成标准 chart data API 图表去套 `/api/v1/chart/data` 的 `query_context` 模板；当前图真实入口是 legacy `/superset/explore_json/`。",
+      "不要把 runtime 别名 `comparisonType`、`xAxisFormat`、`yAxisBounds`、`annotationLayers` 写回 root form_data。",
+      "不要把 `comparison_type` 误写成 `period`、`dimension` 或 `show_percent_change` 一类并不存在于源码的字段；当前正式枚举只有 `values`、`absolute`、`percentage`、`ratio`。",
+      "`time_compare` 是 `multi=true` + `freeForm=true` 的相对时间偏移数组，预置选项写法是 `1 year`、`52 weeks` 这类自然语言，不是固定只读枚举。",
+      "当 `time_compare` 有值时，必须显式提供一个能解析成封闭区间的 `time_range`，否则后端会拒绝生成 time shift 查询。"
+    ]
+  }
+}

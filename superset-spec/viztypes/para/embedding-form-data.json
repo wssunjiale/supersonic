@@ -1,0 +1,515 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "para",
+  "display_name": "Parallel Coordinates",
+  "source_kind": "schema_file",
+  "normalized_embedding_policy": {
+    "immutable_root_keys": [
+      "slice_id",
+      "datasource",
+      "viz_type",
+      "all_saved_chart_definition_fields"
+    ],
+    "allowed_runtime_fields": [
+      {
+        "field_name": "adhoc_filters",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "custom_form_data",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "filters",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "relative_end",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "relative_start",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_column",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_grain",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_range",
+        "behavior": "override",
+        "source": "embedding-schema"
+      }
+    ],
+    "safe_embedding_form_data_seed": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "para",
+      "extra_form_data": {
+        "filters": [],
+        "adhoc_filters": []
+      }
+    }
+  },
+  "original_embedding_form_data_schema": {
+    "viz_type": "para",
+    "display_name": "Parallel Coordinates",
+    "purpose": "第三方 embedding / guest token 场景下安全传输的 Parallel Coordinates form_data 模板",
+    "base_form_data_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/para-form-data-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-parallel-coordinates/src/index.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-parallel-coordinates/src/transformProps.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-parallel-coordinates/src/ParallelCoordinates.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/constants.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/QueryFormData.ts",
+      "D:/vsx/sources/superset-6.0.0/superset/views/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/constants.py",
+      "D:/vsx/sources/superset-6.0.0/superset/security/manager.py",
+      "D:/vsx/sources/superset-6.0.0/superset/viz.py"
+    ],
+    "notes": [
+      "para 仍然是 legacy 图，前端 metadata 明确声明 `useLegacyApi=true`，真实请求路径是 `/superset/explore_json/`。",
+      "`/superset/explore_json/` 路径会读取原始 `form_data`，然后执行 `convert_legacy_filters_into_adhoc(form_data)` 与 `merge_extra_filters(form_data)`。",
+      "当前源码里 `Guest user cannot modify chart payload` 这条错误只在 `security/manager.py::raise_for_access(query_context=...)` 分支触发，核心比较器是 `query_context_modified()`。",
+      "legacy `/superset/explore_json/` 的权限检查会走 `views/utils.py::check_datasource_perms()` -> `get_viz()` -> `viz.raise_for_access()` -> `security/manager.py::raise_for_access(viz=self)`。当前 `viz` 分支会校验 `dashboardId` / `slice_id` / datasource 绑定，但没有 `query_context_modified()` 那种 columns / metrics / orderby 子集比较器。",
+      "对 para 来说，`series`、`metrics`、`secondary_metric`、`timeseries_limit_metric`、`order_desc` 会直接参与查询编译；`show_datatable`、`include_series`、`linear_color_scheme` 会直接改变渲染语义。保守 embedding 模式下，这些根层字段都应直接复制保存态。",
+      "`secondary_metric` 不是纯展示字段：BaseViz.process_metrics() 会把它纳入查询，前端再把它映射成 `colorMetric` 用于着色。"
+    ],
+    "security_enforcement": {
+      "frontend_request_mode": "legacy explore_json",
+      "frontend_request_endpoint": "/superset/explore_json/",
+      "frontend_request_payload": {
+        "form_data": "<raw form_data>"
+      },
+      "backend_normalization_steps": [
+        "convert_legacy_filters_into_adhoc(form_data)",
+        "merge_extra_filters(form_data)"
+      ],
+      "verified_guest_payload_guard": {
+        "chart_data_api": "security/manager.py::query_context_modified",
+        "chart_data_api_error": "Guest user cannot modify chart payload",
+        "legacy_explore_json_api": "`check_datasource_perms()` 会构造 viz 并调用 `raise_for_access(viz=self)`；该分支校验 datasource / dashboard / slice 绑定，但没有 `query_context_modified()` 那种 query subset guard",
+        "confidence": "high"
+      },
+      "guest_access_binding_fields": [
+        "dashboardId",
+        "slice_id"
+      ],
+      "query_critical_root_fields": [
+        "slice_id",
+        "datasource",
+        "viz_type",
+        "series",
+        "metrics",
+        "secondary_metric",
+        "adhoc_filters",
+        "limit",
+        "row_limit",
+        "timeseries_limit_metric",
+        "order_desc"
+      ],
+      "visual_root_fields_should_also_be_copied_if_present": [
+        "show_datatable",
+        "include_series",
+        "linear_color_scheme"
+      ],
+      "recommended_strategy": "复制保存态 para form_data 作为 base，仅通过 extra_form_data 追加过滤条件；不要在 embedding 请求里重构 para 的 root 查询字段和图表定义字段。"
+    },
+    "safe_base_rule": {
+      "description": "第三方 embedding 请求中的根层 form_data，应当从已保存的 Parallel Coordinates 图表直接复制，不要自行重构。",
+      "must_be_copied_from_saved_chart": [
+        "slice_id",
+        "dashboardId",
+        "datasource",
+        "viz_type",
+        "series",
+        "metrics",
+        "secondary_metric",
+        "adhoc_filters",
+        "limit",
+        "row_limit",
+        "timeseries_limit_metric",
+        "order_desc",
+        "show_datatable",
+        "include_series",
+        "linear_color_scheme",
+        "all other saved chart-definition fields"
+      ],
+      "why": [
+        "para 没有专属前端 buildQuery，前端会把 root form_data 直接发给 `/superset/explore_json/`。",
+        "`BaseViz.process_metrics()` 会把 `metrics` 与 `secondary_metric` 一起纳入 `self.all_metrics`。",
+        "`ParallelCoordinatesViz.query_obj()` 会直接把 root `series` 写成 `query_obj.groupby`，并根据 `timeseries_limit_metric` 与 `order_desc` 决定是否追加 `orderby`。",
+        "`ParallelCoordinates.js` 会直接消费 root `show_datatable`、`include_series`、`linear_color_scheme` 与 runtime `colorMetric`，这些都会改变展示语义。",
+        "`merge_extra_filters()` 会在后端把 `extra_form_data` 并入 legacy 请求，因此动态筛选不需要通过覆盖根层保存态字段来实现。",
+        "虽然当前没有在 legacy 路径定位到 `query_context_modified()` 等价校验，但复制保存态仍然是最稳妥、最接近官方前端行为的策略。"
+      ]
+    },
+    "safe_embedding_form_data_template": {
+      "description": "这是 Parallel Coordinates embedding 下的保守安全写法。根层以保存态图表为 base，仅改 extra_form_data。",
+      "template": {
+        "slice_id": "<saved_chart_id>",
+        "dashboardId": "<dashboard_id>",
+        "datasource": "<copied_from_saved_chart>",
+        "viz_type": "para",
+        "series": "<copied_from_saved_chart>",
+        "metrics": "<copied_from_saved_chart>",
+        "secondary_metric": "<copied_from_saved_chart_if_present>",
+        "adhoc_filters": "<copied_from_saved_chart>",
+        "limit": "<copied_from_saved_chart_if_present>",
+        "row_limit": "<copied_from_saved_chart_if_present>",
+        "timeseries_limit_metric": "<copied_from_saved_chart_if_present>",
+        "order_desc": "<copied_from_saved_chart_if_present>",
+        "show_datatable": "<copied_from_saved_chart_if_present>",
+        "include_series": "<copied_from_saved_chart_if_present>",
+        "linear_color_scheme": "<copied_from_saved_chart_if_present>",
+        "extra_form_data": {
+          "filters": [
+            {
+              "col": "experiment_group",
+              "op": "IN",
+              "val": [
+                "A",
+                "B"
+              ]
+            }
+          ],
+          "adhoc_filters": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "experiment_group",
+              "operator": "IN",
+              "comparator": [
+                "A",
+                "B"
+              ]
+            }
+          ],
+          "custom_form_data": {}
+        }
+      }
+    },
+    "preferred_dynamic_container": {
+      "field_name": "extra_form_data",
+      "description": "legacy `/superset/explore_json/` 路径同样会在 `merge_extra_filters()` -> `merge_extra_form_data()` 中消费它。",
+      "append_keys": [
+        "adhoc_filters",
+        "filters",
+        "interactive_groupby",
+        "interactive_highlight",
+        "interactive_drilldown",
+        "custom_form_data"
+      ],
+      "override_keys_backend_high_confidence": [
+        "granularity_sqla",
+        "time_column",
+        "time_grain",
+        "time_range",
+        "time_grain_sqla",
+        "relative_start",
+        "relative_end"
+      ],
+      "legacy_also_accepted_root_container": "extra_filters",
+      "notes": "这些 override key 来自 legacy merge 逻辑的通用白名单，但 para 本身不是时序图，也没有正式时间 section。对于当前图，只有 filters / adhoc_filters 属于高置信动态入口；时间相关 override 不应依赖。"
+    },
+    "extra_form_data_field_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_para_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "experiment_group",
+            "op": "IN",
+            "val": [
+              "A",
+              "B"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters；后端会把它们并入额外过滤条件。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_para_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "experiment_group",
+            "operator": "IN",
+            "comparator": [
+              "A",
+              "B"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会把它们标记为 extra 并并入查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_para_legacy": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；para 默认不直接消费它。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_para_legacy": false,
+        "recommended": false,
+        "sample_data": "Last 30 days",
+        "effect": "legacy merge 层接受该 key，但 para 不是时序图，也没有 controlPanel 时间字段；当前图不应把它当作 guest override 入口。",
+        "source": "superset/constants.py + superset/utils/core.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_para_legacy": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "legacy merge 层支持该 override，但 para 没有正式时间粒度字段；当前图不应依赖。",
+        "source": "superset/constants.py + superset/utils/core.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_para_legacy": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "legacy merge 白名单接受该 key，但 para 本身没有对应 controlPanel 时间列控件。",
+        "source": "superset/constants.py + superset/utils/core.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_column",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_para_legacy": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "底层 QueryObject 时间列 override；当前图没有正式时间语义。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_grain",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_para_legacy": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "底层 QueryObject 时间粒度 override；当前图没有正式时间语义。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "relative_start",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_para_legacy": false,
+        "recommended": false,
+        "sample_data": "now",
+        "effect": "会写入 query extras 的相对开始时间；para 当前没有明确的官方时间控件链路，建议谨慎使用。",
+        "source": "superset/constants.py + superset/utils/core.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "relative_end",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_para_legacy": false,
+        "recommended": false,
+        "sample_data": "today",
+        "effect": "会写入 query extras 的相对结束时间；para 当前没有明确的官方时间控件链路，建议谨慎使用。",
+        "source": "superset/constants.py + superset/utils/core.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_para_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "experiment_group"
+        ],
+        "effect": "通用 ExtraFormData 字段；para 默认不直接消费它。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_para_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "experiment_group"
+        ],
+        "effect": "通用交互字段；para 默认不直接消费。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_para_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "experiment_group"
+        ],
+        "effect": "通用交互字段；para 默认不直接消费。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      }
+    ],
+    "minimal_extra_form_data_template": {
+      "filters": [
+        {
+          "col": "experiment_group",
+          "op": "IN",
+          "val": [
+            "A"
+          ]
+        }
+      ]
+    },
+    "recommended_extra_form_data_template": {
+      "filters": [
+        {
+          "col": "experiment_group",
+          "op": "IN",
+          "val": [
+            "A",
+            "B"
+          ]
+        }
+      ],
+      "adhoc_filters": [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "experiment_group",
+          "operator": "IN",
+          "comparator": [
+            "A",
+            "B"
+          ]
+        }
+      ],
+      "custom_form_data": {}
+    },
+    "unsafe_root_form_data_changes": [
+      {
+        "field_name": "slice_id",
+        "reason": "会改变请求对应的图表实体，embedding 请求里最不应该改。"
+      },
+      {
+        "field_name": "dashboardId",
+        "reason": "guest 用户的数据访问上下文通常依赖 dashboard 绑定关系，保守写法应直接复制保存态。"
+      },
+      {
+        "field_name": "datasource / viz_type",
+        "reason": "legacy para 的 root form_data 会直接驱动后端查询，embedding 不应改图表绑定数据集或图表类型。"
+      },
+      {
+        "field_name": "series",
+        "reason": "`ParallelCoordinatesViz.query_obj()` 会把它直接写成 `query_obj.groupby`。"
+      },
+      {
+        "field_name": "metrics / secondary_metric",
+        "reason": "BaseViz.process_metrics() 会把它们一起纳入 `self.all_metrics`；修改它们会直接改变查询结果与着色语义。"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "reason": "保存态 root filters 是图表定义的一部分；动态筛选应优先通过 extra_form_data 追加，而不是重写 root。"
+      },
+      {
+        "field_name": "limit / row_limit / timeseries_limit_metric / order_desc",
+        "reason": "会直接改变底层排序、截断和参与渲染的记录规模。"
+      },
+      {
+        "field_name": "show_datatable / include_series / linear_color_scheme",
+        "reason": "这些字段虽然不改 SQL，但会直接改变图表展示语义。"
+      }
+    ],
+    "practical_guidance": {
+      "best_practice": [
+        "先从保存态 para 图表读取完整 form_data。",
+        "根层字段保持不变，尤其保留 `series`、`metrics`、`secondary_metric`、`timeseries_limit_metric` 和视觉选项字段。",
+        "只在 `extra_form_data` 中放动态 `filters` / `adhoc_filters`。",
+        "如果你的接入代码自己发请求，para 仍应按 `/superset/explore_json/` 的 `{ form_data: ... }` 形状发送。"
+      ],
+      "avoid": [
+        "不要把 `para` 当成标准 chart data API 图表去套 `/api/v1/chart/data` 的 `query_context` 模板。",
+        "不要在 guest 请求里临时改写 root `series`；当前图后端真正消费的分组键就是它。",
+        "不要把运行时 camelCase 名称 `secondaryMetric`、`showDatatable`、`includeSeries`、`linearColorScheme`、`colorMetric` 写回 root form_data。",
+        "不要把时间相关 override key 当成 para 的正式 embedding 入口。"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "para",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/para-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/para-form-data-schema.json",
+      "control-schema": "form-data-schema/para-schema.json"
+    }
+  }
+}

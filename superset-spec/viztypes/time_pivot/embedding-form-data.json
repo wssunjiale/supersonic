@@ -1,0 +1,546 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "time_pivot",
+  "display_name": "Time-series Period Pivot",
+  "source_kind": "schema_file",
+  "normalized_embedding_policy": {
+    "immutable_root_keys": [
+      "slice_id",
+      "datasource",
+      "viz_type",
+      "all_saved_chart_definition_fields"
+    ],
+    "allowed_runtime_fields": [
+      {
+        "field_name": "adhoc_filters",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "custom_form_data",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "filters",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "granularity",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "behavior": "append",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "relative_end",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "relative_start",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_column",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_compare",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_grain",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "behavior": "override",
+        "source": "embedding-schema"
+      },
+      {
+        "field_name": "time_range",
+        "behavior": "override",
+        "source": "embedding-schema"
+      }
+    ],
+    "safe_embedding_form_data_seed": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "time_pivot",
+      "extra_form_data": {
+        "filters": [],
+        "adhoc_filters": []
+      }
+    }
+  },
+  "original_embedding_form_data_schema": {
+    "viz_type": "time_pivot",
+    "display_name": "Time-series Period Pivot",
+    "purpose": "第三方 embedding / guest token 场景下安全传输的 form_data 模板",
+    "base_form_data_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/time_pivot-form-data-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset/security/manager.py",
+      "D:/vsx/sources/superset-6.0.0/superset/constants.py",
+      "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/charts/schemas.py",
+      "D:/vsx/sources/superset-6.0.0/superset/views/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/constants.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/QueryFormData.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/processExtraFormData.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/dashboard/components/nativeFilters/utils.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataWithDashboardContext.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/TimePivot/controlPanel.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/NVD3Controls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/transformProps.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-nvd3/src/NVD3Vis.js"
+    ],
+    "notes": [
+      "time_pivot 仍然是 legacy 图，前端 metadata 明确声明 `useLegacyApi=true`，真实请求路径是 `/superset/explore_json/`。",
+      "`/superset/explore_json/` 路径会读取原始 `form_data`，补 `datasource`，然后执行 `convert_legacy_filters_into_adhoc(form_data)` 与 `merge_extra_filters(form_data)`。",
+      "当前源码里 `Guest user cannot modify chart payload` 这条错误只在 `security/manager.py::raise_for_access(query_context=...)` 分支触发，核心比较器是 `query_context_modified()`。",
+      "legacy `/superset/explore_json/` 的权限检查会走 `views/utils.py::check_datasource_perms()` -> `get_viz()` -> `viz.raise_for_access()` -> `security/manager.py::raise_for_access(viz=self)`。当前 `viz` 分支会校验 `dashboardId` / `slice_id` / datasource 绑定，但没有 `query_context_modified()` 那种 columns / metrics / orderby 子集比较器。",
+      "即便如此，最稳妥的策略仍然是根层 form_data 直接复制保存态图表，只把动态时间和过滤条件放进 `extra_form_data`。因为 `BaseViz.query_obj()` 与 `TimePivotViz.get_data()` 都会直接消费 root `granularity_sqla/time_grain_sqla/time_range/metric/freq`。",
+      "`freq` 会直接改变 period rollback 和 current / -1 / -2 pivot 系列；`line_interpolation`、`color_picker`、`show_legend`、轴格式字段则会直接改变前端 NVD3 呈现语义。",
+      "`granularity` 虽然是 controlPanel 的 root 字段，但 Superset 6.0.0 后端 constants.py 的 `extra_form_data` merge whitelist 并没有把它列为高置信 override 键。guest embedding 下不建议把它当成动态入口。"
+    ],
+    "security_enforcement": {
+      "frontend_request_mode": "legacy explore_json",
+      "frontend_request_endpoint": "/superset/explore_json/",
+      "frontend_request_payload": {
+        "form_data": "<raw form_data>"
+      },
+      "backend_normalization_steps": [
+        "convert_legacy_filters_into_adhoc(form_data)",
+        "merge_extra_filters(form_data)"
+      ],
+      "verified_guest_payload_guard": {
+        "chart_data_api": "security/manager.py::query_context_modified",
+        "chart_data_api_error": "Guest user cannot modify chart payload",
+        "legacy_explore_json_api": "`check_datasource_perms()` 会构造 viz 并调用 `raise_for_access(viz=self)`；该分支校验 datasource / dashboard / slice 绑定，但没有 `query_context_modified()` 那种 query subset guard",
+        "confidence": "high"
+      },
+      "guest_access_binding_fields": [
+        "dashboardId",
+        "slice_id"
+      ],
+      "query_critical_root_fields": [
+        "datasource",
+        "viz_type",
+        "granularity_sqla",
+        "time_grain_sqla",
+        "time_range",
+        "metric",
+        "freq"
+      ],
+      "recommended_strategy": "复制保存态 chart form_data 作为 base，仅通过 extra_form_data 追加时间范围、时间粒度和过滤条件；不要在 embedding 请求里重构 time_pivot 的 root 查询字段和图表定义字段。"
+    },
+    "safe_base_rule": {
+      "description": "第三方 embedding 请求中的根层 form_data，应当从已保存的 Time-series Period Pivot 图表直接复制，不要自行重构。",
+      "must_be_copied_from_saved_chart": [
+        "slice_id",
+        "dashboardId",
+        "datasource",
+        "viz_type",
+        "granularity_sqla",
+        "time_grain_sqla",
+        "time_range",
+        "granularity",
+        "metric",
+        "adhoc_filters",
+        "freq",
+        "show_legend",
+        "line_interpolation",
+        "color_picker",
+        "x_axis_format",
+        "y_axis_format",
+        "all other saved chart-definition fields"
+      ],
+      "why": [
+        "TimePivot 没有专属前端 buildQuery，前端直接把 root form_data 发给 `/superset/explore_json/`。",
+        "`BaseViz.query_obj()` 会直接从 root `granularity_sqla`、`time_range`、`time_grain_sqla` 编译时间查询上下文。",
+        "`TimePivotViz.query_obj()` 会直接把 root `metric` 编译到 `query_obj.metrics`。",
+        "`TimePivotViz.get_data()` 会直接读取 root `freq` 来做 period rollback 与系列排名。",
+        "`show_legend`、`line_interpolation`、`color_picker`、轴格式字段虽然不改 SQL，但会直接改变渲染语义；保守 embedding 模式也应直接复制保存态。"
+      ]
+    },
+    "safe_embedding_form_data_template": {
+      "description": "这是 TimePivot embedding 下的保守安全写法。根层以保存态图表为 base，仅改 extra_form_data。",
+      "template": {
+        "slice_id": "<saved_chart_id>",
+        "dashboardId": "<dashboard_id>",
+        "datasource": "<copied_from_saved_chart>",
+        "viz_type": "time_pivot",
+        "granularity_sqla": "<copied_from_saved_chart>",
+        "time_grain_sqla": "<copied_from_saved_chart>",
+        "time_range": "<copied_from_saved_chart>",
+        "metric": "<copied_from_saved_chart>",
+        "adhoc_filters": "<copied_from_saved_chart>",
+        "freq": "<copied_from_saved_chart>",
+        "show_legend": "<copied_from_saved_chart>",
+        "line_interpolation": "<copied_from_saved_chart>",
+        "color_picker": "<copied_from_saved_chart>",
+        "extra_form_data": {
+          "time_range": "Last 90 days",
+          "time_grain_sqla": "P1D",
+          "filters": [
+            {
+              "col": "region",
+              "op": "IN",
+              "val": [
+                "APAC"
+              ]
+            }
+          ],
+          "adhoc_filters": [
+            {
+              "expressionType": "SIMPLE",
+              "clause": "WHERE",
+              "subject": "region",
+              "operator": "IN",
+              "comparator": [
+                "APAC"
+              ]
+            }
+          ],
+          "custom_form_data": {}
+        }
+      }
+    },
+    "preferred_dynamic_container": {
+      "field_name": "extra_form_data",
+      "description": "legacy `/superset/explore_json/` 路径同样会在 `merge_extra_filters()` -> `merge_extra_form_data()` 中消费它。",
+      "append_keys": [
+        "adhoc_filters",
+        "filters",
+        "interactive_groupby",
+        "interactive_highlight",
+        "interactive_drilldown",
+        "custom_form_data"
+      ],
+      "override_keys_backend_high_confidence": [
+        "granularity_sqla",
+        "time_column",
+        "time_grain",
+        "time_range",
+        "time_grain_sqla",
+        "relative_start",
+        "relative_end"
+      ],
+      "frontend_declared_but_backend_not_high_confidence": [
+        "granularity",
+        "time_compare"
+      ],
+      "notes": "time_pivot 是时序图，因此 `time_range`、`time_grain_sqla` 是高实用动态入口；`granularity` 不是 Superset 6.0.0 后端 whitelist 的高置信键。"
+    },
+    "extra_form_data_field_schema": [
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_time_pivot_legacy": true,
+        "recommended": true,
+        "sample_data": "Last 90 days",
+        "effect": "覆盖保存态图表的时间范围。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_time_pivot_legacy": true,
+        "recommended": true,
+        "sample_data": "P1D",
+        "effect": "覆盖保存态图表的时间粒度。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_time_pivot_legacy": true,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "覆盖 Time Column；它会改变底层时间列语义，仅在你明确确认保存态图表与目标时间列语义完全一致时使用。",
+        "source": "superset/constants.py + frontend QueryFormData.ts"
+      },
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_time_pivot_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "APAC"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters；后端会把它们并入额外过滤条件。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_time_pivot_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "APAC"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会标记为 extra 并并入查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_time_pivot_legacy": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；time_pivot 默认不直接消费它。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "relative_start",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_time_pivot_legacy": true,
+        "recommended": false,
+        "sample_data": "now",
+        "effect": "进入 query extras 的相对开始时间。",
+        "source": "superset/charts/schemas.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "relative_end",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_time_pivot_legacy": true,
+        "recommended": false,
+        "sample_data": "today",
+        "effect": "进入 query extras 的相对结束时间。",
+        "source": "superset/charts/schemas.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "granularity",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_time_pivot_legacy": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "frontend query/constants.ts 声明了该键，但 Superset 6.0.0 后端 constants.py 并未把它列为高置信 extra_form_data override 键；不建议在 guest embedding 中依赖。",
+        "source": "frontend query/constants.ts + superset/constants.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_column",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_time_pivot_legacy": false,
+        "recommended": false,
+        "sample_data": "order_date",
+        "effect": "底层 QueryObject 时间列 override 键；time_pivot 常规场景优先使用 `granularity_sqla`。",
+        "source": "superset/constants.py + QueryFormData.ts"
+      },
+      {
+        "field_name": "time_grain",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_time_pivot_legacy": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "底层 QueryObject 时间粒度键，通常不必和 `time_grain_sqla` 同时手工传。",
+        "source": "superset/constants.py + QueryFormData.ts"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_time_pivot_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用 ExtraFormData 字段。time_pivot 默认不直接消费它。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_time_pivot_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "APAC"
+        ],
+        "effect": "通用交互字段；time_pivot 默认不直接消费。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_time_pivot_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "region"
+        ],
+        "effect": "通用交互字段；time_pivot 默认不直接消费。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "time_compare",
+        "data_type": "string | array[string]",
+        "behavior": "override",
+        "safe_for_time_pivot_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "1 year ago"
+        ],
+        "effect": "frontend 类型声明存在，但后端 constants.py 的 merge whitelist 未把它列为高置信 override；而且 time_pivot controlPanel 本身也没有暴露该字段。",
+        "source": "QueryFormData.ts + query/constants.ts + superset/constants.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      }
+    ],
+    "minimal_extra_form_data_template": {
+      "time_range": "Last 90 days"
+    },
+    "recommended_extra_form_data_template": {
+      "time_range": "Last 90 days",
+      "time_grain_sqla": "P1D",
+      "filters": [
+        {
+          "col": "region",
+          "op": "IN",
+          "val": [
+            "APAC"
+          ]
+        }
+      ],
+      "adhoc_filters": [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "region",
+          "operator": "IN",
+          "comparator": [
+            "APAC"
+          ]
+        }
+      ],
+      "custom_form_data": {}
+    },
+    "unsafe_root_form_data_changes": [
+      {
+        "field_name": "slice_id",
+        "reason": "会改变请求对应的图表实体，最不应该在 embedding 请求里改。"
+      },
+      {
+        "field_name": "dashboardId",
+        "reason": "guest 用户的数据访问上下文通常依赖 dashboard 绑定关系，保守写法应直接复制保存态。"
+      },
+      {
+        "field_name": "datasource",
+        "reason": "legacy time_pivot 的 root form_data 会直接驱动后端查询，embedding 不应改图表绑定数据集。"
+      },
+      {
+        "field_name": "viz_type",
+        "reason": "time_pivot 仍应保持 `time_pivot`；不应在请求里改成其他 viz。"
+      },
+      {
+        "field_name": "metric",
+        "reason": "TimePivotViz.query_obj() 会把它直接编译到 `query_obj.metrics`。"
+      },
+      {
+        "field_name": "freq",
+        "reason": "TimePivotViz.get_data() 会直接用它计算 period rollback 与 current / -1 / -2 系列。"
+      },
+      {
+        "field_name": "granularity",
+        "reason": "它是 legacy datasource-specific 时间字段，但并不是后端 extra_form_data whitelist 的高置信 override 键；如果保存态图表有它，guest 请求里不要临时改。"
+      },
+      {
+        "field_name": "show_legend",
+        "reason": "会直接改变图例显示语义。"
+      },
+      {
+        "field_name": "line_interpolation",
+        "reason": "会直接改变 NVD3 line chart 的线型。"
+      },
+      {
+        "field_name": "color_picker",
+        "reason": "会直接改变 period pivot 各条系列的基色与透明度体系。"
+      },
+      {
+        "field_name": "x_axis_format",
+        "reason": "会直接改变 X 轴格式化行为。"
+      },
+      {
+        "field_name": "y_axis_format",
+        "reason": "会直接改变 Y 轴与 tooltip 数值格式化行为。"
+      }
+    ],
+    "practical_guidance": {
+      "best_practice": [
+        "先从保存态 time_pivot 图表读取完整 form_data。",
+        "根层字段保持不变，尤其保留 `granularity_sqla`、`time_grain_sqla`、`time_range`、`metric`、`freq`。",
+        "优先只在 `extra_form_data` 中放 `time_range`、`time_grain_sqla`、`filters`、`adhoc_filters`。",
+        "只有当你非常确定要切换同一数据集中的时间列语义时，才考虑用 `extra_form_data.granularity_sqla`。"
+      ],
+      "avoid": [
+        "不要把 time_pivot 当成标准 chart data API 图表去套 `/api/v1/chart/data` 的 `query_context` 模板。",
+        "不要在 embedding 请求里重写 `metric` 或 `freq`；这会直接改变查询和 pivot 结果。",
+        "不要依赖 `extra_form_data.granularity` 或 `extra_form_data.time_compare` 这类低置信键。",
+        "不要把运行时 camelCase 名称 `showLegend`、`lineInterpolation`、`colorPicker`、`baseColor` 写回 root form_data。"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "time_pivot",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/time_pivot-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/time_pivot-form-data-schema.json",
+      "control-schema": "form-data-schema/time_pivot-schema.json"
+    }
+  }
+}

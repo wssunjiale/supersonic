@@ -1,0 +1,410 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "waterfall",
+  "display_name": "Waterfall Chart",
+  "selection_summary": {
+    "category": "comparison",
+    "tags": [
+      "waterfall",
+      "cumulative",
+      "increment",
+      "comparison"
+    ],
+    "description_zh": "Waterfall Chart displays cumulative metric changes over categories, with positive/negative values represented by upward/downward bars and a total bar for final value.",
+    "visual_shape_zh": "瀑布图（增量累积型）",
+    "use_cases_zh": [
+      "指标的增量分析（如月度收入增减、成本构成）",
+      "正负值的累积变化展示（如利润构成）",
+      "类别间的增量贡献度分析"
+    ],
+    "required_slots": [
+      {
+        "field_name": "metric",
+        "required": true,
+        "slot_kind": "metric",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1",
+        "placeholder": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        },
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+        ]
+      },
+      {
+        "field_name": "x_axis",
+        "required": true,
+        "slot_kind": "x_axis",
+        "accepted_dataset_roles": [
+          "time_dimension",
+          "dimension"
+        ],
+        "cardinality": "1",
+        "placeholder": "<x_axis_column>",
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Dimension to use on x-axis."
+        ]
+      },
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "聚合指标，用于计算每个类别的增量数值。"
+        ]
+      }
+    ],
+    "optional_slots": [
+      {
+        "field_name": "adhoc_filters",
+        "required": false,
+        "slot_kind": "filter_list",
+        "accepted_dataset_roles": [
+          "filter_context"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [],
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "Filters"
+        ]
+      },
+      {
+        "field_name": "groupby",
+        "required": false,
+        "slot_kind": "dimension_list",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [
+          "<dimension_column>"
+        ],
+        "source_categories": [
+          "Query",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Breaks down the series by the category specified in this control. This can help viewers understand how each category affects the overall value.",
+          "分类维度字段，定义瀑布图的类别轴（如月份、成本项）。"
+        ]
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "required": false,
+        "slot_kind": "time_grain",
+        "accepted_dataset_roles": [
+          "time_grain"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "P1D",
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart."
+        ]
+      }
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "dimension",
+      "metric",
+      "saved_metric",
+      "time_dimension"
+    ],
+    "optional_dataset_roles": [
+      "category_dimension",
+      "dimension",
+      "filter_context",
+      "time_grain"
+    ],
+    "dataset_role_inventory": {
+      "adhoc_metric": [
+        "metric",
+        "metrics"
+      ],
+      "category_dimension": [
+        "groupby"
+      ],
+      "dimension": [
+        "groupby",
+        "x_axis"
+      ],
+      "filter_context": [
+        "adhoc_filters"
+      ],
+      "metric": [
+        "metric",
+        "metrics"
+      ],
+      "saved_metric": [
+        "metric",
+        "metrics"
+      ],
+      "time_dimension": [
+        "x_axis"
+      ],
+      "time_grain": [
+        "time_grain_sqla"
+      ]
+    },
+    "non_binding_control_names": [
+      "currency_format",
+      "decrease_color",
+      "increase_color",
+      "row_limit",
+      "show_legend",
+      "show_value",
+      "total_color",
+      "x_axis_label",
+      "x_axis_time_format",
+      "x_ticks_layout",
+      "y_axis_format",
+      "y_axis_label"
+    ],
+    "embedding_runtime_field_names": [
+      "adhoc_filters",
+      "custom_form_data",
+      "filters",
+      "time_range"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "metric",
+      "row_limit",
+      "viz_type",
+      "x_axis"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "currency_format",
+      "datasource",
+      "decrease_color",
+      "groupby",
+      "increase_color",
+      "metric",
+      "row_limit",
+      "show_legend",
+      "show_value",
+      "time_grain_sqla",
+      "total_color",
+      "viz_type",
+      "x_axis",
+      "x_axis_label",
+      "x_axis_time_format",
+      "x_ticks_layout",
+      "y_axis_format",
+      "y_axis_label"
+    ],
+    "structural_flags": {
+      "time_series": true,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": false,
+      "flow_like": false,
+      "distribution_like": false,
+      "supports_breakdown": true,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": true,
+      "needs_dimension": true
+    },
+    "selection_hints": [
+      "优先用于趋势、演化、时间对比类问题。",
+      "至少需要 1 个可聚合指标字段。",
+      "需要时间字段，通常还应结合时间粒度或时间范围。",
+      "需要至少 1 个维度字段用于分组、拆分或定位。",
+      "支持按维度拆分多序列或子组。",
+      "可结合时间粒度控制趋势聚合窗口。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：指标的增量分析（如月度收入增减、成本构成）；正负值的累积变化展示（如利润构成）；类别间的增量贡献度分析"
+    ]
+  },
+  "selection_prompt_card": {
+    "viz_type": "waterfall",
+    "display_name": "Waterfall Chart",
+    "category": "comparison",
+    "description_zh": "Waterfall Chart displays cumulative metric changes over categories, with positive/negative values represented by upward/downward bars and a total bar for final value.",
+    "visual_shape_zh": "瀑布图（增量累积型）",
+    "best_for": [
+      "指标的增量分析（如月度收入增减、成本构成）",
+      "正负值的累积变化展示（如利润构成）",
+      "类别间的增量贡献度分析"
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "dimension",
+      "metric",
+      "saved_metric",
+      "time_dimension"
+    ],
+    "optional_dataset_roles": [
+      "category_dimension",
+      "dimension",
+      "filter_context",
+      "time_grain"
+    ],
+    "required_slots": [
+      {
+        "field_name": "metric",
+        "required": true,
+        "slot_kind": "metric",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1",
+        "placeholder": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        },
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+        ]
+      },
+      {
+        "field_name": "x_axis",
+        "required": true,
+        "slot_kind": "x_axis",
+        "accepted_dataset_roles": [
+          "time_dimension",
+          "dimension"
+        ],
+        "cardinality": "1",
+        "placeholder": "<x_axis_column>",
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Dimension to use on x-axis."
+        ]
+      },
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "聚合指标，用于计算每个类别的增量数值。"
+        ]
+      }
+    ],
+    "optional_slot_names": [
+      "adhoc_filters",
+      "groupby",
+      "time_grain_sqla"
+    ],
+    "structural_flags": {
+      "time_series": true,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": false,
+      "flow_like": false,
+      "distribution_like": false,
+      "supports_breakdown": true,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": true,
+      "needs_dimension": true
+    },
+    "selection_hints": [
+      "优先用于趋势、演化、时间对比类问题。",
+      "至少需要 1 个可聚合指标字段。",
+      "需要时间字段，通常还应结合时间粒度或时间范围。",
+      "需要至少 1 个维度字段用于分组、拆分或定位。",
+      "支持按维度拆分多序列或子组。",
+      "可结合时间粒度控制趋势聚合窗口。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：指标的增量分析（如月度收入增减、成本构成）；正负值的累积变化展示（如利润构成）；类别间的增量贡献度分析"
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "waterfall",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/waterfall-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/waterfall-form-data-schema.json",
+      "control-schema": "form-data-schema/waterfall-schema.json"
+    }
+  }
+}

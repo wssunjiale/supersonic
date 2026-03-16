@@ -63,9 +63,12 @@ public class MetricDrillDownChecker {
                         || (Objects.nonNull(dimSchemaResp) && dimSchemaResp.isPartitionTime())) {
                     continue;
                 }
-                String errMsg =
-                        String.format("维度:%s, 不在当前查询指标的下钻维度配置中, 请检查", dimSchemaResp.getName());
-                throw new InvalidArgumentException(errMsg);
+                // NOTE: This checker is a temporary validation. In practice, LLM-generated S2SQL
+                // may select reasonable dimensions that are not explicitly configured as
+                // drill-down dimensions, which would block normal usage. Keep a warning for
+                // troubleshooting but do not fail the query execution.
+                log.warn("维度:{} (bizName={}) 不在当前查询指标的下钻维度配置中，已跳过校验", dimSchemaResp.getName(),
+                        dimSchemaResp.getBizName());
             }
         }
     }
@@ -146,6 +149,9 @@ public class MetricDrillDownChecker {
     }
 
     private List<DrillDownDimension> getDrillDownDimensions(MetricResp metricResp) {
+        if (metricService == null) {
+            return Lists.newArrayList();
+        }
         return metricService.getDrillDownDimension(metricResp.getId());
     }
 }

@@ -1,11 +1,18 @@
 package com.tencent.supersonic.headless.chat.mapper;
 
+import com.google.common.collect.Lists;
 import com.tencent.supersonic.common.config.ParameterConfig;
 import com.tencent.supersonic.common.pojo.Parameter;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service("HeadlessMapperConfig")
 public class MapperConfig extends ParameterConfig {
+
+    public static final Parameter MAPPER_STRATEGY = new Parameter("s2.mapper.strategy", "LEGACY",
+            "Schema映射策略", "LEGACY: 现有Embedding/Keyword等映射; LLM: 使用大模型先选数据集再选字段（忽略旧mapping结果）",
+            "list", "Mapper相关配置", Lists.newArrayList("LEGACY", "LLM"));
 
     public static final Parameter MAPPER_DETECTION_SIZE = new Parameter("s2.mapper.detection.size",
             "8", "一次探测返回结果个数", "在每次探测后, 将前后缀匹配的结果合并, 并根据相似度阈值过滤后的结果个数", "number", "Mapper相关配置");
@@ -65,4 +72,9 @@ public class MapperConfig extends ParameterConfig {
     public static final Parameter EMBEDDING_MAPPER_ALLOWED_SEGMENT_NATURE =
             new Parameter("s2.mapper.embedding.allowed-segment-nature", "['v', 'd', 'a']",
                     "使用LLM召回二次处理时对问题分词词性的控制", "分词后允许的词性才会进行向量召回", "list", "Mapper相关配置");
+
+    @Override
+    public List<Parameter> getSysParameters() {
+        return Lists.newArrayList(MAPPER_STRATEGY);
+    }
 }

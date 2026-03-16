@@ -268,7 +268,7 @@ const ModelCreateForm: React.FC<CreateFormProps> = ({
     if (!saveState && currentStep < 1) {
       forward();
     } else {
-      const { dbName, tableName } = submitForm;
+      const { catalog ,dbName, tableName } = submitForm;
       const queryParams = {
         ...submitForm,
         databaseId: databaseId || modelItem?.databaseId || formDatabaseId,
@@ -278,7 +278,7 @@ const ModelCreateForm: React.FC<CreateFormProps> = ({
         modelDetail: {
           ...submitForm,
           queryType: basicInfoFormMode === 'fast' ? 'table_query' : 'sql_query',
-          tableQuery: dbName && tableName ? `${dbName}.${tableName}` : '',
+          tableQuery: catalog && dbName && tableName ? `${catalog}.${dbName}.${tableName}` : (dbName && tableName ? `${dbName}.${tableName}` : ''),
           sqlQuery: sql,
           sqlVariables: sqlParams,
         },
@@ -299,21 +299,22 @@ const ModelCreateForm: React.FC<CreateFormProps> = ({
       return;
     }
 
-    const columnFields: any[] = columns.map((item: IDataSource.IExecuteSqlColumn) => {
+    const fieldMap = new Map(
+      fieldsClassifyList.map(field => [field.fieldName, field])
+    );
+    columns.forEach((item: IDataSource.IExecuteSqlColumn) => {
       const { type, nameEn, comment } = item;
-      const oldItem =
-        fieldsClassifyList.find((oItem) => {
-          return oItem.fieldName === item.nameEn;
-        }) || {};
-      return {
-        ...oldItem,
+      const existingField = fieldMap.get(nameEn);
+
+      fieldMap.set(nameEn, {
+        ...existingField,
         bizName: nameEn,
         fieldName: nameEn,
         dataType: type,
         comment,
-      };
+      });
     });
-    setFields(columnFields || []);
+    setFields(Array.from(fieldMap.values()));
   };
 
   const formatterIdentifiers = (identifiersList: any[] = []) => {

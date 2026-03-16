@@ -1,0 +1,141 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "gauge_chart",
+  "display_name": "Gauge Chart",
+  "normalized_summary": {
+    "category": "kpi",
+    "tags": [
+      "gauge",
+      "kpi",
+      "threshold",
+      "dial"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "核心指标，用于展示仪表盘的指针位置。"
+      },
+      {
+        "key": "min_value",
+        "required": false,
+        "description": "仪表盘最小值（默认0），用于定义数值范围的下限。"
+      },
+      {
+        "key": "max_value",
+        "required": false,
+        "description": "仪表盘最大值（默认100），用于定义数值范围的上限。"
+      },
+      {
+        "key": "thresholds",
+        "required": false,
+        "description": "阈值列表（如 [60, 80]），用于划分正常/警告/危险区间。"
+      },
+      {
+        "key": "show_value",
+        "required": false,
+        "description": "是否展示数值（true/false），控制指标数值的显示。"
+      }
+    ],
+    "description_zh": "Gauge Chart displays a single metric value within a predefined range (e.g., 0-100) as a needle on a dial, ideal for KPI threshold monitoring.",
+    "visual_shape_zh": "仪表盘图（KPI阈值型）",
+    "use_cases_zh": [
+      "单指标阈值监控（如完成率、使用率、达标率）",
+      "KPI状态可视化（正常/警告/危险）",
+      "紧凑型关键指标展示"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "gauge_chart",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/gauge_chart-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/gauge_chart-form-data-schema.json",
+      "control-schema": "form-data-schema/gauge_chart-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Gauge Chart",
+    "viztype": "gauge_chart",
+    "详细描述": "Gauge Chart displays a single metric value within a predefined range (e.g., 0-100) as a needle on a dial, ideal for KPI threshold monitoring.",
+    "表现形态": "仪表盘图（KPI阈值型）",
+    "适用场景": [
+      "单指标阈值监控（如完成率、使用率、达标率）",
+      "KPI状态可视化（正常/警告/危险）",
+      "紧凑型关键指标展示"
+    ],
+    "vizKey": "Gauge",
+    "pluginCategory": "KPI",
+    "pluginTags": [],
+    "category": "kpi",
+    "tags": [
+      "gauge",
+      "kpi",
+      "threshold",
+      "dial"
+    ],
+    "关键字段": [
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "核心指标，用于展示仪表盘的指针位置。"
+      },
+      {
+        "key": "min_value",
+        "required": false,
+        "description": "仪表盘最小值（默认0），用于定义数值范围的下限。"
+      },
+      {
+        "key": "max_value",
+        "required": false,
+        "description": "仪表盘最大值（默认100），用于定义数值范围的上限。"
+      },
+      {
+        "key": "thresholds",
+        "required": false,
+        "description": "阈值列表（如 [60, 80]），用于划分正常/警告/危险区间。"
+      },
+      {
+        "key": "show_value",
+        "required": false,
+        "description": "是否展示数值（true/false），控制指标数值的显示。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

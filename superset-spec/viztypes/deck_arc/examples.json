@@ -1,0 +1,300 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "deck_arc",
+  "display_name": "deck.gl Arc",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "LATITUDE",
+          "operator": "IS NOT NULL",
+          "comparator": ""
+        }
+      ]
+    ],
+    "autozoom": [
+      true
+    ],
+    "color_picker": [
+      {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      }
+    ],
+    "color_scheme": [
+      "SUPERSET_DEFAULT"
+    ],
+    "color_scheme_type": [
+      "fixed_color"
+    ],
+    "dimension": [
+      "carrier"
+    ],
+    "end_spatial": [
+      {
+        "type": "latlong",
+        "lonCol": "LONGITUDE_DEST",
+        "latCol": "LATITUDE_DEST"
+      }
+    ],
+    "filter_nulls": [
+      true
+    ],
+    "js_columns": [
+      [
+        "carrier"
+      ]
+    ],
+    "js_data_mutator": [
+      "data => data"
+    ],
+    "js_onclick_href": [
+      "o => `https://example.com/?from=${o.object.sourcePosition}`"
+    ],
+    "js_tooltip": [
+      "o => `<div>${o.object.cat_color}</div>`"
+    ],
+    "legend_format": [
+      "SMART_NUMBER"
+    ],
+    "legend_position": [
+      "tr"
+    ],
+    "mapbox_style": [
+      "mapbox://styles/mapbox/light-v9"
+    ],
+    "row_limit": [
+      5000
+    ],
+    "start_spatial": [
+      {
+        "type": "latlong",
+        "lonCol": "LONGITUDE",
+        "latCol": "LATITUDE"
+      }
+    ],
+    "stroke_width": [
+      1
+    ],
+    "target_color_picker": [
+      {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      }
+    ],
+    "viewport": [
+      {
+        "longitude": -91.84340711201104,
+        "latitude": 44.596651438714254,
+        "zoom": 2.929837070560775,
+        "bearing": 8.546256357301871,
+        "pitch": 60
+      }
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "deck_arc",
+      "start_spatial": {
+        "type": "latlong",
+        "lonCol": "LONGITUDE",
+        "latCol": "LATITUDE"
+      },
+      "end_spatial": {
+        "type": "latlong",
+        "lonCol": "LONGITUDE_DEST",
+        "latCol": "LATITUDE_DEST"
+      },
+      "adhoc_filters": []
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "deck_arc",
+      "start_spatial": {
+        "type": "latlong",
+        "lonCol": "LONGITUDE",
+        "latCol": "LATITUDE"
+      },
+      "end_spatial": {
+        "type": "latlong",
+        "lonCol": "LONGITUDE_DEST",
+        "latCol": "LATITUDE_DEST"
+      },
+      "row_limit": 5000,
+      "filter_nulls": true,
+      "adhoc_filters": [],
+      "mapbox_style": "mapbox://styles/mapbox/light-v9",
+      "autozoom": true,
+      "viewport": {
+        "longitude": 6.85236157047845,
+        "latitude": 31.222656842808707,
+        "zoom": 1,
+        "bearing": 0,
+        "pitch": 0
+      },
+      "color_scheme_type": "fixed_color",
+      "color_picker": {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      },
+      "target_color_picker": {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      },
+      "dimension": null,
+      "color_scheme": "SUPERSET_DEFAULT",
+      "stroke_width": 1,
+      "legend_position": "tr",
+      "legend_format": "SMART_NUMBER",
+      "js_columns": [],
+      "js_data_mutator": "",
+      "js_tooltip": "",
+      "js_onclick_href": ""
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "deck_arc",
+      "start_spatial": "<copied_from_saved_chart>",
+      "end_spatial": "<copied_from_saved_chart>",
+      "row_limit": "<copied_from_saved_chart_if_present>",
+      "filter_nulls": "<copied_from_saved_chart_if_present>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "mapbox_style": "<copied_from_saved_chart_if_present>",
+      "viewport": "<copied_from_saved_chart_if_present>",
+      "autozoom": "<copied_from_saved_chart_if_present>",
+      "color_scheme_type": "<copied_from_saved_chart_if_present>",
+      "color_picker": "<copied_from_saved_chart_if_present>",
+      "target_color_picker": "<copied_from_saved_chart_if_present>",
+      "dimension": "<copied_from_saved_chart_if_present>",
+      "color_scheme": "<copied_from_saved_chart_if_present>",
+      "stroke_width": "<copied_from_saved_chart_if_present>",
+      "legend_position": "<copied_from_saved_chart_if_present>",
+      "legend_format": "<copied_from_saved_chart_if_present>",
+      "js_columns": "<copied_from_saved_chart_if_present>",
+      "js_data_mutator": "<copied_from_saved_chart_if_present>",
+      "js_tooltip": "<copied_from_saved_chart_if_present>",
+      "js_onclick_href": "<copied_from_saved_chart_if_present>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "LONGITUDE",
+            "op": "==",
+            "val": -122.30931
+          },
+          {
+            "col": "LATITUDE",
+            "op": "==",
+            "val": 47.44898
+          },
+          {
+            "col": "LONGITUDE_DEST",
+            "op": "==",
+            "val": -149.99619
+          },
+          {
+            "col": "LATITUDE_DEST",
+            "op": "==",
+            "val": 61.17432
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "carrier",
+            "operator": "IN",
+            "comparator": [
+              "AA"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_deck_arc_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "LONGITUDE",
+            "op": "==",
+            "val": -122.30931
+          }
+        ],
+        "effect": "追加 simple filters；后端会把它们并入额外过滤条件。对 deck_arc 来说，这也是 `crossFiltersDataMask.ts` 交互筛选明确产出的容器。",
+        "source": "superset/constants.py + superset/utils/core.py + crossFiltersDataMask.ts"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_deck_arc_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "carrier",
+            "operator": "IN",
+            "comparator": [
+              "AA"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会标记为 `isExtra` 并并入查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_deck_arc_legacy": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；deck_arc 默认不直接消费它。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_deck_arc_legacy": false,
+        "recommended": false,
+        "sample_data": "Last 30 days",
+        "effect": "这是通用 extra_form_data override 字段。若保存态图表本来就带有 legacy 时间字段，理论上可能影响 timeseries 模式；但当前 controlPanel 没有正式时间 section，guest 模式下不建议依赖这种 override。",
+        "source": "QueryFormData.ts + superset/constants.py + superset/utils/core.py + superset/viz.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "deck_arc",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/deck_arc-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/deck_arc-form-data-schema.json",
+      "control-schema": "form-data-schema/deck_arc-schema.json"
+    }
+  }
+}

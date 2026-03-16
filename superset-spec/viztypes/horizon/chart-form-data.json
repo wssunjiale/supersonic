@@ -1,0 +1,477 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "horizon",
+  "display_name": "Horizon Chart",
+  "source_kind": "schema_file",
+  "normalized_chart_form_data": {
+    "required_root_fields": [
+      "datasource",
+      "granularity_sqla",
+      "metrics",
+      "viz_type"
+    ],
+    "optional_root_fields": [
+      "adhoc_filters",
+      "cache_timeout",
+      "contribution",
+      "custom_params",
+      "extra_form_data",
+      "groupby",
+      "horizon_color_scale",
+      "limit",
+      "order_desc",
+      "row_limit",
+      "series_height",
+      "slice_id",
+      "time_range",
+      "timeseries_limit_metric",
+      "url_params"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "granularity_sqla",
+      "metrics",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "contribution",
+      "datasource",
+      "granularity_sqla",
+      "groupby",
+      "horizon_color_scale",
+      "limit",
+      "metrics",
+      "order_desc",
+      "row_limit",
+      "series_height",
+      "time_range",
+      "timeseries_limit_metric",
+      "viz_type"
+    ],
+    "fallback_template_seed": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "horizon",
+      "granularity_sqla": "<time_column>",
+      "metrics": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        }
+      ],
+      "adhoc_filters": [],
+      "time_range": "No filter"
+    }
+  },
+  "original_chart_form_data_schema": {
+    "viz_type": "horizon",
+    "display_name": "Horizon Chart",
+    "purpose": "用于调用 API 创建或保存 Horizon Chart 时填写的 form_data 模板",
+    "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/horizon-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-horizon/src/controlPanel.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-horizon/src/index.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-horizon/src/transformProps.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-horizon/src/HorizonChart.jsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-horizon/src/HorizonRow.jsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+      "D:/vsx/sources/superset-6.0.0/superset/viz.py",
+      "D:/vsx/sources/superset-6.0.0/superset/views/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/constants.py"
+    ],
+    "notes": [
+      "Horizon 是 legacy 图，前端真实请求路径是 `/superset/explore_json/`，不是 `/api/v1/chart/data`。",
+      "`getFormDataFromControls.ts` 会把 controls 的 `value` 直接写成 `form_data[name]`，因此保存态 root form_data 应保持 controlPanel 的原始 snake_case 命名。",
+      "Horizon 没有专属前端 buildQuery，`ChartClient.ts` 对它会退回 `() => formData`。也就是说，API 层真正应该构造的是原始 root `form_data`，而不是 `query_context`。",
+      "这个图使用的是 `metrics` 数组，不是单值 `metric`。如果把它误写成 `metric`，`HorizonViz` 继承链上的查询编译不会按 UI 的写法工作。",
+      "`limit` 控制 series limit，`row_limit` 控制底层查询最大返回行数。两者同时存在时，前者决定 series 截断，后者决定底层 SQL 行数上限。",
+      "`timeseries_limit_metric` 未显式设置时，`NVD3TimeSeriesViz.query_obj()` 会回退到第一个 metric 作为排序依据；因此 `order_desc` 即使在 UI 上隐藏，也仍可能影响最终 `orderby`。",
+      "`contribution=true` 的真实行为是按每个时间点做横向归一化。`series_height` 与 `horizon_color_scale` 只影响前端渲染，但它们仍然是保存态图表定义的一部分。"
+    ],
+    "naming_and_pipeline": {
+      "control_to_api_form_data": "`getFormDataFromControls.ts` 直接把 `controlsState[controlName].value` 写成 `formData[controlName]`，因此保存态 root 字段保持 controlPanel 的原始 snake_case 命名。",
+      "api_form_data_to_backend_request": "`ChartClient.ts` 在 `useLegacyApi=true` 时，把 `buildQuery(formData)` 包装成 `{ form_data }` POST 到 `/superset/explore_json/`；Horizon 没有专属 buildQuery，因此等价于直接发送原始 form_data。",
+      "backend_form_data_normalization": "`explore_json()` 会先补 `datasource`，再执行 `convert_legacy_filters_into_adhoc(form_data)` 与 `merge_extra_filters(form_data)`。",
+      "backend_form_data_to_query_obj": "`BaseViz.query_obj()` 先处理时间、limit、row_limit 与 filters；`NVD3TimeSeriesViz.query_obj()` 再补 `orderby`。"
+    },
+    "global_required_fields": {
+      "datasource": {
+        "data_type": "string",
+        "required": true,
+        "sample_data": "<dataset_id>__table",
+        "source": "explore_json() + datasourceAndVizType hidden control"
+      },
+      "viz_type": {
+        "data_type": "string",
+        "required": true,
+        "fixed_value": "horizon",
+        "source": "HorizonViz.viz_type + Horizon/index.js"
+      },
+      "granularity_sqla": {
+        "data_type": "string | object",
+        "required": true,
+        "sample_data": "ds",
+        "source": "Horizon Time section + BaseViz.query_obj()"
+      },
+      "metrics": {
+        "data_type": "array[string | object]",
+        "required": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "value"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(value)"
+          }
+        ],
+        "source": "Horizon Query section + dndAdhocMetricsControl + NVD3TimeSeriesViz.query_obj()"
+      }
+    },
+    "global_optional_fields": {
+      "time_range": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "Last 30 days",
+        "source": "Horizon Time section + BaseViz.query_obj()"
+      },
+      "adhoc_filters": {
+        "data_type": "array[object]",
+        "required": false,
+        "sample_data": [],
+        "source": "Horizon Query section + merge_extra_filters()"
+      },
+      "groupby": {
+        "data_type": "array[string | object]",
+        "required": false,
+        "sample_data": [
+          "region"
+        ],
+        "source": "Horizon Query section + NVD3TimeSeriesViz.process_data()"
+      },
+      "limit": {
+        "data_type": "integer | string | null",
+        "required": false,
+        "sample_data": 50,
+        "source": "Horizon Query section + BaseViz.query_obj()"
+      },
+      "timeseries_limit_metric": {
+        "data_type": "string | object | null",
+        "required": false,
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "value"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(value)"
+        },
+        "source": "Horizon Query section + NVD3TimeSeriesViz.query_obj()"
+      },
+      "order_desc": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": true,
+        "source": "Horizon Query section + NVD3TimeSeriesViz.query_obj()"
+      },
+      "contribution": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": false,
+        "source": "Horizon Query section + NVD3TimeSeriesViz.process_data()"
+      },
+      "row_limit": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 10000,
+        "source": "Horizon Query section + BaseViz.query_obj()"
+      },
+      "series_height": {
+        "data_type": "string | integer",
+        "required": false,
+        "sample_data": "25",
+        "source": "Horizon Chart Options section + transformProps.js"
+      },
+      "horizon_color_scale": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "series",
+        "source": "Horizon Chart Options section + HorizonChart.jsx / HorizonRow.jsx"
+      },
+      "slice_id": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 0,
+        "source": "datasourceAndVizType hidden control",
+        "notes": "新建图表时通常省略；编辑已存在图表时由服务端或上层调用方提供。"
+      },
+      "cache_timeout": {
+        "data_type": "integer | null",
+        "required": false,
+        "sample_data": null,
+        "source": "datasourceAndVizType hidden control"
+      },
+      "url_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "QueryFormData"
+      },
+      "custom_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "QueryFormData"
+      },
+      "extra_form_data": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "utils.merge_extra_form_data()",
+        "notes": "虽然不属于 controlPanel 字段，但 legacy explore_json 路径会消费它。对 Horizon 而言，`time_range` 是这里相对高置信的动态 override。"
+      }
+    },
+    "minimal_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "horizon",
+      "granularity_sqla": "<temporal_column>",
+      "metrics": [
+        "<metric_or_adhoc_metric>"
+      ],
+      "adhoc_filters": []
+    },
+    "recommended_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "horizon",
+      "granularity_sqla": "ds",
+      "time_range": "Last 30 days",
+      "metrics": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "value"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(value)"
+        }
+      ],
+      "adhoc_filters": [],
+      "groupby": [
+        "region"
+      ],
+      "limit": 50,
+      "timeseries_limit_metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "value"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(value)"
+      },
+      "order_desc": true,
+      "contribution": false,
+      "row_limit": 10000,
+      "series_height": "25",
+      "horizon_color_scale": "series"
+    },
+    "conditional_blocks": {
+      "grouped_rows": {
+        "condition": "需要按维度把 horizon 拆成多行时",
+        "fields": {
+          "groupby": [
+            "region"
+          ],
+          "metrics": [
+            {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "value"
+              },
+              "aggregate": "SUM",
+              "label": "SUM(value)"
+            }
+          ]
+        }
+      },
+      "metric_rows_without_groupby": {
+        "condition": "需要不按维度拆分，而让每个 metric 各占一行时",
+        "fields": {
+          "groupby": [],
+          "metrics": [
+            {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "revenue"
+              },
+              "aggregate": "SUM",
+              "label": "SUM(revenue)"
+            },
+            {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "cost"
+              },
+              "aggregate": "SUM",
+              "label": "SUM(cost)"
+            }
+          ]
+        }
+      },
+      "time_filtering": {
+        "condition": "需要控制查询时间窗口时",
+        "fields": {
+          "time_range": "Last 90 days"
+        }
+      },
+      "series_limiting": {
+        "condition": "需要控制只显示前 N 条 series，并指定截断排序依据时",
+        "fields": {
+          "limit": 20,
+          "timeseries_limit_metric": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "value"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(value)"
+          },
+          "order_desc": true
+        }
+      },
+      "contribution_mode": {
+        "condition": "需要把每个时间点的值转换成占总量的贡献比例时",
+        "fields": {
+          "contribution": true
+        }
+      },
+      "display_options": {
+        "condition": "需要调整每行高度或颜色域解释方式时",
+        "fields": {
+          "series_height": "40",
+          "horizon_color_scale": "overall"
+        }
+      }
+    },
+    "runtime_only_or_non_template_fields": {
+      "runtime_aliases_generated_by_transformProps": [
+        {
+          "field_name": "seriesHeight",
+          "reason": "由 raw form_data.series_height 派生的运行时别名，不是 API root 键。"
+        },
+        {
+          "field_name": "horizonColorScale",
+          "reason": "由 raw form_data.horizon_color_scale 派生的运行时别名，不是 API root 键。"
+        },
+        {
+          "field_name": "colorScale",
+          "reason": "这是 `transformProps.js` 输出给 HorizonChart 的运行时属性，不是 root form_data 字段。"
+        }
+      ],
+      "component_defaults_not_root_fields": [
+        {
+          "field_name": "bands",
+          "reason": "这是 `HorizonChart.jsx` / `HorizonRow.jsx` 的组件默认值，由颜色数组长度推导，不是 controlPanel 字段。"
+        },
+        {
+          "field_name": "colors",
+          "reason": "默认颜色来自 `HorizonRow.jsx::DEFAULT_COLORS`，不是 root form_data 字段。"
+        },
+        {
+          "field_name": "mode",
+          "reason": "组件默认 `mode='offset'`，源码中没有对应 controlPanel 字段。"
+        },
+        {
+          "field_name": "offsetX",
+          "reason": "这是画布渲染时的内部位移参数，不是 root form_data 字段。"
+        },
+        {
+          "field_name": "yDomain",
+          "reason": "仅在运行时根据 `horizon_color_scale` 推导，不是 root form_data 字段。"
+        }
+      ],
+      "backend_response_only_fields": [
+        {
+          "field_name": "queriesData[0].data",
+          "reason": "这是后端返回给前端的 horizon series 数据，不是 root form_data 字段。"
+        }
+      ],
+      "legacy_request_wrapper": [
+        {
+          "field_name": "payload.form_data",
+          "reason": "这是 legacy `/superset/explore_json/` 请求外层包裹字段，不是图表保存态内部的 root form_data 字段。"
+        }
+      ],
+      "avoid_confusing_shapes": [
+        {
+          "field_name": "metric",
+          "reason": "Horizon 使用的是 `metrics` 数组，而不是单值 `metric`。"
+        },
+        {
+          "field_name": "seriesHeight / horizonColorScale",
+          "reason": "它们是运行时 camelCase 名称，不应写回 root form_data。"
+        },
+        {
+          "field_name": "limit vs row_limit",
+          "reason": "`limit` 是 series limit；`row_limit` 是底层查询最大返回行数。"
+        }
+      ]
+    },
+    "api_usage_guidance": {
+      "high_confidence_required_fields": [
+        "datasource",
+        "viz_type",
+        "granularity_sqla",
+        "metrics"
+      ],
+      "recommended_always_set": [
+        "time_range",
+        "adhoc_filters",
+        "groupby",
+        "row_limit",
+        "series_height",
+        "horizon_color_scale"
+      ],
+      "api_field_examples": [
+        "granularity_sqla",
+        "time_range",
+        "metrics",
+        "groupby",
+        "limit",
+        "timeseries_limit_metric",
+        "order_desc",
+        "contribution",
+        "row_limit",
+        "series_height",
+        "horizon_color_scale"
+      ],
+      "avoid_confusion": [
+        "不要把 `horizon` 当成标准 chart data API 图表去套 `/api/v1/chart/data` 的 `query_context` 模板。",
+        "不要把 `metrics` 误写成单值 `metric`。",
+        "不要把运行时 camelCase 名称 `seriesHeight`、`horizonColorScale`、`colorScale` 写回 root form_data。",
+        "不要把 `limit` 当成 `row_limit` 的同义词；它们分别控制 series 截断和底层查询行数。",
+        "如果不显式传 `timeseries_limit_metric`，后端会回退到第一个 metric 排序；这时 `order_desc` 仍然有效。"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "horizon",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/horizon-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/horizon-form-data-schema.json",
+      "control-schema": "form-data-schema/horizon-schema.json"
+    }
+  }
+}

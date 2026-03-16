@@ -19,12 +19,14 @@ public class MybatisConfig {
     @Bean
     public SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception {
         SqlSessionFactoryBean bean = new SqlSessionFactoryBean();
-        org.apache.ibatis.session.Configuration configuration = new org.apache.ibatis.session.Configuration();
+        org.apache.ibatis.session.Configuration configuration =
+                new org.apache.ibatis.session.Configuration();
         configuration.setMapUnderscoreToCamelCase(true);
         bean.setConfiguration(configuration);
         bean.setDataSource(dataSource);
 
-        bean.setMapperLocations(new PathMatchingResourcePatternResolver().getResources(MAPPER_LOCATION));
+        bean.setMapperLocations(
+                new PathMatchingResourcePatternResolver().getResources(MAPPER_LOCATION));
         return bean.getObject();
     }
 }

@@ -1,0 +1,3011 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "bubble_v2",
+  "display_name": "Bubble Chart",
+  "source_kind": "schema_file",
+  "normalized_control_schema": {
+    "field_category_order": [
+      "Query",
+      "Chart Options",
+      "X Axis",
+      "Y Axis"
+    ],
+    "field_occurrences": [
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "series",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Defines the grouping of entities. Each series is represented by a specific color in the chart.",
+        "data_type": "string | object | null",
+        "sample_data": "product_line",
+        "original_field": {
+          "field_name": "series",
+          "description": "Defines the grouping of entities. Each series is represented by a specific color in the chart.",
+          "data_type": "string | object | null",
+          "enum_source": "datasource columns",
+          "sample_data": "product_line",
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "dndSeriesControl 是单选 Dimension。Bubble/buildQuery.ts 会把它追加进 query.columns。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "entity",
+        "runtime_alias": null,
+        "required": true,
+        "embedding": "否",
+        "description": "This defines the element to be plotted on the chart",
+        "data_type": "string | object",
+        "sample_data": "deal_size",
+        "original_field": {
+          "field_name": "entity",
+          "description": "This defines the element to be plotted on the chart",
+          "data_type": "string | object",
+          "enum_source": "datasource columns",
+          "sample_data": "deal_size",
+          "required": true,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "dndEntityControl 带 validateNonEmpty 校验，是 Bubble 唯一强制的维度字段。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "x",
+        "runtime_alias": null,
+        "required": true,
+        "embedding": "否",
+        "description": "The dataset column/metric that returns the values on your chart's x-axis.",
+        "data_type": "string | object",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "quantity_ordered"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(quantity_ordered)"
+        },
+        "original_field": {
+          "field_name": "x",
+          "description": "The dataset column/metric that returns the values on your chart's x-axis.",
+          "data_type": "string | object",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "quantity_ordered"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(quantity_ordered)"
+          },
+          "required": true,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "extractQueryFields.ts 会把 x 视作 metrics。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "y",
+        "runtime_alias": null,
+        "required": true,
+        "embedding": "否",
+        "description": "The dataset column/metric that returns the values on your chart's y-axis.",
+        "data_type": "string | object",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "country"
+          },
+          "aggregate": "COUNT_DISTINCT",
+          "label": "COUNT_DISTINCT(country)"
+        },
+        "original_field": {
+          "field_name": "y",
+          "description": "The dataset column/metric that returns the values on your chart's y-axis.",
+          "data_type": "string | object",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "country"
+            },
+            "aggregate": "COUNT_DISTINCT",
+            "label": "COUNT_DISTINCT(country)"
+          },
+          "required": true,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "extractQueryFields.ts 会把 y 视作 metrics。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "adhoc_filters",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "description": "字段标签为 Filters。可用于普通筛选，也可通过 TEMPORAL_RANGE 表达时间过滤。",
+        "data_type": "array[object]",
+        "sample_data": [
+          {
+            "clause": "WHERE",
+            "subject": "order_date",
+            "operator": "TEMPORAL_RANGE",
+            "comparator": "No filter",
+            "expressionType": "SIMPLE"
+          }
+        ],
+        "original_field": {
+          "field_name": "adhoc_filters",
+          "description": "字段标签为 Filters。可用于普通筛选，也可通过 TEMPORAL_RANGE 表达时间过滤。",
+          "data_type": "array[object]",
+          "enum_source": "dataset columns + saved metrics + 当前 x/y/size 指标",
+          "sample_data": [
+            {
+              "clause": "WHERE",
+              "subject": "order_date",
+              "operator": "TEMPORAL_RANGE",
+              "comparator": "No filter",
+              "expressionType": "SIMPLE"
+            }
+          ],
+          "required": false,
+          "embedding": "extra_form_data.append",
+          "default_value": []
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "size",
+        "runtime_alias": null,
+        "required": true,
+        "embedding": "否",
+        "description": "Metric used to calculate bubble size",
+        "data_type": "string | object",
+        "sample_data": "count",
+        "original_field": {
+          "field_name": "size",
+          "description": "Metric used to calculate bubble size",
+          "data_type": "string | object",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": "count",
+          "required": true,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "extractQueryFields.ts 会把 size 视作 metrics。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "orderby",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Orders the query result that generates the source data for this chart. If a series or row limit is reached, this determines what data are truncated. If undefined, defaults to the first metric (where appropriate).",
+        "data_type": "string | object | null",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "quantity_ordered"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(quantity_ordered)"
+        },
+        "original_field": {
+          "field_name": "orderby",
+          "description": "Orders the query result that generates the source data for this chart. If a series or row limit is reached, this determines what data are truncated. If undefined, defaults to the first metric (where appropriate).",
+          "data_type": "string | object | null",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "quantity_ordered"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(quantity_ordered)"
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "Bubble/buildQuery.ts 会把 query.orderby 重写成二维数组，并结合 order_desc 反转排序方向。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "order_desc",
+        "runtime_alias": "orderDesc",
+        "required": false,
+        "embedding": "否",
+        "description": "If enabled, this control sorts the results/values descending, otherwise it sorts the results ascending.",
+        "data_type": "boolean",
+        "sample_data": true,
+        "original_field": {
+          "field_name": "order_desc",
+          "runtime_alias": "orderDesc",
+          "description": "If enabled, this control sorts the results/values descending, otherwise it sorts the results ascending.",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true,
+          "notes": "sharedControls.order_desc 的默认值是 true；Bubble/controlPanel.tsx 只在 orderby 有值时显示它。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Query",
+        "field_name": "row_limit",
+        "runtime_alias": "rowLimit",
+        "required": false,
+        "embedding": "否",
+        "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+        "data_type": "integer",
+        "sample_data": 10000,
+        "original_field": {
+          "field_name": "row_limit",
+          "runtime_alias": "rowLimit",
+          "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+          "data_type": "integer",
+          "enum_values": [
+            10,
+            50,
+            100,
+            250,
+            500,
+            1000,
+            5000,
+            10000,
+            50000
+          ],
+          "sample_data": 10000,
+          "required": false,
+          "embedding": "否",
+          "default_value": 10000
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "color_scheme",
+        "runtime_alias": "colorScheme",
+        "required": false,
+        "embedding": "否",
+        "description": "The color scheme for rendering chart",
+        "data_type": "string",
+        "sample_data": "supersetColors",
+        "original_field": {
+          "field_name": "color_scheme",
+          "runtime_alias": "colorScheme",
+          "description": "The color scheme for rendering chart",
+          "data_type": "string",
+          "enum_source": "categoricalSchemeRegistry.keys()",
+          "sample_data": "supersetColors",
+          "required": false,
+          "embedding": "否",
+          "default_value": "categoricalSchemeRegistry.getDefaultKey()",
+          "notes": "sharedControls.color_scheme 的默认值来自 categoricalSchemeRegistry.getDefaultKey()。官方 Bubble 示例保存态使用的是 supersetColors。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "show_legend",
+        "runtime_alias": "showLegend",
+        "required": false,
+        "embedding": "否",
+        "description": "Whether to display a legend for the chart",
+        "data_type": "boolean",
+        "sample_data": true,
+        "original_field": {
+          "field_name": "show_legend",
+          "runtime_alias": "showLegend",
+          "description": "Whether to display a legend for the chart",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "legendType",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Legend type",
+        "data_type": "string",
+        "sample_data": "scroll",
+        "original_field": {
+          "field_name": "legendType",
+          "description": "Legend type",
+          "data_type": "string",
+          "enum_values": [
+            "scroll",
+            "plain"
+          ],
+          "sample_data": "scroll",
+          "required": false,
+          "embedding": "否",
+          "default_value": "scroll"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "legendOrientation",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Legend Orientation",
+        "data_type": "string",
+        "sample_data": "top",
+        "original_field": {
+          "field_name": "legendOrientation",
+          "description": "Legend Orientation",
+          "data_type": "string",
+          "enum_values": [
+            "top",
+            "bottom",
+            "left",
+            "right"
+          ],
+          "sample_data": "top",
+          "required": false,
+          "embedding": "否",
+          "default_value": "top"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "legendMargin",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Additional padding for legend.",
+        "data_type": "integer | null",
+        "sample_data": 12,
+        "original_field": {
+          "field_name": "legendMargin",
+          "description": "Additional padding for legend.",
+          "data_type": "integer | null",
+          "sample_data": 12,
+          "required": false,
+          "embedding": "否",
+          "default_value": null
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "max_bubble_size",
+        "runtime_alias": "maxBubbleSize",
+        "required": false,
+        "embedding": "否",
+        "description": "Max Bubble Size",
+        "data_type": "string",
+        "sample_data": "25",
+        "original_field": {
+          "field_name": "max_bubble_size",
+          "runtime_alias": "maxBubbleSize",
+          "description": "Max Bubble Size",
+          "data_type": "string",
+          "enum_values": [
+            "5",
+            "10",
+            "15",
+            "25",
+            "50",
+            "75",
+            "100"
+          ],
+          "sample_data": "25",
+          "required": false,
+          "embedding": "否",
+          "default_value": "25",
+          "notes": "这个字段在 controlPanel 中是 SelectControl，但 choice 值全是字符串，不是 number。transformProps.ts 会把它作为 normalizeSymbolSize() 的上限。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "tooltipSizeFormat",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Bubble size number format",
+        "data_type": "string",
+        "sample_data": "SMART_NUMBER",
+        "original_field": {
+          "field_name": "tooltipSizeFormat",
+          "description": "Bubble size number format",
+          "data_type": "string",
+          "enum_source": "D3_FORMAT_OPTIONS",
+          "sample_data": "SMART_NUMBER",
+          "required": false,
+          "embedding": "否",
+          "default_value": "SMART_NUMBER"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Chart Options",
+        "field_name": "opacity",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Opacity of bubbles, 0 means completely transparent, 1 means opaque",
+        "data_type": "number",
+        "sample_data": 0.6,
+        "original_field": {
+          "field_name": "opacity",
+          "description": "Opacity of bubbles, 0 means completely transparent, 1 means opaque",
+          "data_type": "number",
+          "enum_source": "SliderControl min=0 max=1 step=0.1",
+          "sample_data": 0.6,
+          "required": false,
+          "embedding": "否",
+          "default_value": 0.6
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "X Axis",
+        "field_name": "x_axis_label",
+        "runtime_alias": "xAxisLabel",
+        "required": false,
+        "embedding": "否",
+        "description": "X Axis Title",
+        "data_type": "string",
+        "sample_data": "Quantity Ordered",
+        "original_field": {
+          "field_name": "x_axis_label",
+          "runtime_alias": "xAxisLabel",
+          "description": "X Axis Title",
+          "data_type": "string",
+          "sample_data": "Quantity Ordered",
+          "required": false,
+          "embedding": "否",
+          "default_value": ""
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "X Axis",
+        "field_name": "xAxisLabelRotation",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Rotate x axis label",
+        "data_type": "integer | string",
+        "sample_data": 45,
+        "original_field": {
+          "field_name": "xAxisLabelRotation",
+          "description": "Rotate x axis label",
+          "data_type": "integer | string",
+          "enum_values": [
+            0,
+            45,
+            90
+          ],
+          "sample_data": 45,
+          "required": false,
+          "embedding": "否",
+          "default_value": 0,
+          "notes": "控件允许 freeForm，自定义角度时也可能出现非预设整数。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "X Axis",
+        "field_name": "xAxisLabelInterval",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Choose how many X-Axis labels to show",
+        "data_type": "string",
+        "sample_data": "auto",
+        "original_field": {
+          "field_name": "xAxisLabelInterval",
+          "description": "Choose how many X-Axis labels to show",
+          "data_type": "string",
+          "enum_values": [
+            "auto",
+            "0"
+          ],
+          "sample_data": "auto",
+          "required": false,
+          "embedding": "否",
+          "default_value": "auto"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "X Axis",
+        "field_name": "x_axis_title_margin",
+        "runtime_alias": "xAxisTitleMargin",
+        "required": false,
+        "embedding": "否",
+        "description": "X axis title margin",
+        "data_type": "integer | string",
+        "sample_data": 30,
+        "original_field": {
+          "field_name": "x_axis_title_margin",
+          "runtime_alias": "xAxisTitleMargin",
+          "description": "X axis title margin",
+          "data_type": "integer | string",
+          "enum_values": [
+            15,
+            30,
+            50,
+            75,
+            100,
+            125,
+            150,
+            200
+          ],
+          "sample_data": 30,
+          "required": false,
+          "embedding": "否",
+          "default_value": 30
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "X Axis",
+        "field_name": "xAxisFormat",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "X Axis Format",
+        "data_type": "string",
+        "sample_data": "SMART_NUMBER",
+        "original_field": {
+          "field_name": "xAxisFormat",
+          "description": "X Axis Format",
+          "data_type": "string",
+          "enum_source": "D3_FORMAT_OPTIONS",
+          "sample_data": "SMART_NUMBER",
+          "required": false,
+          "embedding": "否",
+          "default_value": "SMART_NUMBER"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "X Axis",
+        "field_name": "logXAxis",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Logarithmic x-axis",
+        "data_type": "boolean",
+        "sample_data": false,
+        "original_field": {
+          "field_name": "logXAxis",
+          "description": "Logarithmic x-axis",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": "源码缺陷：controlPanel 默认值取到 undefined；省略时运行时表现为线性轴",
+          "notes": "Bubble/constants.ts 把默认值误写成 logXAis，Bubble/controlPanel.tsx 又去解构 logAxis。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Y Axis",
+        "field_name": "y_axis_label",
+        "runtime_alias": "yAxisLabel",
+        "required": false,
+        "embedding": "否",
+        "description": "Y Axis Title",
+        "data_type": "string",
+        "sample_data": "Distinct Countries",
+        "original_field": {
+          "field_name": "y_axis_label",
+          "runtime_alias": "yAxisLabel",
+          "description": "Y Axis Title",
+          "data_type": "string",
+          "sample_data": "Distinct Countries",
+          "required": false,
+          "embedding": "否",
+          "default_value": ""
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Y Axis",
+        "field_name": "yAxisLabelRotation",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Rotate y axis label",
+        "data_type": "integer | string",
+        "sample_data": 45,
+        "original_field": {
+          "field_name": "yAxisLabelRotation",
+          "description": "Rotate y axis label",
+          "data_type": "integer | string",
+          "enum_values": [
+            0,
+            45
+          ],
+          "sample_data": 45,
+          "required": false,
+          "embedding": "否",
+          "default_value": 0,
+          "notes": "控件允许 freeForm，自定义角度时也可能出现非预设整数。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Y Axis",
+        "field_name": "y_axis_title_margin",
+        "runtime_alias": "yAxisTitleMargin",
+        "required": false,
+        "embedding": "否",
+        "description": "Y axis title margin",
+        "data_type": "integer | string",
+        "sample_data": 30,
+        "original_field": {
+          "field_name": "y_axis_title_margin",
+          "runtime_alias": "yAxisTitleMargin",
+          "description": "Y axis title margin",
+          "data_type": "integer | string",
+          "enum_values": [
+            15,
+            30,
+            50,
+            75,
+            100,
+            125,
+            150,
+            200
+          ],
+          "sample_data": 30,
+          "required": false,
+          "embedding": "否",
+          "default_value": 30
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Y Axis",
+        "field_name": "y_axis_format",
+        "runtime_alias": "yAxisFormat",
+        "required": false,
+        "embedding": "否",
+        "description": "Y Axis Format",
+        "data_type": "string",
+        "sample_data": "SMART_NUMBER",
+        "original_field": {
+          "field_name": "y_axis_format",
+          "runtime_alias": "yAxisFormat",
+          "description": "Y Axis Format",
+          "data_type": "string",
+          "enum_source": "D3_FORMAT_OPTIONS",
+          "sample_data": "SMART_NUMBER",
+          "required": false,
+          "embedding": "否",
+          "default_value": "SMART_NUMBER"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Y Axis",
+        "field_name": "logYAxis",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Logarithmic y-axis",
+        "data_type": "boolean",
+        "sample_data": false,
+        "original_field": {
+          "field_name": "logYAxis",
+          "description": "Logarithmic y-axis",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": "源码缺陷：controlPanel 默认值取到 undefined；transformProps 省略时仍按 false 合并",
+          "notes": "Bubble/constants.ts 中虽然存在 logYAxis=false，但 Bubble/controlPanel.tsx 实际拿的是不存在的 logAxis。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Y Axis",
+        "field_name": "truncateXAxis",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Truncate X Axis. Can be overridden by specifying a min or max bound. Only applicable for numerical X axis.",
+        "data_type": "boolean",
+        "sample_data": false,
+        "original_field": {
+          "field_name": "truncateXAxis",
+          "description": "Truncate X Axis. Can be overridden by specifying a min or max bound. Only applicable for numerical X axis.",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false,
+          "notes": "虽然逻辑上属于 X 轴，但 Bubble/controlPanel.tsx 把它放在 Y Axis section。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Y Axis",
+        "field_name": "xAxisBounds",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Bounds for numerical X axis. Not applicable for temporal or categorical axes. When left empty, the bounds are dynamically defined based on the min/max of the data. Note that this feature will only expand the axis range. It won't narrow the data's extent.",
+        "data_type": "array[number | null]",
+        "sample_data": [
+          0,
+          5000
+        ],
+        "original_field": {
+          "field_name": "xAxisBounds",
+          "description": "Bounds for numerical X axis. Not applicable for temporal or categorical axes. When left empty, the bounds are dynamically defined based on the min/max of the data. Note that this feature will only expand the axis range. It won't narrow the data's extent.",
+          "data_type": "array[number | null]",
+          "sample_data": [
+            0,
+            5000
+          ],
+          "required": false,
+          "embedding": "否",
+          "default_value": [
+            null,
+            null
+          ],
+          "notes": "只有 truncateXAxis=true 时才显示。control name 本身就是 camelCase。"
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Y Axis",
+        "field_name": "truncateYAxis",
+        "runtime_alias": null,
+        "required": false,
+        "embedding": "否",
+        "description": "Truncate Y Axis. Can be overridden by specifying a min or max bound.",
+        "data_type": "boolean",
+        "sample_data": false,
+        "original_field": {
+          "field_name": "truncateYAxis",
+          "description": "Truncate Y Axis. Can be overridden by specifying a min or max bound.",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false
+        }
+      },
+      {
+        "source_name": "control-schema",
+        "category": "Y Axis",
+        "field_name": "y_axis_bounds",
+        "runtime_alias": "yAxisBounds",
+        "required": false,
+        "embedding": "否",
+        "description": "Bounds for the Y-axis. When left empty, the bounds are dynamically defined based on the min/max of the data. Note that this feature will only expand the axis range. It won't narrow the data's extent.",
+        "data_type": "array[number | null]",
+        "sample_data": [
+          0,
+          100
+        ],
+        "original_field": {
+          "field_name": "y_axis_bounds",
+          "runtime_alias": "yAxisBounds",
+          "description": "Bounds for the Y-axis. When left empty, the bounds are dynamically defined based on the min/max of the data. Note that this feature will only expand the axis range. It won't narrow the data's extent.",
+          "data_type": "array[number | null]",
+          "sample_data": [
+            0,
+            100
+          ],
+          "required": false,
+          "embedding": "否",
+          "default_value": [
+            null,
+            null
+          ],
+          "notes": "只有 truncateYAxis=true 时才显示。注意它的 API 主键是 y_axis_bounds，不是 yAxisBounds。"
+        }
+      }
+    ],
+    "field_inventory": [
+      {
+        "field_name": "adhoc_filters",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "字段标签为 Filters。可用于普通筛选，也可通过 TEMPORAL_RANGE 表达时间过滤。"
+        ],
+        "data_types": [
+          "array[object]"
+        ],
+        "sample_data_examples": [
+          [
+            {
+              "clause": "WHERE",
+              "subject": "order_date",
+              "operator": "TEMPORAL_RANGE",
+              "comparator": "No filter",
+              "expressionType": "SIMPLE"
+            }
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "adhoc_filters",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "extra_form_data.append",
+            "description": "字段标签为 Filters。可用于普通筛选，也可通过 TEMPORAL_RANGE 表达时间过滤。",
+            "data_type": "array[object]",
+            "sample_data": [
+              {
+                "clause": "WHERE",
+                "subject": "order_date",
+                "operator": "TEMPORAL_RANGE",
+                "comparator": "No filter",
+                "expressionType": "SIMPLE"
+              }
+            ],
+            "original_field": {
+              "field_name": "adhoc_filters",
+              "description": "字段标签为 Filters。可用于普通筛选，也可通过 TEMPORAL_RANGE 表达时间过滤。",
+              "data_type": "array[object]",
+              "enum_source": "dataset columns + saved metrics + 当前 x/y/size 指标",
+              "sample_data": [
+                {
+                  "clause": "WHERE",
+                  "subject": "order_date",
+                  "operator": "TEMPORAL_RANGE",
+                  "comparator": "No filter",
+                  "expressionType": "SIMPLE"
+                }
+              ],
+              "required": false,
+              "embedding": "extra_form_data.append",
+              "default_value": []
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "color_scheme",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [
+          "colorScheme"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "The color scheme for rendering chart"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "supersetColors"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "color_scheme",
+            "runtime_alias": "colorScheme",
+            "required": false,
+            "embedding": "否",
+            "description": "The color scheme for rendering chart",
+            "data_type": "string",
+            "sample_data": "supersetColors",
+            "original_field": {
+              "field_name": "color_scheme",
+              "runtime_alias": "colorScheme",
+              "description": "The color scheme for rendering chart",
+              "data_type": "string",
+              "enum_source": "categoricalSchemeRegistry.keys()",
+              "sample_data": "supersetColors",
+              "required": false,
+              "embedding": "否",
+              "default_value": "categoricalSchemeRegistry.getDefaultKey()",
+              "notes": "sharedControls.color_scheme 的默认值来自 categoricalSchemeRegistry.getDefaultKey()。官方 Bubble 示例保存态使用的是 supersetColors。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "entity",
+        "required": true,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "This defines the element to be plotted on the chart"
+        ],
+        "data_types": [
+          "string | object"
+        ],
+        "sample_data_examples": [
+          "deal_size"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "entity",
+            "runtime_alias": null,
+            "required": true,
+            "embedding": "否",
+            "description": "This defines the element to be plotted on the chart",
+            "data_type": "string | object",
+            "sample_data": "deal_size",
+            "original_field": {
+              "field_name": "entity",
+              "description": "This defines the element to be plotted on the chart",
+              "data_type": "string | object",
+              "enum_source": "datasource columns",
+              "sample_data": "deal_size",
+              "required": true,
+              "embedding": "否",
+              "default_value": null,
+              "notes": "dndEntityControl 带 validateNonEmpty 校验，是 Bubble 唯一强制的维度字段。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "legendMargin",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Additional padding for legend."
+        ],
+        "data_types": [
+          "integer | null"
+        ],
+        "sample_data_examples": [
+          12
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "legendMargin",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Additional padding for legend.",
+            "data_type": "integer | null",
+            "sample_data": 12,
+            "original_field": {
+              "field_name": "legendMargin",
+              "description": "Additional padding for legend.",
+              "data_type": "integer | null",
+              "sample_data": 12,
+              "required": false,
+              "embedding": "否",
+              "default_value": null
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "legendOrientation",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Legend Orientation"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "top"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "legendOrientation",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Legend Orientation",
+            "data_type": "string",
+            "sample_data": "top",
+            "original_field": {
+              "field_name": "legendOrientation",
+              "description": "Legend Orientation",
+              "data_type": "string",
+              "enum_values": [
+                "top",
+                "bottom",
+                "left",
+                "right"
+              ],
+              "sample_data": "top",
+              "required": false,
+              "embedding": "否",
+              "default_value": "top"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "legendType",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Legend type"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "scroll"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "legendType",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Legend type",
+            "data_type": "string",
+            "sample_data": "scroll",
+            "original_field": {
+              "field_name": "legendType",
+              "description": "Legend type",
+              "data_type": "string",
+              "enum_values": [
+                "scroll",
+                "plain"
+              ],
+              "sample_data": "scroll",
+              "required": false,
+              "embedding": "否",
+              "default_value": "scroll"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "logXAxis",
+        "required": false,
+        "categories": [
+          "X Axis"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Logarithmic x-axis"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          false
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "X Axis",
+            "field_name": "logXAxis",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Logarithmic x-axis",
+            "data_type": "boolean",
+            "sample_data": false,
+            "original_field": {
+              "field_name": "logXAxis",
+              "description": "Logarithmic x-axis",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": false,
+              "required": false,
+              "embedding": "否",
+              "default_value": "源码缺陷：controlPanel 默认值取到 undefined；省略时运行时表现为线性轴",
+              "notes": "Bubble/constants.ts 把默认值误写成 logXAis，Bubble/controlPanel.tsx 又去解构 logAxis。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "logYAxis",
+        "required": false,
+        "categories": [
+          "Y Axis"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Logarithmic y-axis"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          false
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Y Axis",
+            "field_name": "logYAxis",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Logarithmic y-axis",
+            "data_type": "boolean",
+            "sample_data": false,
+            "original_field": {
+              "field_name": "logYAxis",
+              "description": "Logarithmic y-axis",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": false,
+              "required": false,
+              "embedding": "否",
+              "default_value": "源码缺陷：controlPanel 默认值取到 undefined；transformProps 省略时仍按 false 合并",
+              "notes": "Bubble/constants.ts 中虽然存在 logYAxis=false，但 Bubble/controlPanel.tsx 实际拿的是不存在的 logAxis。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "max_bubble_size",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [
+          "maxBubbleSize"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Max Bubble Size"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "25"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "max_bubble_size",
+            "runtime_alias": "maxBubbleSize",
+            "required": false,
+            "embedding": "否",
+            "description": "Max Bubble Size",
+            "data_type": "string",
+            "sample_data": "25",
+            "original_field": {
+              "field_name": "max_bubble_size",
+              "runtime_alias": "maxBubbleSize",
+              "description": "Max Bubble Size",
+              "data_type": "string",
+              "enum_values": [
+                "5",
+                "10",
+                "15",
+                "25",
+                "50",
+                "75",
+                "100"
+              ],
+              "sample_data": "25",
+              "required": false,
+              "embedding": "否",
+              "default_value": "25",
+              "notes": "这个字段在 controlPanel 中是 SelectControl，但 choice 值全是字符串，不是 number。transformProps.ts 会把它作为 normalizeSymbolSize() 的上限。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "opacity",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Opacity of bubbles, 0 means completely transparent, 1 means opaque"
+        ],
+        "data_types": [
+          "number"
+        ],
+        "sample_data_examples": [
+          0.6
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "opacity",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Opacity of bubbles, 0 means completely transparent, 1 means opaque",
+            "data_type": "number",
+            "sample_data": 0.6,
+            "original_field": {
+              "field_name": "opacity",
+              "description": "Opacity of bubbles, 0 means completely transparent, 1 means opaque",
+              "data_type": "number",
+              "enum_source": "SliderControl min=0 max=1 step=0.1",
+              "sample_data": 0.6,
+              "required": false,
+              "embedding": "否",
+              "default_value": 0.6
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "order_desc",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [
+          "orderDesc"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "If enabled, this control sorts the results/values descending, otherwise it sorts the results ascending."
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          true
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "order_desc",
+            "runtime_alias": "orderDesc",
+            "required": false,
+            "embedding": "否",
+            "description": "If enabled, this control sorts the results/values descending, otherwise it sorts the results ascending.",
+            "data_type": "boolean",
+            "sample_data": true,
+            "original_field": {
+              "field_name": "order_desc",
+              "runtime_alias": "orderDesc",
+              "description": "If enabled, this control sorts the results/values descending, otherwise it sorts the results ascending.",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": true,
+              "required": false,
+              "embedding": "否",
+              "default_value": true,
+              "notes": "sharedControls.order_desc 的默认值是 true；Bubble/controlPanel.tsx 只在 orderby 有值时显示它。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "orderby",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Orders the query result that generates the source data for this chart. If a series or row limit is reached, this determines what data are truncated. If undefined, defaults to the first metric (where appropriate)."
+        ],
+        "data_types": [
+          "string | object | null"
+        ],
+        "sample_data_examples": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "quantity_ordered"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(quantity_ordered)"
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "orderby",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Orders the query result that generates the source data for this chart. If a series or row limit is reached, this determines what data are truncated. If undefined, defaults to the first metric (where appropriate).",
+            "data_type": "string | object | null",
+            "sample_data": {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "quantity_ordered"
+              },
+              "aggregate": "SUM",
+              "label": "SUM(quantity_ordered)"
+            },
+            "original_field": {
+              "field_name": "orderby",
+              "description": "Orders the query result that generates the source data for this chart. If a series or row limit is reached, this determines what data are truncated. If undefined, defaults to the first metric (where appropriate).",
+              "data_type": "string | object | null",
+              "enum_source": "saved metrics + adhoc metrics",
+              "sample_data": {
+                "expressionType": "SIMPLE",
+                "column": {
+                  "column_name": "quantity_ordered"
+                },
+                "aggregate": "SUM",
+                "label": "SUM(quantity_ordered)"
+              },
+              "required": false,
+              "embedding": "否",
+              "default_value": null,
+              "notes": "Bubble/buildQuery.ts 会把 query.orderby 重写成二维数组，并结合 order_desc 反转排序方向。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "row_limit",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [
+          "rowLimit"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Limits the number of the rows that are computed in the query that is the source of the data used for this chart."
+        ],
+        "data_types": [
+          "integer"
+        ],
+        "sample_data_examples": [
+          10000
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "row_limit",
+            "runtime_alias": "rowLimit",
+            "required": false,
+            "embedding": "否",
+            "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+            "data_type": "integer",
+            "sample_data": 10000,
+            "original_field": {
+              "field_name": "row_limit",
+              "runtime_alias": "rowLimit",
+              "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+              "data_type": "integer",
+              "enum_values": [
+                10,
+                50,
+                100,
+                250,
+                500,
+                1000,
+                5000,
+                10000,
+                50000
+              ],
+              "sample_data": 10000,
+              "required": false,
+              "embedding": "否",
+              "default_value": 10000
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "series",
+        "required": false,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Defines the grouping of entities. Each series is represented by a specific color in the chart."
+        ],
+        "data_types": [
+          "string | object | null"
+        ],
+        "sample_data_examples": [
+          "product_line"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "series",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Defines the grouping of entities. Each series is represented by a specific color in the chart.",
+            "data_type": "string | object | null",
+            "sample_data": "product_line",
+            "original_field": {
+              "field_name": "series",
+              "description": "Defines the grouping of entities. Each series is represented by a specific color in the chart.",
+              "data_type": "string | object | null",
+              "enum_source": "datasource columns",
+              "sample_data": "product_line",
+              "required": false,
+              "embedding": "否",
+              "default_value": null,
+              "notes": "dndSeriesControl 是单选 Dimension。Bubble/buildQuery.ts 会把它追加进 query.columns。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "show_legend",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [
+          "showLegend"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Whether to display a legend for the chart"
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          true
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "show_legend",
+            "runtime_alias": "showLegend",
+            "required": false,
+            "embedding": "否",
+            "description": "Whether to display a legend for the chart",
+            "data_type": "boolean",
+            "sample_data": true,
+            "original_field": {
+              "field_name": "show_legend",
+              "runtime_alias": "showLegend",
+              "description": "Whether to display a legend for the chart",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": true,
+              "required": false,
+              "embedding": "否",
+              "default_value": true
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "size",
+        "required": true,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Metric used to calculate bubble size"
+        ],
+        "data_types": [
+          "string | object"
+        ],
+        "sample_data_examples": [
+          "count"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "size",
+            "runtime_alias": null,
+            "required": true,
+            "embedding": "否",
+            "description": "Metric used to calculate bubble size",
+            "data_type": "string | object",
+            "sample_data": "count",
+            "original_field": {
+              "field_name": "size",
+              "description": "Metric used to calculate bubble size",
+              "data_type": "string | object",
+              "enum_source": "saved metrics + adhoc metrics",
+              "sample_data": "count",
+              "required": true,
+              "embedding": "否",
+              "default_value": null,
+              "notes": "extractQueryFields.ts 会把 size 视作 metrics。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "tooltipSizeFormat",
+        "required": false,
+        "categories": [
+          "Chart Options"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Bubble size number format"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "SMART_NUMBER"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Chart Options",
+            "field_name": "tooltipSizeFormat",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Bubble size number format",
+            "data_type": "string",
+            "sample_data": "SMART_NUMBER",
+            "original_field": {
+              "field_name": "tooltipSizeFormat",
+              "description": "Bubble size number format",
+              "data_type": "string",
+              "enum_source": "D3_FORMAT_OPTIONS",
+              "sample_data": "SMART_NUMBER",
+              "required": false,
+              "embedding": "否",
+              "default_value": "SMART_NUMBER"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "truncateXAxis",
+        "required": false,
+        "categories": [
+          "Y Axis"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Truncate X Axis. Can be overridden by specifying a min or max bound. Only applicable for numerical X axis."
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          false
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Y Axis",
+            "field_name": "truncateXAxis",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Truncate X Axis. Can be overridden by specifying a min or max bound. Only applicable for numerical X axis.",
+            "data_type": "boolean",
+            "sample_data": false,
+            "original_field": {
+              "field_name": "truncateXAxis",
+              "description": "Truncate X Axis. Can be overridden by specifying a min or max bound. Only applicable for numerical X axis.",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": false,
+              "required": false,
+              "embedding": "否",
+              "default_value": false,
+              "notes": "虽然逻辑上属于 X 轴，但 Bubble/controlPanel.tsx 把它放在 Y Axis section。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "truncateYAxis",
+        "required": false,
+        "categories": [
+          "Y Axis"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Truncate Y Axis. Can be overridden by specifying a min or max bound."
+        ],
+        "data_types": [
+          "boolean"
+        ],
+        "sample_data_examples": [
+          false
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Y Axis",
+            "field_name": "truncateYAxis",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Truncate Y Axis. Can be overridden by specifying a min or max bound.",
+            "data_type": "boolean",
+            "sample_data": false,
+            "original_field": {
+              "field_name": "truncateYAxis",
+              "description": "Truncate Y Axis. Can be overridden by specifying a min or max bound.",
+              "data_type": "boolean",
+              "enum_values": [
+                true,
+                false
+              ],
+              "sample_data": false,
+              "required": false,
+              "embedding": "否",
+              "default_value": false
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "x",
+        "required": true,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "The dataset column/metric that returns the values on your chart's x-axis."
+        ],
+        "data_types": [
+          "string | object"
+        ],
+        "sample_data_examples": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "quantity_ordered"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(quantity_ordered)"
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "x",
+            "runtime_alias": null,
+            "required": true,
+            "embedding": "否",
+            "description": "The dataset column/metric that returns the values on your chart's x-axis.",
+            "data_type": "string | object",
+            "sample_data": {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "quantity_ordered"
+              },
+              "aggregate": "SUM",
+              "label": "SUM(quantity_ordered)"
+            },
+            "original_field": {
+              "field_name": "x",
+              "description": "The dataset column/metric that returns the values on your chart's x-axis.",
+              "data_type": "string | object",
+              "enum_source": "saved metrics + adhoc metrics",
+              "sample_data": {
+                "expressionType": "SIMPLE",
+                "column": {
+                  "column_name": "quantity_ordered"
+                },
+                "aggregate": "SUM",
+                "label": "SUM(quantity_ordered)"
+              },
+              "required": true,
+              "embedding": "否",
+              "default_value": null,
+              "notes": "extractQueryFields.ts 会把 x 视作 metrics。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "xAxisBounds",
+        "required": false,
+        "categories": [
+          "Y Axis"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Bounds for numerical X axis. Not applicable for temporal or categorical axes. When left empty, the bounds are dynamically defined based on the min/max of the data. Note that this feature will only expand the axis range. It won't narrow the data's extent."
+        ],
+        "data_types": [
+          "array[number | null]"
+        ],
+        "sample_data_examples": [
+          [
+            0,
+            5000
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Y Axis",
+            "field_name": "xAxisBounds",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Bounds for numerical X axis. Not applicable for temporal or categorical axes. When left empty, the bounds are dynamically defined based on the min/max of the data. Note that this feature will only expand the axis range. It won't narrow the data's extent.",
+            "data_type": "array[number | null]",
+            "sample_data": [
+              0,
+              5000
+            ],
+            "original_field": {
+              "field_name": "xAxisBounds",
+              "description": "Bounds for numerical X axis. Not applicable for temporal or categorical axes. When left empty, the bounds are dynamically defined based on the min/max of the data. Note that this feature will only expand the axis range. It won't narrow the data's extent.",
+              "data_type": "array[number | null]",
+              "sample_data": [
+                0,
+                5000
+              ],
+              "required": false,
+              "embedding": "否",
+              "default_value": [
+                null,
+                null
+              ],
+              "notes": "只有 truncateXAxis=true 时才显示。control name 本身就是 camelCase。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "xAxisFormat",
+        "required": false,
+        "categories": [
+          "X Axis"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "X Axis Format"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "SMART_NUMBER"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "X Axis",
+            "field_name": "xAxisFormat",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "X Axis Format",
+            "data_type": "string",
+            "sample_data": "SMART_NUMBER",
+            "original_field": {
+              "field_name": "xAxisFormat",
+              "description": "X Axis Format",
+              "data_type": "string",
+              "enum_source": "D3_FORMAT_OPTIONS",
+              "sample_data": "SMART_NUMBER",
+              "required": false,
+              "embedding": "否",
+              "default_value": "SMART_NUMBER"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "xAxisLabelInterval",
+        "required": false,
+        "categories": [
+          "X Axis"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Choose how many X-Axis labels to show"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "auto"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "X Axis",
+            "field_name": "xAxisLabelInterval",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Choose how many X-Axis labels to show",
+            "data_type": "string",
+            "sample_data": "auto",
+            "original_field": {
+              "field_name": "xAxisLabelInterval",
+              "description": "Choose how many X-Axis labels to show",
+              "data_type": "string",
+              "enum_values": [
+                "auto",
+                "0"
+              ],
+              "sample_data": "auto",
+              "required": false,
+              "embedding": "否",
+              "default_value": "auto"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "xAxisLabelRotation",
+        "required": false,
+        "categories": [
+          "X Axis"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Rotate x axis label"
+        ],
+        "data_types": [
+          "integer | string"
+        ],
+        "sample_data_examples": [
+          45
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "X Axis",
+            "field_name": "xAxisLabelRotation",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Rotate x axis label",
+            "data_type": "integer | string",
+            "sample_data": 45,
+            "original_field": {
+              "field_name": "xAxisLabelRotation",
+              "description": "Rotate x axis label",
+              "data_type": "integer | string",
+              "enum_values": [
+                0,
+                45,
+                90
+              ],
+              "sample_data": 45,
+              "required": false,
+              "embedding": "否",
+              "default_value": 0,
+              "notes": "控件允许 freeForm，自定义角度时也可能出现非预设整数。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "x_axis_label",
+        "required": false,
+        "categories": [
+          "X Axis"
+        ],
+        "runtime_aliases": [
+          "xAxisLabel"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "X Axis Title"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "Quantity Ordered"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "X Axis",
+            "field_name": "x_axis_label",
+            "runtime_alias": "xAxisLabel",
+            "required": false,
+            "embedding": "否",
+            "description": "X Axis Title",
+            "data_type": "string",
+            "sample_data": "Quantity Ordered",
+            "original_field": {
+              "field_name": "x_axis_label",
+              "runtime_alias": "xAxisLabel",
+              "description": "X Axis Title",
+              "data_type": "string",
+              "sample_data": "Quantity Ordered",
+              "required": false,
+              "embedding": "否",
+              "default_value": ""
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "x_axis_title_margin",
+        "required": false,
+        "categories": [
+          "X Axis"
+        ],
+        "runtime_aliases": [
+          "xAxisTitleMargin"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "X axis title margin"
+        ],
+        "data_types": [
+          "integer | string"
+        ],
+        "sample_data_examples": [
+          30
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "X Axis",
+            "field_name": "x_axis_title_margin",
+            "runtime_alias": "xAxisTitleMargin",
+            "required": false,
+            "embedding": "否",
+            "description": "X axis title margin",
+            "data_type": "integer | string",
+            "sample_data": 30,
+            "original_field": {
+              "field_name": "x_axis_title_margin",
+              "runtime_alias": "xAxisTitleMargin",
+              "description": "X axis title margin",
+              "data_type": "integer | string",
+              "enum_values": [
+                15,
+                30,
+                50,
+                75,
+                100,
+                125,
+                150,
+                200
+              ],
+              "sample_data": 30,
+              "required": false,
+              "embedding": "否",
+              "default_value": 30
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "y",
+        "required": true,
+        "categories": [
+          "Query"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "The dataset column/metric that returns the values on your chart's y-axis."
+        ],
+        "data_types": [
+          "string | object"
+        ],
+        "sample_data_examples": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "country"
+            },
+            "aggregate": "COUNT_DISTINCT",
+            "label": "COUNT_DISTINCT(country)"
+          }
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Query",
+            "field_name": "y",
+            "runtime_alias": null,
+            "required": true,
+            "embedding": "否",
+            "description": "The dataset column/metric that returns the values on your chart's y-axis.",
+            "data_type": "string | object",
+            "sample_data": {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "country"
+              },
+              "aggregate": "COUNT_DISTINCT",
+              "label": "COUNT_DISTINCT(country)"
+            },
+            "original_field": {
+              "field_name": "y",
+              "description": "The dataset column/metric that returns the values on your chart's y-axis.",
+              "data_type": "string | object",
+              "enum_source": "saved metrics + adhoc metrics",
+              "sample_data": {
+                "expressionType": "SIMPLE",
+                "column": {
+                  "column_name": "country"
+                },
+                "aggregate": "COUNT_DISTINCT",
+                "label": "COUNT_DISTINCT(country)"
+              },
+              "required": true,
+              "embedding": "否",
+              "default_value": null,
+              "notes": "extractQueryFields.ts 会把 y 视作 metrics。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "yAxisLabelRotation",
+        "required": false,
+        "categories": [
+          "Y Axis"
+        ],
+        "runtime_aliases": [],
+        "embedding_modes": [],
+        "descriptions": [
+          "Rotate y axis label"
+        ],
+        "data_types": [
+          "integer | string"
+        ],
+        "sample_data_examples": [
+          45
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Y Axis",
+            "field_name": "yAxisLabelRotation",
+            "runtime_alias": null,
+            "required": false,
+            "embedding": "否",
+            "description": "Rotate y axis label",
+            "data_type": "integer | string",
+            "sample_data": 45,
+            "original_field": {
+              "field_name": "yAxisLabelRotation",
+              "description": "Rotate y axis label",
+              "data_type": "integer | string",
+              "enum_values": [
+                0,
+                45
+              ],
+              "sample_data": 45,
+              "required": false,
+              "embedding": "否",
+              "default_value": 0,
+              "notes": "控件允许 freeForm，自定义角度时也可能出现非预设整数。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "y_axis_bounds",
+        "required": false,
+        "categories": [
+          "Y Axis"
+        ],
+        "runtime_aliases": [
+          "yAxisBounds"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Bounds for the Y-axis. When left empty, the bounds are dynamically defined based on the min/max of the data. Note that this feature will only expand the axis range. It won't narrow the data's extent."
+        ],
+        "data_types": [
+          "array[number | null]"
+        ],
+        "sample_data_examples": [
+          [
+            0,
+            100
+          ]
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Y Axis",
+            "field_name": "y_axis_bounds",
+            "runtime_alias": "yAxisBounds",
+            "required": false,
+            "embedding": "否",
+            "description": "Bounds for the Y-axis. When left empty, the bounds are dynamically defined based on the min/max of the data. Note that this feature will only expand the axis range. It won't narrow the data's extent.",
+            "data_type": "array[number | null]",
+            "sample_data": [
+              0,
+              100
+            ],
+            "original_field": {
+              "field_name": "y_axis_bounds",
+              "runtime_alias": "yAxisBounds",
+              "description": "Bounds for the Y-axis. When left empty, the bounds are dynamically defined based on the min/max of the data. Note that this feature will only expand the axis range. It won't narrow the data's extent.",
+              "data_type": "array[number | null]",
+              "sample_data": [
+                0,
+                100
+              ],
+              "required": false,
+              "embedding": "否",
+              "default_value": [
+                null,
+                null
+              ],
+              "notes": "只有 truncateYAxis=true 时才显示。注意它的 API 主键是 y_axis_bounds，不是 yAxisBounds。"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "y_axis_format",
+        "required": false,
+        "categories": [
+          "Y Axis"
+        ],
+        "runtime_aliases": [
+          "yAxisFormat"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Y Axis Format"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "SMART_NUMBER"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Y Axis",
+            "field_name": "y_axis_format",
+            "runtime_alias": "yAxisFormat",
+            "required": false,
+            "embedding": "否",
+            "description": "Y Axis Format",
+            "data_type": "string",
+            "sample_data": "SMART_NUMBER",
+            "original_field": {
+              "field_name": "y_axis_format",
+              "runtime_alias": "yAxisFormat",
+              "description": "Y Axis Format",
+              "data_type": "string",
+              "enum_source": "D3_FORMAT_OPTIONS",
+              "sample_data": "SMART_NUMBER",
+              "required": false,
+              "embedding": "否",
+              "default_value": "SMART_NUMBER"
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "y_axis_label",
+        "required": false,
+        "categories": [
+          "Y Axis"
+        ],
+        "runtime_aliases": [
+          "yAxisLabel"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Y Axis Title"
+        ],
+        "data_types": [
+          "string"
+        ],
+        "sample_data_examples": [
+          "Distinct Countries"
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Y Axis",
+            "field_name": "y_axis_label",
+            "runtime_alias": "yAxisLabel",
+            "required": false,
+            "embedding": "否",
+            "description": "Y Axis Title",
+            "data_type": "string",
+            "sample_data": "Distinct Countries",
+            "original_field": {
+              "field_name": "y_axis_label",
+              "runtime_alias": "yAxisLabel",
+              "description": "Y Axis Title",
+              "data_type": "string",
+              "sample_data": "Distinct Countries",
+              "required": false,
+              "embedding": "否",
+              "default_value": ""
+            }
+          }
+        ]
+      },
+      {
+        "field_name": "y_axis_title_margin",
+        "required": false,
+        "categories": [
+          "Y Axis"
+        ],
+        "runtime_aliases": [
+          "yAxisTitleMargin"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Y axis title margin"
+        ],
+        "data_types": [
+          "integer | string"
+        ],
+        "sample_data_examples": [
+          30
+        ],
+        "occurrences": [
+          {
+            "source_name": "control-schema",
+            "category": "Y Axis",
+            "field_name": "y_axis_title_margin",
+            "runtime_alias": "yAxisTitleMargin",
+            "required": false,
+            "embedding": "否",
+            "description": "Y axis title margin",
+            "data_type": "integer | string",
+            "sample_data": 30,
+            "original_field": {
+              "field_name": "y_axis_title_margin",
+              "runtime_alias": "yAxisTitleMargin",
+              "description": "Y axis title margin",
+              "data_type": "integer | string",
+              "enum_values": [
+                15,
+                30,
+                50,
+                75,
+                100,
+                125,
+                150,
+                200
+              ],
+              "sample_data": 30,
+              "required": false,
+              "embedding": "否",
+              "default_value": 30
+            }
+          }
+        ]
+      }
+    ],
+    "required_field_names": [
+      "entity",
+      "size",
+      "x",
+      "y"
+    ],
+    "embedding_enabled_field_names": [
+      "adhoc_filters"
+    ],
+    "runtime_alias_index": {
+      "color_scheme": [
+        "colorScheme"
+      ],
+      "max_bubble_size": [
+        "maxBubbleSize"
+      ],
+      "order_desc": [
+        "orderDesc"
+      ],
+      "row_limit": [
+        "rowLimit"
+      ],
+      "show_legend": [
+        "showLegend"
+      ],
+      "x_axis_label": [
+        "xAxisLabel"
+      ],
+      "x_axis_title_margin": [
+        "xAxisTitleMargin"
+      ],
+      "y_axis_bounds": [
+        "yAxisBounds"
+      ],
+      "y_axis_format": [
+        "yAxisFormat"
+      ],
+      "y_axis_label": [
+        "yAxisLabel"
+      ],
+      "y_axis_title_margin": [
+        "yAxisTitleMargin"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "bubble_v2",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/bubble_v2-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/bubble_v2-form-data-schema.json",
+      "control-schema": "form-data-schema/bubble_v2-schema.json"
+    }
+  },
+  "fallback_online_field_categories": {
+    "Query": [],
+    "Advanced analytics": [],
+    "Annotations & Layers": [],
+    "Predictive Analytics（Forecast）": [],
+    "Chart Options": [],
+    "Chart Title": [],
+    "图表专属": [],
+    "通用图表选项": []
+  },
+  "original_control_schema": {
+    "viz_type": "bubble_v2",
+    "display_name": "Bubble Chart",
+    "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Bubble/controlPanel.tsx",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Bubble/controlPanel.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Bubble/index.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Bubble/buildQuery.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Bubble/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Bubble/types.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Bubble/constants.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/test/Bubble/buildQuery.test.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/test/Bubble/transformProps.test.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/controls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/constants.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/defaults.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryContext.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryObject.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractQueryFields.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/models/ChartProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+      "D:/vsx/sources/superset-6.0.0/superset/migrations/shared/migrate_viz/processors.py",
+      "D:/vsx/sources/superset-6.0.0/superset/examples/configs/charts/Featured Charts/Bubble.yaml"
+    ],
+    "notes": [
+      "Bubble 插件源码目录是 plugin-chart-echarts/src/Bubble，metadata.name 明确写的是 Bubble Chart，metadata.description 说明该图通过 X 轴、Y 轴和 bubble size 三个维度展示数据，并可用颜色区分分组。",
+      "Superset 6.0.0 的正式 viz_type 是 bubble_v2。superset-ui-core/src/chart/types/VizType.ts 把 Bubble 注册成 bubble_v2，examples/configs/charts/Featured Charts/Bubble.yaml 也使用 bubble_v2；Bubble 单测里残留的 echarts_bubble 只是旧测试值，不应作为新模板主键名。",
+      "Bubble 没有单独的 formDataOverrides。最终 form_data 直接来自 getFormDataFromControls()，即 control name 原样写入 form_data。",
+      "x / y / size 并不是直接叫 metrics 的控件，但 extractQueryFields.ts 里把 x、y、size 预定义映射到 metrics；Bubble/buildQuery.test.ts 也明确断言 query.metrics = [x, y, size]。",
+      "entity 和 series 在 shared controls 体系里属于列类字段；Bubble/buildQuery.ts 又显式把 query.columns 覆盖为 [entity, series]，因此 Bubble 的查询主轴是 entity，series 仅用于颜色分组。",
+      "Bubble/controlPanel.tsx 对 log 轴默认值存在源码缺陷：它从 DEFAULT_FORM_DATA 解构的是 logAxis，但 Bubble/constants.ts 实际导出的是 logXAis 和 logYAxis。结果 controlPanel 层的 logXAxis / logYAxis 默认值都拿到 undefined；运行时 transformProps 省略时仍会按线性轴工作。",
+      "Bubble/types.ts 里写了 yAXisFormat 这个拼写错误，但 transformProps.ts 真实读取的是 ChartProps 转 camelCase 后的 yAxisFormat，对应的 API form_data 主键仍然是 y_axis_format。"
+    ],
+    "legacy_compatibility": {
+      "official_viz_type": "bubble_v2",
+      "legacy_test_only_viz_type": "echarts_bubble",
+      "legacy_migration": {
+        "source_viz_type": "bubble",
+        "target_viz_type": "bubble_v2",
+        "notes": "migrations/shared/migrate_viz/processors.py 中的 MigrateBubbleChart 会把老的 bubble 迁移到 bubble_v2，并重命名一批旧字段。"
+      }
+    },
+    "control_overrides": {
+      "order_desc": {
+        "based_on": "sharedControls.order_desc",
+        "override": "只有 orderby 有值时才显示",
+        "source": "Bubble/controlPanel.tsx"
+      },
+      "tooltipSizeFormat": {
+        "based_on": "sharedControls.y_axis_format",
+        "override": "label 改成 Bubble size number format",
+        "source": "Bubble/controlPanel.tsx"
+      },
+      "xAxisFormat": {
+        "based_on": "sharedControls.y_axis_format",
+        "override": "label 改成 X Axis Format",
+        "source": "Bubble/controlPanel.tsx"
+      },
+      "legend_fields": {
+        "based_on": "plugin-chart-echarts/src/controls.tsx legendSection",
+        "defaults": {
+          "show_legend": true,
+          "legendType": "scroll",
+          "legendOrientation": "top",
+          "legendMargin": null
+        }
+      },
+      "log_axis_defaults": {
+        "issue": "Bubble/controlPanel.tsx 解构的是 logAxis，但 Bubble/constants.ts 没有这个键",
+        "effective_behavior": "省略 logXAxis / logYAxis 时，transformProps 会按线性轴工作"
+      }
+    },
+    "query_compilation": {
+      "query_metrics": "buildQueryContext() 先调用 buildQueryObject()；buildQueryObject() 再调用 extractQueryFields()。extractQueryFields() 的预定义别名里包含 x -> metrics、y -> metrics、size -> metrics，所以最终 query.metrics 来自 x / y / size。",
+      "query_columns": "Bubble/buildQuery.ts 先取 ensureIsArray(formData.entity) + ensureIsArray(formData.series)，再把这个数组直接覆写到 query.columns。",
+      "query_orderby": "orderby 先由 buildQueryObject() 提取；Bubble/buildQuery.ts 再把它包装成 [[baseQueryObject.orderby[0], !baseQueryObject.order_desc]]。因此 root form_data 的 order_desc=true 会对应 query.orderby 的 descending=false。"
+    },
+    "field_categories": {
+      "Query": [
+        {
+          "field_name": "series",
+          "description": "Defines the grouping of entities. Each series is represented by a specific color in the chart.",
+          "data_type": "string | object | null",
+          "enum_source": "datasource columns",
+          "sample_data": "product_line",
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "dndSeriesControl 是单选 Dimension。Bubble/buildQuery.ts 会把它追加进 query.columns。"
+        },
+        {
+          "field_name": "entity",
+          "description": "This defines the element to be plotted on the chart",
+          "data_type": "string | object",
+          "enum_source": "datasource columns",
+          "sample_data": "deal_size",
+          "required": true,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "dndEntityControl 带 validateNonEmpty 校验，是 Bubble 唯一强制的维度字段。"
+        },
+        {
+          "field_name": "x",
+          "description": "The dataset column/metric that returns the values on your chart's x-axis.",
+          "data_type": "string | object",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "quantity_ordered"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(quantity_ordered)"
+          },
+          "required": true,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "extractQueryFields.ts 会把 x 视作 metrics。"
+        },
+        {
+          "field_name": "y",
+          "description": "The dataset column/metric that returns the values on your chart's y-axis.",
+          "data_type": "string | object",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "country"
+            },
+            "aggregate": "COUNT_DISTINCT",
+            "label": "COUNT_DISTINCT(country)"
+          },
+          "required": true,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "extractQueryFields.ts 会把 y 视作 metrics。"
+        },
+        {
+          "field_name": "adhoc_filters",
+          "description": "字段标签为 Filters。可用于普通筛选，也可通过 TEMPORAL_RANGE 表达时间过滤。",
+          "data_type": "array[object]",
+          "enum_source": "dataset columns + saved metrics + 当前 x/y/size 指标",
+          "sample_data": [
+            {
+              "clause": "WHERE",
+              "subject": "order_date",
+              "operator": "TEMPORAL_RANGE",
+              "comparator": "No filter",
+              "expressionType": "SIMPLE"
+            }
+          ],
+          "required": false,
+          "embedding": "extra_form_data.append",
+          "default_value": []
+        },
+        {
+          "field_name": "size",
+          "description": "Metric used to calculate bubble size",
+          "data_type": "string | object",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": "count",
+          "required": true,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "extractQueryFields.ts 会把 size 视作 metrics。"
+        },
+        {
+          "field_name": "orderby",
+          "description": "Orders the query result that generates the source data for this chart. If a series or row limit is reached, this determines what data are truncated. If undefined, defaults to the first metric (where appropriate).",
+          "data_type": "string | object | null",
+          "enum_source": "saved metrics + adhoc metrics",
+          "sample_data": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "quantity_ordered"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(quantity_ordered)"
+          },
+          "required": false,
+          "embedding": "否",
+          "default_value": null,
+          "notes": "Bubble/buildQuery.ts 会把 query.orderby 重写成二维数组，并结合 order_desc 反转排序方向。"
+        },
+        {
+          "field_name": "order_desc",
+          "runtime_alias": "orderDesc",
+          "description": "If enabled, this control sorts the results/values descending, otherwise it sorts the results ascending.",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true,
+          "notes": "sharedControls.order_desc 的默认值是 true；Bubble/controlPanel.tsx 只在 orderby 有值时显示它。"
+        },
+        {
+          "field_name": "row_limit",
+          "runtime_alias": "rowLimit",
+          "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+          "data_type": "integer",
+          "enum_values": [
+            10,
+            50,
+            100,
+            250,
+            500,
+            1000,
+            5000,
+            10000,
+            50000
+          ],
+          "sample_data": 10000,
+          "required": false,
+          "embedding": "否",
+          "default_value": 10000
+        }
+      ],
+      "Chart Options": [
+        {
+          "field_name": "color_scheme",
+          "runtime_alias": "colorScheme",
+          "description": "The color scheme for rendering chart",
+          "data_type": "string",
+          "enum_source": "categoricalSchemeRegistry.keys()",
+          "sample_data": "supersetColors",
+          "required": false,
+          "embedding": "否",
+          "default_value": "categoricalSchemeRegistry.getDefaultKey()",
+          "notes": "sharedControls.color_scheme 的默认值来自 categoricalSchemeRegistry.getDefaultKey()。官方 Bubble 示例保存态使用的是 supersetColors。"
+        },
+        {
+          "field_name": "show_legend",
+          "runtime_alias": "showLegend",
+          "description": "Whether to display a legend for the chart",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": true,
+          "required": false,
+          "embedding": "否",
+          "default_value": true
+        },
+        {
+          "field_name": "legendType",
+          "description": "Legend type",
+          "data_type": "string",
+          "enum_values": [
+            "scroll",
+            "plain"
+          ],
+          "sample_data": "scroll",
+          "required": false,
+          "embedding": "否",
+          "default_value": "scroll"
+        },
+        {
+          "field_name": "legendOrientation",
+          "description": "Legend Orientation",
+          "data_type": "string",
+          "enum_values": [
+            "top",
+            "bottom",
+            "left",
+            "right"
+          ],
+          "sample_data": "top",
+          "required": false,
+          "embedding": "否",
+          "default_value": "top"
+        },
+        {
+          "field_name": "legendMargin",
+          "description": "Additional padding for legend.",
+          "data_type": "integer | null",
+          "sample_data": 12,
+          "required": false,
+          "embedding": "否",
+          "default_value": null
+        },
+        {
+          "field_name": "max_bubble_size",
+          "runtime_alias": "maxBubbleSize",
+          "description": "Max Bubble Size",
+          "data_type": "string",
+          "enum_values": [
+            "5",
+            "10",
+            "15",
+            "25",
+            "50",
+            "75",
+            "100"
+          ],
+          "sample_data": "25",
+          "required": false,
+          "embedding": "否",
+          "default_value": "25",
+          "notes": "这个字段在 controlPanel 中是 SelectControl，但 choice 值全是字符串，不是 number。transformProps.ts 会把它作为 normalizeSymbolSize() 的上限。"
+        },
+        {
+          "field_name": "tooltipSizeFormat",
+          "description": "Bubble size number format",
+          "data_type": "string",
+          "enum_source": "D3_FORMAT_OPTIONS",
+          "sample_data": "SMART_NUMBER",
+          "required": false,
+          "embedding": "否",
+          "default_value": "SMART_NUMBER"
+        },
+        {
+          "field_name": "opacity",
+          "description": "Opacity of bubbles, 0 means completely transparent, 1 means opaque",
+          "data_type": "number",
+          "enum_source": "SliderControl min=0 max=1 step=0.1",
+          "sample_data": 0.6,
+          "required": false,
+          "embedding": "否",
+          "default_value": 0.6
+        }
+      ],
+      "X Axis": [
+        {
+          "field_name": "x_axis_label",
+          "runtime_alias": "xAxisLabel",
+          "description": "X Axis Title",
+          "data_type": "string",
+          "sample_data": "Quantity Ordered",
+          "required": false,
+          "embedding": "否",
+          "default_value": ""
+        },
+        {
+          "field_name": "xAxisLabelRotation",
+          "description": "Rotate x axis label",
+          "data_type": "integer | string",
+          "enum_values": [
+            0,
+            45,
+            90
+          ],
+          "sample_data": 45,
+          "required": false,
+          "embedding": "否",
+          "default_value": 0,
+          "notes": "控件允许 freeForm，自定义角度时也可能出现非预设整数。"
+        },
+        {
+          "field_name": "xAxisLabelInterval",
+          "description": "Choose how many X-Axis labels to show",
+          "data_type": "string",
+          "enum_values": [
+            "auto",
+            "0"
+          ],
+          "sample_data": "auto",
+          "required": false,
+          "embedding": "否",
+          "default_value": "auto"
+        },
+        {
+          "field_name": "x_axis_title_margin",
+          "runtime_alias": "xAxisTitleMargin",
+          "description": "X axis title margin",
+          "data_type": "integer | string",
+          "enum_values": [
+            15,
+            30,
+            50,
+            75,
+            100,
+            125,
+            150,
+            200
+          ],
+          "sample_data": 30,
+          "required": false,
+          "embedding": "否",
+          "default_value": 30
+        },
+        {
+          "field_name": "xAxisFormat",
+          "description": "X Axis Format",
+          "data_type": "string",
+          "enum_source": "D3_FORMAT_OPTIONS",
+          "sample_data": "SMART_NUMBER",
+          "required": false,
+          "embedding": "否",
+          "default_value": "SMART_NUMBER"
+        },
+        {
+          "field_name": "logXAxis",
+          "description": "Logarithmic x-axis",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": "源码缺陷：controlPanel 默认值取到 undefined；省略时运行时表现为线性轴",
+          "notes": "Bubble/constants.ts 把默认值误写成 logXAis，Bubble/controlPanel.tsx 又去解构 logAxis。"
+        }
+      ],
+      "Y Axis": [
+        {
+          "field_name": "y_axis_label",
+          "runtime_alias": "yAxisLabel",
+          "description": "Y Axis Title",
+          "data_type": "string",
+          "sample_data": "Distinct Countries",
+          "required": false,
+          "embedding": "否",
+          "default_value": ""
+        },
+        {
+          "field_name": "yAxisLabelRotation",
+          "description": "Rotate y axis label",
+          "data_type": "integer | string",
+          "enum_values": [
+            0,
+            45
+          ],
+          "sample_data": 45,
+          "required": false,
+          "embedding": "否",
+          "default_value": 0,
+          "notes": "控件允许 freeForm，自定义角度时也可能出现非预设整数。"
+        },
+        {
+          "field_name": "y_axis_title_margin",
+          "runtime_alias": "yAxisTitleMargin",
+          "description": "Y axis title margin",
+          "data_type": "integer | string",
+          "enum_values": [
+            15,
+            30,
+            50,
+            75,
+            100,
+            125,
+            150,
+            200
+          ],
+          "sample_data": 30,
+          "required": false,
+          "embedding": "否",
+          "default_value": 30
+        },
+        {
+          "field_name": "y_axis_format",
+          "runtime_alias": "yAxisFormat",
+          "description": "Y Axis Format",
+          "data_type": "string",
+          "enum_source": "D3_FORMAT_OPTIONS",
+          "sample_data": "SMART_NUMBER",
+          "required": false,
+          "embedding": "否",
+          "default_value": "SMART_NUMBER"
+        },
+        {
+          "field_name": "logYAxis",
+          "description": "Logarithmic y-axis",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": "源码缺陷：controlPanel 默认值取到 undefined；transformProps 省略时仍按 false 合并",
+          "notes": "Bubble/constants.ts 中虽然存在 logYAxis=false，但 Bubble/controlPanel.tsx 实际拿的是不存在的 logAxis。"
+        },
+        {
+          "field_name": "truncateXAxis",
+          "description": "Truncate X Axis. Can be overridden by specifying a min or max bound. Only applicable for numerical X axis.",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false,
+          "notes": "虽然逻辑上属于 X 轴，但 Bubble/controlPanel.tsx 把它放在 Y Axis section。"
+        },
+        {
+          "field_name": "xAxisBounds",
+          "description": "Bounds for numerical X axis. Not applicable for temporal or categorical axes. When left empty, the bounds are dynamically defined based on the min/max of the data. Note that this feature will only expand the axis range. It won't narrow the data's extent.",
+          "data_type": "array[number | null]",
+          "sample_data": [
+            0,
+            5000
+          ],
+          "required": false,
+          "embedding": "否",
+          "default_value": [
+            null,
+            null
+          ],
+          "notes": "只有 truncateXAxis=true 时才显示。control name 本身就是 camelCase。"
+        },
+        {
+          "field_name": "truncateYAxis",
+          "description": "Truncate Y Axis. Can be overridden by specifying a min or max bound.",
+          "data_type": "boolean",
+          "enum_values": [
+            true,
+            false
+          ],
+          "sample_data": false,
+          "required": false,
+          "embedding": "否",
+          "default_value": false
+        },
+        {
+          "field_name": "y_axis_bounds",
+          "runtime_alias": "yAxisBounds",
+          "description": "Bounds for the Y-axis. When left empty, the bounds are dynamically defined based on the min/max of the data. Note that this feature will only expand the axis range. It won't narrow the data's extent.",
+          "data_type": "array[number | null]",
+          "sample_data": [
+            0,
+            100
+          ],
+          "required": false,
+          "embedding": "否",
+          "default_value": [
+            null,
+            null
+          ],
+          "notes": "只有 truncateYAxis=true 时才显示。注意它的 API 主键是 y_axis_bounds，不是 yAxisBounds。"
+        }
+      ]
+    }
+  }
+}

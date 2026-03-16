@@ -1,5 +1,6 @@
 package com.tencent.supersonic.common.jsqlparser;
 
+import net.sf.jsqlparser.expression.AnalyticExpression;
 import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.ExpressionVisitorAdapter;
@@ -74,8 +75,14 @@ public class ExpressionReplaceVisitor extends ExpressionVisitorAdapter {
         }
     }
 
+    @Override
+    public void visit(AnalyticExpression expr) {
+        QueryExpressionReplaceVisitor.replaceAnalyticExpression(expr, fieldExprMap);
+    }
+
     private boolean visitFunction(Function function) {
-        if (function.getParameters().getExpressions().get(0) instanceof Column) {
+        if (Objects.nonNull(function.getParameters()) && !function.getParameters().isEmpty()
+                && function.getParameters().getExpressions().get(0) instanceof Column) {
             Expression expression = QueryExpressionReplaceVisitor.getExpression(
                     QueryExpressionReplaceVisitor.getReplaceExpr(function, fieldExprMap));
             if (Objects.nonNull(expression)) {

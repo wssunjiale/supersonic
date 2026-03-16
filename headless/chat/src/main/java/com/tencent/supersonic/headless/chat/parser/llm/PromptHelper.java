@@ -14,11 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
+import static com.tencent.supersonic.common.pojo.DimensionConstants.*;
 import static com.tencent.supersonic.headless.chat.parser.ParserConfig.*;
 
 @Component
@@ -33,29 +32,66 @@ public class PromptHelper {
 
     public List<List<Text2SQLExemplar>> getFewShotExemplars(LLMReq llmReq) {
         int exemplarRecallNumber =
-                Integer.valueOf(parserConfig.getParameterValue(PARSER_EXEMPLAR_RECALL_NUMBER));
-        int fewShotNumber = Integer.valueOf(parserConfig.getParameterValue(PARSER_FEW_SHOT_NUMBER));
+                Integer.parseInt(parserConfig.getParameterValue(PARSER_EXEMPLAR_RECALL_NUMBER));
+        int fewShotNumber =
+                Integer.parseInt(parserConfig.getParameterValue(PARSER_FEW_SHOT_NUMBER));
         int selfConsistencyNumber =
-                Integer.valueOf(parserConfig.getParameterValue(PARSER_SELF_CONSISTENCY_NUMBER));
+                Integer.parseInt(parserConfig.getParameterValue(PARSER_SELF_CONSISTENCY_NUMBER));
+
+        List<List<Text2SQLExemplar>> results = new ArrayList<>();
+        if (selfConsistencyNumber <= 0) {
+            return results;
+        }
+        if (fewShotNumber <= 0) {
+            for (int i = 0; i < selfConsistencyNumber; i++) {
+                results.add(new ArrayList<>());
+            }
+            return results;
+        }
 
         List<Text2SQLExemplar> exemplars = Lists.newArrayList();
-        llmReq.getDynamicExemplars().stream().forEach(e -> {
-            exemplars.add(e);
-        });
+        exemplars.addAll(llmReq.getDynamicExemplars());
 
         int recallSize = exemplarRecallNumber - llmReq.getDynamicExemplars().size();
         if (recallSize > 0) {
             exemplars.addAll(exemplarService.recallExemplars(llmReq.getQueryText(), recallSize));
         }
 
-        List<List<Text2SQLExemplar>> results = new ArrayList<>();
         // use random collection of exemplars for each self-consistency inference
         for (int i = 0; i < selfConsistencyNumber; i++) {
             List<Text2SQLExemplar> shuffledList = new ArrayList<>(exemplars);
-            Collections.shuffle(shuffledList);
-            results.add(shuffledList.subList(0, Math.min(shuffledList.size(), fewShotNumber)));
+            List<Text2SQLExemplar> same = shuffledList.stream() // 相似度极高的话，先找出来
+                    .filter(e -> e.getSimilarity() > 0.989).collect(Collectors.toList());
+            List<Text2SQLExemplar> noSame = shuffledList.stream()
+                    .filter(e -> e.getSimilarity() <= 0.989).collect(Collectors.toList());
+            if (same.isEmpty() && noSame.isEmpty()) {
+                results.add(new ArrayList<>());
+                continue;
+            }
+            if ((noSame.size() - same.size()) > fewShotNumber) {// 去除部分最低分
+                noSame.sort(Comparator.comparingDouble(Text2SQLExemplar::getSimilarity));
+                noSame = noSame.subList((noSame.size() - fewShotNumber) / 2, noSame.size());
+            }
+            Text2SQLExemplar mostSimilar =
+                    noSame.isEmpty() ? null : noSame.get(noSame.size() - 1);
+            Collections.shuffle(noSame);
+            List<Text2SQLExemplar> ts;
+            if (same.size() > 0) {// 一样的话，必须作为提示语
+                ts = new ArrayList<>();
+                int needSize = Math.min(noSame.size() + same.size(), fewShotNumber);
+                if (needSize > same.size()) {
+                    ts.addAll(noSame.subList(0, needSize - same.size()));
+                }
+                ts.addAll(same);
+            } else { // 至少要一个最像的
+                ts = noSame.subList(0, Math.min(noSame.size(), fewShotNumber));
+                if (!ts.isEmpty() && Objects.nonNull(mostSimilar) && !ts.contains(mostSimilar)) {
+                    ts.remove(ts.size() - 1);
+                    ts.add(mostSimilar);
+                }
+            }
+            results.add(ts);
         }
-
         return results;
     }
 
@@ -85,60 +121,68 @@ public class PromptHelper {
         String tableStr = llmReq.getSchema().getDataSetName();
 
         List<String> metrics = Lists.newArrayList();
-        llmReq.getSchema().getMetrics().stream().forEach(metric -> {
+        llmReq.getSchema().getMetrics().forEach(metric -> {
             StringBuilder metricStr = new StringBuilder();
             metricStr.append("<");
             metricStr.append(metric.getName());
             if (!CollectionUtils.isEmpty(metric.getAlias())) {
                 StringBuilder alias = new StringBuilder();
-                metric.getAlias().stream().forEach(a -> alias.append(a + ","));
-                metricStr.append(" ALIAS '" + alias + "'");
+                metric.getAlias().forEach(a -> alias.append(a).append(","));
+                metricStr.append(" ALIAS '").append(alias).append("'");
             }
             if (StringUtils.isNotEmpty(metric.getDataFormatType())) {
                 String dataFormatType = metric.getDataFormatType();
                 if (DataFormatTypeEnum.DECIMAL.getName().equalsIgnoreCase(dataFormatType)
                         || DataFormatTypeEnum.PERCENT.getName().equalsIgnoreCase(dataFormatType)) {
-                    metricStr.append(" FORMAT '" + dataFormatType + "'");
+                    metricStr.append(" FORMAT '").append(dataFormatType).append("'");
                 }
             }
             if (StringUtils.isNotEmpty(metric.getDescription())) {
-                metricStr.append(" COMMENT '" + metric.getDescription() + "'");
+                metricStr.append(" COMMENT '").append(metric.getDescription()).append("'");
             }
             if (StringUtils.isNotEmpty(metric.getDefaultAgg())) {
-                metricStr.append(" AGGREGATE '" + metric.getDefaultAgg().toUpperCase() + "'");
+                metricStr.append(" AGGREGATE '").append(metric.getDefaultAgg().toUpperCase())
+                        .append("'");
             }
             metricStr.append(">");
             metrics.add(metricStr.toString());
         });
 
         List<String> dimensions = Lists.newArrayList();
-        llmReq.getSchema().getDimensions().stream().forEach(dimension -> {
+        llmReq.getSchema().getDimensions().forEach(dimension -> {
             StringBuilder dimensionStr = new StringBuilder();
             dimensionStr.append("<");
             dimensionStr.append(dimension.getName());
             if (!CollectionUtils.isEmpty(dimension.getAlias())) {
                 StringBuilder alias = new StringBuilder();
-                dimension.getAlias().stream().forEach(a -> alias.append(a + ";"));
-                dimensionStr.append(" ALIAS '" + alias + "'");
+                dimension.getAlias().forEach(a -> alias.append(a).append(";"));
+                dimensionStr.append(" ALIAS '").append(alias).append("'");
+            }
+            if (Objects.nonNull(dimension.getExtInfo().get(DIMENSION_DATA_TYPE))) {
+                dimensionStr.append(" DATATYPE '")
+                        .append(dimension.getExtInfo().get(DIMENSION_DATA_TYPE)).append("'");
             }
             if (StringUtils.isNotEmpty(dimension.getTimeFormat())) {
-                dimensionStr.append(" FORMAT '" + dimension.getTimeFormat() + "'");
+                dimensionStr.append(" FORMAT '").append(dimension.getTimeFormat()).append("'");
             }
             if (StringUtils.isNotEmpty(dimension.getDescription())) {
-                dimensionStr.append(" COMMENT '" + dimension.getDescription() + "'");
+                dimensionStr.append(" COMMENT '").append(dimension.getDescription()).append("'");
             }
             dimensionStr.append(">");
             dimensions.add(dimensionStr.toString());
         });
 
         List<String> values = Lists.newArrayList();
-        llmReq.getSchema().getValues().stream().forEach(value -> {
-            StringBuilder valueStr = new StringBuilder();
-            String fieldName = value.getFieldName();
-            String fieldValue = value.getFieldValue();
-            valueStr.append(String.format("<%s='%s'>", fieldName, fieldValue));
-            values.add(valueStr.toString());
-        });
+        List<LLMReq.ElementValue> elementValueList = llmReq.getSchema().getValues();
+        if (elementValueList != null) {
+            elementValueList.forEach(value -> {
+                StringBuilder valueStr = new StringBuilder();
+                String fieldName = value.getFieldName();
+                String fieldValue = value.getFieldValue();
+                valueStr.append(String.format("<%s='%s'>", fieldName, fieldValue));
+                values.add(valueStr.toString());
+            });
+        }
 
         String partitionTimeStr = "";
         if (llmReq.getSchema().getPartitionTime() != null) {
@@ -172,14 +216,14 @@ public class PromptHelper {
     private String buildTermStr(LLMReq llmReq) {
         List<LLMReq.Term> terms = llmReq.getTerms();
         List<String> termStr = Lists.newArrayList();
-        terms.stream().forEach(term -> {
+        terms.forEach(term -> {
             StringBuilder termsDesc = new StringBuilder();
             String description = term.getDescription();
             termsDesc.append(String.format("<%s COMMENT '%s'>", term.getName(), description));
             termStr.add(termsDesc.toString());
         });
         String ret = "";
-        if (termStr.size() > 0) {
+        if (!termStr.isEmpty()) {
             ret = String.join(",", termStr);
         }
 

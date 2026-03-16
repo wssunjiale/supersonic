@@ -1,0 +1,131 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "chord",
+  "display_name": "Chord Diagram",
+  "normalized_summary": {
+    "category": "relationship",
+    "tags": [
+      "chord",
+      "relationship",
+      "flow",
+      "network"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "source",
+        "required": true,
+        "description": "来源实体字段，用于定义关系的起点。"
+      },
+      {
+        "key": "target",
+        "required": true,
+        "description": "目标实体字段，用于定义关系的终点。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "关系强度指标，用于控制弦的宽度（数值越大弦越宽）。"
+      },
+      {
+        "key": "sort_entities",
+        "required": false,
+        "description": "实体排序方式（如 alphabetical、value），控制实体的展示顺序。"
+      }
+    ],
+    "description_zh": "Chord Chart displays directed relationships between entities, with chord width representing the strength of the relationship.",
+    "visual_shape_zh": "弦图（关联关系型）",
+    "use_cases_zh": [
+      "实体间的流向/关联分析（如用户来源-去向、产品流转）",
+      "多实体双向关系对比",
+      "关系强度可视化"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "chord",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/chord-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/chord-form-data-schema.json",
+      "control-schema": "form-data-schema/chord-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Chord Diagram",
+    "viztype": "chord",
+    "详细描述": "Chord Chart displays directed relationships between entities, with chord width representing the strength of the relationship.",
+    "表现形态": "弦图（关联关系型）",
+    "适用场景": [
+      "实体间的流向/关联分析（如用户来源-去向、产品流转）",
+      "多实体双向关系对比",
+      "关系强度可视化"
+    ],
+    "vizKey": "Chord",
+    "pluginCategory": "Relationship",
+    "pluginTags": [],
+    "category": "relationship",
+    "tags": [
+      "chord",
+      "relationship",
+      "flow",
+      "network"
+    ],
+    "关键字段": [
+      {
+        "key": "source",
+        "required": true,
+        "description": "来源实体字段，用于定义关系的起点。"
+      },
+      {
+        "key": "target",
+        "required": true,
+        "description": "目标实体字段，用于定义关系的终点。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "关系强度指标，用于控制弦的宽度（数值越大弦越宽）。"
+      },
+      {
+        "key": "sort_entities",
+        "required": false,
+        "description": "实体排序方式（如 alphabetical、value），控制实体的展示顺序。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

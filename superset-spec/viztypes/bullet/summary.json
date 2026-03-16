@@ -1,0 +1,121 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "bullet",
+  "display_name": "Bullet Chart",
+  "normalized_summary": {
+    "category": "kpi",
+    "tags": [
+      "kpi",
+      "bullet",
+      "target",
+      "comparison"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "核心指标（实际值），用于展示主要KPI数值。"
+      },
+      {
+        "key": "target",
+        "required": true,
+        "description": "目标值指标，用于对比实际值与目标值的差距。"
+      },
+      {
+        "key": "range",
+        "required": false,
+        "description": "参考范围指标，用于展示指标的合理范围。"
+      }
+    ],
+    "description_zh": "Bullet Chart displays a primary metric alongside comparative metrics (target, range) in a compact format, ideal for dashboards and KPI tracking.",
+    "visual_shape_zh": "子弹图（KPI对比型）",
+    "use_cases_zh": [
+      "KPI目标达成率展示（如实际值vs目标值）",
+      "指标范围对比（如实际值vs参考范围）",
+      "紧凑型多指标对比仪表盘"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "bullet",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/bullet-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/bullet-form-data-schema.json",
+      "control-schema": "form-data-schema/bullet-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Bullet Chart",
+    "viztype": "bullet",
+    "详细描述": "Bullet Chart displays a primary metric alongside comparative metrics (target, range) in a compact format, ideal for dashboards and KPI tracking.",
+    "表现形态": "子弹图（KPI对比型）",
+    "适用场景": [
+      "KPI目标达成率展示（如实际值vs目标值）",
+      "指标范围对比（如实际值vs参考范围）",
+      "紧凑型多指标对比仪表盘"
+    ],
+    "vizKey": "Bullet",
+    "pluginCategory": "KPI",
+    "pluginTags": [],
+    "category": "kpi",
+    "tags": [
+      "kpi",
+      "bullet",
+      "target",
+      "comparison"
+    ],
+    "关键字段": [
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "核心指标（实际值），用于展示主要KPI数值。"
+      },
+      {
+        "key": "target",
+        "required": true,
+        "description": "目标值指标，用于对比实际值与目标值的差距。"
+      },
+      {
+        "key": "range",
+        "required": false,
+        "description": "参考范围指标，用于展示指标的合理范围。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

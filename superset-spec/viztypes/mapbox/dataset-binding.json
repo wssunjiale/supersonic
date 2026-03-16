@@ -1,0 +1,318 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "mapbox",
+  "display_name": "MapBox",
+  "generation_mode": "heuristic_seed",
+  "slot_candidates": [
+    {
+      "field_name": "adhoc_filters",
+      "required": false,
+      "slot_kind": "filter_list",
+      "accepted_dataset_roles": [
+        "filter_context"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [],
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [
+        "extra_form_data.append"
+      ],
+      "descriptions": [
+        "字段标签为 Filters。legacy explore_json 路径会先把 legacy filters 转成 adhoc_filters，再继续处理 extra filters / extra_form_data。"
+      ]
+    },
+    {
+      "field_name": "all_columns_x",
+      "required": true,
+      "slot_kind": "x_dimension_list",
+      "accepted_dataset_roles": [
+        "dimension",
+        "category_dimension"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [
+        "<x_dimension_column>"
+      ],
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Column containing longitude data"
+      ]
+    },
+    {
+      "field_name": "all_columns_y",
+      "required": true,
+      "slot_kind": "y_dimension_list",
+      "accepted_dataset_roles": [
+        "dimension",
+        "category_dimension"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [
+        "<y_dimension_column>"
+      ],
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Column containing latitude data"
+      ]
+    },
+    {
+      "field_name": "groupby",
+      "required": false,
+      "slot_kind": "dimension_list",
+      "accepted_dataset_roles": [
+        "dimension",
+        "category_dimension"
+      ],
+      "cardinality": "0..n",
+      "placeholder": [
+        "<dimension_column>"
+      ],
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "One or many controls to group by. If grouping, latitude and longitude columns must be present."
+      ]
+    }
+  ],
+  "non_binding_form_controls": [
+    {
+      "field_name": "clustering_radius",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The radius (in pixels) the algorithm uses to define a cluster. Choose 0 to turn off clustering, but beware that a large number of points (>1000) will cause lag."
+      ]
+    },
+    {
+      "field_name": "global_opacity",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Visual Tweaks"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Opacity of all clusters, points, and labels. Between 0 and 1."
+      ]
+    },
+    {
+      "field_name": "mapbox_color",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Visual Tweaks"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The color for points and clusters in RGB"
+      ]
+    },
+    {
+      "field_name": "mapbox_label",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Labelling"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "`count` is COUNT(*) if a group by is used. Numerical columns will be aggregated with the aggregator. Non-numerical columns will be used to label points. Leave empty to get a count of points in each cluster."
+      ]
+    },
+    {
+      "field_name": "mapbox_style",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Visual Tweaks"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Base layer map style. See Mapbox documentation: https://docs.mapbox.com/help/glossary/style-url/"
+      ]
+    },
+    {
+      "field_name": "pandas_aggfunc",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Labelling"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Aggregate function applied to the list of points in each cluster to produce the cluster label."
+      ]
+    },
+    {
+      "field_name": "point_radius",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Points"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The radius of individual points (ones that are not in a cluster). Either a numerical column or `Auto`, which scales the point based on the largest cluster"
+      ]
+    },
+    {
+      "field_name": "point_radius_unit",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Points"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "The unit of measure for the specified point radius"
+      ]
+    },
+    {
+      "field_name": "render_while_dragging",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Visual Tweaks"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Points and clusters will update as the viewport is being changed"
+      ]
+    },
+    {
+      "field_name": "row_limit",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Query"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Limits the number of the rows that are computed in the query that is the source of the data used for this chart."
+      ]
+    },
+    {
+      "field_name": "viewport_latitude",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Viewport"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Latitude of default viewport"
+      ]
+    },
+    {
+      "field_name": "viewport_longitude",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Viewport"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Longitude of default viewport"
+      ]
+    },
+    {
+      "field_name": "viewport_zoom",
+      "required": false,
+      "slot_kind": "presentation_or_behavior_control",
+      "accepted_dataset_roles": [],
+      "cardinality": "n/a",
+      "placeholder": null,
+      "source_categories": [
+        "Viewport"
+      ],
+      "embedding_modes": [],
+      "descriptions": [
+        "Zoom level of the map"
+      ]
+    }
+  ],
+  "dataset_role_inventory": {
+    "category_dimension": [
+      "all_columns_x",
+      "all_columns_y",
+      "groupby"
+    ],
+    "dimension": [
+      "all_columns_x",
+      "all_columns_y",
+      "groupby"
+    ],
+    "filter_context": [
+      "adhoc_filters"
+    ]
+  },
+  "binding_seed_example": {
+    "all_columns_x": [
+      "<x_dimension_column>"
+    ],
+    "all_columns_y": [
+      "<y_dimension_column>"
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "mapbox",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/mapbox-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/mapbox-form-data-schema.json",
+      "control-schema": "form-data-schema/mapbox-schema.json"
+    }
+  }
+}

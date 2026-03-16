@@ -1,0 +1,368 @@
+{
+  "viz_type": "graph_chart",
+  "display_name": "Graph Chart",
+  "purpose": "第三方 embedding / guest token 场景下安全传输的 form_data 模板",
+  "base_form_data_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/graph_chart-form-data-schema.json",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset/security/manager.py",
+    "D:/vsx/sources/superset-6.0.0/superset/constants.py",
+    "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+    "D:/vsx/sources/superset-6.0.0/superset/charts/data/api.py",
+    "D:/vsx/sources/superset-6.0.0/superset/commands/chart/data/get_data_command.py",
+    "D:/vsx/sources/superset-6.0.0/superset/charts/schemas.py",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/constants.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/QueryFormData.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/processExtraFormData.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/dashboard/components/nativeFilters/utils.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataWithDashboardContext.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Graph/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Graph/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Graph/controlPanel.tsx"
+  ],
+  "notes": [
+    "embedded guest 的核心限制在后端 security/manager.py 的 `query_context_modified()`。报错原文是 `Guest user cannot modify chart payload`。",
+    "Graph Chart 走标准 `/api/v1/chart/data`，因此 guest 校验会检查请求里编译出来的 `metrics`、`columns`、`orderby` 等查询结构。",
+    "Graph Chart 的 `source`、`target`、`source_category`、`target_category` 虽然不是后端显式硬编码比较的 root 字段，但它们都会通过 `buildQuery.ts` 进入 `query.columns`，所以也属于根层不可随意改的敏感字段。",
+    "安全做法不是重新拼装一份新的 Graph Chart form_data，而是以已保存图表的 form_data 原样复制为 base，只把动态条件放进 `extra_form_data`。",
+    "layout、edgeSymbol、draggable、roam、selectedMode、baseNodeSize、baseEdgeWidth、edgeLength、gravity、repulsion、friction 主要影响前端布局和交互，不直接进入 query context；但 embedding 下也建议复制保存态，避免 guest 视图漂移。"
+  ],
+  "security_enforcement": {
+    "backend_check_function": "superset/security/manager.py::query_context_modified",
+    "checked_when": "ChartDataCommand.validate() -> QueryContext.raise_for_access()",
+    "error_message": "Guest user cannot modify chart payload",
+    "hard_block_fields": [
+      "slice_id",
+      "metrics",
+      "groupby",
+      "columns",
+      "orderby"
+    ],
+    "indirectly_sensitive_fields_for_graph_chart": [
+      "source",
+      "target",
+      "source_category",
+      "target_category",
+      "metric"
+    ],
+    "presentation_only_fields_not_compared_directly": [
+      "color_scheme",
+      "show_legend",
+      "legendType",
+      "legendOrientation",
+      "legendMargin",
+      "layout",
+      "edgeSymbol",
+      "draggable",
+      "roam",
+      "selectedMode",
+      "showSymbolThreshold",
+      "baseNodeSize",
+      "baseEdgeWidth",
+      "edgeLength",
+      "gravity",
+      "repulsion",
+      "friction"
+    ],
+    "recommended_strategy": "复制保存态 chart form_data 作为 base，仅通过 extra_form_data 追加过滤条件。"
+  },
+  "safe_base_rule": {
+    "description": "第三方 embedding 请求中的根层 form_data，应当从已保存图表的 form_data 直接复制，不要重构。",
+    "must_be_copied_from_saved_chart": [
+      "slice_id",
+      "datasource",
+      "viz_type",
+      "source",
+      "target",
+      "metric",
+      "source_category",
+      "target_category",
+      "adhoc_filters",
+      "row_limit",
+      "color_scheme",
+      "show_legend",
+      "layout",
+      "edgeSymbol",
+      "draggable",
+      "roam",
+      "selectedMode",
+      "showSymbolThreshold",
+      "baseNodeSize",
+      "baseEdgeWidth",
+      "edgeLength",
+      "gravity",
+      "repulsion",
+      "friction",
+      "all other chart-definition fields"
+    ],
+    "why": [
+      "`query_context_modified()` 会把请求中的 metrics/columns/orderby 与保存态图表对比。",
+      "Graph Chart 的 `source`、`target`、`source_category`、`target_category` 会被编译到 `query.columns`，修改后会通过 columns 差异触发越权。",
+      "`metric` 会直接编译到 `query.metrics`，属于高风险根字段。",
+      "`row_limit`、图例和布局字段虽然不直接触发 query_context_modified() 的集合对比，但复制保存态可以保证 guest 看到的是分享者保存下来的图表定义。"
+    ]
+  },
+  "safe_embedding_form_data_template": {
+    "description": "这是 guest embedding 下的安全写法。根层以保存态图表为 base，仅改 extra_form_data。",
+    "template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "graph_chart",
+      "source": "<copied_from_saved_chart>",
+      "target": "<copied_from_saved_chart>",
+      "metric": "<copied_from_saved_chart>",
+      "source_category": "<copied_from_saved_chart>",
+      "target_category": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "row_limit": "<copied_from_saved_chart>",
+      "layout": "<copied_from_saved_chart>",
+      "edgeSymbol": "<copied_from_saved_chart>",
+      "roam": "<copied_from_saved_chart>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "source_type",
+            "op": "IN",
+            "val": [
+              "person"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "source_type",
+            "operator": "IN",
+            "comparator": [
+              "person"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    }
+  },
+  "preferred_dynamic_container": {
+    "field_name": "extra_form_data",
+    "description": "第三方 embedding 允许动态传入的上下文容器；后端会在 `merge_extra_form_data()` 中把它并入实际查询。",
+    "append_keys": [
+      "adhoc_filters",
+      "filters",
+      "interactive_groupby",
+      "interactive_highlight",
+      "interactive_drilldown",
+      "custom_form_data"
+    ],
+    "override_keys_backend_high_confidence": [
+      "granularity_sqla",
+      "granularity",
+      "time_column",
+      "time_grain",
+      "time_range",
+      "time_grain_sqla",
+      "relative_start",
+      "relative_end"
+    ],
+    "notes": "Graph Chart controlPanel 本身没有时间语义字段；override 类时间字段对当前图通常不应依赖。"
+  },
+  "extra_form_data_field_schema": [
+    {
+      "field_name": "filters",
+      "data_type": "array[QueryObjectFilterClause]",
+      "behavior": "append",
+      "safe_for_graph_chart": true,
+      "recommended": true,
+      "sample_data": [
+        {
+          "col": "source_type",
+          "op": "IN",
+          "val": [
+            "person"
+          ]
+        }
+      ],
+      "effect": "追加 simple filters；后端会把它们并入额外过滤条件。",
+      "source": "superset/constants.py + superset/utils/core.py"
+    },
+    {
+      "field_name": "adhoc_filters",
+      "data_type": "array[AdhocFilter]",
+      "behavior": "append",
+      "safe_for_graph_chart": true,
+      "recommended": true,
+      "sample_data": [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "source_type",
+          "operator": "IN",
+          "comparator": [
+            "person"
+          ]
+        }
+      ],
+      "effect": "追加 adhoc filters；后端会标记为 isExtra 并并入查询。",
+      "source": "superset/constants.py + superset/utils/core.py"
+    },
+    {
+      "field_name": "custom_form_data",
+      "data_type": "object",
+      "behavior": "append",
+      "safe_for_graph_chart": true,
+      "recommended": false,
+      "sample_data": {},
+      "effect": "可传非标准附加数据；Graph Chart 默认 buildQuery/transformProps 不直接消费它。",
+      "source": "superset/constants.py + frontend QueryFormData.ts"
+    },
+    {
+      "field_name": "interactive_groupby",
+      "data_type": "array[string]",
+      "behavior": "append",
+      "safe_for_graph_chart": false,
+      "recommended": false,
+      "sample_data": [
+        "source_type"
+      ],
+      "effect": "通用 ExtraFormData 字段。Graph Chart 默认不直接消费它。",
+      "source": "frontend QueryFormData.ts + query/constants.ts"
+    },
+    {
+      "field_name": "interactive_highlight",
+      "data_type": "array[string]",
+      "behavior": "append",
+      "safe_for_graph_chart": false,
+      "recommended": false,
+      "sample_data": [
+        "source_type"
+      ],
+      "effect": "通用交互字段；Graph Chart 默认不直接消费。",
+      "source": "frontend QueryFormData.ts + query/constants.ts"
+    },
+    {
+      "field_name": "interactive_drilldown",
+      "data_type": "array[string]",
+      "behavior": "append",
+      "safe_for_graph_chart": false,
+      "recommended": false,
+      "sample_data": [
+        "source_type"
+      ],
+      "effect": "通用交互字段；Graph Chart 默认不直接消费。",
+      "source": "frontend QueryFormData.ts + query/constants.ts"
+    },
+    {
+      "field_name": "time_range",
+      "data_type": "string",
+      "behavior": "override",
+      "safe_for_graph_chart": false,
+      "recommended": false,
+      "sample_data": "Last 7 days",
+      "effect": "通用时间范围 override；Graph Chart controlPanel 没有对应时间字段，不建议依赖它重构 guest 请求。",
+      "source": "superset/constants.py + QueryFormData.ts",
+      "status": "低置信，不建议在 guest embedding 中依赖"
+    },
+    {
+      "field_name": "time_grain_sqla",
+      "data_type": "string | null",
+      "behavior": "override",
+      "safe_for_graph_chart": false,
+      "recommended": false,
+      "sample_data": "P1D",
+      "effect": "通用时间粒度 override；Graph Chart 常规场景不需要。",
+      "source": "superset/constants.py + QueryFormData.ts",
+      "status": "低置信，不建议在 guest embedding 中依赖"
+    }
+  ],
+  "minimal_extra_form_data_template": {
+    "filters": [
+      {
+        "col": "source_type",
+        "op": "IN",
+        "val": [
+          "person"
+        ]
+      }
+    ]
+  },
+  "recommended_extra_form_data_template": {
+    "filters": [
+      {
+        "col": "source_type",
+        "op": "IN",
+        "val": [
+          "person",
+          "company"
+        ]
+      }
+    ],
+    "adhoc_filters": [
+      {
+        "expressionType": "SIMPLE",
+        "clause": "WHERE",
+        "subject": "source_type",
+        "operator": "IN",
+        "comparator": [
+          "person",
+          "company"
+        ]
+      }
+    ],
+    "custom_form_data": {}
+  },
+  "unsafe_root_form_data_changes": [
+    {
+      "field_name": "slice_id",
+      "reason": "会改变请求对应的图表实体，最不应该在 embedding 请求里改。"
+    },
+    {
+      "field_name": "datasource",
+      "reason": "Graph Chart 的 root form_data 会直接驱动标准 query builder，embedding 不应改图表绑定数据集。"
+    },
+    {
+      "field_name": "viz_type",
+      "reason": "Graph Chart 仍应保持 `graph_chart`；不应在请求里改成其他 viz。"
+    },
+    {
+      "field_name": "source",
+      "reason": "会直接改变编译后的 `query.columns` 中的源节点字段。"
+    },
+    {
+      "field_name": "target",
+      "reason": "会直接改变编译后的 `query.columns` 中的目标节点字段。"
+    },
+    {
+      "field_name": "source_category",
+      "reason": "会直接改变编译后的 `query.columns`，并影响节点分类与图例。"
+    },
+    {
+      "field_name": "target_category",
+      "reason": "会直接改变编译后的 `query.columns`，并影响节点分类与图例。"
+    },
+    {
+      "field_name": "metric",
+      "reason": "会直接改变编译后的 `query.metrics`。"
+    },
+    {
+      "field_name": "adhoc_filters",
+      "reason": "动态筛选应优先放进 `extra_form_data.append`，不要覆盖保存态根字段。"
+    },
+    {
+      "field_name": "row_limit",
+      "reason": "会直接改变参与构图的底层记录数。"
+    }
+  ],
+  "practical_guidance": {
+    "best_practice": [
+      "先从保存态 Graph Chart 读取完整 form_data。",
+      "根层字段保持不变，尤其保留 `source`、`target`、`source_category`、`target_category`、`metric`、`row_limit`。",
+      "只在 `extra_form_data` 中放动态 filters / adhoc_filters。",
+      "如果只是做第三方筛选联动，优先使用 `filters` 和 `adhoc_filters`。"
+    ],
+    "avoid": [
+      "不要在 guest 请求里把 `source` 和 `target` 改成另一组节点字段；这会直接改变网络结构。",
+      "不要把动态筛选直接覆盖到根层 `adhoc_filters`；优先用 `extra_form_data.append`。",
+      "不要把运行时 camelCase 别名和 root 键名混用，例如把 `sourceCategory` 写回根层。"
+    ]
+  }
+}

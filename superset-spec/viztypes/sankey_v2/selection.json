@@ -1,0 +1,481 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "sankey_v2",
+  "display_name": "Sankey Chart",
+  "selection_summary": {
+    "category": "flow",
+    "tags": [
+      "sankey",
+      "flow",
+      "relationship",
+      "hierarchy"
+    ],
+    "description_zh": "Sankey Diagram displays flow relationships between entities, with line width representing the volume of flow between source and target nodes.",
+    "visual_shape_zh": "桑基图（流向型）",
+    "use_cases_zh": [
+      "实体间流向/流量关系展示（如用户行为路径、资金流转）",
+      "层级间的流量占比分析",
+      "多维度的流转链路可视化"
+    ],
+    "required_slots": [
+      {
+        "field_name": "metric",
+        "required": true,
+        "slot_kind": "metric",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1",
+        "placeholder": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        },
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+        ]
+      },
+      {
+        "field_name": "source",
+        "required": true,
+        "slot_kind": "graph_source",
+        "accepted_dataset_roles": [
+          "entity_id",
+          "dimension"
+        ],
+        "cardinality": "1",
+        "placeholder": "<source_column>",
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "The column to be used as the source of the edge."
+        ]
+      },
+      {
+        "field_name": "target",
+        "required": true,
+        "slot_kind": "graph_target",
+        "accepted_dataset_roles": [
+          "entity_id",
+          "dimension"
+        ],
+        "cardinality": "1",
+        "placeholder": "<target_column>",
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "The column to be used as the target of the edge."
+        ]
+      },
+      {
+        "field_name": "groupby",
+        "required": true,
+        "slot_kind": "dimension_list",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [
+          "<dimension_column>"
+        ],
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "分类维度字段，需包含source（源节点）、target（目标节点）两个维度，定义桑基图的节点与流向。"
+        ]
+      },
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "聚合指标，用于计算节点间的流量值（线条宽度依据）。"
+        ]
+      }
+    ],
+    "optional_slots": [
+      {
+        "field_name": "adhoc_filters",
+        "required": false,
+        "slot_kind": "filter_list",
+        "accepted_dataset_roles": [
+          "filter_context"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [],
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "Filters"
+        ]
+      },
+      {
+        "field_name": "node_width",
+        "required": false,
+        "slot_kind": "graph_or_hierarchy",
+        "accepted_dataset_roles": [
+          "entity_id",
+          "entity",
+          "dimension"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<entity_or_relation_column>",
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "节点宽度（像素），控制桑基图节点的显示宽度。"
+        ]
+      },
+      {
+        "field_name": "node_gap",
+        "required": false,
+        "slot_kind": "graph_or_hierarchy",
+        "accepted_dataset_roles": [
+          "entity_id",
+          "entity",
+          "dimension"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<entity_or_relation_column>",
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "节点间距（像素），控制同层级节点间的间距。"
+        ]
+      }
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "category_dimension",
+      "dimension",
+      "entity_id",
+      "metric",
+      "saved_metric"
+    ],
+    "optional_dataset_roles": [
+      "dimension",
+      "entity",
+      "entity_id",
+      "filter_context"
+    ],
+    "dataset_role_inventory": {
+      "adhoc_metric": [
+        "metric",
+        "metrics"
+      ],
+      "dimension": [
+        "groupby",
+        "node_gap",
+        "node_width",
+        "source",
+        "target"
+      ],
+      "entity_id": [
+        "node_gap",
+        "node_width",
+        "source",
+        "target"
+      ],
+      "filter_context": [
+        "adhoc_filters"
+      ],
+      "metric": [
+        "metric",
+        "metrics"
+      ],
+      "saved_metric": [
+        "metric",
+        "metrics"
+      ],
+      "category_dimension": [
+        "groupby"
+      ],
+      "entity": [
+        "node_gap",
+        "node_width"
+      ]
+    },
+    "non_binding_control_names": [
+      "color_scheme",
+      "row_limit",
+      "sort_by_metric"
+    ],
+    "embedding_runtime_field_names": [
+      "adhoc_filters",
+      "custom_form_data",
+      "filters",
+      "granularity_sqla",
+      "interactive_drilldown",
+      "interactive_groupby",
+      "interactive_highlight",
+      "relative_end",
+      "relative_start",
+      "time_column",
+      "time_grain",
+      "time_grain_sqla",
+      "time_range"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "metric",
+      "row_limit",
+      "source",
+      "target",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "color_scheme",
+      "datasource",
+      "metric",
+      "row_limit",
+      "sort_by_metric",
+      "source",
+      "target",
+      "viz_type"
+    ],
+    "structural_flags": {
+      "time_series": false,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": false,
+      "flow_like": true,
+      "distribution_like": false,
+      "supports_breakdown": true,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": false,
+      "needs_dimension": true
+    },
+    "selection_hints": [
+      "至少需要 1 个可聚合指标字段。",
+      "需要至少 1 个维度字段用于分组、拆分或定位。",
+      "适合流向、路径、节点关系或网络结构问题。",
+      "支持按维度拆分多序列或子组。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：实体间流向/流量关系展示（如用户行为路径、资金流转）；层级间的流量占比分析；多维度的流转链路可视化"
+    ]
+  },
+  "selection_prompt_card": {
+    "viz_type": "sankey_v2",
+    "display_name": "Sankey Chart",
+    "category": "flow",
+    "description_zh": "Sankey Diagram displays flow relationships between entities, with line width representing the volume of flow between source and target nodes.",
+    "visual_shape_zh": "桑基图（流向型）",
+    "best_for": [
+      "实体间流向/流量关系展示（如用户行为路径、资金流转）",
+      "层级间的流量占比分析",
+      "多维度的流转链路可视化"
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "category_dimension",
+      "dimension",
+      "entity_id",
+      "metric",
+      "saved_metric"
+    ],
+    "optional_dataset_roles": [
+      "dimension",
+      "entity",
+      "entity_id",
+      "filter_context"
+    ],
+    "required_slots": [
+      {
+        "field_name": "metric",
+        "required": true,
+        "slot_kind": "metric",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1",
+        "placeholder": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        },
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+        ]
+      },
+      {
+        "field_name": "source",
+        "required": true,
+        "slot_kind": "graph_source",
+        "accepted_dataset_roles": [
+          "entity_id",
+          "dimension"
+        ],
+        "cardinality": "1",
+        "placeholder": "<source_column>",
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "The column to be used as the source of the edge."
+        ]
+      },
+      {
+        "field_name": "target",
+        "required": true,
+        "slot_kind": "graph_target",
+        "accepted_dataset_roles": [
+          "entity_id",
+          "dimension"
+        ],
+        "cardinality": "1",
+        "placeholder": "<target_column>",
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "The column to be used as the target of the edge."
+        ]
+      },
+      {
+        "field_name": "groupby",
+        "required": true,
+        "slot_kind": "dimension_list",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [
+          "<dimension_column>"
+        ],
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "分类维度字段，需包含source（源节点）、target（目标节点）两个维度，定义桑基图的节点与流向。"
+        ]
+      },
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "聚合指标，用于计算节点间的流量值（线条宽度依据）。"
+        ]
+      }
+    ],
+    "optional_slot_names": [
+      "adhoc_filters",
+      "node_width",
+      "node_gap"
+    ],
+    "structural_flags": {
+      "time_series": false,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": false,
+      "flow_like": true,
+      "distribution_like": false,
+      "supports_breakdown": true,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": false,
+      "needs_dimension": true
+    },
+    "selection_hints": [
+      "至少需要 1 个可聚合指标字段。",
+      "需要至少 1 个维度字段用于分组、拆分或定位。",
+      "适合流向、路径、节点关系或网络结构问题。",
+      "支持按维度拆分多序列或子组。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：实体间流向/流量关系展示（如用户行为路径、资金流转）；层级间的流量占比分析；多维度的流转链路可视化"
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "sankey_v2",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/sankey_v2-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/sankey_v2-form-data-schema.json",
+      "control-schema": "form-data-schema/sankey_v2-schema.json"
+    }
+  }
+}

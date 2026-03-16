@@ -1,0 +1,4518 @@
+{
+  "source": "chart/add All charts",
+  "fetchedAt": "2026-03-10T13:52:48.7016584+08:00",
+  "pairs": [
+    {
+      "name": "Area Chart",
+      "viztype": "echarts_area",
+      "field_categories": {
+        "Query": [
+          {
+            "field_name": "x_axis",
+            "runtime_alias": "xAxis",
+            "description": "Dimension to use on x-axis.",
+            "data_type": "string | object",
+            "enum_source": "datasource columns; xAxisMixin 会在 granularity_sqla 已存在且 x_axis 为空时回填",
+            "sample_data": "order_date",
+            "required": true,
+            "embedding": "否",
+            "default_value": null
+          },
+          {
+            "field_name": "time_grain_sqla",
+            "runtime_alias": "timeGrainSqla",
+            "description": "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart.",
+            "data_type": "string | null",
+            "enum_source": "datasource.time_grain_sqla",
+            "sample_data": "P1D",
+            "required": false,
+            "embedding": "extra_form_data.override",
+            "default_value": "P1D"
+          },
+          {
+            "field_name": "xAxisForceCategorical",
+            "description": "Treat values as categorical.",
+            "data_type": "boolean",
+            "enum_values": [
+              true,
+              false
+            ],
+            "sample_data": false,
+            "required": false,
+            "embedding": "否",
+            "default_value": false
+          },
+          {
+            "field_name": "x_axis_sort",
+            "runtime_alias": "xAxisSort",
+            "description": "Decides which column or measure to sort the base axis by.",
+            "data_type": "string",
+            "enum_source": "当前 x_axis、metrics、timeseries_limit_metric 和 SORT_SERIES_CHOICES 的动态组合",
+            "sample_data": "SUM(sales)",
+            "required": false,
+            "embedding": "否",
+            "default_value": null
+          },
+          {
+            "field_name": "x_axis_sort_asc",
+            "runtime_alias": "xAxisSortAsc",
+            "description": "Whether to sort ascending or descending on the base Axis.",
+            "data_type": "boolean",
+            "enum_values": [
+              true,
+              false
+            ],
+            "sample_data": false,
+            "required": false,
+            "embedding": "否",
+            "default_value": true
+          },
+          {
+            "field_name": "metrics",
+            "description": "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+            "data_type": "array[string | object]",
+            "enum_source": "saved metrics + adhoc metrics",
+            "sample_data": [
+              {
+                "expressionType": "SIMPLE",
+                "column": {
+                  "column_name": "sales"
+                },
+                "aggregate": "SUM",
+                "label": "SUM(sales)"
+              }
+            ],
+            "required": true,
+            "embedding": "否",
+            "default_value": []
+          },
+          {
+            "field_name": "groupby",
+            "description": "Dimensions contain qualitative values such as names, dates, or geographical data. Use dimensions to categorize, segment, and reveal the details in your data. Dimensions affect the level of detail in the view.",
+            "data_type": "array[string | object]",
+            "enum_source": "datasource columns",
+            "sample_data": [
+              "region"
+            ],
+            "required": false,
+            "embedding": "否",
+            "default_value": []
+          },
+          {
+            "field_name": "contributionMode",
+            "description": "Calculate contribution per series or row",
+            "data_type": "string | null",
+            "enum_values": [
+              null,
+              "row",
+              "column"
+            ],
+            "sample_data": "row",
+            "required": false,
+            "embedding": "否",
+            "default_value": null
+          },
+          {
+            "field_name": "adhoc_filters",
+            "description": "源码未提供额外描述；字段标签为 Filters。",
+            "data_type": "array[object]",
+            "enum_source": "dataset columns + saved metrics + 当前 metrics",
+            "sample_data": [
+              {
+                "clause": "WHERE",
+                "subject": "order_date",
+                "operator": "TEMPORAL_RANGE",
+                "comparator": "No filter",
+                "expressionType": "SIMPLE"
+              }
+            ],
+            "required": false,
+            "embedding": "extra_form_data.append",
+            "default_value": []
+          },
+          {
+            "field_name": "limit",
+            "description": "Limits the number of series that get displayed. A joined subquery (or an extra phase where subqueries are not supported) is applied to limit the number of series that get fetched and rendered. This feature is useful when grouping by high cardinality column(s) though does increase the query complexity and cost.",
+            "data_type": "integer | null",
+            "enum_values": [
+              5,
+              10,
+              25,
+              50,
+              100,
+              500
+            ],
+            "sample_data": 10,
+            "required": false,
+            "embedding": "否",
+            "default_value": null
+          },
+          {
+            "field_name": "group_others_when_limit_reached",
+            "description": "Groups remaining series into an \"Others\" category when series limit is reached. This prevents incomplete time series data from being displayed.",
+            "data_type": "boolean",
+            "enum_values": [
+              true,
+              false
+            ],
+            "sample_data": false,
+            "required": false,
+            "embedding": "否",
+            "default_value": false
+          },
+          {
+            "field_name": "timeseries_limit_metric",
+            "description": "Orders the query result that generates the source data for this chart. If a series or row limit is reached, this determines what data are truncated. If undefined, defaults to the first metric (where appropriate).",
+            "data_type": "string | object | null",
+            "enum_source": "saved metrics + adhoc metrics",
+            "sample_data": {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "sales"
+              },
+              "aggregate": "SUM",
+              "label": "SUM(sales)"
+            },
+            "required": false,
+            "embedding": "否",
+            "default_value": null
+          },
+          {
+            "field_name": "order_desc",
+            "runtime_alias": "orderDesc",
+            "description": "If enabled, this control sorts the results/values descending, otherwise it sorts the results ascending.",
+            "data_type": "boolean",
+            "enum_values": [
+              true,
+              false
+            ],
+            "sample_data": true,
+            "required": false,
+            "embedding": "否",
+            "default_value": true
+          },
+          {
+            "field_name": "row_limit",
+            "runtime_alias": "rowLimit",
+            "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+            "data_type": "integer",
+            "enum_values": [
+              10,
+              50,
+              100,
+              250,
+              500,
+              1000,
+              5000,
+              10000,
+              50000
+            ],
+            "sample_data": 10000,
+            "required": false,
+            "embedding": "否",
+            "default_value": 10000
+          },
+          {
+            "field_name": "truncate_metric",
+            "description": "Whether to truncate metrics",
+            "data_type": "boolean",
+            "enum_values": [
+              true,
+              false
+            ],
+            "sample_data": true,
+            "required": false,
+            "embedding": "否",
+            "default_value": true
+          },
+          {
+            "field_name": "show_empty_columns",
+            "description": "Show empty columns",
+            "data_type": "boolean",
+            "enum_values": [
+              true,
+              false
+            ],
+            "sample_data": true,
+            "required": false,
+            "embedding": "否",
+            "default_value": true
+          }
+        ],
+        "Advanced analytics": [
+          {
+            "field_name": "rolling_type",
+            "description": "Defines a rolling window function to apply, works along with the [Periods] text box",
+            "data_type": "string | null",
+            "enum_values": [
+              null,
+              "mean",
+              "sum",
+              "std",
+              "cumsum"
+            ],
+            "sample_data": "mean",
+            "required": false,
+            "embedding": "否",
+            "default_value": null
+          },
+          {
+            "field_name": "rolling_periods",
+            "description": "Defines the size of the rolling window function, relative to the time granularity selected",
+            "data_type": "integer | null",
+            "sample_data": 7,
+            "required": false,
+            "embedding": "否",
+            "default_value": null
+          },
+          {
+            "field_name": "min_periods",
+            "description": "The minimum number of rolling periods required to show a value.",
+            "data_type": "integer | null",
+            "sample_data": 7,
+            "required": false,
+            "embedding": "否",
+            "default_value": null
+          },
+          {
+            "field_name": "time_compare",
+            "runtime_alias": "timeCompare",
+            "description": "Overlay one or more timeseries from a relative time period. Expects relative time deltas in natural language. Free text is supported.",
+            "data_type": "array[string]",
+            "enum_values": [
+              "1 day ago",
+              "1 week ago",
+              "28 days ago",
+              "30 days ago",
+              "52 weeks ago",
+              "1 year ago",
+              "104 weeks ago",
+              "2 years ago",
+              "156 weeks ago",
+              "3 years ago"
+            ],
+            "sample_data": [
+              "1 year ago"
+            ],
+            "required": false,
+            "embedding": "extra_form_data.override",
+            "default_value": null
+          },
+          {
+            "field_name": "comparison_type",
+            "runtime_alias": "comparisonType",
+            "description": "How to display time shifts: as individual lines; as the difference between the main time series and each time shift; as the percentage change; or as the ratio between series and time shifts.",
+            "data_type": "string",
+            "enum_values": [
+              "values",
+              "difference",
+              "percentage",
+              "ratio"
+            ],
+            "sample_data": "values",
+            "required": false,
+            "embedding": "否",
+            "default_value": "values"
+          },
+          {
+            "field_name": "resample_rule",
+            "runtime_alias": "resampleRule",
+            "description": "Pandas resample rule",
+            "data_type": "string | null",
+            "enum_values": [
+              "1T",
+              "1H",
+              "1D",
+              "7D",
+              "1MS",
+              "1M",
+              "1AS",
+              "1A"
+            ],
+            "sample_data": "1D",
+            "required": false,
+            "embedding": "否",
+            "default_value": null
+          },
+          {
+            "field_name": "resample_method",
+            "runtime_alias": "resampleMethod",
+            "description": "Pandas resample method",
+            "data_type": "string | null",
+            "enum_values": [
+              "asfreq",
+              "zerofill",
+              "linear",
+              "ffill",
+              "bfill",
+              "median",
+              "mean",
+              "sum"
+            ],
+            "sample_data": "asfreq",
+            "required": false,
+            "embedding": "否",
+            "default_value": null
+          }
+        ],
+        "Annotations and Layers": [
+          {
+            "field_name": "annotation_layers",
+            "runtime_alias": "annotationLayers",
+            "description": "Annotation Layers",
+            "data_type": "array[object]",
+            "sample_data": [],
+            "required": false,
+            "embedding": "否",
+            "default_value": []
+          }
+        ],
+        "Predictive Analytics": [
+          {
+            "field_name": "forecastEnabled",
+            "description": "Enable forecasting",
+            "data_type": "boolean",
+            "enum_values": [
+              true,
+              false
+            ],
+            "sample_data": false,
+            "required": false,
+            "embedding": "否",
+            "default_value": false
+          },
+          {
+            "field_name": "forecastPeriods",
+            "description": "How many periods into the future do we want to predict",
+            "data_type": "integer",
+            "sample_data": 10,
+            "required": false,
+            "embedding": "否",
+            "default_value": 10
+          },
+          {
+            "field_name": "forecastInterval",
+            "description": "Width of the confidence interval. Should be between 0 and 1",
+            "data_type": "number",
+            "sample_data": 0.8,
+            "required": false,
+            "embedding": "否",
+            "default_value": 0.8
+          },
+          {
+            "field_name": "forecastSeasonalityYearly",
+            "description": "Should yearly seasonality be applied. An integer value will specify Fourier order of seasonality.",
+            "data_type": "null | boolean | integer",
+            "enum_values": [
+              null,
+              true,
+              false
+            ],
+            "sample_data": true,
+            "required": false,
+            "embedding": "否",
+            "default_value": null
+          },
+          {
+            "field_name": "forecastSeasonalityWeekly",
+            "description": "Should weekly seasonality be applied. An integer value will specify Fourier order of seasonality.",
+            "data_type": "null | boolean | integer",
+            "enum_values": [
+              null,
+              true,
+              false
+            ],
+            "sample_data": true,
+            "required": false,
+            "embedding": "否",
+            "default_value": null
+          },
+          {
+            "field_name": "forecastSeasonalityDaily",
+            "description": "Should daily seasonality be applied. An integer value will specify Fourier order of seasonality.",
+            "data_type": "null | boolean | integer",
+            "enum_values": [
+              null,
+              true,
+              false
+            ],
+            "sample_data": false,
+            "required": false,
+            "embedding": "否",
+            "default_value": null
+          }
+        ],
+        "Chart Title": [
+          {
+            "field_name": "x_axis_title",
+            "runtime_alias": "xAxisTitle",
+            "description": "源码未提供额外描述；字段标签为 X Axis Title。",
+            "data_type": "string",
+            "sample_data": "Order Date",
+            "required": false,
+            "embedding": "否",
+            "default_value": ""
+          },
+          {
+            "field_name": "x_axis_title_margin",
+            "runtime_alias": "xAxisTitleMargin",
+            "description": "源码未提供额外描述；字段标签为 X Axis Title Margin。",
+            "data_type": "number | null",
+            "enum_values": [
+              15,
+              30,
+              50,
+              75,
+              100,
+              125,
+              150,
+              200
+            ],
+            "sample_data": 15,
+            "required": false,
+            "embedding": "否",
+            "default_value": 15
+          },
+          {
+            "field_name": "y_axis_title",
+            "runtime_alias": "yAxisTitle",
+            "description": "源码未提供额外描述；字段标签为 Y Axis Title。",
+            "data_type": "string",
+            "sample_data": "Sales",
+            "required": false,
+            "embedding": "否",
+            "default_value": ""
+          },
+          {
+            "field_name": "y_axis_title_margin",
+            "runtime_alias": "yAxisTitleMargin",
+            "description": "源码未提供额外描述；字段标签为 Y Axis Title Margin。",
+            "data_type": "number | null",
+            "enum_values": [
+              15,
+              30,
+              50,
+              75,
+              100,
+              125,
+              150,
+              200
+            ],
+            "sample_data": 30,
+            "required": false,
+            "embedding": "否",
+            "default_value": 30
+          },
+          {
+            "field_name": "y_axis_title_position",
+            "runtime_alias": "yAxisTitlePosition",
+            "description": "源码未提供额外描述；字段标签为 Y Axis Title Position。",
+            "data_type": "string",
+            "enum_values": [
+              "Left",
+              "Top"
+            ],
+            "sample_data": "Left",
+            "required": false,
+            "embedding": "否",
+            "default_value": "Left"
+          }
+        ],
+        "Chart Options / Series Order": [
+          {
+            "field_name": "sort_series_type",
+            "runtime_alias": "sortSeriesType",
+            "description": "Based on what should series be ordered on the chart and legend",
+            "data_type": "string",
+            "enum_values": [
+              "name",
+              "sum",
+              "min",
+              "max",
+              "avg"
+            ],
+            "sample_data": "sum",
+            "required": false,
+            "embedding": "否",
+            "default_value": "sum"
+          },
+          {
+            "field_name": "sort_series_ascending",
+            "runtime_alias": "sortSeriesAscending",
+            "description": "Sort series in ascending order",
+            "data_type": "boolean",
+            "enum_values": [
+              true,
+              false
+            ],
+            "sample_data": false,
+            "required": false,
+            "embedding": "否",
+            "default_value": false
+          }
+        ],
+        "Chart Options / General": [
+          {
+            "field_name": "color_scheme",
+            "runtime_alias": "colorScheme",
+            "description": "The color scheme for rendering chart",
+            "data_type": "string",
+            "enum_source": "categoricalSchemeRegistry.keys()",
+            "sample_data": "supersetColors",
+            "required": false,
+            "embedding": "否",
+            "default_value": "categoricalSchemeRegistry.getDefaultKey()"
+          },
+          {
+            "field_name": "time_shift_color",
+            "runtime_alias": "timeShiftColor",
+            "description": "When unchecked, colors from the selected color scheme will be used for time shifted series",
+            "data_type": "boolean",
+            "enum_values": [
+              true,
+              false
+            ],
+            "sample_data": true,
+            "required": false,
+            "embedding": "否",
+            "default_value": true
+          },
+          {
+            "field_name": "seriesType",
+            "description": "Series chart type (line, bar etc)",
+            "data_type": "string",
+            "enum_values": [
+              "line",
+              "smooth",
+              "start",
+              "middle",
+              "end"
+            ],
+            "sample_data": "line",
+            "required": false,
+            "embedding": "否",
+            "default_value": "line"
+          },
+          {
+            "field_name": "opacity",
+            "description": "Opacity of Area Chart. Also applies to confidence band.",
+            "data_type": "number",
+            "enum_values": [
+              0,
+              0.1,
+              0.2,
+              0.3,
+              0.4,
+              0.5,
+              0.6,
+              0.7,
+              0.8,
+              0.9,
+              1
+            ],
+            "sample_data": 0.2,
+            "required": false,
+            "embedding": "否",
+            "default_value": 0.2
+          },
+          {
+            "field_name": "show_value",
+            "runtime_alias": "showValue",
+            "description": "Show series values on the chart",
+            "data_type": "boolean",
+            "enum_values": [
+              true,
+              false
+            ],
+            "sample_data": false,
+            "required": false,
+            "embedding": "否",
+            "default_value": false
+          },
+          {
+            "field_name": "stack",
+            "description": "Stack series on top of each other",
+            "data_type": "string | null | boolean",
+            "enum_values": [
+              null,
+              "Stack",
+              "Stream",
+              "Expand"
+            ],
+            "sample_data": "Stack",
+            "required": false,
+            "embedding": "否",
+            "default_value": null,
+            "notes": "controlPanel 默认值是 null；Timeseries/DEFAULT_FORM_DATA 的 runtime fallback 为 false。"
+          },
+          {
+            "field_name": "only_total",
+            "runtime_alias": "onlyTotal",
+            "description": "Only show the total value on the stacked chart, and not show on the selected category",
+            "data_type": "boolean",
+            "enum_values": [
+              true,
+              false
+            ],
+            "sample_data": true,
+            "required": false,
+            "embedding": "否",
+            "default_value": true,
+            "notes": "controlPanel 默认值是 true；Timeseries/DEFAULT_FORM_DATA 的 runtime fallback 为 false。"
+          },
+          {
+            "field_name": "percentage_threshold",
+            "runtime_alias": "percentageThreshold",
+            "description": "Minimum threshold in percentage points for showing labels.",
+            "data_type": "number",
+            "sample_data": 5,
+            "required": false,
+            "embedding": "否",
+            "default_value": 0
+          },
+          {
+            "field_name": "show_extra_controls",
+            "description": "源码未提供额外描述；字段标签为 Extra Controls。",
+            "data_type": "boolean",
+            "enum_values": [
+              true,
+              false
+            ],
+            "sample_data": false,
+            "required": false,
+            "embedding": "否",
+            "default_value": false
+          },
+          {
+            "field_name": "markerEnabled",
+            "description": "Draw a marker on data points. Only applicable for line types.",
+            "data_type": "boolean",
+            "enum_values": [
+              true,
+              false
+            ],
+            "sample_data": false,
+            "required": false,
+            "embedding": "否",
+            "default_value": false
+          },
+          {
+            "field_name": "markerSize",
+            "description": "Size of marker. Also applies to forecast observations.",
+            "data_type": "number",
+            "sample_data": 6,
+            "required": false,
+            "embedding": "否",
+            "default_value": 6
+          },
+          {
+            "field_name": "minorTicks",
+            "description": "Show minor ticks on axes.",
+            "data_type": "boolean",
+            "enum_values": [
+              true,
+              false
+            ],
+            "sample_data": false,
+            "required": false,
+            "embedding": "否",
+            "default_value": false
+          },
+          {
+            "field_name": "zoomable",
+            "description": "Enable data zooming controls",
+            "data_type": "boolean",
+            "enum_values": [
+              true,
+              false
+            ],
+            "sample_data": false,
+            "required": false,
+            "embedding": "否",
+            "default_value": false
+          }
+        ],
+        "Chart Options / Legend": [
+          {
+            "field_name": "show_legend",
+            "runtime_alias": "showLegend",
+            "description": "Whether to display a legend for the chart",
+            "data_type": "boolean",
+            "enum_values": [
+              true,
+              false
+            ],
+            "sample_data": true,
+            "required": false,
+            "embedding": "否",
+            "default_value": true
+          },
+          {
+            "field_name": "legendType",
+            "description": "Legend type",
+            "data_type": "string",
+            "enum_values": [
+              "scroll",
+              "plain"
+            ],
+            "sample_data": "scroll",
+            "required": false,
+            "embedding": "否",
+            "default_value": "scroll"
+          },
+          {
+            "field_name": "legendOrientation",
+            "description": "Legend Orientation",
+            "data_type": "string",
+            "enum_values": [
+              "top",
+              "bottom",
+              "left",
+              "right"
+            ],
+            "sample_data": "top",
+            "required": false,
+            "embedding": "否",
+            "default_value": "top"
+          },
+          {
+            "field_name": "legendMargin",
+            "description": "Additional padding for legend.",
+            "data_type": "integer | null",
+            "sample_data": 12,
+            "required": false,
+            "embedding": "否",
+            "default_value": null
+          }
+        ],
+        "Chart Options / X Axis": [
+          {
+            "field_name": "x_axis_time_format",
+            "runtime_alias": "xAxisTimeFormat",
+            "description": "D3 time format syntax: https://github.com/d3/d3-time-format. When using other than adaptive formatting, labels may overlap",
+            "data_type": "string",
+            "enum_source": "D3_TIME_FORMAT_OPTIONS",
+            "sample_data": "smart_date",
+            "required": false,
+            "embedding": "否",
+            "default_value": "smart_date"
+          },
+          {
+            "field_name": "xAxisLabelRotation",
+            "description": "Input field supports custom rotation. e.g. 30 for 30°",
+            "data_type": "number",
+            "enum_values": [
+              0,
+              45,
+              90
+            ],
+            "sample_data": 0,
+            "required": false,
+            "embedding": "否",
+            "default_value": 0
+          },
+          {
+            "field_name": "xAxisLabelInterval",
+            "description": "Choose how many X-Axis labels to show",
+            "data_type": "string",
+            "enum_values": [
+              "auto",
+              "0"
+            ],
+            "sample_data": "auto",
+            "required": false,
+            "embedding": "否",
+            "default_value": "auto"
+          },
+          {
+            "field_name": "truncateXAxis",
+            "description": "Truncate X Axis. Can be overridden by specifying a min or max bound. Only applicable for numerical X axis.",
+            "data_type": "boolean",
+            "enum_values": [
+              true,
+              false
+            ],
+            "sample_data": true,
+            "required": false,
+            "embedding": "否",
+            "default_value": true
+          },
+          {
+            "field_name": "xAxisBounds",
+            "description": "Bounds for numerical X axis. Not applicable for temporal or categorical axes. When left empty, the bounds are dynamically defined based on the min/max of the data. Note that this feature will only expand the axis range. It won't narrow the data's extent.",
+            "data_type": "array[number | null, number | null] | null",
+            "sample_data": [
+              0,
+              100
+            ],
+            "required": false,
+            "embedding": "否",
+            "default_value": null
+          }
+        ],
+        "Chart Options / Tooltip": [
+          {
+            "field_name": "rich_tooltip",
+            "runtime_alias": "richTooltip",
+            "description": "Shows a list of all series available at that point in time",
+            "data_type": "boolean",
+            "enum_values": [
+              true,
+              false
+            ],
+            "sample_data": true,
+            "required": false,
+            "embedding": "否",
+            "default_value": true
+          },
+          {
+            "field_name": "showTooltipTotal",
+            "description": "Whether to display the total value in the tooltip",
+            "data_type": "boolean",
+            "enum_values": [
+              true,
+              false
+            ],
+            "sample_data": true,
+            "required": false,
+            "embedding": "否",
+            "default_value": true
+          },
+          {
+            "field_name": "showTooltipPercentage",
+            "description": "Whether to display the percentage value in the tooltip",
+            "data_type": "boolean",
+            "enum_values": [
+              true,
+              false
+            ],
+            "sample_data": false,
+            "required": false,
+            "embedding": "否",
+            "default_value": false
+          },
+          {
+            "field_name": "tooltipSortByMetric",
+            "description": "Whether to sort tooltip by the selected metric in descending order.",
+            "data_type": "boolean",
+            "enum_values": [
+              true,
+              false
+            ],
+            "sample_data": false,
+            "required": false,
+            "embedding": "否",
+            "default_value": false
+          },
+          {
+            "field_name": "tooltipTimeFormat",
+            "description": "Tooltip time format; shared control derives from x_axis_time_format.",
+            "data_type": "string",
+            "enum_source": "D3_TIME_FORMAT_OPTIONS",
+            "sample_data": "smart_date",
+            "required": false,
+            "embedding": "否",
+            "default_value": "smart_date"
+          }
+        ],
+        "Chart Options / Y Axis": [
+          {
+            "field_name": "y_axis_format",
+            "runtime_alias": "yAxisFormat",
+            "description": "D3 format syntax: https://github.com/d3/d3-format",
+            "data_type": "string",
+            "enum_source": "D3_FORMAT_OPTIONS; comparison_type=percentage 时仅保留百分比格式",
+            "sample_data": "SMART_NUMBER",
+            "required": false,
+            "embedding": "否",
+            "default_value": "SMART_NUMBER"
+          },
+          {
+            "field_name": "currency_format",
+            "runtime_alias": "currencyFormat",
+            "description": "Currency format",
+            "data_type": "string | object | null",
+            "sample_data": {
+              "symbol": "$",
+              "symbolPosition": "prefix"
+            },
+            "required": false,
+            "embedding": "否",
+            "default_value": null
+          },
+          {
+            "field_name": "logAxis",
+            "description": "Logarithmic y-axis",
+            "data_type": "boolean",
+            "enum_values": [
+              true,
+              false
+            ],
+            "sample_data": false,
+            "required": false,
+            "embedding": "否",
+            "default_value": false
+          },
+          {
+            "field_name": "minorSplitLine",
+            "description": "Draw split lines for minor y-axis ticks",
+            "data_type": "boolean",
+            "enum_values": [
+              true,
+              false
+            ],
+            "sample_data": false,
+            "required": false,
+            "embedding": "否",
+            "default_value": false
+          },
+          {
+            "field_name": "truncateYAxis",
+            "description": "Truncate Y Axis. Can be overridden by specifying a min or max bound.",
+            "data_type": "boolean",
+            "enum_values": [
+              true,
+              false
+            ],
+            "sample_data": false,
+            "required": false,
+            "embedding": "否",
+            "default_value": false
+          },
+          {
+            "field_name": "y_axis_bounds",
+            "runtime_alias": "yAxisBounds",
+            "description": "Bounds for the Y-axis. When left empty, the bounds are dynamically defined based on the min/max of the data. Note that this feature will only expand the axis range. It won't narrow the data's extent.",
+            "data_type": "array[number | null, number | null]",
+            "sample_data": [
+              null,
+              null
+            ],
+            "required": false,
+            "embedding": "否",
+            "default_value": [
+              null,
+              null
+            ]
+          }
+        ]
+      },
+      "详细描述": "Area charts are similar to line charts in that they represent variables with the same scale, but area charts stack the metrics on top of each other.",
+      "表现形态": "时间序列（面积）",
+      "适用场景": [
+        "随时间的趋势变化",
+        "多序列占比对比（堆叠面积）",
+        "累计值/总量趋势展示"
+      ],
+      "vizKey": "Area",
+      "pluginCategory": "Evolution",
+      "pluginTags": [],
+      "category": "timeseries",
+      "tags": [
+        "timeseries",
+        "area",
+        "stacked"
+      ],
+      "关键字段": [
+        {
+          "key": "x_axis",
+          "required": true,
+          "description": "Dimension to use on x-axis."
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+        },
+        {
+          "key": "groupby",
+          "required": false,
+          "description": "Optional breakdown dimensions for multi-series area charts."
+        },
+        {
+          "key": "seriesType",
+          "required": false,
+          "description": "Series chart type (line, smooth line, step start/middle/end) for the area chart."
+        },
+        {
+          "key": "stack",
+          "required": false,
+          "description": "Stack series on top of each other; area chart supports None, Stack, Stream and Expand."
+        },
+        {
+          "key": "opacity",
+          "required": false,
+          "description": "Opacity of Area Chart. Also applies to confidence band."
+        },
+        {
+          "key": "markerEnabled",
+          "required": false,
+          "description": "Draw a marker on data points. Only applicable for line types."
+        }
+      ]
+    },
+    {
+      "name": "Bar Chart",
+      "viztype": "echarts_timeseries_bar",
+      "详细描述": "Time-series bar charts display categorical data with rectangular bars with heights or lengths proportional to the values that they represent, ordered by time dimension.",
+      "表现形态": "时间序列（柱状）",
+      "适用场景": [
+        "时间维度的数值对比",
+        "离散时间点的指标差异",
+        "多维度分组柱状对比"
+      ],
+      "vizKey": "Bar",
+      "pluginCategory": "Evolution",
+      "pluginTags": [],
+      "category": "timeseries",
+      "tags": [
+        "timeseries",
+        "bar",
+        "categorical"
+      ],
+      "关键字段": [
+        {
+          "key": "groupby",
+          "required": true,
+          "description": "维度字段列表，用于分组/系列/分类轴（通常为时间维度）。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "聚合指标列表（可多个），用于绘制多系列柱状对比。"
+        },
+        {
+          "key": "time_grain_sqla",
+          "required": false,
+          "description": "时间粒度（如 day/week/month），用于时间聚合桶。"
+        },
+        {
+          "key": "orientation",
+          "required": false,
+          "description": "柱状图方向（horizontal/vertical），控制横向/纵向展示。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Big Number",
+      "viztype": "big_number_total",
+      "详细描述": "Big Number Total chart displays a cumulative total metric value in a prominent format, with optional comparison to previous periods.",
+      "表现形态": "累计单值指标（大数字）",
+      "适用场景": [
+        "累计类KPI展示（如累计销售额、总用户数）",
+        "全量数据指标汇总",
+        "带累计对比的关键指标"
+      ],
+      "vizKey": "BigNumberTotal",
+      "pluginCategory": "KPI",
+      "pluginTags": [],
+      "category": "kpi",
+      "tags": [
+        "kpi",
+        "single_value",
+        "total",
+        "cumulative"
+      ],
+      "关键字段": [
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "聚合指标（仅单个），用于展示累计核心KPI数值。"
+        },
+        {
+          "key": "number_format",
+          "required": false,
+          "description": "数字格式化（如 SMART_NUMBER、PERCENT），控制数值展示格式。"
+        },
+        {
+          "key": "compare_lag",
+          "required": false,
+          "description": "对比时间偏移（如 7 天、1 个月），用于展示累计值的周期对比。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Big Number with Trendline",
+      "viztype": "big_number",
+      "详细描述": "Big Number chart displays a single key metric value in a prominent format, often used for KPI dashboards to highlight key values.",
+      "表现形态": "单值指标（大数字）",
+      "适用场景": [
+        "核心KPI展示（如总销售额、用户数）",
+        "仪表盘关键指标突出显示",
+        "无维度对比的单值展示"
+      ],
+      "vizKey": "BigNumber",
+      "pluginCategory": "KPI",
+      "pluginTags": [],
+      "category": "kpi",
+      "tags": [
+        "kpi",
+        "single_value",
+        "metric"
+      ],
+      "关键字段": [
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "聚合指标（仅单个），用于展示核心KPI数值。"
+        },
+        {
+          "key": "number_format",
+          "required": false,
+          "description": "数字格式化（如 SMART_NUMBER、PERCENT），控制数值展示格式。"
+        },
+        {
+          "key": "subtitle_text",
+          "required": false,
+          "description": "副标题文本，用于补充说明指标含义。"
+        },
+        {
+          "key": "comparison_type",
+          "required": false,
+          "description": "对比类型（如 previous_period、previous_year），用于展示指标同比/环比变化。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Box Plot",
+      "viztype": "box_plot",
+      "详细描述": "Box Plot (Box and Whisker) chart displays the distribution of numerical data based on the five-number summary: minimum, first quartile, median, third quartile, and maximum.",
+      "表现形态": "箱线图（分布型）",
+      "适用场景": [
+        "数据分布特征分析（如中位数、四分位、异常值）",
+        "多组数据分布对比",
+        "离群值检测"
+      ],
+      "vizKey": "BoxPlot",
+      "pluginCategory": "Distribution",
+      "pluginTags": [],
+      "category": "distribution",
+      "tags": [
+        "boxplot",
+        "distribution",
+        "statistics",
+        "outliers"
+      ],
+      "关键字段": [
+        {
+          "key": "groupby",
+          "required": true,
+          "description": "维度字段列表，用于分组展示不同类别的箱线图。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "数值型指标，用于计算箱线图的分布特征（中位数、四分位等）。"
+        },
+        {
+          "key": "show_outliers",
+          "required": false,
+          "description": "是否展示异常值（true/false），控制离群点的显示。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Bubble Chart",
+      "viztype": "bubble_v2",
+      "详细描述": "Bubble Chart displays three dimensions of data: x-axis, y-axis, and bubble size (representing a third metric), with optional color coding for categories.",
+      "表现形态": "气泡图（关联型）",
+      "适用场景": [
+        "三维数据关系分析（X/Y轴+大小）",
+        "多维度指标关联对比",
+        "分类气泡聚类展示"
+      ],
+      "vizKey": "Bubble",
+      "pluginCategory": "Relationship",
+      "pluginTags": [],
+      "category": "relationship",
+      "tags": [
+        "bubble",
+        "relationship",
+        "3d",
+        "correlation"
+      ],
+      "关键字段": [
+        {
+          "key": "x_axis",
+          "required": true,
+          "description": "X 轴数值型字段，用于气泡的水平位置。"
+        },
+        {
+          "key": "y_axis",
+          "required": true,
+          "description": "Y 轴数值型字段，用于气泡的垂直位置。"
+        },
+        {
+          "key": "size",
+          "required": true,
+          "description": "气泡大小对应的指标，用于表示第三个维度的数值。"
+        },
+        {
+          "key": "bubble_max_size",
+          "required": false,
+          "description": "气泡最大尺寸，控制气泡大小的上限。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Bubble Chart (legacy)",
+      "viztype": "bubble",
+      "详细描述": "Legacy Bubble Chart displays three dimensions of data (x-axis, y-axis, bubble size) with basic styling, maintained for backward compatibility.",
+      "表现形态": "旧版气泡图（关联型）",
+      "适用场景": [
+        "三维数据关系分析（兼容旧版配置）",
+        "简单多维度指标关联对比",
+        "遗留系统的气泡图展示"
+      ],
+      "vizKey": "LegacyBubble",
+      "pluginCategory": "Relationship",
+      "pluginTags": [],
+      "category": "relationship",
+      "tags": [
+        "bubble",
+        "legacy",
+        "relationship",
+        "3d"
+      ],
+      "关键字段": [
+        {
+          "key": "x_axis",
+          "required": true,
+          "description": "X 轴数值型字段，用于气泡的水平位置。"
+        },
+        {
+          "key": "y_axis",
+          "required": true,
+          "description": "Y 轴数值型字段，用于气泡的垂直位置。"
+        },
+        {
+          "key": "size",
+          "required": true,
+          "description": "气泡大小对应的指标，用于表示第三个维度的数值。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Bullet Chart",
+      "viztype": "bullet",
+      "详细描述": "Bullet Chart displays a primary metric alongside comparative metrics (target, range) in a compact format, ideal for dashboards and KPI tracking.",
+      "表现形态": "子弹图（KPI对比型）",
+      "适用场景": [
+        "KPI目标达成率展示（如实际值vs目标值）",
+        "指标范围对比（如实际值vs参考范围）",
+        "紧凑型多指标对比仪表盘"
+      ],
+      "vizKey": "Bullet",
+      "pluginCategory": "KPI",
+      "pluginTags": [],
+      "category": "kpi",
+      "tags": [
+        "kpi",
+        "bullet",
+        "target",
+        "comparison"
+      ],
+      "关键字段": [
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "核心指标（实际值），用于展示主要KPI数值。"
+        },
+        {
+          "key": "target",
+          "required": true,
+          "description": "目标值指标，用于对比实际值与目标值的差距。"
+        },
+        {
+          "key": "range",
+          "required": false,
+          "description": "参考范围指标，用于展示指标的合理范围。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Calendar Heatmap",
+      "viztype": "cal_heatmap",
+      "详细描述": "Calendar Heatmap displays numerical data aggregated by date (day/week/month) using color intensity, ideal for time-based pattern analysis.",
+      "表现形态": "日历热力图（时间维度）",
+      "适用场景": [
+        "按日期的指标分布（如每日销售额、用户活跃度）",
+        "时间维度的热点分析",
+        "周期性（周/月）规律识别"
+      ],
+      "vizKey": "Calendar",
+      "pluginCategory": "Evolution",
+      "pluginTags": [],
+      "category": "timeseries",
+      "tags": [
+        "timeseries",
+        "calendar",
+        "heatmap",
+        "time_based"
+      ],
+      "关键字段": [
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "聚合指标，用于计算每日/每周的数值（热力图颜色依据）。"
+        },
+        {
+          "key": "time_grain_sqla",
+          "required": true,
+          "description": "时间粒度（如 day/week），用于日历的聚合单位。"
+        },
+        {
+          "key": "number_format",
+          "required": false,
+          "description": "数字格式化，控制tooltip中数值的展示格式。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Cartodiagram",
+      "viztype": "cartodiagram",
+      "详细描述": "CartoDiagram overlays arbitrary Superset charts onto a customizable geographic map (supporting WMS/WFS/XYZ layers), enabling combined visualization of chart metrics and spatial data.",
+      "表现形态": "地图叠加图表（复合地理空间型）",
+      "适用场景": [
+        "地理空间与多维度指标的联合分析（如地图上叠加柱状图/折线图展示区域趋势）",
+        "自定义底图（WMS/WFS/XYZ）+ 业务图表的融合展示",
+        "多尺度地理视角下的精细化指标对比"
+      ],
+      "vizKey": "CartoDiagram",
+      "pluginCategory": "Geospatial",
+      "pluginTags": [],
+      "category": "geospatial",
+      "tags": [
+        "cartodiagram",
+        "geospatial",
+        "chart overlay",
+        "map layer",
+        "spatial analysis"
+      ],
+      "关键字段": [
+        {
+          "key": "map_layers",
+          "required": true,
+          "description": "地图底图层配置，支持WMS、WFS、XYZ等类型的背景图层定义。"
+        },
+        {
+          "key": "chart_viz_type",
+          "required": true,
+          "description": "叠加的图表类型（如bar、line、pie），指定要渲染在地图上的图表类型。"
+        },
+        {
+          "key": "geographic_field",
+          "required": true,
+          "description": "地理维度字段，用于关联地图位置与图表数据。"
+        },
+        {
+          "key": "chart_form_data",
+          "required": true,
+          "description": "叠加图表的配置参数，复用对应图表的所有表单配置（如groupby、metrics）。"
+        },
+        {
+          "key": "initial_map_extent",
+          "required": false,
+          "description": "初始地图视野范围，定义地图加载时的经纬度边界与缩放级别。"
+        },
+        {
+          "key": "chart_size",
+          "required": false,
+          "description": "图表尺寸配置（按缩放级别自定义），控制不同地图缩放层级下的图表大小。"
+        },
+        {
+          "key": "chart_background",
+          "required": false,
+          "description": "图表背景样式（颜色、圆角），优化地图上图表的视觉展示效果。"
+        },
+        {
+          "key": "map_interaction",
+          "required": false,
+          "description": "地图交互配置（平移、缩放、旋转），控制地图的交互行为。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Chord Diagram",
+      "viztype": "chord",
+      "详细描述": "Chord Chart displays directed relationships between entities, with chord width representing the strength of the relationship.",
+      "表现形态": "弦图（关联关系型）",
+      "适用场景": [
+        "实体间的流向/关联分析（如用户来源-去向、产品流转）",
+        "多实体双向关系对比",
+        "关系强度可视化"
+      ],
+      "vizKey": "Chord",
+      "pluginCategory": "Relationship",
+      "pluginTags": [],
+      "category": "relationship",
+      "tags": [
+        "chord",
+        "relationship",
+        "flow",
+        "network"
+      ],
+      "关键字段": [
+        {
+          "key": "source",
+          "required": true,
+          "description": "来源实体字段，用于定义关系的起点。"
+        },
+        {
+          "key": "target",
+          "required": true,
+          "description": "目标实体字段，用于定义关系的终点。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "关系强度指标，用于控制弦的宽度（数值越大弦越宽）。"
+        },
+        {
+          "key": "sort_entities",
+          "required": false,
+          "description": "实体排序方式（如 alphabetical、value），控制实体的展示顺序。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Country Map",
+      "viztype": "country_map",
+      "详细描述": "Country Map visualizes data on a country-level geographic map, enabling detailed spatial analysis of metrics within a specific country's administrative divisions (e.g., provinces, states).",
+      "表现形态": "国家地图（地理空间型）",
+      "适用场景": [
+        "单一国家内各行政区域的指标对比（如各省人口、各州市销售额）",
+        "国家级业务数据的精细化空间分布展示",
+        "区域级趋势分析与地理关联洞察"
+      ],
+      "vizKey": "CountryMap",
+      "pluginCategory": "Geospatial",
+      "pluginTags": [],
+      "category": "geospatial",
+      "tags": [
+        "country_map",
+        "geospatial",
+        "national",
+        "administrative",
+        "spatial"
+      ],
+      "关键字段": [
+        {
+          "key": "geographic_field",
+          "required": true,
+          "description": "地理维度字段（如省份/州编码、名称），用于关联国家内部行政边界与数据。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "聚合指标，用于计算每个行政区域的数值（地图配色/尺寸依据）。"
+        },
+        {
+          "key": "country_code",
+          "required": true,
+          "description": "国家编码（如CN、US），用于指定渲染的目标国家地图。"
+        },
+        {
+          "key": "administrative_level",
+          "required": false,
+          "description": "行政层级（如省/州、市/县），控制地图展示的行政划分粒度。"
+        },
+        {
+          "key": "legend_position",
+          "required": false,
+          "description": "图例位置（如top、right、bottom），控制图例在地图中的展示位置。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "deck.gl 3D Hexagon",
+      "viztype": "deck_hex",
+      "详细描述": "Overlays a hexagonal grid on a map, and aggregates data within the boundary of each cell.",
+      "表现形态": "地图/空间可视化（deck.gl）",
+      "适用场景": [
+        "空间点/面/轨迹数据展示",
+        "地理分布密度（网格/六边形/热力）",
+        "地图交互（缩放/旋转/视角）"
+      ],
+      "vizKey": null,
+      "pluginCategory": "Geospatial",
+      "pluginTags": [
+        "deckGL",
+        "3D",
+        "Geo",
+        "Comparison"
+      ],
+      "category": "geospatial",
+      "tags": [
+        "geo",
+        "deckgl",
+        "deckGL",
+        "3D",
+        "Geo",
+        "Comparison",
+        "geospatial",
+        "aggregate"
+      ],
+      "关键字段": [
+        {
+          "key": "groupby",
+          "required": true,
+          "description": "维度字段列表（列名）。用于分组/系列/分类轴，把明细数据按维度聚合到可视化需要的粒度。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "指标列表（聚合/度量）。用于计算数值（如 sum(sales)、count(*)），通常至少提供 1 个。"
+        },
+        {
+          "key": "percent_metrics",
+          "required": true,
+          "description": "百分比指标列表。用于把指标转换为百分比/占比列（具体展示随图表而定）；通常与 metrics 搭配使用。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "deck.gl Arc",
+      "viztype": "deck_arc",
+      "详细描述": "Plot the distance (like flight paths) between origin and destination.",
+      "表现形态": "地图/空间可视化（deck.gl）",
+      "适用场景": [
+        "空间点/面/轨迹数据展示",
+        "地理分布密度（网格/六边形/热力）",
+        "地图交互（缩放/旋转/视角）"
+      ],
+      "vizKey": null,
+      "pluginCategory": "Geospatial",
+      "pluginTags": [
+        "deckGL",
+        "Geo",
+        "3D",
+        "Relational",
+        "Web"
+      ],
+      "category": "geospatial",
+      "tags": [
+        "geo",
+        "deckgl",
+        "deckGL",
+        "Geo",
+        "3D",
+        "Relational",
+        "Web",
+        "geospatial",
+        "non_aggregate"
+      ],
+      "关键字段": [
+        {
+          "key": "groupby",
+          "required": true,
+          "description": "维度字段列表（列名）。用于分组/系列/分类轴，把明细数据按维度聚合到可视化需要的粒度。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "指标列表（聚合/度量）。用于计算数值（如 sum(sales)、count(*)），通常至少提供 1 个。"
+        },
+        {
+          "key": "percent_metrics",
+          "required": true,
+          "description": "百分比指标列表。用于把指标转换为百分比/占比列（具体展示随图表而定）；通常与 metrics 搭配使用。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "deck.gl Contour",
+      "viztype": "deck_contour",
+      "详细描述": "Uses Gaussian Kernel Density Estimation to visualize spatial distribution of data",
+      "表现形态": "地图/空间可视化（deck.gl）",
+      "适用场景": [
+        "空间点/面/轨迹数据展示",
+        "地理分布密度（网格/六边形/热力）",
+        "地图交互（缩放/旋转/视角）"
+      ],
+      "vizKey": null,
+      "pluginCategory": "Geospatial",
+      "pluginTags": [
+        "deckGL",
+        "Spatial",
+        "Comparison"
+      ],
+      "category": "geospatial",
+      "tags": [
+        "geo",
+        "deckgl",
+        "deckGL",
+        "Spatial",
+        "Comparison",
+        "geospatial",
+        "aggregate"
+      ],
+      "关键字段": [
+        {
+          "key": "groupby",
+          "required": true,
+          "description": "维度字段列表（列名）。用于分组/系列/分类轴，把明细数据按维度聚合到可视化需要的粒度。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "指标列表（聚合/度量）。用于计算数值（如 sum(sales)、count(*)），通常至少提供 1 个。"
+        },
+        {
+          "key": "percent_metrics",
+          "required": true,
+          "description": "百分比指标列表。用于把指标转换为百分比/占比列（具体展示随图表而定）；通常与 metrics 搭配使用。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "deck.gl Geojson",
+      "viztype": "deck_geojson",
+      "详细描述": "The GeoJsonLayer takes in GeoJSON formatted data and renders it as interactive polygons, lines and points (circles, icons and/or texts).",
+      "表现形态": "地图/空间可视化（deck.gl）",
+      "适用场景": [
+        "空间点/面/轨迹数据展示",
+        "地理分布密度（网格/六边形/热力）",
+        "地图交互（缩放/旋转/视角）"
+      ],
+      "vizKey": null,
+      "pluginCategory": "Geospatial",
+      "pluginTags": [
+        "deckGL",
+        "2D"
+      ],
+      "category": "geospatial",
+      "tags": [
+        "geo",
+        "deckgl",
+        "deckGL",
+        "2D",
+        "geospatial",
+        "non_aggregate"
+      ],
+      "关键字段": [
+        {
+          "key": "groupby",
+          "required": true,
+          "description": "维度字段列表（列名）。用于分组/系列/分类轴，把明细数据按维度聚合到可视化需要的粒度。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "指标列表（聚合/度量）。用于计算数值（如 sum(sales)、count(*)），通常至少提供 1 个。"
+        },
+        {
+          "key": "percent_metrics",
+          "required": true,
+          "description": "百分比指标列表。用于把指标转换为百分比/占比列（具体展示随图表而定）；通常与 metrics 搭配使用。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "deck.gl Grid",
+      "viztype": "deck_grid",
+      "详细描述": "Visualize geospatial data like 3D buildings, landscapes, or objects in grid view.",
+      "表现形态": "地图/空间可视化（deck.gl）",
+      "适用场景": [
+        "空间点/面/轨迹数据展示",
+        "地理分布密度（网格/六边形/热力）",
+        "地图交互（缩放/旋转/视角）"
+      ],
+      "vizKey": null,
+      "pluginCategory": "Geospatial",
+      "pluginTags": [
+        "deckGL",
+        "3D",
+        "Comparison"
+      ],
+      "category": "geospatial",
+      "tags": [
+        "geo",
+        "deckgl",
+        "deckGL",
+        "3D",
+        "Comparison",
+        "geospatial",
+        "aggregate"
+      ],
+      "关键字段": [
+        {
+          "key": "groupby",
+          "required": true,
+          "description": "维度字段列表（列名）。用于分组/系列/分类轴，把明细数据按维度聚合到可视化需要的粒度。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "指标列表（聚合/度量）。用于计算数值（如 sum(sales)、count(*)），通常至少提供 1 个。"
+        },
+        {
+          "key": "percent_metrics",
+          "required": true,
+          "description": "百分比指标列表。用于把指标转换为百分比/占比列（具体展示随图表而定）；通常与 metrics 搭配使用。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "deck.gl Heatmap",
+      "viztype": "deck_heatmap",
+      "详细描述": "Uses Gaussian Kernel Density Estimation to visualize spatial distribution of data",
+      "表现形态": "地图/空间可视化（deck.gl）",
+      "适用场景": [
+        "空间点/面/轨迹数据展示",
+        "地理分布密度（网格/六边形/热力）",
+        "地图交互（缩放/旋转/视角）"
+      ],
+      "vizKey": null,
+      "pluginCategory": "Geospatial",
+      "pluginTags": [
+        "deckGL",
+        "Spatial",
+        "Comparison"
+      ],
+      "category": "geospatial",
+      "tags": [
+        "geo",
+        "deckgl",
+        "deckGL",
+        "Spatial",
+        "Comparison",
+        "geospatial",
+        "aggregate"
+      ],
+      "关键字段": [
+        {
+          "key": "groupby",
+          "required": true,
+          "description": "维度字段列表（列名）。用于分组/系列/分类轴，把明细数据按维度聚合到可视化需要的粒度。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "指标列表（聚合/度量）。用于计算数值（如 sum(sales)、count(*)），通常至少提供 1 个。"
+        },
+        {
+          "key": "percent_metrics",
+          "required": true,
+          "description": "百分比指标列表。用于把指标转换为百分比/占比列（具体展示随图表而定）；通常与 metrics 搭配使用。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "deck.gl Multiple Layers",
+      "viztype": "deck_multi",
+      "详细描述": "Compose multiple layers together to form complex visuals.",
+      "表现形态": "地图/空间可视化（deck.gl）",
+      "适用场景": [
+        "空间点/面/轨迹数据展示",
+        "地理分布密度（网格/六边形/热力）",
+        "地图交互（缩放/旋转/视角）"
+      ],
+      "vizKey": null,
+      "pluginCategory": "Geospatial",
+      "pluginTags": [
+        "deckGL",
+        "Multi-Layers"
+      ],
+      "category": "geospatial",
+      "tags": [
+        "geo",
+        "deckgl",
+        "deckGL",
+        "Multi-Layers",
+        "geospatial",
+        "mixed"
+      ],
+      "关键字段": [
+        {
+          "key": "groupby",
+          "required": true,
+          "description": "维度字段列表（列名）。用于分组/系列/分类轴，把明细数据按维度聚合到可视化需要的粒度。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "指标列表（聚合/度量）。用于计算数值（如 sum(sales)、count(*)），通常至少提供 1 个。"
+        },
+        {
+          "key": "percent_metrics",
+          "required": true,
+          "description": "百分比指标列表。用于把指标转换为百分比/占比列（具体展示随图表而定）；通常与 metrics 搭配使用。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "deck.gl Path",
+      "viztype": "deck_path",
+      "详细描述": "Visualizes connected points, which form a path, on a map.",
+      "表现形态": "地图/空间可视化（deck.gl）",
+      "适用场景": [
+        "空间点/面/轨迹数据展示",
+        "地理分布密度（网格/六边形/热力）",
+        "地图交互（缩放/旋转/视角）"
+      ],
+      "vizKey": null,
+      "pluginCategory": "Geospatial",
+      "pluginTags": [
+        "deckGL",
+        "Web"
+      ],
+      "category": "geospatial",
+      "tags": [
+        "geo",
+        "deckgl",
+        "deckGL",
+        "Web",
+        "geospatial",
+        "non_aggregate"
+      ],
+      "关键字段": [
+        {
+          "key": "groupby",
+          "required": true,
+          "description": "维度字段列表（列名）。用于分组/系列/分类轴，把明细数据按维度聚合到可视化需要的粒度。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "指标列表（聚合/度量）。用于计算数值（如 sum(sales)、count(*)），通常至少提供 1 个。"
+        },
+        {
+          "key": "percent_metrics",
+          "required": true,
+          "description": "百分比指标列表。用于把指标转换为百分比/占比列（具体展示随图表而定）；通常与 metrics 搭配使用。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "deck.gl Polygon",
+      "viztype": "deck_polygon",
+      "详细描述": "Visualizes geographic areas from your data as polygons on a Mapbox rendered map. Polygons can be colored using a metric.",
+      "表现形态": "地图/空间可视化（deck.gl）",
+      "适用场景": [
+        "空间点/面/轨迹数据展示",
+        "地理分布密度（网格/六边形/热力）",
+        "地图交互（缩放/旋转/视角）"
+      ],
+      "vizKey": null,
+      "pluginCategory": "Geospatial",
+      "pluginTags": [
+        "deckGL",
+        "3D",
+        "Multi-Dimensions",
+        "Geo"
+      ],
+      "category": "geospatial",
+      "tags": [
+        "geo",
+        "deckgl",
+        "deckGL",
+        "3D",
+        "Multi-Dimensions",
+        "Geo",
+        "geospatial",
+        "non_aggregate"
+      ],
+      "关键字段": [
+        {
+          "key": "groupby",
+          "required": true,
+          "description": "维度字段列表（列名）。用于分组/系列/分类轴，把明细数据按维度聚合到可视化需要的粒度。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "指标列表（聚合/度量）。用于计算数值（如 sum(sales)、count(*)），通常至少提供 1 个。"
+        },
+        {
+          "key": "percent_metrics",
+          "required": true,
+          "description": "百分比指标列表。用于把指标转换为百分比/占比列（具体展示随图表而定）；通常与 metrics 搭配使用。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "deck.gl Scatterplot",
+      "viztype": "deck_scatter",
+      "详细描述": "A map that takes rendering circles with a variable radius at latitude/longitude coordinates",
+      "表现形态": "地图/空间可视化（deck.gl）",
+      "适用场景": [
+        "空间点/面/轨迹数据展示",
+        "地理分布密度（网格/六边形/热力）",
+        "地图交互（缩放/旋转/视角）"
+      ],
+      "vizKey": null,
+      "pluginCategory": "Geospatial",
+      "pluginTags": [
+        "deckGL",
+        "Comparison",
+        "Scatter",
+        "2D",
+        "Geo",
+        "Intensity",
+        "Density"
+      ],
+      "category": "geospatial",
+      "tags": [
+        "geo",
+        "deckgl",
+        "deckGL",
+        "Comparison",
+        "Scatter",
+        "2D",
+        "Geo",
+        "Intensity",
+        "Density",
+        "geospatial",
+        "non_aggregate"
+      ],
+      "关键字段": [
+        {
+          "key": "groupby",
+          "required": true,
+          "description": "维度字段列表（列名）。用于分组/系列/分类轴，把明细数据按维度聚合到可视化需要的粒度。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "指标列表（聚合/度量）。用于计算数值（如 sum(sales)、count(*)），通常至少提供 1 个。"
+        },
+        {
+          "key": "percent_metrics",
+          "required": true,
+          "description": "百分比指标列表。用于把指标转换为百分比/占比列（具体展示随图表而定）；通常与 metrics 搭配使用。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "deck.gl Screen Grid",
+      "viztype": "deck_screengrid",
+      "详细描述": "Aggregates data within the boundary of grid cells and maps the aggregated values to a dynamic color scale",
+      "表现形态": "地图/空间可视化（deck.gl）",
+      "适用场景": [
+        "空间点/面/轨迹数据展示",
+        "地理分布密度（网格/六边形/热力）",
+        "地图交互（缩放/旋转/视角）"
+      ],
+      "vizKey": null,
+      "pluginCategory": "Geospatial",
+      "pluginTags": [
+        "deckGL",
+        "Comparison",
+        "Intensity",
+        "Density"
+      ],
+      "category": "geospatial",
+      "tags": [
+        "geo",
+        "deckgl",
+        "deckGL",
+        "Comparison",
+        "Intensity",
+        "Density",
+        "geospatial",
+        "aggregate"
+      ],
+      "关键字段": [
+        {
+          "key": "groupby",
+          "required": true,
+          "description": "维度字段列表（列名）。用于分组/系列/分类轴，把明细数据按维度聚合到可视化需要的粒度。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "指标列表（聚合/度量）。用于计算数值（如 sum(sales)、count(*)），通常至少提供 1 个。"
+        },
+        {
+          "key": "percent_metrics",
+          "required": true,
+          "description": "百分比指标列表。用于把指标转换为百分比/占比列（具体展示随图表而定）；通常与 metrics 搭配使用。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Funnel Chart",
+      "viztype": "funnel",
+      "详细描述": "Funnel Chart displays a process with decreasing values at each stage (e.g., sales funnel: leads → prospects → customers), ideal for conversion analysis.",
+      "表现形态": "漏斗图（流程转化型）",
+      "适用场景": [
+        "转化漏斗分析（如销售漏斗、用户转化漏斗）",
+        "流程各阶段数值递减展示",
+        "转化率/流失率监控"
+      ],
+      "vizKey": "Funnel",
+      "pluginCategory": "Process",
+      "pluginTags": [],
+      "category": "process",
+      "tags": [
+        "funnel",
+        "conversion",
+        "process",
+        "sales"
+      ],
+      "关键字段": [
+        {
+          "key": "groupby",
+          "required": true,
+          "description": "漏斗阶段字段（如转化阶段、流程步骤），用于定义漏斗的层级。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "各阶段数值指标，用于展示漏斗各层级的数值。"
+        },
+        {
+          "key": "sort_order",
+          "required": false,
+          "description": "漏斗排序方式（asc/desc），控制阶段的展示顺序。"
+        },
+        {
+          "key": "show_percent",
+          "required": false,
+          "description": "是否展示百分比（true/false），控制各阶段占比的显示。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Gantt Chart",
+      "viztype": "gantt_chart",
+      "详细描述": "Gantt Chart displays tasks/projects over time, with horizontal bars representing task duration (start/end time) and optional categorization by resource/owner.",
+      "表现形态": "甘特图（时间规划型）",
+      "适用场景": [
+        "项目/任务时间规划（如任务开始/结束时间、时长）",
+        "资源分配与进度监控",
+        "多任务时间重叠分析"
+      ],
+      "vizKey": "Gantt",
+      "pluginCategory": "Planning",
+      "pluginTags": [],
+      "category": "planning",
+      "tags": [
+        "gantt",
+        "project",
+        "time",
+        "planning"
+      ],
+      "关键字段": [
+        {
+          "key": "start_time",
+          "required": true,
+          "description": "任务开始时间字段，用于定义甘特条的起始位置。"
+        },
+        {
+          "key": "end_time",
+          "required": true,
+          "description": "任务结束时间字段，用于定义甘特条的结束位置。"
+        },
+        {
+          "key": "y_axis",
+          "required": true,
+          "description": "Y轴分类字段（如任务名称、资源、负责人），用于分组展示任务。"
+        },
+        {
+          "key": "zoomable",
+          "required": false,
+          "description": "是否可缩放（true/false），控制时间轴的缩放交互。"
+        },
+        {
+          "key": "x_axis_time_format",
+          "required": false,
+          "description": "X轴时间格式（如 YYYY-MM-DD），控制时间轴的展示格式。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Gauge Chart",
+      "viztype": "gauge_chart",
+      "详细描述": "Gauge Chart displays a single metric value within a predefined range (e.g., 0-100) as a needle on a dial, ideal for KPI threshold monitoring.",
+      "表现形态": "仪表盘图（KPI阈值型）",
+      "适用场景": [
+        "单指标阈值监控（如完成率、使用率、达标率）",
+        "KPI状态可视化（正常/警告/危险）",
+        "紧凑型关键指标展示"
+      ],
+      "vizKey": "Gauge",
+      "pluginCategory": "KPI",
+      "pluginTags": [],
+      "category": "kpi",
+      "tags": [
+        "gauge",
+        "kpi",
+        "threshold",
+        "dial"
+      ],
+      "关键字段": [
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "核心指标，用于展示仪表盘的指针位置。"
+        },
+        {
+          "key": "min_value",
+          "required": false,
+          "description": "仪表盘最小值（默认0），用于定义数值范围的下限。"
+        },
+        {
+          "key": "max_value",
+          "required": false,
+          "description": "仪表盘最大值（默认100），用于定义数值范围的上限。"
+        },
+        {
+          "key": "thresholds",
+          "required": false,
+          "description": "阈值列表（如 [60, 80]），用于划分正常/警告/危险区间。"
+        },
+        {
+          "key": "show_value",
+          "required": false,
+          "description": "是否展示数值（true/false），控制指标数值的显示。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Generic Chart",
+      "viztype": "echarts_timeseries",
+      "详细描述": "General Time Series Chart is a flexible container supporting multiple time-series chart types (Area/Bar/Line/Scatter) with unified time-axis configuration.",
+      "表现形态": "通用时序图（多类型兼容型）",
+      "适用场景": [
+        "多类型时序图的灵活切换（如折线/柱状图快速切换）",
+        "多指标的混合展示（如一条折线+一个柱状图）",
+        "统一时间轴的多维度分析"
+      ],
+      "vizKey": "Timeseries",
+      "pluginCategory": "Time Series",
+      "pluginTags": [],
+      "category": "time_series",
+      "tags": [
+        "timeseries",
+        "general",
+        "flexible",
+        "mixed"
+      ],
+      "关键字段": [
+        {
+          "key": "granularity_sqla",
+          "required": true,
+          "description": "时间粒度字段，定义时序图的时间轴维度（如小时、天、月）。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "聚合指标，用于计算每个时间点的数值。"
+        },
+        {
+          "key": "chart_type",
+          "required": false,
+          "description": "子图表类型（area/bar/line/scatter），控制时序图的展示形态。"
+        },
+        {
+          "key": "show_legend",
+          "required": false,
+          "description": "是否展示图例（true/false），控制系列图例的显示。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Graph Chart",
+      "viztype": "graph_chart",
+      "详细描述": "Graph Chart (Network) displays nodes and edges to represent relationships between entities, with node size/edge width indicating relationship strength.",
+      "表现形态": "网络图（节点-边关联型）",
+      "适用场景": [
+        "实体间的关联分析（如用户关系、产品关联）",
+        "网络结构可视化（如社交网络、供应链）",
+        "关联强度与聚类分析"
+      ],
+      "vizKey": "Graph",
+      "pluginCategory": "Relationship",
+      "pluginTags": [],
+      "category": "relationship",
+      "tags": [
+        "graph",
+        "network",
+        "nodes",
+        "edges",
+        "relationship"
+      ],
+      "关键字段": [
+        {
+          "key": "source",
+          "required": true,
+          "description": "来源节点字段，用于定义边的起点。"
+        },
+        {
+          "key": "target",
+          "required": true,
+          "description": "目标节点字段，用于定义边的终点。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "关联强度指标，用于控制节点大小/边宽度。"
+        },
+        {
+          "key": "layout",
+          "required": false,
+          "description": "布局方式（如 force、circular），控制节点的排列方式。"
+        },
+        {
+          "key": "base_node_size",
+          "required": false,
+          "description": "基础节点大小，用于控制节点的默认尺寸。"
+        },
+        {
+          "key": "base_edge_width",
+          "required": false,
+          "description": "基础边宽度，用于控制边的默认宽度。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Handlebars",
+      "viztype": "handlebars",
+      "详细描述": "Handlebars Template chart renders custom HTML/JSON content using Handlebars templating engine, ideal for fully customized data presentation.",
+      "表现形态": "自定义模板（HTML/JSON）",
+      "适用场景": [
+        "全自定义数据展示（如定制化报表、富文本）",
+        "非标准可视化需求",
+        "结合HTML/CSS的个性化展示"
+      ],
+      "vizKey": "Handlebars",
+      "pluginCategory": "Custom",
+      "pluginTags": [],
+      "category": "custom",
+      "tags": [
+        "handlebars",
+        "custom",
+        "template",
+        "html"
+      ],
+      "关键字段": [
+        {
+          "key": "template",
+          "required": true,
+          "description": "Handlebars模板字符串，用于定义自定义展示内容。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "聚合指标列表，用于模板中渲染数值。"
+        },
+        {
+          "key": "custom_css",
+          "required": false,
+          "description": "自定义CSS样式，用于美化模板展示效果。"
+        },
+        {
+          "key": "json_format",
+          "required": false,
+          "description": "是否输出JSON格式（true/false），控制模板的输出类型。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Heatmap",
+      "viztype": "heatmap_v2",
+      "详细描述": "Heatmap displays two-dimensional numerical data using color intensity, with X/Y axes as categorical dimensions and color representing metric values.",
+      "表现形态": "热力图（二维分布型）",
+      "适用场景": [
+        "二维维度的数值分布（如时间×区域、产品×渠道）",
+        "热点/冷点分析",
+        "多维度交叉分析"
+      ],
+      "vizKey": "Heatmap",
+      "pluginCategory": "Distribution",
+      "pluginTags": [],
+      "category": "distribution",
+      "tags": [
+        "heatmap",
+        "distribution",
+        "2d",
+        "color_intensity"
+      ],
+      "关键字段": [
+        {
+          "key": "x_axis",
+          "required": true,
+          "description": "X轴分类维度字段，用于定义热力图的横向维度。"
+        },
+        {
+          "key": "y_axis",
+          "required": true,
+          "description": "Y轴分类维度字段，用于定义热力图的纵向维度。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "聚合指标，用于计算每个交叉点的数值（颜色依据）。"
+        },
+        {
+          "key": "show_values",
+          "required": false,
+          "description": "是否展示数值（true/false），控制交叉点数值的显示。"
+        },
+        {
+          "key": "number_format",
+          "required": false,
+          "description": "数字格式化，控制交叉点数值的展示格式。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Histogram",
+      "viztype": "histogram_v2",
+      "详细描述": "Histogram displays the frequency distribution of numerical data, grouping values into bins (intervals) and showing bin counts as bars.",
+      "表现形态": "直方图（频率分布型）",
+      "适用场景": [
+        "数值型数据的频率分布分析（如用户年龄分布、销售额分布）",
+        "数据分布形态识别（正态/偏态）",
+        "区间频次统计"
+      ],
+      "vizKey": "Histogram",
+      "pluginCategory": "Distribution",
+      "pluginTags": [],
+      "category": "distribution",
+      "tags": [
+        "histogram",
+        "distribution",
+        "frequency",
+        "statistics"
+      ],
+      "关键字段": [
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "数值型指标，用于计算频率分布的基础数据。"
+        },
+        {
+          "key": "bin_size",
+          "required": true,
+          "description": "分箱大小，用于定义数值区间的宽度（如 10、50）。"
+        },
+        {
+          "key": "show_mean",
+          "required": false,
+          "description": "是否展示均值线（true/false），控制均值的显示。"
+        },
+        {
+          "key": "show_median",
+          "required": false,
+          "description": "是否展示中位数线（true/false），控制中位数的显示。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Horizon Chart",
+      "viztype": "horizon",
+      "详细描述": "Horizon Chart is a compact time-series chart that splits negative/positive values into bands, ideal for displaying multiple time-series in a small space.",
+      "表现形态": "水平地平线图（紧凑型时间序列）",
+      "适用场景": [
+        "多时间序列紧凑型展示（如多指标趋势、多维度对比）",
+        "正负值分离的趋势分析",
+        "小空间内的高密度时间序列展示"
+      ],
+      "vizKey": "Horizon",
+      "pluginCategory": "Evolution",
+      "pluginTags": [],
+      "category": "timeseries",
+      "tags": [
+        "timeseries",
+        "horizon",
+        "compact",
+        "multiple_series"
+      ],
+      "关键字段": [
+        {
+          "key": "groupby",
+          "required": true,
+          "description": "维度字段列表（通常为时间维度），用于分组展示时间序列。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "聚合指标列表，用于展示多时间序列的数值。"
+        },
+        {
+          "key": "time_grain_sqla",
+          "required": true,
+          "description": "时间粒度（如 day/week），用于时间聚合桶。"
+        },
+        {
+          "key": "band_count",
+          "required": false,
+          "description": "波段数量，用于控制正负值分离的波段数。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Line Chart",
+      "viztype": "echarts_timeseries_line",
+      "详细描述": "Time-series Line Chart displays metric trends over time, with data points connected by lines to show continuous change over a time dimension.",
+      "表现形态": "时间序列（折线）",
+      "适用场景": [
+        "随时间的趋势变化（如小时/日/月指标波动）",
+        "多指标趋势对比",
+        "长期趋势与周期性分析"
+      ],
+      "vizKey": "Line",
+      "pluginCategory": "Evolution",
+      "pluginTags": [],
+      "category": "timeseries",
+      "tags": [
+        "timeseries",
+        "line",
+        "trend",
+        "continuous"
+      ],
+      "关键字段": [
+        {
+          "key": "groupby",
+          "required": true,
+          "description": "维度字段列表（通常为时间维度），用于分组/系列/分类轴。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "聚合指标列表（可多个），用于绘制多系列折线对比。"
+        },
+        {
+          "key": "time_grain_sqla",
+          "required": false,
+          "description": "时间粒度（如 day/week/month），用于时间聚合桶。"
+        },
+        {
+          "key": "smooth",
+          "required": false,
+          "description": "是否平滑折线（true/false），控制折线的展示样式。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "MapBox",
+      "viztype": "mapbox",
+      "详细描述": "MapBox Chart integrates MapBox maps with custom geospatial data, supporting interactive zoom/pan and advanced spatial visualizations (e.g., clusters, heatmaps).",
+      "表现形态": "MapBox地图（高级地理空间）",
+      "适用场景": [
+        "高精度地理空间分析（如经纬度级别的点位展示）",
+        "交互式地图探索（缩放/平移/聚类）",
+        "自定义地图样式与图层叠加"
+      ],
+      "vizKey": "MapBox",
+      "pluginCategory": "Geospatial",
+      "pluginTags": [],
+      "category": "geospatial",
+      "tags": [
+        "mapbox",
+        "geospatial",
+        "interactive",
+        "map"
+      ],
+      "关键字段": [
+        {
+          "key": "lat",
+          "required": true,
+          "description": "纬度字段，用于定义地理点位的纬度坐标。"
+        },
+        {
+          "key": "lon",
+          "required": true,
+          "description": "经度字段，用于定义地理点位的经度坐标。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "聚合指标，用于计算每个地理点位的数值（大小/颜色依据）。"
+        },
+        {
+          "key": "map_style",
+          "required": false,
+          "description": "MapBox样式ID，用于自定义地图底图样式。"
+        },
+        {
+          "key": "cluster",
+          "required": false,
+          "description": "是否聚类（true/false），控制高密度点位的聚类展示。"
+        },
+        {
+          "key": "zoom_level",
+          "required": false,
+          "description": "初始缩放级别，用于控制地图的初始展示范围。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Mixed Chart",
+      "viztype": "mixed_timeseries",
+      "详细描述": "Mixed Timeseries Chart combines multiple chart types (line, area, bar) in a single time-series visualization, ideal for multi-metric comparison with different display types.",
+      "表现形态": "混合时间序列（折线/面积/柱状）",
+      "适用场景": [
+        "多指标混合类型展示（如折线+柱状、面积+折线）",
+        "不同量级指标对比（如绝对值+百分比）",
+        "复杂时间序列的分层展示"
+      ],
+      "vizKey": "MixedTimeseries",
+      "pluginCategory": "Evolution",
+      "pluginTags": [],
+      "category": "timeseries",
+      "tags": [
+        "timeseries",
+        "mixed",
+        "multi_type",
+        "comparison"
+      ],
+      "关键字段": [
+        {
+          "key": "groupby",
+          "required": true,
+          "description": "维度字段列表（通常为时间维度），用于分组/系列/分类轴。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "聚合指标列表（可多个），用于绘制多系列混合类型对比。"
+        },
+        {
+          "key": "series_type",
+          "required": false,
+          "description": "系列类型映射（如 {metric1: 'line', metric2: 'bar'}），用于指定每个指标的展示类型。"
+        },
+        {
+          "key": "secondary_y",
+          "required": false,
+          "description": "次Y轴指标列表，用于展示不同量级的指标。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Nightingale Rose Chart",
+      "viztype": "rose",
+      "详细描述": "Rose Chart (Polar Bar) displays categorical data on a polar coordinate system, with each category as a spoke and bar length/area representing metric values.",
+      "表现形态": "玫瑰图（极坐标柱状型）",
+      "适用场景": [
+        "类别数值的极坐标对比（如各产品销售额、各区域用户数）",
+        "周期性类别数据展示",
+        "视觉化的类别占比/数值对比"
+      ],
+      "vizKey": "Rose",
+      "pluginCategory": "Composition",
+      "pluginTags": [],
+      "category": "composition",
+      "tags": [
+        "rose",
+        "polar",
+        "composition",
+        "categorical"
+      ],
+      "关键字段": [
+        {
+          "key": "groupby",
+          "required": true,
+          "description": "分类维度字段，用于定义玫瑰图的辐条类别。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "聚合指标，用于计算每个类别的数值（柱长/面积依据）。"
+        },
+        {
+          "key": "rose_type",
+          "required": false,
+          "description": "玫瑰图类型（radius/area），控制数值的展示方式（半径/面积）。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Paired t-test Table",
+      "viztype": "paired_ttest",
+      "详细描述": "Paired T-Test Chart displays the results of a paired t-test statistical analysis, comparing means of two related samples (e.g., before/after treatment).",
+      "表现形态": "配对T检验图（统计分析型）",
+      "适用场景": [
+        "配对样本均值对比（如实验前后、对照组vs实验组）",
+        "统计显著性分析",
+        "假设检验结果可视化"
+      ],
+      "vizKey": "PairedTTest",
+      "pluginCategory": "Statistics",
+      "pluginTags": [],
+      "category": "statistics",
+      "tags": [
+        "statistics",
+        "t-test",
+        "paired",
+        "significance"
+      ],
+      "关键字段": [
+        {
+          "key": "metric1",
+          "required": true,
+          "description": "第一个样本指标，用于配对检验的基础样本。"
+        },
+        {
+          "key": "metric2",
+          "required": true,
+          "description": "第二个样本指标，用于与基础样本对比。"
+        },
+        {
+          "key": "groupby",
+          "required": true,
+          "description": "分组字段，用于定义配对的样本组。"
+        },
+        {
+          "key": "alpha",
+          "required": false,
+          "description": "显著性水平（默认0.05），用于判断统计显著性。"
+        },
+        {
+          "key": "show_p_value",
+          "required": false,
+          "description": "是否展示P值（true/false），控制统计检验结果的显示。"
+        },
+        {
+          "key": "show_confidence_interval",
+          "required": false,
+          "description": "是否展示置信区间（true/false），控制置信区间的显示。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Parallel Coordinates",
+      "viztype": "para",
+      "详细描述": "Parallel Coordinates Chart displays multi-dimensional numerical data, with each dimension as a vertical axis and data points as lines connecting values across axes.",
+      "表现形态": "平行坐标图（多维关联型）",
+      "适用场景": [
+        "多维数值数据关联分析（如多指标特征对比）",
+        "高维数据模式识别",
+        "多维度异常值检测"
+      ],
+      "vizKey": "ParallelCoordinates",
+      "pluginCategory": "Relationship",
+      "pluginTags": [],
+      "category": "relationship",
+      "tags": [
+        "parallel",
+        "multi_dimensional",
+        "relationship",
+        "coordinates"
+      ],
+      "关键字段": [
+        {
+          "key": "dimensions",
+          "required": true,
+          "description": "维度字段列表，用于定义平行坐标的垂直轴。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "数值指标列表，用于绘制跨维度的数值连线。"
+        },
+        {
+          "key": "normalize",
+          "required": false,
+          "description": "是否归一化数值（true/false），用于跨维度数值的可比化。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Partition Chart",
+      "viztype": "partition",
+      "详细描述": "Partition Chart (Icicle) displays hierarchical data as nested rectangles, with each level of hierarchy as a row and rectangle size representing metric values.",
+      "表现形态": "分区图（层级矩形型）",
+      "适用场景": [
+        "层级数据占比分析（如品类→子品类→产品销售额）",
+        "分层级的数值分布",
+        "树形结构数据的矩形化展示"
+      ],
+      "vizKey": "Partition",
+      "pluginCategory": "Hierarchy",
+      "pluginTags": [],
+      "category": "hierarchy",
+      "tags": [
+        "partition",
+        "hierarchy",
+        "icicle",
+        "rectangular"
+      ],
+      "关键字段": [
+        {
+          "key": "groupby",
+          "required": true,
+          "description": "层级维度字段列表（按层级顺序），用于定义分区的层级结构。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "聚合指标，用于计算每个分区的大小（面积依据）。"
+        },
+        {
+          "key": "sort_by",
+          "required": false,
+          "description": "排序字段（metric/name），控制分区的排列顺序。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Pie Chart",
+      "viztype": "pie",
+      "详细描述": "Pie Chart displays categorical data as a circular graph divided into slices, with slice size representing the proportion of each category to the total.",
+      "表现形态": "饼图（构成占比型）",
+      "适用场景": [
+        "类别占比分析（如各产品销售额占总销售额的比例）",
+        "部分与整体的关系展示",
+        "少类别（<8）的占比对比"
+      ],
+      "vizKey": "Pie",
+      "pluginCategory": "Composition",
+      "pluginTags": [],
+      "category": "composition",
+      "tags": [
+        "pie",
+        "composition",
+        "proportion",
+        "percentage"
+      ],
+      "关键字段": [
+        {
+          "key": "groupby",
+          "required": true,
+          "description": "分类维度字段，用于定义饼图的切片类别。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "聚合指标，用于计算每个类别的数值（切片大小依据）。"
+        },
+        {
+          "key": "label_type",
+          "required": false,
+          "description": "标签类型（value/percent/name），控制标签展示内容。"
+        },
+        {
+          "key": "donut",
+          "required": false,
+          "description": "是否展示为环形图（true/false），控制饼图的展示样式。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Pivot Table",
+      "viztype": "pivot_table_v2",
+      "详细描述": "Pivot Table (v2) displays multi-dimensional aggregated data in a tabular format, with rows/columns as dimensions and cells as metric values, supporting sorting/filtering.",
+      "表现形态": "透视表（多维表格型）",
+      "适用场景": [
+        "多维数据交叉分析（如行：区域、列：时间、值：销售额）",
+        "结构化数据明细展示",
+        "可交互的表格分析（排序/过滤/钻取）"
+      ],
+      "vizKey": "PivotTable",
+      "pluginCategory": "Table",
+      "pluginTags": [],
+      "category": "table",
+      "tags": [
+        "pivot",
+        "table",
+        "multi_dimensional",
+        "tabular"
+      ],
+      "关键字段": [
+        {
+          "key": "rows",
+          "required": true,
+          "description": "行维度字段列表，用于定义透视表的行。"
+        },
+        {
+          "key": "columns",
+          "required": true,
+          "description": "列维度字段列表，用于定义透视表的列。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "聚合指标列表，用于计算单元格的数值。"
+        },
+        {
+          "key": "agg_func",
+          "required": false,
+          "description": "聚合函数（sum/avg/count），用于定义指标的聚合方式。"
+        },
+        {
+          "key": "sort_by",
+          "required": false,
+          "description": "排序字段（行/列/值），控制透视表的排序方式。"
+        },
+        {
+          "key": "number_format",
+          "required": false,
+          "description": "数字格式化，控制单元格数值的展示格式。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Radar Chart",
+      "viztype": "radar",
+      "详细描述": "Radar Chart displays multi-dimensional numerical data on a polar coordinate system, with each dimension as a spoke and data points as a polygon connecting values across spokes.",
+      "表现形态": "雷达图（多维对比型）",
+      "适用场景": [
+        "多维度指标对比（如产品多维度评分、用户多特征分析）",
+        "多维特征的相似度分析",
+        "综合能力/性能评估"
+      ],
+      "vizKey": "Radar",
+      "pluginCategory": "Relationship",
+      "pluginTags": [],
+      "category": "relationship",
+      "tags": [
+        "radar",
+        "multi_dimensional",
+        "polar",
+        "comparison"
+      ],
+      "关键字段": [
+        {
+          "key": "groupby",
+          "required": true,
+          "description": "分类维度字段，用于定义雷达图的系列（不同多边形）。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "多维数值指标列表，用于定义雷达图的维度（辐条）。"
+        },
+        {
+          "key": "normalize",
+          "required": false,
+          "description": "是否归一化数值（true/false），用于跨维度数值的可比化。"
+        },
+        {
+          "key": "fill",
+          "required": false,
+          "description": "是否填充多边形（true/false），控制雷达图的展示样式。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Sankey Chart",
+      "viztype": "sankey_v2",
+      "详细描述": "Sankey Diagram displays flow relationships between entities, with line width representing the volume of flow between source and target nodes.",
+      "表现形态": "桑基图（流向型）",
+      "适用场景": [
+        "实体间流向/流量关系展示（如用户行为路径、资金流转）",
+        "层级间的流量占比分析",
+        "多维度的流转链路可视化"
+      ],
+      "vizKey": "Sankey",
+      "pluginCategory": "Flow",
+      "pluginTags": [],
+      "category": "flow",
+      "tags": [
+        "sankey",
+        "flow",
+        "relationship",
+        "hierarchy"
+      ],
+      "关键字段": [
+        {
+          "key": "groupby",
+          "required": true,
+          "description": "分类维度字段，需包含source（源节点）、target（目标节点）两个维度，定义桑基图的节点与流向。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "聚合指标，用于计算节点间的流量值（线条宽度依据）。"
+        },
+        {
+          "key": "node_width",
+          "required": false,
+          "description": "节点宽度（像素），控制桑基图节点的显示宽度。"
+        },
+        {
+          "key": "node_gap",
+          "required": false,
+          "description": "节点间距（像素），控制同层级节点间的间距。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Scatter Plot",
+      "viztype": "echarts_timeseries_scatter",
+      "详细描述": "Time Series Scatter Chart plots individual data points over a time axis, showing the distribution and trend of metric values over time.",
+      "表现形态": "时序散点图（时间轴分布型）",
+      "适用场景": [
+        "时间维度下的数值分布分析（如每小时用户访问量分布）",
+        "异常值识别（离散点检测）",
+        "多指标的时序相关性分析"
+      ],
+      "vizKey": "Scatter",
+      "pluginCategory": "Time Series",
+      "pluginTags": [],
+      "category": "time_series",
+      "tags": [
+        "scatter",
+        "time_series",
+        "distribution",
+        "anomaly"
+      ],
+      "关键字段": [
+        {
+          "key": "granularity_sqla",
+          "required": true,
+          "description": "时间粒度字段，定义散点图的时间轴维度（如小时、天、月）。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "聚合指标，用于确定每个时间点的散点数值。"
+        },
+        {
+          "key": "symbol_size",
+          "required": false,
+          "description": "散点符号大小（像素），控制散点的显示尺寸。"
+        },
+        {
+          "key": "show_legend",
+          "required": false,
+          "description": "是否展示图例（true/false），控制系列图例的显示。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Smooth Line",
+      "viztype": "echarts_timeseries_smooth",
+      "详细描述": "Smooth Line Time Series Chart renders metric values over time with a smoothed curve, emphasizing continuous trends.",
+      "表现形态": "平滑曲线时序图（时间轴趋势型）",
+      "适用场景": [
+        "连续型时间趋势展示（如产品日销量变化趋势）",
+        "多指标的趋势对比（平滑曲线更易区分）",
+        "视觉化的长期趋势分析"
+      ],
+      "vizKey": "SmoothLine",
+      "pluginCategory": "Time Series",
+      "pluginTags": [],
+      "category": "time_series",
+      "tags": [
+        "smooth_line",
+        "time_series",
+        "trend",
+        "continuous"
+      ],
+      "关键字段": [
+        {
+          "key": "granularity_sqla",
+          "required": true,
+          "description": "时间粒度字段，定义时序图的时间轴维度（如小时、天、月）。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "聚合指标，用于计算每个时间点的曲线数值。"
+        },
+        {
+          "key": "line_width",
+          "required": false,
+          "description": "曲线宽度（像素），控制平滑曲线的显示粗细。"
+        },
+        {
+          "key": "show_area",
+          "required": false,
+          "description": "是否展示面积填充（true/false），在曲线下方填充颜色增强视觉效果。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Stepped Line",
+      "viztype": "echarts_timeseries_step",
+      "详细描述": "Step Line Time Series Chart displays metric values over time with a step-wise line, highlighting discrete value changes at time intervals.",
+      "表现形态": "阶梯线时序图（时间轴离散型）",
+      "适用场景": [
+        "离散型时间节点的数值变化（如版本发布后的指标变化）",
+        "阶段性指标展示（如按周统计的库存变化）",
+        "非连续型趋势的精准呈现"
+      ],
+      "vizKey": "Step",
+      "pluginCategory": "Time Series",
+      "pluginTags": [],
+      "category": "time_series",
+      "tags": [
+        "step_line",
+        "time_series",
+        "discrete",
+        "step"
+      ],
+      "关键字段": [
+        {
+          "key": "granularity_sqla",
+          "required": true,
+          "description": "时间粒度字段，定义时序图的时间轴维度（如小时、天、月）。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "聚合指标，用于计算每个时间点的阶梯数值。"
+        },
+        {
+          "key": "step_type",
+          "required": false,
+          "description": "阶梯类型（start/middle/end），控制阶梯线的拐点位置。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Sunburst Chart",
+      "viztype": "sunburst_v2",
+      "详细描述": "Sunburst Chart displays hierarchical data as concentric circles, with each level of the hierarchy represented by a ring and segment size proportional to metric values.",
+      "表现形态": "旭日图（层级环形型）",
+      "适用场景": [
+        "层级化数据占比分析（如地区-品类-产品的销售额分布）",
+        "多维度层级的钻取分析",
+        "核心节点的层级贡献度展示"
+      ],
+      "vizKey": "Sunburst",
+      "pluginCategory": "Hierarchy",
+      "pluginTags": [],
+      "category": "hierarchy",
+      "tags": [
+        "sunburst",
+        "hierarchy",
+        "ring",
+        "proportion"
+      ],
+      "关键字段": [
+        {
+          "key": "groupby",
+          "required": true,
+          "description": "分类维度字段（多层级），定义旭日图的环形层级（如region、country、city）。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "聚合指标，用于计算每个层级分段的大小（面积依据）。"
+        },
+        {
+          "key": "secondary_metric",
+          "required": false,
+          "description": "次要指标，用于辅助分析层级分段的补充维度数值。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Table",
+      "viztype": "table",
+      "详细描述": "Table 是 Superset 6.0.0 的标准二维数据表插件，既可按 raw 模式直接展示底层明细记录，也可按 aggregate 模式展示分组后的聚合指标、百分比指标和时间对比结果。",
+      "表现形态": "经典二维数据表（明细表 / 聚合报表 / 对比表）",
+      "适用场景": [
+        "查看原始明细记录与字段值",
+        "按维度分组后展示聚合指标或百分比指标",
+        "服务端分页、列表检索、报表导出与 Drill to Detail 入口"
+      ],
+      "vizKey": "Table",
+      "pluginCategory": "Table",
+      "pluginTags": [
+        "Additive",
+        "Business",
+        "Pattern",
+        "Featured",
+        "Report",
+        "Sequential",
+        "Tabular"
+      ],
+      "category": "table",
+      "tags": [
+        "additive",
+        "business",
+        "pattern",
+        "featured",
+        "report",
+        "sequential",
+        "tabular"
+      ],
+      "关键字段": [
+        {
+          "key": "query_mode",
+          "required": false,
+          "description": "查询模式。`raw` 表示明细记录，`aggregate` 表示聚合模式；源码会在未显式设置时根据 `all_columns` 是否非空自动推断。"
+        },
+        {
+          "key": "all_columns",
+          "required": false,
+          "description": "明细模式下展示的列集合。处于 `raw` 模式时至少需要 1 列。"
+        },
+        {
+          "key": "groupby",
+          "required": false,
+          "description": "聚合模式下的分组维度。与 `metrics` / `percent_metrics` 共同决定聚合结果粒度。"
+        },
+        {
+          "key": "metrics",
+          "required": false,
+          "description": "聚合模式下的主指标集合。源码校验要求 `groupby`、`metrics`、`percent_metrics` 至少有一类非空。"
+        },
+        {
+          "key": "percent_metrics",
+          "required": false,
+          "description": "聚合模式下的百分比指标集合，是 Table 图表相对其他普通表格的特色字段之一。"
+        },
+        {
+          "key": "order_by_cols",
+          "required": false,
+          "description": "raw 模式下的排序字段集合，会编译成 query.orderby。"
+        },
+        {
+          "key": "server_pagination",
+          "required": false,
+          "description": "是否开启服务端分页。打开后查询会拆成主查询与 rowcount 查询。"
+        },
+        {
+          "key": "column_config",
+          "required": false,
+          "description": "逐列格式配置对象，可定义列宽、别名、数值/时间格式、显示隐藏等，是 Table 的展示核心字段。"
+        },
+        {
+          "key": "time_compare",
+          "required": false,
+          "description": "启用时间对比后，Table 会把指标列展开成 Main / # / △ / % 四类 comparison columns。"
+        }
+      ],
+      "field_categories": {
+        "Query": [
+          {
+            "field_name": "groupby",
+            "description": "聚合模式下的分组维度。",
+            "data_type": "array[string | object]",
+            "enum_source": "datasource columns",
+            "sample_data": [
+              "region"
+            ],
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "default_value": []
+          },
+          {
+            "field_name": "time_grain_sqla",
+            "description": "时间粒度。仅当 `groupby` 中包含 temporal 列时才生效。",
+            "data_type": "string | null",
+            "enum_source": "datasource.time_grain_sqla",
+            "sample_data": "P1D",
+            "required": false,
+            "embedding": "extra_form_data.override（guest 下不建议）",
+            "default_value": "新建未保存图且 metadata 为空时初始为 P1D，否则沿用已有值"
+          },
+          {
+            "field_name": "temporal_columns_lookup",
+            "description": "隐藏映射，用来标记哪些分组列是 temporal physical columns。",
+            "data_type": "object[string, boolean]",
+            "sample_data": {
+              "order_date": true
+            },
+            "required": false,
+            "embedding": "否",
+            "default_value": "由 datasource 自动生成"
+          },
+          {
+            "field_name": "metrics",
+            "description": "聚合模式下的主指标集合。",
+            "data_type": "array[string | object]",
+            "enum_source": "saved metrics + adhoc metrics",
+            "sample_data": [
+              {
+                "expressionType": "SIMPLE",
+                "column": {
+                  "column_name": "sales"
+                },
+                "aggregate": "SUM",
+                "label": "SUM(sales)"
+              }
+            ],
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "default_value": "未显式 default（UI 空态）"
+          },
+          {
+            "field_name": "adhoc_filters",
+            "description": "过滤条件集合。",
+            "data_type": "array[object]",
+            "enum_source": "dataset filterable columns + saved metrics + current metrics",
+            "sample_data": [
+              {
+                "expressionType": "SIMPLE",
+                "clause": "WHERE",
+                "subject": "region",
+                "operator": "IN",
+                "comparator": [
+                  "East",
+                  "West"
+                ]
+              }
+            ],
+            "required": false,
+            "embedding": "extra_form_data.append",
+            "default_value": []
+          },
+          {
+            "field_name": "timeseries_limit_metric",
+            "description": "aggregate 模式下用于决定 top rows 排序与截断依据的指标。",
+            "data_type": "string | object | null",
+            "enum_source": "saved metrics + adhoc metrics",
+            "sample_data": {
+              "expressionType": "SIMPLE",
+              "column": {
+                "column_name": "sales"
+              },
+              "aggregate": "SUM",
+              "label": "SUM(sales)"
+            },
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "default_value": null
+          },
+          {
+            "field_name": "order_desc",
+            "description": "aggregate 模式下，是否按 `timeseries_limit_metric` 降序排序。",
+            "data_type": "boolean",
+            "enum_values": [
+              true,
+              false
+            ],
+            "sample_data": true,
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "default_value": true
+          },
+          {
+            "field_name": "row_limit",
+            "description": "查询返回的最大行数上限。",
+            "data_type": "integer",
+            "sample_data": 1000,
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "default_value": 1000
+          }
+        ],
+        "Advanced analytics": [
+          {
+            "field_name": "time_compare",
+            "description": "时间位移对比字段。开启后会生成 comparison columns。",
+            "data_type": "string | null",
+            "enum_values": [
+              "1 day ago",
+              "1 week ago",
+              "1 month ago",
+              "1 year ago",
+              "custom",
+              "inherit"
+            ],
+            "sample_data": "1 year ago",
+            "required": false,
+            "embedding": "extra_form_data.override（guest 下不建议）",
+            "default_value": "未显式 default"
+          },
+          {
+            "field_name": "start_date_offset",
+            "description": "当 `time_compare='custom'` 时的自定义偏移量。",
+            "data_type": "string | null",
+            "sample_data": "1 year ago",
+            "required": false,
+            "embedding": "extra_form_data.override（guest 下不建议）",
+            "default_value": null
+          },
+          {
+            "field_name": "comparison_type",
+            "description": "时间对比展示方式：值、差值、百分比变化或比率。",
+            "data_type": "string",
+            "enum_values": [
+              "values",
+              "difference",
+              "percentage",
+              "ratio"
+            ],
+            "sample_data": "values",
+            "required": false,
+            "embedding": "否",
+            "default_value": "values"
+          }
+        ],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [
+          {
+            "field_name": "page_length",
+            "description": "前端分页时每页显示行数；`null` 代表自动分页。",
+            "data_type": "integer | string | null",
+            "enum_values": [
+              0,
+              10,
+              20,
+              50,
+              100,
+              200
+            ],
+            "sample_data": 20,
+            "required": false,
+            "embedding": "否",
+            "default_value": null
+          },
+          {
+            "field_name": "include_search",
+            "description": "是否展示客户端搜索框。",
+            "data_type": "boolean",
+            "enum_values": [
+              true,
+              false
+            ],
+            "sample_data": false,
+            "required": false,
+            "embedding": "否",
+            "default_value": false
+          },
+          {
+            "field_name": "allow_rearrange_columns",
+            "description": "是否允许终端用户拖拽重排列顺序。",
+            "data_type": "boolean",
+            "enum_values": [
+              true,
+              false
+            ],
+            "sample_data": false,
+            "required": false,
+            "embedding": "否",
+            "default_value": false
+          },
+          {
+            "field_name": "allow_render_html",
+            "description": "是否按 HTML 渲染单元格内容。",
+            "data_type": "boolean",
+            "enum_values": [
+              true,
+              false
+            ],
+            "sample_data": true,
+            "required": false,
+            "embedding": "否",
+            "default_value": true
+          },
+          {
+            "field_name": "show_cell_bars",
+            "description": "是否在数值单元格背景显示数据条。",
+            "data_type": "boolean",
+            "enum_values": [
+              true,
+              false
+            ],
+            "sample_data": true,
+            "required": false,
+            "embedding": "否",
+            "default_value": true
+          },
+          {
+            "field_name": "align_pn",
+            "description": "正负值数据条是否以 0 为对齐中轴。",
+            "data_type": "boolean",
+            "enum_values": [
+              true,
+              false
+            ],
+            "sample_data": false,
+            "required": false,
+            "embedding": "否",
+            "default_value": false
+          },
+          {
+            "field_name": "color_pn",
+            "description": "是否按正负值给数据条着色。",
+            "data_type": "boolean",
+            "enum_values": [
+              true,
+              false
+            ],
+            "sample_data": true,
+            "required": false,
+            "embedding": "否",
+            "default_value": true
+          },
+          {
+            "field_name": "comparison_color_enabled",
+            "description": "时间对比模式下，是否启用基础涨跌箭头与底色格式。",
+            "data_type": "boolean",
+            "enum_values": [
+              true,
+              false
+            ],
+            "sample_data": false,
+            "required": false,
+            "embedding": "否",
+            "default_value": false
+          },
+          {
+            "field_name": "comparison_color_scheme",
+            "description": "时间对比模式下，涨跌配色策略。",
+            "data_type": "string",
+            "enum_values": [
+              "Green",
+              "Red"
+            ],
+            "sample_data": "Green",
+            "required": false,
+            "embedding": "否",
+            "default_value": "Green"
+          },
+          {
+            "field_name": "conditional_formatting",
+            "description": "自定义条件着色规则集合。",
+            "data_type": "array[object]",
+            "sample_data": [
+              {
+                "column": "sum__num",
+                "operator": ">",
+                "targetValue": 2467,
+                "colorScheme": "#ACE1C4"
+              }
+            ],
+            "required": false,
+            "embedding": "否",
+            "default_value": "未显式 default；runtime 按空数组容错"
+          }
+        ],
+        "Chart Title": [],
+        "图表专属": [
+          {
+            "field_name": "query_mode",
+            "description": "Table 独有的 raw / aggregate 双模式开关。",
+            "data_type": "string | null",
+            "enum_values": [
+              "aggregate",
+              "raw"
+            ],
+            "sample_data": "aggregate",
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "default_value": null
+          },
+          {
+            "field_name": "all_columns",
+            "description": "raw 模式下展示的明细列集合。",
+            "data_type": "array[string | object]",
+            "enum_source": "datasource columns",
+            "sample_data": [
+              "order_id",
+              "customer_name"
+            ],
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "default_value": []
+          },
+          {
+            "field_name": "percent_metrics",
+            "description": "aggregate 模式下追加百分比指标列。",
+            "data_type": "array[string | object]",
+            "enum_source": "saved metrics + adhoc metrics",
+            "sample_data": [
+              {
+                "expressionType": "SIMPLE",
+                "column": {
+                  "column_name": "sales"
+                },
+                "aggregate": "SUM",
+                "label": "SUM(sales)"
+              }
+            ],
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "default_value": []
+          },
+          {
+            "field_name": "order_by_cols",
+            "description": "raw 模式专用排序配置。",
+            "data_type": "array[string | [string, boolean]]",
+            "sample_data": [
+              "[\"order_id\",true]"
+            ],
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "default_value": []
+          },
+          {
+            "field_name": "server_pagination",
+            "description": "是否启用服务端分页。",
+            "data_type": "boolean",
+            "enum_values": [
+              true,
+              false
+            ],
+            "sample_data": false,
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "default_value": false
+          },
+          {
+            "field_name": "server_page_length",
+            "description": "服务端分页时的每页条数。",
+            "data_type": "integer",
+            "enum_values": [
+              10,
+              20,
+              50,
+              100,
+              200
+            ],
+            "sample_data": 20,
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "default_value": 10
+          },
+          {
+            "field_name": "percent_metric_calculation",
+            "description": "百分比指标基于 row_limit 还是 all_records 计算。",
+            "data_type": "string",
+            "enum_values": [
+              "row_limit",
+              "all_records"
+            ],
+            "sample_data": "row_limit",
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "default_value": "row_limit"
+          },
+          {
+            "field_name": "show_totals",
+            "description": "是否额外生成 summary totals。",
+            "data_type": "boolean",
+            "enum_values": [
+              true,
+              false
+            ],
+            "sample_data": false,
+            "required": false,
+            "embedding": "否（guest 下不应动态修改）",
+            "default_value": false
+          },
+          {
+            "field_name": "table_timestamp_format",
+            "description": "Table 全局时间列格式。",
+            "data_type": "string",
+            "enum_source": "D3_TIME_FORMAT_OPTIONS + freeForm",
+            "sample_data": "smart_date",
+            "required": false,
+            "embedding": "否",
+            "default_value": "smart_date"
+          },
+          {
+            "field_name": "column_config",
+            "description": "逐列定制格式、列宽、别名、显示隐藏和 comparison 子列格式。",
+            "data_type": "object[string, TableColumnConfig]",
+            "sample_data": {
+              "sum__num": {
+                "d3NumberFormat": ".3s",
+                "columnWidth": 180,
+                "customColumnName": "Sales"
+              }
+            },
+            "required": false,
+            "embedding": "否",
+            "default_value": "未显式 default；transformProps runtime fallback 为 {}"
+          }
+        ],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Time-series Percent Change",
+      "viztype": "compare",
+      "详细描述": "Compare Chart displays side-by-side comparisons of metrics across multiple dimensions or time periods, ideal for direct value comparison.",
+      "表现形态": "对比图表（多维度/周期）",
+      "适用场景": [
+        "多维度指标对比（如不同产品、不同区域）",
+        "多周期数值对比（如本周vs上周、本月vs上月）",
+        "直接数值差异展示"
+      ],
+      "vizKey": "Compare",
+      "pluginCategory": "Comparison",
+      "pluginTags": [],
+      "category": "comparison",
+      "tags": [
+        "compare",
+        "comparison",
+        "side_by_side",
+        "difference"
+      ],
+      "关键字段": [
+        {
+          "key": "groupby",
+          "required": true,
+          "description": "维度字段列表，用于分组展示对比项。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "聚合指标列表，用于对比不同维度/周期的数值。"
+        },
+        {
+          "key": "comparison_type",
+          "required": true,
+          "description": "对比类型（如 period、dimension），用于定义对比规则。"
+        },
+        {
+          "key": "show_percent_change",
+          "required": false,
+          "description": "是否展示百分比变化（true/false），控制对比结果的展示形式。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Time-series Period Pivot",
+      "viztype": "time_pivot",
+      "详细描述": "Time Pivot Table aggregates and displays time-series data in a pivot format, with time as rows/columns and metrics as values.",
+      "表现形态": "时间透视表（时间维度聚合型）",
+      "适用场景": [
+        "时间维度的交叉分析（如按周/月聚合的销售数据）",
+        "多指标的时间对比（如同比/环比分析）",
+        "时间粒度下的维度钻取"
+      ],
+      "vizKey": "TimePivot",
+      "pluginCategory": "Table",
+      "pluginTags": [],
+      "category": "table",
+      "tags": [
+        "time_pivot",
+        "pivot",
+        "time_series",
+        "aggregation"
+      ],
+      "关键字段": [
+        {
+          "key": "granularity_sqla",
+          "required": true,
+          "description": "时间粒度字段，定义透视表的时间轴维度（如小时、天、月）。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "聚合指标，用于透视表中数值单元格的计算。"
+        },
+        {
+          "key": "show_totals",
+          "required": false,
+          "description": "是否显示总计（true/false），展示行/列的汇总数值。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Time-series Table",
+      "viztype": "time_table",
+      "详细描述": "Time Table displays time-series data in a tabular format with support for sparklines and time-based comparisons (e.g., period-over-period).",
+      "表现形态": "时间表（带迷你图的时间列表示）",
+      "适用场景": [
+        "带趋势的时间数据展示（如每日指标+迷你折线图）",
+        "多指标的时间对比（同比/环比）",
+        "紧凑的时间序列报表"
+      ],
+      "vizKey": "TimeTable",
+      "pluginCategory": "Table",
+      "pluginTags": [],
+      "category": "table",
+      "tags": [
+        "time_table",
+        "sparkline",
+        "time_series",
+        "comparison"
+      ],
+      "关键字段": [
+        {
+          "key": "granularity_sqla",
+          "required": true,
+          "description": "时间粒度字段，定义时间表的时间轴维度（如小时、天、月）。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "聚合指标，用于时间表中数值列的计算。"
+        },
+        {
+          "key": "spark_type",
+          "required": false,
+          "description": "迷你图类型（line/bar/area），控制单元格内迷你图的展示形态。"
+        },
+        {
+          "key": "comparison_type",
+          "required": false,
+          "description": "对比类型（同比/环比），用于展示指标的时间对比结果。"
+        },
+        {
+          "key": "date_format",
+          "required": false,
+          "description": "日期格式，定义时间列的显示格式（如YYYY-MM-DD）。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Tree Chart",
+      "viztype": "tree_chart",
+      "详细描述": "Tree Chart displays hierarchical data as a tree structure with nodes and branches, supporting orthogonal/radial layout and drill-down interactions.",
+      "表现形态": "树形图（层级分支型）",
+      "适用场景": [
+        "层级化结构展示（如组织架构、文件目录）",
+        "节点间的父子关系分析",
+        "层级钻取的交互分析"
+      ],
+      "vizKey": "Tree",
+      "pluginCategory": "Hierarchy",
+      "pluginTags": [],
+      "category": "hierarchy",
+      "tags": [
+        "tree",
+        "hierarchy",
+        "structure",
+        "drilldown"
+      ],
+      "关键字段": [
+        {
+          "key": "id",
+          "required": true,
+          "description": "节点ID字段，定义树形图的唯一节点标识。"
+        },
+        {
+          "key": "parent",
+          "required": true,
+          "description": "父节点ID字段，定义节点间的父子关系。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "聚合指标，用于计算节点的大小/数值。"
+        },
+        {
+          "key": "layout",
+          "required": false,
+          "description": "布局类型（orthogonal/radial），控制树形图的展示布局（正交/径向）。"
+        },
+        {
+          "key": "orient",
+          "required": false,
+          "description": "朝向（LR/RL/TB/BT），控制正交布局的展开方向。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Treemap",
+      "viztype": "treemap_v2",
+      "详细描述": "Treemap Chart displays hierarchical data as nested rectangles, with rectangle size/color proportional to metric values of each node.",
+      "表现形态": "矩形树图（层级嵌套型）",
+      "适用场景": [
+        "层级化数据的占比展示（如品类-产品的销售额分布）",
+        "大体积层级数据的紧凑可视化",
+        "核心节点的快速识别（大矩形为高价值节点）"
+      ],
+      "vizKey": "Treemap",
+      "pluginCategory": "Hierarchy",
+      "pluginTags": [],
+      "category": "hierarchy",
+      "tags": [
+        "treemap",
+        "hierarchy",
+        "rectangle",
+        "nested"
+      ],
+      "关键字段": [
+        {
+          "key": "groupby",
+          "required": true,
+          "description": "分类维度字段（多层级），定义矩形树图的嵌套层级（如region、country、city）。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "聚合指标，用于计算每个矩形的大小（面积依据）。"
+        },
+        {
+          "key": "drilldown",
+          "required": false,
+          "description": "是否启用钻取（true/false），支持点击矩形展开下一层级。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Waterfall Chart",
+      "viztype": "waterfall",
+      "详细描述": "Waterfall Chart displays cumulative metric changes over categories, with positive/negative values represented by upward/downward bars and a total bar for final value.",
+      "表现形态": "瀑布图（增量累积型）",
+      "适用场景": [
+        "指标的增量分析（如月度收入增减、成本构成）",
+        "正负值的累积变化展示（如利润构成）",
+        "类别间的增量贡献度分析"
+      ],
+      "vizKey": "Waterfall",
+      "pluginCategory": "Comparison",
+      "pluginTags": [],
+      "category": "comparison",
+      "tags": [
+        "waterfall",
+        "cumulative",
+        "increment",
+        "comparison"
+      ],
+      "关键字段": [
+        {
+          "key": "groupby",
+          "required": true,
+          "description": "分类维度字段，定义瀑布图的类别轴（如月份、成本项）。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "聚合指标，用于计算每个类别的增量数值。"
+        },
+        {
+          "key": "show_total",
+          "required": false,
+          "description": "是否显示总计行（true/false），展示最终的累积数值。"
+        },
+        {
+          "key": "total_label",
+          "required": false,
+          "description": "总计行标签，自定义总计行的显示名称（如“总计”、“净利润”）。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "Word Cloud",
+      "viztype": "word_cloud",
+      "详细描述": "Word Cloud Chart displays text data as a cloud of words, with word size proportional to metric values (e.g., frequency, volume) and optional rotation.",
+      "表现形态": "词云图（文本权重型）",
+      "适用场景": [
+        "文本关键词的权重展示（如用户评论热词、产品标签）",
+        "非结构化文本的可视化分析",
+        "营销/运营的热词展示"
+      ],
+      "vizKey": "WordCloud",
+      "pluginCategory": "Text",
+      "pluginTags": [],
+      "category": "text",
+      "tags": [
+        "word_cloud",
+        "text",
+        "keyword",
+        "frequency"
+      ],
+      "关键字段": [
+        {
+          "key": "series",
+          "required": true,
+          "description": "文本字段，定义词云图的展示文本（如关键词、标签）。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "聚合指标，用于计算每个文本的权重（词大小依据）。"
+        },
+        {
+          "key": "size_from",
+          "required": false,
+          "description": "最小字体大小（像素），控制词云的最小文本尺寸。"
+        },
+        {
+          "key": "size_to",
+          "required": false,
+          "description": "最大字体大小（像素），控制词云的最大文本尺寸。"
+        },
+        {
+          "key": "rotation",
+          "required": false,
+          "description": "旋转类型（square/horizontal/vertical），控制文本的旋转方式。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    },
+    {
+      "name": "World Map",
+      "viztype": "world_map",
+      "详细描述": "World Map displays geographic data on a global map canvas, with regions/countries colored or sized based on metric values to visualize spatial distribution of data.",
+      "表现形态": "世界地图（地理空间型）",
+      "适用场景": [
+        "全球范围内的数值分布展示（如各国人口、GDP、销售额）",
+        "地理维度的指标对比分析",
+        "跨国/跨区域业务数据的空间可视化"
+      ],
+      "vizKey": "WorldMap",
+      "pluginCategory": "Geospatial",
+      "pluginTags": [],
+      "category": "geospatial",
+      "tags": [
+        "world_map",
+        "geospatial",
+        "global",
+        "geographic",
+        "spatial"
+      ],
+      "关键字段": [
+        {
+          "key": "geographic_field",
+          "required": true,
+          "description": "地理维度字段（如国家/地区编码、名称），用于关联地图地理边界与数据。"
+        },
+        {
+          "key": "metrics",
+          "required": true,
+          "description": "聚合指标，用于计算每个地理区域的数值（地图配色/尺寸依据）。"
+        },
+        {
+          "key": "map_projection",
+          "required": false,
+          "description": "地图投影方式（如墨卡托、等积投影），控制地图的空间展示形态。"
+        },
+        {
+          "key": "range_min",
+          "required": false,
+          "description": "数值区间最小值，用于定义地图配色/尺寸的下限阈值。"
+        },
+        {
+          "key": "range_max",
+          "required": false,
+          "description": "数值区间最大值，用于定义地图配色/尺寸的上限阈值。"
+        },
+        {
+          "key": "show_legend",
+          "required": false,
+          "description": "是否展示图例（true/false），控制数值与颜色/尺寸对应关系的显示。"
+        }
+      ],
+      "field_categories": {
+        "Query": [],
+        "Advanced analytics": [],
+        "Annotations & Layers": [],
+        "Predictive Analytics（Forecast）": [],
+        "Chart Options": [],
+        "Chart Title": [],
+        "图表专属": [],
+        "通用图表选项": []
+      }
+    }
+  ],
+  "missingNames": null
+}

@@ -1,0 +1,314 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "chord",
+  "display_name": "Chord Diagram",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "source_entity",
+          "operator": "IN",
+          "comparator": [
+            "A"
+          ]
+        }
+      ]
+    ],
+    "color_scheme": [
+      "SUPERSET_DEFAULT"
+    ],
+    "columns": [
+      "target_entity"
+    ],
+    "groupby": [
+      "source_entity"
+    ],
+    "metric": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "link_value"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(link_value)"
+      }
+    ],
+    "row_limit": [
+      10000
+    ],
+    "sort_by_metric": [
+      true
+    ],
+    "y_axis_format": [
+      "SMART_NUMBER"
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "chord",
+      "groupby": "<source_dimension>",
+      "columns": "<target_dimension>",
+      "metric": "<metric_or_saved_metric>",
+      "adhoc_filters": []
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "chord",
+      "groupby": "source_entity",
+      "columns": "target_entity",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "link_value"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(link_value)"
+      },
+      "adhoc_filters": [],
+      "row_limit": 10000,
+      "sort_by_metric": false,
+      "y_axis_format": "SMART_NUMBER",
+      "color_scheme": "SUPERSET_DEFAULT"
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "chord",
+      "groupby": "<copied_from_saved_chart>",
+      "columns": "<copied_from_saved_chart>",
+      "metric": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "row_limit": "<copied_from_saved_chart_if_present>",
+      "sort_by_metric": "<copied_from_saved_chart_if_present>",
+      "y_axis_format": "<copied_from_saved_chart_if_present>",
+      "color_scheme": "<copied_from_saved_chart_if_present>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "source_entity",
+            "op": "IN",
+            "val": [
+              "A"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "source_entity",
+            "operator": "IN",
+            "comparator": [
+              "A"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_chord_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "source_entity",
+            "op": "IN",
+            "val": [
+              "A"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters；后端会把它们并入额外过滤条件。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_chord_legacy": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "source_entity",
+            "operator": "IN",
+            "comparator": [
+              "A"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会标记为 extra 并并入查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_chord_legacy": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；Chord 默认不直接消费它。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_chord_legacy": false,
+        "recommended": false,
+        "sample_data": "Last 30 days",
+        "effect": "legacy merge 逻辑支持该 override，但 Chord controlPanel 没有时间范围字段，当前图没有高置信证据表明应依赖它。",
+        "source": "superset/constants.py + superset/utils/core.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_chord_legacy": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "legacy merge 逻辑支持该 override，但 Chord 没有正式时间粒度字段；当前图不应把它当作稳定入口。",
+        "source": "superset/constants.py + superset/utils/core.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_chord_legacy": false,
+        "recommended": false,
+        "sample_data": "ds",
+        "effect": "通用时间列 override 键；Chord 常规场景没有对应 controlPanel 字段，不建议在 guest embedding 中依赖。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "granularity",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_chord_legacy": false,
+        "recommended": false,
+        "sample_data": "__time",
+        "effect": "通用 QueryObject 时间列 override；Chord 常规场景不应依赖它重构查询。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_column",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_chord_legacy": false,
+        "recommended": false,
+        "sample_data": "ds",
+        "effect": "底层 QueryObject 时间列 override；当前图表定义里没有对应 controlPanel 正式字段。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "time_grain",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_chord_legacy": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "底层 QueryObject 时间粒度 override；Chord 常规场景通常不需要手动传。",
+        "source": "superset/constants.py + QueryFormData.ts",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "relative_start",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_chord_legacy": false,
+        "recommended": false,
+        "sample_data": "now",
+        "effect": "写入 query extras 的相对开始时间。Chord 当前没有明确的官方时间控件链路，建议谨慎使用。",
+        "source": "superset/charts/schemas.py + superset/utils/core.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "relative_end",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_chord_legacy": false,
+        "recommended": false,
+        "sample_data": "today",
+        "effect": "写入 query extras 的相对结束时间。Chord 当前没有明确的官方时间控件链路，建议谨慎使用。",
+        "source": "superset/charts/schemas.py + superset/utils/core.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_chord_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "source_entity"
+        ],
+        "effect": "通用 ExtraFormData 字段。Chord 默认不直接消费它。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_highlight",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_chord_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "source_entity"
+        ],
+        "effect": "通用交互字段；Chord 默认不直接消费。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "interactive_drilldown",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_chord_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "source_entity"
+        ],
+        "effect": "通用交互字段；Chord 默认不直接消费。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "time_compare",
+        "data_type": "string | array[string]",
+        "behavior": "override",
+        "safe_for_chord_legacy": false,
+        "recommended": false,
+        "sample_data": [
+          "1 year ago"
+        ],
+        "effect": "frontend 类型声明存在，但后端 constants.py 的 merge whitelist 未把它列为高置信 override；Chord 当前也没有直接消费它的证据。",
+        "source": "QueryFormData.ts + query/constants.ts + superset/constants.py",
+        "status": "低置信，不建议在 guest embedding 中依赖"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "chord",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/chord-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/chord-form-data-schema.json",
+      "control-schema": "form-data-schema/chord-schema.json"
+    }
+  }
+}

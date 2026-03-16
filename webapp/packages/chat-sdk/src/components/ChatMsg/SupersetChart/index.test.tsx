@@ -1,5 +1,5 @@
 import { fireEvent, render, waitFor } from '@testing-library/react';
-import SupersetChart, { filterTemporaryDashboards } from './index';
+import SupersetChart from './index';
 
 jest.mock('@superset-ui/embedded-sdk', () => ({
   embedDashboard: jest.fn(),
@@ -7,7 +7,8 @@ jest.mock('@superset-ui/embedded-sdk', () => ({
 
 jest.mock('../../../service', () => ({
   fetchSupersetGuestToken: jest.fn(),
-  fetchSupersetDashboards: jest.fn(),
+  fetchSupersetManualDashboards: jest.fn(),
+  createSupersetDashboard: jest.fn(),
   pushSupersetChartToDashboard: jest.fn(),
 }));
 
@@ -27,9 +28,38 @@ const ensureEmbedDashboardMock = () => {
 };
 
 const ensureServiceMocks = () => {
-  const { fetchSupersetDashboards, fetchSupersetGuestToken } = require('../../../service');
-  fetchSupersetDashboards.mockResolvedValue({ data: [] });
+  const {
+    fetchSupersetGuestToken,
+    fetchSupersetManualDashboards,
+    createSupersetDashboard,
+    pushSupersetChartToDashboard,
+  } = require('../../../service');
   fetchSupersetGuestToken.mockResolvedValue({ data: { token: 'token-default' } });
+  fetchSupersetManualDashboards.mockResolvedValue({
+    code: 200,
+    data: {
+      pluginId: 1,
+      supersetDomain: 'https://superset.example.com',
+      dashboards: [
+        {
+          id: 9001,
+          title: '经营分析总览',
+          embeddedId: 'manual-dashboard-9001',
+          supersetDomain: 'https://superset.example.com',
+        },
+      ],
+    },
+  });
+  createSupersetDashboard.mockResolvedValue({
+    code: 200,
+    data: {
+      id: 9101,
+      title: '新建看板',
+      embeddedId: 'manual-dashboard-9101',
+      supersetDomain: 'https://superset.example.com',
+    },
+  });
+  pushSupersetChartToDashboard.mockResolvedValue({ code: 200, data: true });
 };
 
 describe('SupersetChart', () => {
@@ -73,41 +103,143 @@ describe('SupersetChart', () => {
     await expect(args.fetchGuestToken()).resolves.toBe('token-default');
   });
 
-  test('switches embed when viz type candidates change', async () => {
+  test('uses first candidate embed as default view and renders switcher', async () => {
     const { embedDashboard } = require('@superset-ui/embedded-sdk');
     embedDashboard.mockClear();
     const data = buildData({
       webPage: { url: '', params: [] },
       pluginId: 1,
+      dashboardId: 88,
+      dashboardTitle: '分析看板',
+      embeddedId: 'embed-line',
+      supersetDomain: 'https://superset.example.com',
       vizTypeCandidates: [
         {
-          vizType: 'bar',
-          vizName: 'Bar Chart',
-          embeddedId: 'embed-1',
+          vizType: 'echarts_timeseries_line',
+          vizName: 'Line Chart',
+          embeddedId: 'embed-line',
           supersetDomain: 'https://superset.example.com',
           chartId: 11,
         },
         {
-          vizType: 'line',
-          vizName: 'Line Chart',
-          embeddedId: 'embed-2',
+          vizType: 'echarts_timeseries_bar',
+          vizName: 'Bar Chart',
+          embeddedId: 'embed-bar',
           supersetDomain: 'https://superset.example.com',
           chartId: 22,
         },
+        {
+          vizType: 'table',
+          vizName: 'Table',
+          embeddedId: 'embed-table',
+          supersetDomain: 'https://superset.example.com',
+          chartId: 33,
+        },
       ],
     });
-    const { getByText } = render(<SupersetChart id={1} data={data} />);
+    const { getByRole, queryByText } = render(<SupersetChart id={1} data={data} />);
     await waitFor(() => {
       expect(embedDashboard).toHaveBeenCalled();
     });
-    expect(embedDashboard.mock.calls[0][0].id).toBe('embed-1');
-    fireEvent.click(getByText('Line Chart'));
+    expect(embedDashboard).toHaveBeenCalledTimes(1);
+    const args = embedDashboard.mock.calls[0][0];
+    expect(args.id).toBe('embed-line');
+    await expect(args.fetchGuestToken()).resolves.toBe('token-default');
+    expect(queryByText('分析看板')).toBeNull();
+    expect(queryByText('折线图')).toBeTruthy();
+    expect(queryByText('柱状图')).toBeTruthy();
+    expect(queryByText('数据表')).toBeTruthy();
+    expect(queryByText('Line Chart')).toBeNull();
+    expect(getByRole('button', { name: '折线图' })).toBeTruthy();
+    expect(queryByText('推送到看板')).toBeTruthy();
+  });
+
+  test('prefers final dashboard embed when candidates only describe child charts', async () => {
+    const { embedDashboard } = require('@superset-ui/embedded-sdk');
+    embedDashboard.mockClear();
+    const data = buildData({
+      webPage: { url: '', params: [] },
+      pluginId: 1,
+      dashboardId: 88,
+      dashboardTitle: '访问趋势分析',
+      embeddedId: 'final-dashboard-embed',
+      supersetDomain: 'https://superset.example.com',
+      vizTypeCandidates: [
+        {
+          vizType: 'echarts_timeseries_line',
+          vizName: '趋势折线图',
+          chartId: 11,
+          chartUuid: 'chart-uuid-11',
+        },
+        {
+          vizType: 'pie',
+          vizName: '占比饼图',
+          chartId: 22,
+          chartUuid: 'chart-uuid-22',
+        },
+      ],
+    });
+    const { queryByText } = render(<SupersetChart id={1} data={data} />);
+    await waitFor(() => {
+      expect(embedDashboard).toHaveBeenCalled();
+    });
+    expect(embedDashboard).toHaveBeenCalledTimes(1);
+    expect(embedDashboard.mock.calls[0][0].id).toBe('final-dashboard-embed');
+    expect(queryByText('访问趋势分析')).toBeNull();
+    expect(queryByText('折线图')).toBeTruthy();
+    expect(queryByText('饼图')).toBeTruthy();
+    expect(queryByText('推送到看板')).toBeNull();
+  });
+
+  test('switches embedded dashboard when user selects another viz type', async () => {
+    const { embedDashboard } = require('@superset-ui/embedded-sdk');
+    embedDashboard.mockClear();
+    const data = buildData({
+      webPage: { url: '', params: [] },
+      pluginId: 1,
+      dashboardId: 88,
+      dashboardTitle: '访问趋势分析',
+      embeddedId: 'embed-line',
+      supersetDomain: 'https://superset.example.com',
+      vizTypeCandidates: [
+        {
+          vizType: 'echarts_timeseries_line',
+          vizName: 'Line Chart',
+          embeddedId: 'embed-line',
+          supersetDomain: 'https://superset.example.com',
+          chartId: 11,
+        },
+        {
+          vizType: 'echarts_timeseries_bar',
+          vizName: 'Bar Chart',
+          embeddedId: 'embed-bar',
+          supersetDomain: 'https://superset.example.com',
+          chartId: 22,
+        },
+        {
+          vizType: 'table',
+          vizName: 'Table',
+          embeddedId: 'embed-table',
+          supersetDomain: 'https://superset.example.com',
+          chartId: 33,
+        },
+      ],
+    });
+    const { getByRole } = render(<SupersetChart id={1} data={data} />);
+    await waitFor(() => {
+      expect(embedDashboard).toHaveBeenCalledTimes(1);
+    });
+    fireEvent.click(getByRole('button', { name: '柱状图' }));
     await waitFor(() => {
       expect(embedDashboard).toHaveBeenCalledTimes(2);
     });
-    const args = embedDashboard.mock.calls[1][0];
-    expect(args.id).toBe('embed-2');
-    await expect(args.fetchGuestToken()).resolves.toBe('token-default');
+    expect(embedDashboard.mock.calls[1][0].id).toBe('embed-bar');
+
+    fireEvent.click(getByRole('button', { name: '数据表' }));
+    await waitFor(() => {
+      expect(embedDashboard).toHaveBeenCalledTimes(3);
+    });
+    expect(embedDashboard.mock.calls[2][0].id).toBe('embed-table');
   });
 
   test('fetches guest token from response wrapper', async () => {
@@ -175,36 +307,114 @@ describe('SupersetChart', () => {
     });
   });
 
-  test('shows push button when dashboards exist', () => {
-    const data = buildData({
-      webPage: { url: 'https://superset.example.com/embed', params: [] },
-      pluginId: 1,
-      chartId: 2,
-      dashboards: [{ id: 10, title: 'Sales' }],
-    });
-    const { getByText } = render(<SupersetChart id={1} data={data} />);
-    expect(getByText('推送到看板')).toBeTruthy();
-  });
-
-  test('fetches dashboards when response list is empty', async () => {
-    const { fetchSupersetDashboards } = require('../../../service');
+  test('does not fetch dashboard list or show push action for dashboard-first response', async () => {
     const data = buildData({
       webPage: { url: '', params: [] },
       pluginId: 1,
-      chartId: 2,
-      dashboards: [],
+      dashboardId: 100,
+      embeddedId: 'dashboard-embed-100',
+      supersetDomain: 'https://superset.example.com',
     });
-    render(<SupersetChart id={1} data={data} />);
+    const { queryByText } = render(<SupersetChart id={1} data={data} />);
     await waitFor(() => {
-      expect(fetchSupersetDashboards).toHaveBeenCalledWith(1);
+      expect(queryByText('推送到看板')).toBeNull();
     });
   });
 
-  test('filters temporary dashboards by supersonic prefix', () => {
-    const dashboards = [
-      { id: 10, title: 'supersonic_Plugin_123' },
-      { id: 11, title: 'Sales' },
-    ];
-    expect(filterTemporaryDashboards(dashboards, 'Plugin')).toEqual([{ id: 11, title: 'Sales' }]);
+  test('pushes the currently selected chart into existing manual dashboard', async () => {
+    const { embedDashboard } = require('@superset-ui/embedded-sdk');
+    const { fetchSupersetManualDashboards, pushSupersetChartToDashboard } = require('../../../service');
+    embedDashboard.mockClear();
+    const data = buildData({
+      webPage: { url: '', params: [] },
+      pluginId: 1,
+      dashboardId: 88,
+      dashboardTitle: '访问趋势分析',
+      embeddedId: 'embed-line',
+      supersetDomain: 'https://superset.example.com',
+      vizTypeCandidates: [
+        {
+          vizType: 'echarts_timeseries_line',
+          vizName: 'Line Chart',
+          embeddedId: 'embed-line',
+          supersetDomain: 'https://superset.example.com',
+          chartId: 11,
+        },
+        {
+          vizType: 'echarts_timeseries_bar',
+          vizName: 'Bar Chart',
+          embeddedId: 'embed-bar',
+          supersetDomain: 'https://superset.example.com',
+          chartId: 22,
+        },
+      ],
+    });
+    const { findByText, getByRole } = render(<SupersetChart id={1} data={data} />);
+    await waitFor(() => {
+      expect(embedDashboard).toHaveBeenCalledTimes(1);
+    });
+    fireEvent.click(getByRole('button', { name: '柱状图' }));
+    await waitFor(() => {
+      expect(embedDashboard).toHaveBeenCalledTimes(2);
+    });
+    fireEvent.click(getByRole('button', { name: '推送到看板' }));
+    await waitFor(() => {
+      expect(fetchSupersetManualDashboards).toHaveBeenCalledWith(1);
+    });
+    await findByText('经营分析总览');
+    fireEvent.click(getByRole('button', { name: '经营分析总览' }));
+    fireEvent.click(getByRole('button', { name: '推送到所选看板' }));
+    await waitFor(() => {
+      expect(pushSupersetChartToDashboard).toHaveBeenCalledWith({
+        pluginId: 1,
+        dashboardId: 9001,
+        chartId: 22,
+      });
+    });
+  });
+
+  test('creates a new dashboard and pushes current chart when requested', async () => {
+    const { embedDashboard } = require('@superset-ui/embedded-sdk');
+    const { createSupersetDashboard, pushSupersetChartToDashboard } = require('../../../service');
+    embedDashboard.mockClear();
+    const data = buildData({
+      webPage: { url: '', params: [] },
+      pluginId: 1,
+      dashboardId: 88,
+      dashboardTitle: '访问趋势分析',
+      embeddedId: 'embed-line',
+      supersetDomain: 'https://superset.example.com',
+      vizTypeCandidates: [
+        {
+          vizType: 'echarts_timeseries_line',
+          vizName: 'Line Chart',
+          embeddedId: 'embed-line',
+          supersetDomain: 'https://superset.example.com',
+          chartId: 11,
+        },
+      ],
+    });
+    const { getByPlaceholderText, getByRole } = render(<SupersetChart id={1} data={data} />);
+    await waitFor(() => {
+      expect(embedDashboard).toHaveBeenCalledTimes(1);
+    });
+    fireEvent.click(getByRole('button', { name: '推送到看板' }));
+    fireEvent.change(getByPlaceholderText('输入新看板名称'), {
+      target: { value: '我的趋势看板' },
+    });
+    fireEvent.click(getByRole('button', { name: '新建并推送' }));
+    await waitFor(() => {
+      expect(createSupersetDashboard).toHaveBeenCalledWith({
+        pluginId: 1,
+        title: '我的趋势看板',
+      });
+    });
+    await waitFor(() => {
+      expect(pushSupersetChartToDashboard).toHaveBeenCalledWith({
+        pluginId: 1,
+        dashboardId: 9101,
+        chartId: 11,
+      });
+    });
   });
 });

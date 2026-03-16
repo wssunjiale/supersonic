@@ -1,0 +1,121 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "partition",
+  "display_name": "Partition Chart",
+  "normalized_summary": {
+    "category": "hierarchy",
+    "tags": [
+      "partition",
+      "hierarchy",
+      "icicle",
+      "rectangular"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "groupby",
+        "required": true,
+        "description": "层级维度字段列表（按层级顺序），用于定义分区的层级结构。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于计算每个分区的大小（面积依据）。"
+      },
+      {
+        "key": "sort_by",
+        "required": false,
+        "description": "排序字段（metric/name），控制分区的排列顺序。"
+      }
+    ],
+    "description_zh": "Partition Chart (Icicle) displays hierarchical data as nested rectangles, with each level of hierarchy as a row and rectangle size representing metric values.",
+    "visual_shape_zh": "分区图（层级矩形型）",
+    "use_cases_zh": [
+      "层级数据占比分析（如品类→子品类→产品销售额）",
+      "分层级的数值分布",
+      "树形结构数据的矩形化展示"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "partition",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/partition-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/partition-form-data-schema.json",
+      "control-schema": "form-data-schema/partition-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Partition Chart",
+    "viztype": "partition",
+    "详细描述": "Partition Chart (Icicle) displays hierarchical data as nested rectangles, with each level of hierarchy as a row and rectangle size representing metric values.",
+    "表现形态": "分区图（层级矩形型）",
+    "适用场景": [
+      "层级数据占比分析（如品类→子品类→产品销售额）",
+      "分层级的数值分布",
+      "树形结构数据的矩形化展示"
+    ],
+    "vizKey": "Partition",
+    "pluginCategory": "Hierarchy",
+    "pluginTags": [],
+    "category": "hierarchy",
+    "tags": [
+      "partition",
+      "hierarchy",
+      "icicle",
+      "rectangular"
+    ],
+    "关键字段": [
+      {
+        "key": "groupby",
+        "required": true,
+        "description": "层级维度字段列表（按层级顺序），用于定义分区的层级结构。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于计算每个分区的大小（面积依据）。"
+      },
+      {
+        "key": "sort_by",
+        "required": false,
+        "description": "排序字段（metric/name），控制分区的排列顺序。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

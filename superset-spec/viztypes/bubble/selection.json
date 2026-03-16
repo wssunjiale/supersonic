@@ -1,0 +1,436 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "bubble",
+  "display_name": "Bubble Chart (legacy)",
+  "selection_summary": {
+    "category": "relationship",
+    "tags": [
+      "bubble",
+      "legacy",
+      "relationship",
+      "3d"
+    ],
+    "description_zh": "Legacy Bubble Chart displays three dimensions of data (x-axis, y-axis, bubble size) with basic styling, maintained for backward compatibility.",
+    "visual_shape_zh": "旧版气泡图（关联型）",
+    "use_cases_zh": [
+      "三维数据关系分析（兼容旧版配置）",
+      "简单多维度指标关联对比",
+      "遗留系统的气泡图展示"
+    ],
+    "required_slots": [
+      {
+        "field_name": "entity",
+        "required": true,
+        "slot_kind": "entity",
+        "accepted_dataset_roles": [
+          "entity",
+          "entity_id",
+          "dimension"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<entity_column>",
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "This defines the element to be plotted on the chart"
+        ]
+      },
+      {
+        "field_name": "size",
+        "required": true,
+        "slot_kind": "metric",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1",
+        "placeholder": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        },
+        "source_categories": [
+          "Query",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Metric used to calculate bubble size",
+          "气泡大小对应的指标，用于表示第三个维度的数值。"
+        ]
+      },
+      {
+        "field_name": "x_axis",
+        "required": true,
+        "slot_kind": "x_axis",
+        "accepted_dataset_roles": [
+          "time_dimension",
+          "dimension"
+        ],
+        "cardinality": "1",
+        "placeholder": "<x_axis_column>",
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "X 轴数值型字段，用于气泡的水平位置。"
+        ]
+      },
+      {
+        "field_name": "y_axis",
+        "required": true,
+        "slot_kind": "y_axis",
+        "accepted_dataset_roles": [
+          "metric",
+          "dimension"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<y_axis_column_or_metric>",
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Y 轴数值型字段，用于气泡的垂直位置。"
+        ]
+      }
+    ],
+    "optional_slots": [
+      {
+        "field_name": "adhoc_filters",
+        "required": false,
+        "slot_kind": "filter_list",
+        "accepted_dataset_roles": [
+          "filter_context"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [],
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "字段标签为 Filters。legacy explore_json 路径会先把 legacy filters 转成 adhoc_filters，再继续处理 extra filters。"
+        ]
+      },
+      {
+        "field_name": "series",
+        "required": false,
+        "slot_kind": "dimension",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "1",
+        "placeholder": "<dimension_column>",
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Defines the grouping of entities. Each series is represented by a specific color in the chart."
+        ]
+      }
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "dimension",
+      "entity",
+      "entity_id",
+      "metric",
+      "saved_metric",
+      "time_dimension"
+    ],
+    "optional_dataset_roles": [
+      "category_dimension",
+      "dimension",
+      "filter_context"
+    ],
+    "dataset_role_inventory": {
+      "adhoc_metric": [
+        "size"
+      ],
+      "category_dimension": [
+        "series"
+      ],
+      "dimension": [
+        "entity",
+        "series",
+        "x_axis",
+        "y_axis"
+      ],
+      "entity": [
+        "entity"
+      ],
+      "entity_id": [
+        "entity"
+      ],
+      "filter_context": [
+        "adhoc_filters"
+      ],
+      "metric": [
+        "size",
+        "y_axis"
+      ],
+      "saved_metric": [
+        "size"
+      ],
+      "time_dimension": [
+        "x_axis"
+      ]
+    },
+    "non_binding_control_names": [
+      "bottom_margin",
+      "color_scheme",
+      "left_margin",
+      "limit",
+      "max_bubble_size",
+      "show_legend",
+      "x",
+      "x_axis_format",
+      "x_axis_label",
+      "x_axis_showminmax",
+      "x_log_scale",
+      "x_ticks_layout",
+      "y",
+      "y_axis_bounds",
+      "y_axis_format",
+      "y_axis_label",
+      "y_axis_showminmax",
+      "y_log_scale"
+    ],
+    "embedding_runtime_field_names": [
+      "adhoc_filters",
+      "custom_form_data",
+      "filters",
+      "granularity",
+      "granularity_sqla",
+      "interactive_drilldown",
+      "interactive_groupby",
+      "interactive_highlight",
+      "relative_end",
+      "relative_start",
+      "time_column",
+      "time_compare",
+      "time_grain",
+      "time_grain_sqla",
+      "time_range"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "entity",
+      "size",
+      "viz_type",
+      "x",
+      "y"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "bottom_margin",
+      "color_scheme",
+      "datasource",
+      "entity",
+      "left_margin",
+      "limit",
+      "max_bubble_size",
+      "series",
+      "show_legend",
+      "size",
+      "viz_type",
+      "x",
+      "x_axis_format",
+      "x_axis_label",
+      "x_axis_showminmax",
+      "x_log_scale",
+      "x_ticks_layout",
+      "y",
+      "y_axis_bounds",
+      "y_axis_format",
+      "y_axis_label",
+      "y_axis_showminmax",
+      "y_log_scale"
+    ],
+    "structural_flags": {
+      "time_series": true,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": false,
+      "flow_like": false,
+      "distribution_like": false,
+      "supports_breakdown": true,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": true,
+      "needs_dimension": true
+    },
+    "selection_hints": [
+      "优先用于趋势、演化、时间对比类问题。",
+      "至少需要 1 个可聚合指标字段。",
+      "需要时间字段，通常还应结合时间粒度或时间范围。",
+      "需要至少 1 个维度字段用于分组、拆分或定位。",
+      "支持按维度拆分多序列或子组。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：三维数据关系分析（兼容旧版配置）；简单多维度指标关联对比；遗留系统的气泡图展示"
+    ]
+  },
+  "selection_prompt_card": {
+    "viz_type": "bubble",
+    "display_name": "Bubble Chart (legacy)",
+    "category": "relationship",
+    "description_zh": "Legacy Bubble Chart displays three dimensions of data (x-axis, y-axis, bubble size) with basic styling, maintained for backward compatibility.",
+    "visual_shape_zh": "旧版气泡图（关联型）",
+    "best_for": [
+      "三维数据关系分析（兼容旧版配置）",
+      "简单多维度指标关联对比",
+      "遗留系统的气泡图展示"
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "dimension",
+      "entity",
+      "entity_id",
+      "metric",
+      "saved_metric",
+      "time_dimension"
+    ],
+    "optional_dataset_roles": [
+      "category_dimension",
+      "dimension",
+      "filter_context"
+    ],
+    "required_slots": [
+      {
+        "field_name": "entity",
+        "required": true,
+        "slot_kind": "entity",
+        "accepted_dataset_roles": [
+          "entity",
+          "entity_id",
+          "dimension"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<entity_column>",
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "This defines the element to be plotted on the chart"
+        ]
+      },
+      {
+        "field_name": "size",
+        "required": true,
+        "slot_kind": "metric",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1",
+        "placeholder": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        },
+        "source_categories": [
+          "Query",
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Metric used to calculate bubble size",
+          "气泡大小对应的指标，用于表示第三个维度的数值。"
+        ]
+      },
+      {
+        "field_name": "x_axis",
+        "required": true,
+        "slot_kind": "x_axis",
+        "accepted_dataset_roles": [
+          "time_dimension",
+          "dimension"
+        ],
+        "cardinality": "1",
+        "placeholder": "<x_axis_column>",
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "X 轴数值型字段，用于气泡的水平位置。"
+        ]
+      },
+      {
+        "field_name": "y_axis",
+        "required": true,
+        "slot_kind": "y_axis",
+        "accepted_dataset_roles": [
+          "metric",
+          "dimension"
+        ],
+        "cardinality": "0..1",
+        "placeholder": "<y_axis_column_or_metric>",
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Y 轴数值型字段，用于气泡的垂直位置。"
+        ]
+      }
+    ],
+    "optional_slot_names": [
+      "adhoc_filters",
+      "series"
+    ],
+    "structural_flags": {
+      "time_series": true,
+      "kpi_like": false,
+      "table_like": false,
+      "map_like": false,
+      "flow_like": false,
+      "distribution_like": false,
+      "supports_breakdown": true,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": true,
+      "needs_dimension": true
+    },
+    "selection_hints": [
+      "优先用于趋势、演化、时间对比类问题。",
+      "至少需要 1 个可聚合指标字段。",
+      "需要时间字段，通常还应结合时间粒度或时间范围。",
+      "需要至少 1 个维度字段用于分组、拆分或定位。",
+      "支持按维度拆分多序列或子组。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：三维数据关系分析（兼容旧版配置）；简单多维度指标关联对比；遗留系统的气泡图展示"
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "bubble",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/bubble-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/bubble-form-data-schema.json",
+      "control-schema": "form-data-schema/bubble-schema.json"
+    }
+  }
+}

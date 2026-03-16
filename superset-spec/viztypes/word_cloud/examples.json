@@ -1,0 +1,181 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "word_cloud",
+  "display_name": "Word Cloud",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "lang",
+          "operator": "IN",
+          "comparator": [
+            "zh"
+          ]
+        }
+      ]
+    ],
+    "color_scheme": [
+      "bnbColors"
+    ],
+    "metric": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "cnt"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(cnt)"
+      }
+    ],
+    "rotation": [
+      "square"
+    ],
+    "row_limit": [
+      100
+    ],
+    "series": [
+      "term"
+    ],
+    "size_from": [
+      10
+    ],
+    "size_to": [
+      70
+    ],
+    "sort_by_metric": [
+      false
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "word_cloud",
+      "series": "term",
+      "adhoc_filters": [],
+      "row_limit": 100
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "word_cloud",
+      "series": "term",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "cnt"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(cnt)"
+      },
+      "adhoc_filters": [],
+      "row_limit": 100,
+      "sort_by_metric": false,
+      "size_from": 10,
+      "size_to": 70,
+      "rotation": "square",
+      "color_scheme": "bnbColors"
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "word_cloud",
+      "series": "<copied_from_saved_chart>",
+      "metric": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "row_limit": "<copied_from_saved_chart>",
+      "sort_by_metric": "<copied_from_saved_chart>",
+      "size_from": "<copied_from_saved_chart>",
+      "size_to": "<copied_from_saved_chart>",
+      "rotation": "<copied_from_saved_chart>",
+      "color_scheme": "<copied_from_saved_chart>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "lang",
+            "op": "IN",
+            "val": [
+              "zh"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "lang",
+            "operator": "IN",
+            "comparator": [
+              "zh"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_word_cloud": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "lang",
+            "op": "IN",
+            "val": [
+              "zh"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_word_cloud": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "lang",
+            "operator": "IN",
+            "comparator": [
+              "zh"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_word_cloud": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；Word Cloud 默认不直接消费它。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "word_cloud",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/word_cloud-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/word_cloud-form-data-schema.json",
+      "control-schema": "form-data-schema/word_cloud-schema.json"
+    }
+  }
+}

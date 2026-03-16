@@ -1,0 +1,566 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "deck_arc",
+  "display_name": "deck.gl Arc",
+  "source_kind": "schema_file",
+  "normalized_chart_form_data": {
+    "required_root_fields": [
+      "datasource",
+      "end_spatial",
+      "start_spatial",
+      "viz_type"
+    ],
+    "optional_root_fields": [
+      "adhoc_filters",
+      "autozoom",
+      "cache_timeout",
+      "color_picker",
+      "color_scheme",
+      "color_scheme_type",
+      "custom_params",
+      "dimension",
+      "extra_form_data",
+      "filter_nulls",
+      "js_columns",
+      "js_data_mutator",
+      "js_onclick_href",
+      "js_tooltip",
+      "legend_format",
+      "legend_position",
+      "mapbox_style",
+      "row_limit",
+      "slice_id",
+      "stroke_width",
+      "target_color_picker",
+      "url_params",
+      "viewport"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "end_spatial",
+      "start_spatial",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "autozoom",
+      "color_picker",
+      "color_scheme",
+      "color_scheme_type",
+      "datasource",
+      "dimension",
+      "end_spatial",
+      "filter_nulls",
+      "js_columns",
+      "js_data_mutator",
+      "js_onclick_href",
+      "js_tooltip",
+      "legend_format",
+      "legend_position",
+      "mapbox_style",
+      "row_limit",
+      "start_spatial",
+      "stroke_width",
+      "target_color_picker",
+      "viewport",
+      "viz_type"
+    ],
+    "fallback_template_seed": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "deck_arc",
+      "end_spatial": "<end_spatial_column>",
+      "start_spatial": "<start_spatial_column>",
+      "adhoc_filters": [],
+      "time_range": "No filter"
+    }
+  },
+  "original_chart_form_data_schema": {
+    "viz_type": "deck_arc",
+    "display_name": "deck.gl Arc",
+    "purpose": "用于调用 API 创建或保存 deck.gl Arc 时填写的 form_data 模板",
+    "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/deck_arc-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Arc/controlPanel.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Arc/index.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Arc/Arc.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/factory.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/common.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/Shared_DeckGL.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/controls.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/utils.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/components/controls/SpatialControl.jsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-demo/storybook/stories/plugins/legacy-preset-chart-deckgl/Arc/payload.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+      "D:/vsx/sources/superset-6.0.0/superset/views/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/viz.py"
+    ],
+    "notes": [
+      "deck_arc 是 legacy 图，metadata 明确声明 `useLegacyApi=true`，真实请求路径仍是 `/superset/explore_json/`。",
+      "Explore 导出 form_data 时走 `getFormDataFromControls()`，它按 control name 原样写入 root form_data。API 根层必须使用 `start_spatial`、`end_spatial`、`mapbox_style`、`color_scheme_type`、`stroke_width` 等原始键名。",
+      "deck_arc 没有专属前端 buildQuery。ChartClient.ts 对它会退回 `() => formData`，也就是说，API 层真正应该构造的是原始 root `form_data`，然后由 legacy `/superset/explore_json/` 包装成 `{ form_data: ... }`。",
+      "Arc 没有正式指标字段，因此创建模板不需要 `metric`/`metrics`/`size`。后端默认按起点列、终点列以及可选维度列返回弧线记录。",
+      "当前 controlPanel 没有时间 section。虽然源码里 `DeckArc` 在 `time_grain_sqla` 存在时支持 timeseries 模式，但这更像 legacy 携带能力，不是当前图的规范创建模板入口。",
+      "`filters` 不是当前 controlPanel 正式字段。虽然 legacy payload 或老保存态可能出现它，但当前创建模板应优先使用 `adhoc_filters`。"
+    ],
+    "naming_and_pipeline": {
+      "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写成 form_data[name]，不会自动把 snake_case 改成 camelCase。",
+      "api_form_data_to_backend_request": "ChartClient.ts 在 `useLegacyApi=true` 时，把 `buildQuery(formData)` 包成 `{ form_data }` POST 到 `/superset/explore_json/`；deck_arc 没有专属 buildQuery，因此等价于直接发送原始 form_data。",
+      "backend_form_data_normalization": "`explore_json()` 会先补 `datasource`，再执行 `convert_legacy_filters_into_adhoc(form_data)` 与 `merge_extra_filters(form_data)`。",
+      "backend_form_data_to_query_obj": "`DeckArc.query_obj()` 先根据 `time_grain_sqla` 决定是否视为 timeseries，再复用 `BaseDeckGLViz.query_obj()`：展开 `start_spatial` / `end_spatial` 的真实列，并追加可选 `dimension`、`js_columns`。",
+      "runtime_chart_props": "`transformProps.ts` 直接把 `rawFormData` 透传成 runtime `formData`，把 `queriesData[0]` 透传成 runtime `payload`，并把 `viewport` 与 `width`/`height` 合并。"
+    },
+    "global_required_fields": {
+      "datasource": {
+        "data_type": "string",
+        "required": true,
+        "sample_data": "<dataset_id>__table",
+        "source": "explore_json() + datasourceAndVizType hidden control"
+      },
+      "viz_type": {
+        "data_type": "string",
+        "required": true,
+        "fixed_value": "deck_arc",
+        "source": "Arc/index.ts + VizType.DeckArc"
+      },
+      "start_spatial": {
+        "data_type": "object",
+        "required": true,
+        "sample_data": {
+          "type": "latlong",
+          "lonCol": "LONGITUDE",
+          "latCol": "LATITUDE"
+        },
+        "source": "Arc Query section + SpatialControl validator + BaseDeckGLViz.query_obj()"
+      },
+      "end_spatial": {
+        "data_type": "object",
+        "required": true,
+        "sample_data": {
+          "type": "latlong",
+          "lonCol": "LONGITUDE_DEST",
+          "latCol": "LATITUDE_DEST"
+        },
+        "source": "Arc Query section + SpatialControl validator + BaseDeckGLViz.query_obj()"
+      }
+    },
+    "global_optional_fields": {
+      "row_limit": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 5000,
+        "source": "Query section"
+      },
+      "filter_nulls": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": true,
+        "source": "Query section"
+      },
+      "adhoc_filters": {
+        "data_type": "array[object]",
+        "required": false,
+        "sample_data": [],
+        "source": "Query section"
+      },
+      "mapbox_style": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "mapbox://styles/mapbox/light-v9",
+        "source": "Map section"
+      },
+      "autozoom": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": true,
+        "source": "Map section"
+      },
+      "viewport": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {
+          "longitude": -91.84340711201104,
+          "latitude": 44.596651438714254,
+          "zoom": 2.929837070560775,
+          "bearing": 8.546256357301871,
+          "pitch": 60
+        },
+        "source": "Map section"
+      },
+      "color_scheme_type": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "fixed_color",
+        "source": "Arc section"
+      },
+      "color_picker": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {
+          "r": 0,
+          "g": 122,
+          "b": 135,
+          "a": 1
+        },
+        "source": "Arc section"
+      },
+      "target_color_picker": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {
+          "r": 0,
+          "g": 122,
+          "b": 135,
+          "a": 1
+        },
+        "source": "Arc section"
+      },
+      "dimension": {
+        "data_type": "string | object | null",
+        "required": false,
+        "sample_data": "carrier",
+        "source": "Arc section"
+      },
+      "color_scheme": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "SUPERSET_DEFAULT",
+        "source": "Arc section"
+      },
+      "stroke_width": {
+        "data_type": "integer | string | null",
+        "required": false,
+        "sample_data": 1,
+        "source": "Arc section"
+      },
+      "legend_position": {
+        "data_type": "string | null",
+        "required": false,
+        "sample_data": "tr",
+        "source": "Arc section"
+      },
+      "legend_format": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "SMART_NUMBER",
+        "source": "Arc section"
+      },
+      "js_columns": {
+        "data_type": "array[string | object]",
+        "required": false,
+        "sample_data": [],
+        "source": "Advanced section"
+      },
+      "js_data_mutator": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "data => data",
+        "source": "Advanced section"
+      },
+      "js_tooltip": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "o => `<div>${o.object.cat_color}</div>`",
+        "source": "Advanced section"
+      },
+      "js_onclick_href": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "o => `https://example.com/?from=${o.object.sourcePosition}`",
+        "source": "Advanced section"
+      },
+      "slice_id": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 0,
+        "source": "datasourceAndVizType hidden control",
+        "notes": "新建图表时通常省略；编辑已存在图表时由服务端或上层调用方提供。"
+      },
+      "cache_timeout": {
+        "data_type": "integer | null",
+        "required": false,
+        "sample_data": null,
+        "source": "datasourceAndVizType hidden control"
+      },
+      "url_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "QueryFormData"
+      },
+      "custom_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "QueryFormData"
+      },
+      "extra_form_data": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "utils.merge_extra_form_data()",
+        "notes": "虽然不属于 deck_arc controlPanel 正式字段，但 legacy explore_json 路径会消费它。"
+      }
+    },
+    "minimal_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "deck_arc",
+      "start_spatial": {
+        "type": "latlong",
+        "lonCol": "LONGITUDE",
+        "latCol": "LATITUDE"
+      },
+      "end_spatial": {
+        "type": "latlong",
+        "lonCol": "LONGITUDE_DEST",
+        "latCol": "LATITUDE_DEST"
+      },
+      "adhoc_filters": []
+    },
+    "recommended_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "deck_arc",
+      "start_spatial": {
+        "type": "latlong",
+        "lonCol": "LONGITUDE",
+        "latCol": "LATITUDE"
+      },
+      "end_spatial": {
+        "type": "latlong",
+        "lonCol": "LONGITUDE_DEST",
+        "latCol": "LATITUDE_DEST"
+      },
+      "row_limit": 5000,
+      "filter_nulls": true,
+      "adhoc_filters": [],
+      "mapbox_style": "mapbox://styles/mapbox/light-v9",
+      "autozoom": true,
+      "viewport": {
+        "longitude": 6.85236157047845,
+        "latitude": 31.222656842808707,
+        "zoom": 1,
+        "bearing": 0,
+        "pitch": 0
+      },
+      "color_scheme_type": "fixed_color",
+      "color_picker": {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      },
+      "target_color_picker": {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      },
+      "dimension": null,
+      "color_scheme": "SUPERSET_DEFAULT",
+      "stroke_width": 1,
+      "legend_position": "tr",
+      "legend_format": "SMART_NUMBER",
+      "js_columns": [],
+      "js_data_mutator": "",
+      "js_tooltip": "",
+      "js_onclick_href": ""
+    },
+    "conditional_blocks": {
+      "delimited_spatial_columns": {
+        "condition": "起点或终点空间字段存储在单列经纬度字符串中时",
+        "fields": {
+          "start_spatial": {
+            "type": "delimited",
+            "lonlatCol": "FROM_LONLAT",
+            "delimiter": ",",
+            "reverseCheckbox": false
+          },
+          "end_spatial": {
+            "type": "delimited",
+            "lonlatCol": "TO_LONLAT",
+            "delimiter": ",",
+            "reverseCheckbox": false
+          }
+        }
+      },
+      "geohash_spatial_columns": {
+        "condition": "起点或终点空间字段存储为 geohash 时",
+        "fields": {
+          "start_spatial": {
+            "type": "geohash",
+            "geohashCol": "FROM_GEOHASH",
+            "reverseCheckbox": false
+          },
+          "end_spatial": {
+            "type": "geohash",
+            "geohashCol": "TO_GEOHASH",
+            "reverseCheckbox": false
+          }
+        }
+      },
+      "fixed_color_mode": {
+        "condition": "需要弧线固定起点色和终点色时",
+        "fields": {
+          "color_scheme_type": "fixed_color",
+          "color_picker": {
+            "r": 0,
+            "g": 122,
+            "b": 135,
+            "a": 1
+          },
+          "target_color_picker": {
+            "r": 255,
+            "g": 87,
+            "b": 34,
+            "a": 1
+          }
+        }
+      },
+      "categorical_palette_mode": {
+        "condition": "需要按某个维度给弧线着色时",
+        "fields": {
+          "color_scheme_type": "categorical_palette",
+          "dimension": "carrier",
+          "color_scheme": "SUPERSET_DEFAULT",
+          "legend_position": "tr",
+          "legend_format": "SMART_NUMBER"
+        }
+      },
+      "custom_js": {
+        "condition": "需要自定义数据加工、tooltip 或点击跳转行为时",
+        "fields": {
+          "js_columns": [
+            "carrier"
+          ],
+          "js_data_mutator": "data => data",
+          "js_tooltip": "o => `<div>${o.object.cat_color}</div>`",
+          "js_onclick_href": "o => `https://example.com/?from=${o.object.sourcePosition}&to=${o.object.targetPosition}`"
+        }
+      }
+    },
+    "runtime_only_or_non_template_fields": {
+      "runtime_props_generated_by_transformProps": [
+        {
+          "field_name": "payload",
+          "reason": "这是运行时从 `queriesData[0]` 注入的对象，不是 API root form_data 字段。"
+        },
+        {
+          "field_name": "formData",
+          "reason": "这是 runtime 对 `rawFormData` 的整体透传容器，不是额外的 API root 字段。"
+        },
+        {
+          "field_name": "viewport.width",
+          "reason": "运行时由图表尺寸补入，不需要写到 root form_data。"
+        },
+        {
+          "field_name": "viewport.height",
+          "reason": "运行时由图表尺寸补入，不需要写到 root form_data。"
+        },
+        {
+          "field_name": "emitCrossFilters",
+          "reason": "这是 ChartProps/hook 层运行时能力，不是 API root 字段。"
+        },
+        {
+          "field_name": "filterState",
+          "reason": "这是 runtime 交互状态，不是 API root 字段。"
+        }
+      ],
+      "backend_response_only_fields": [
+        {
+          "field_name": "queriesData[0].data.features[*].sourcePosition",
+          "reason": "这是后端 `DeckArc.get_data()` 产出的起点坐标，不是 root form_data 字段。"
+        },
+        {
+          "field_name": "queriesData[0].data.features[*].targetPosition",
+          "reason": "这是后端 `DeckArc.get_data()` 产出的终点坐标，不是 root form_data 字段。"
+        },
+        {
+          "field_name": "queriesData[0].data.features[*].cat_color",
+          "reason": "这是后端按 `dimension` 取出的分类值，不是 root form_data 字段。"
+        },
+        {
+          "field_name": "queriesData[0].data.features[*].__timestamp",
+          "reason": "这是后端返回的时间戳列，当前 controlPanel 没把时间字段暴露成正式模板输入。"
+        },
+        {
+          "field_name": "queriesData[0].data.mapboxApiKey",
+          "reason": "这是后端 payload 附带的运行时地图密钥，不是 root form_data 字段。"
+        }
+      ],
+      "legacy_hidden_or_carry_over_fields": [
+        {
+          "field_name": "granularity_sqla",
+          "reason": "storyboard payload 里出现过，但当前 controlPanel 没有正式暴露它，不应作为 canonical deck_arc 创建模板字段。"
+        },
+        {
+          "field_name": "time_grain_sqla",
+          "reason": "后端在它存在时支持 timeseries 模式，但当前 controlPanel 没有正式时间 section。"
+        },
+        {
+          "field_name": "time_range",
+          "reason": "storyboard payload 里出现过，但当前 controlPanel 没有正式时间控件。"
+        },
+        {
+          "field_name": "filters",
+          "reason": "这不是当前 controlPanel 正式字段。它可能在旧保存态或 legacy 兼容处理中出现，但当前创建模板应优先使用 `adhoc_filters`。"
+        },
+        {
+          "field_name": "payload.form_data",
+          "reason": "这是 legacy `/superset/explore_json/` 请求的外层包裹字段，不是图表保存态内部的 root form_data 字段。"
+        }
+      ]
+    },
+    "api_usage_guidance": {
+      "high_confidence_required_fields": [
+        "datasource",
+        "viz_type",
+        "start_spatial",
+        "end_spatial"
+      ],
+      "recommended_always_set": [
+        "adhoc_filters",
+        "filter_nulls",
+        "row_limit",
+        "mapbox_style",
+        "viewport",
+        "autozoom",
+        "color_scheme_type",
+        "stroke_width",
+        "legend_position"
+      ],
+      "api_field_examples": [
+        "start_spatial",
+        "end_spatial",
+        "mapbox_style",
+        "viewport",
+        "color_scheme_type",
+        "dimension",
+        "color_scheme",
+        "stroke_width",
+        "legend_position"
+      ],
+      "avoid_confusion": [
+        "不要把 deck_arc 当成标准 chart data API 图表去套 `/api/v1/chart/data` 的 `query_context` 模板；当前图真实入口是 legacy `/superset/explore_json/`。",
+        "不要给 deck_arc 人为添加并不存在的 `metric` 或 `size` 字段；当前图默认按列返回弧线记录。",
+        "`start_spatial` 和 `end_spatial` 都是对象，不是单个列名字符串。根据你的空间数据编码方式，必须传 `latlong` / `delimited` / `geohash` 三种形状之一。",
+        "只有 `color_scheme_type='categorical_palette'` 时，`dimension` 和 `color_scheme` 才真正决定颜色与图例。",
+        "`viewport` 是正式保存态字段，但 `width`/`height` 由运行时补入，不要把这两个字段写回 root form_data。"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "deck_arc",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/deck_arc-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/deck_arc-form-data-schema.json",
+      "control-schema": "form-data-schema/deck_arc-schema.json"
+    }
+  }
+}

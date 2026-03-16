@@ -8,10 +8,13 @@ import { isArrayOfValues } from '@/utils/utils';
 import { ISemantic } from '../SemanticModel/data';
 import styles from '../SemanticModel/components/style.less';
 import {
+  batchSyncSupersetDatasets,
   batchDeleteSupersetDataset,
   deleteSupersetDataset,
   getDatabaseList,
   querySupersetDatasets,
+  syncSupersetDataset,
+  syncSupersetDatasets,
 } from '../SemanticModel/service';
 
 const datasetTypeOptions = [
@@ -19,9 +22,10 @@ const datasetTypeOptions = [
   { label: '虚拟', value: 'VIRTUAL' },
 ];
 
-const syncStatusOptions = [
-  { label: '已同步', value: true },
-  { label: '未同步', value: false },
+const syncStateOptions = [
+  { label: '待同步', value: 'PENDING' },
+  { label: '同步失败', value: 'FAILED' },
+  { label: '已同步', value: 'SUCCESS' },
 ];
 
 const SupersetDatasetPage: React.FC = () => {
@@ -30,7 +34,9 @@ const SupersetDatasetPage: React.FC = () => {
     datasetName?: string;
     datasetType?: string;
     databaseId?: number;
-    synced?: boolean;
+    sourceType?: string;
+    needSync?: boolean;
+    syncState?: string;
   }>({});
   const [selectedRowKeys, setSelectedRowKeys] = useState<number[]>([]);
   const [databaseList, setDatabaseList] = useState<ISemantic.IDatabaseItem[]>([]);
@@ -73,6 +79,37 @@ const SupersetDatasetPage: React.FC = () => {
     if (code === 200) {
       message.success('已删除');
       setSelectedRowKeys([]);
+      actionRef.current?.reload();
+    } else {
+      message.error(msg);
+    }
+  };
+
+  const syncSingle = async (id: number) => {
+    const { code, msg } = await syncSupersetDataset(id);
+    if (code === 200) {
+      message.success('已触发同步');
+      actionRef.current?.reload();
+    } else {
+      message.error(msg);
+    }
+  };
+
+  const syncBatch = async (ids: number[]) => {
+    const { code, msg } = await batchSyncSupersetDatasets(ids);
+    if (code === 200) {
+      message.success('已触发同步');
+      setSelectedRowKeys([]);
+      actionRef.current?.reload();
+    } else {
+      message.error(msg);
+    }
+  };
+
+  const syncAll = async () => {
+    const { code, msg } = await syncSupersetDatasets();
+    if (code === 200) {
+      message.success('已触发全量同步');
       actionRef.current?.reload();
     } else {
       message.error(msg);
@@ -134,6 +171,38 @@ const SupersetDatasetPage: React.FC = () => {
       width: 120,
     },
     {
+      dataIndex: 'syncState',
+      title: '同步状态',
+      width: 110,
+      render: (value) => {
+        if (value === 'PENDING') {
+          return '待同步';
+        }
+        if (value === 'FAILED') {
+          return '失败';
+        }
+        if (value === 'SUCCESS') {
+          return '已同步';
+        }
+        return value || '-';
+      },
+    },
+    {
+      dataIndex: 'syncErrorMsg',
+      title: '失败原因',
+      width: 240,
+      ellipsis: true,
+      render: (value) => value || '-',
+    },
+    {
+      dataIndex: 'nextRetryAt',
+      title: '下次重试',
+      width: 160,
+      render: (value: any) => {
+        return value && value !== '-' ? dayjs(value).format('YYYY-MM-DD HH:mm:ss') : '-';
+      },
+    },
+    {
       dataIndex: 'supersetDatasetId',
       title: 'Superset ID',
       width: 120,
@@ -163,10 +232,13 @@ const SupersetDatasetPage: React.FC = () => {
       title: '操作',
       dataIndex: 'x',
       valueType: 'option',
-      width: 120,
+      width: 180,
       render: (_, record) => {
         return (
           <Space className={styles.ctrlBtnContainer}>
+            <Button type="link" onClick={() => syncSingle(record.id)}>
+              同步
+            </Button>
             <Popconfirm
               title="确认删除该数据集？"
               okText="是"
@@ -200,6 +272,8 @@ const SupersetDatasetPage: React.FC = () => {
         request={async (params) => {
           const { current, pageSize } = params;
           const { code, data, msg } = await querySupersetDatasets({
+            sourceType: 'SEMANTIC_DATASET',
+            needSync: true,
             ...filters,
             current,
             pageSize,
@@ -268,10 +342,10 @@ const SupersetDatasetPage: React.FC = () => {
                     style={{ width: 160 }}
                     placeholder="请选择状态"
                     allowClear
-                    options={syncStatusOptions}
-                    value={filters.synced}
+                    options={syncStateOptions}
+                    value={filters.syncState}
                     onChange={(value) => {
-                      setFilters({ ...filters, synced: value });
+                      setFilters({ ...filters, syncState: value });
                     }}
                   />
                 ),
@@ -280,6 +354,27 @@ const SupersetDatasetPage: React.FC = () => {
           />
         }
         toolBarRender={() => [
+          <Button
+            key="syncAll"
+            type="primary"
+            onClick={() => {
+              syncAll();
+            }}
+          >
+            全量同步
+          </Button>,
+          <Popconfirm
+            key="batchSync"
+            title="确认同步所选数据集？"
+            okText="是"
+            cancelText="否"
+            onConfirm={() => syncBatch(selectedRowKeys)}
+            disabled={!isArrayOfValues(selectedRowKeys)}
+          >
+            <Button type="primary" disabled={!isArrayOfValues(selectedRowKeys)}>
+              批量同步
+            </Button>
+          </Popconfirm>,
           <Button
             key="reset"
             onClick={() => {

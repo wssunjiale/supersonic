@@ -1,0 +1,335 @@
+{
+  "viz_type": "handlebars",
+  "display_name": "Handlebars",
+  "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/plugin/controlPanel.tsx",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/index.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/Handlebars.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/types.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/consts.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/components/Handlebars/HandlebarsViewer.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/plugin/index.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/plugin/controlPanel.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/plugin/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/plugin/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/plugin/controls/columns.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/plugin/controls/groupBy.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/plugin/controls/handlebarTemplate.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/plugin/controls/includeTime.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/plugin/controls/limits.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/plugin/controls/metrics.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/plugin/controls/orderBy.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/plugin/controls/queryMode.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/plugin/controls/shared.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/plugin/controls/style.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/test/plugin/buildQuery.test.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/test/plugin/transformProps.test.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryContext.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryObject.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractExtras.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractQueryFields.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/normalizeOrderBy.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/actions/hydrateExplore.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/standardizedFormData.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-table/src/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-table/src/controlPanel.tsx"
+  ],
+  "notes": [
+    "Handlebars plugin metadata 没有声明 `useLegacyApi=true`，因此走标准 `/api/v1/chart/data`。",
+    "该插件的 root form_data 既包含 snake_case 查询字段（如 `query_mode`、`groupby`、`row_limit`、`time_range`），也包含 camelCase 模板字段（`handlebarsTemplate`、`styleTemplate`）。",
+    "`getFormDataFromControls()` 会按 control name 原样写入 root form_data，因此 Handlebars 模板字段的 canonical 键名是 `handlebarsTemplate` 和 `styleTemplate`，不是 snake_case。",
+    "`query_mode` 默认值是 `null`，但插件自己的 `getQueryMode()` 会推断：`all_columns` 非空则视为 raw records，否则视为 aggregate。",
+    "aggregate 模式下，`groupby`、`metrics`、`percent_metrics` 三者至少应有一个非空才能通过该插件自定义校验；raw 模式下 `all_columns` 不能为空。",
+    "`buildQuery.ts` 只是在标准 `buildQueryContext(formData)` 基础上用 `normalizeOrderBy(baseQueryObject).orderby` 覆盖排序，没有像 Table plugin 那样添加 percent metric post-processing、totals extra query、server pagination 或 search 逻辑。",
+    "`percent_metrics` 和 `show_totals` 虽然出现在 Handlebars controlPanel 中，但当前 Handlebars buildQuery/transformProps 没有实现 Table plugin 对这两个字段的专用处理；源码层面它们更像借来的 UI 字段。",
+    "`include_time` 也没有被 Handlebars buildQuery 直接读取；`hydrateExplore.ts` 只在 Explore 初始化时，针对 `include_time + granularity_sqla` 做一次把时间列塞进 `groupby` 的前端标准化。",
+    "`Handlebars.tsx` 最终把 `handlebarsTemplate` 和 `styleTemplate` 拼成一段模板源码，再把数据包装成 `{ data }` 传给 `HandlebarsViewer`。模板里最直接可用的顶层变量就是 `data`。",
+    "`HandlebarsViewer.tsx` 额外挂载了 `dateFormat`、`stringify`、`formatNumber`、`parseJson`，还注册了 `just-handlebars-helpers` 和 `handlebars-group-by`。"
+  ],
+  "form_data_overrides": {
+    "groupby": "getStandardizedControls().popAllColumns()",
+    "metrics": "getStandardizedControls().popAllMetrics()"
+  },
+  "chart_data_api_behavior": {
+    "useLegacyApi": false,
+    "frontend_request_endpoint": "/api/v1/chart/data",
+    "frontend_request_payload": {
+      "query_context": "<buildQuery(form_data)>"
+    },
+    "query_builder": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-handlebars/src/plugin/buildQuery.ts"
+  },
+  "query_compilation": {
+    "query_context_builder": "`buildQuery(formData)` 调用 `buildQueryContext(formData, baseQueryObject => [{ ...baseQueryObject, orderby: normalizeOrderBy(baseQueryObject).orderby }])`，没有 Handlebars 专属 post_processing。",
+    "query_mode_inference": "`extractQueryFields()` 会读取 `query_mode`；当 mode=`aggregate` 时忽略 `all_columns`，当 mode=`raw` 时忽略 `groupby` 和 `metrics`。该插件自己的 `getQueryMode()` 还会在 `query_mode` 为空时根据 `all_columns` 是否为空自动推断模式。",
+    "columns_mapping": "aggregate 模式下 `groupby` 会经 `extractQueryFields()` 编译到 `query.columns`；raw 模式下 `all_columns` 通过别名映射 `all_columns -> columns` 进入 `query.columns`。",
+    "metrics_mapping": "aggregate 模式下只有 `metrics` 会进入 `query.metrics`；raw 模式下 `query.metrics` 为 `undefined`。`percent_metrics` 不会被 Handlebars buildQuery 自动并入 `query.metrics`。",
+    "orderby_mapping": "raw 模式下 `order_by_cols` 通过别名映射到 `query.orderby`；aggregate 模式下如果 `orderby` 非法或为空，`normalizeOrderBy()` 会回退为 `timeseries_limit_metric`，再不行则回退为第一项 `metrics`，升降序由 `order_desc` 控制。",
+    "time_fields": "`extractExtras()` 会把 `granularity_sqla` 映射到 `query.granularity`，把 `time_grain_sqla` 放到 `query.extras.time_grain_sqla`，把 `time_range` 放到 `query.time_range`。`include_time` 本身不会直接进入 query。",
+    "filters_mapping": "`adhoc_filters`、`extra_filters`、`extra_form_data` 仍由通用 `buildQueryObject()` 处理。`extra_form_data.filters/adhoc_filters` 会并入查询过滤条件。"
+  },
+  "field_categories": {
+    "Query / Mode & Fields": [
+      {
+        "field_name": "query_mode",
+        "description": "Query mode",
+        "data_type": "string | null",
+        "enum_values": [
+          "aggregate",
+          "raw",
+          null
+        ],
+        "sample_data": "aggregate",
+        "required": false,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "若缺省，插件会根据 `all_columns` 是否非空自动推断模式。"
+      },
+      {
+        "field_name": "groupby",
+        "description": "Dimensions contain qualitative values such as names, dates, or geographical data. Use dimensions to categorize, segment, and reveal the details in your data. Dimensions affect the level of detail in the view.",
+        "data_type": "array[string | object]",
+        "enum_source": "datasource columns（优先 groupby=true 的列）",
+        "sample_data": [
+          "name"
+        ],
+        "required": false,
+        "embedding": "否",
+        "default_value": [],
+        "notes": "仅 aggregate 模式可见；aggregate 模式下会和 `metrics`、`percent_metrics` 一起参与“至少一项非空”的校验。"
+      },
+      {
+        "field_name": "metrics",
+        "description": "Select one or many metrics to display. You can use an aggregation function on a column or write custom SQL to create a metric.",
+        "data_type": "array[string | object]",
+        "enum_source": "saved metrics + adhoc metrics",
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "value"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(value)"
+          }
+        ],
+        "required": false,
+        "embedding": "否",
+        "default_value": [],
+        "notes": "仅 aggregate 模式可见；这是 Handlebars buildQuery 真正会写进 `query.metrics` 的指标字段。"
+      },
+      {
+        "field_name": "all_columns",
+        "description": "Columns to display",
+        "data_type": "array[string | object]",
+        "enum_source": "datasource columns；若列元数据带 `filterable`，控件会优先只给出 filterable 列",
+        "sample_data": [
+          "name",
+          "state"
+        ],
+        "required": false,
+        "embedding": "否",
+        "default_value": [],
+        "notes": "仅 raw 模式可见；raw 模式下该字段不能为空，并会编译到 `query.columns`。"
+      },
+      {
+        "field_name": "percent_metrics",
+        "description": "Select one or many metrics to display, that will be displayed in the percentages of total. Percentage metrics will be calculated only from data within the row limit. You can use an aggregation function on a column or write custom SQL to create a percentage metric.",
+        "data_type": "array[string | object]",
+        "enum_source": "saved metrics + adhoc metrics",
+        "sample_data": [
+          {
+            "expressionType": "SQL",
+            "sqlExpression": "SUM(value) / SUM(total)",
+            "column": null,
+            "aggregate": null,
+            "label": "ratio"
+          }
+        ],
+        "required": false,
+        "embedding": "否",
+        "default_value": [],
+        "notes": "UI 校验会把它计入 aggregate 模式的“至少一项非空”；但当前 Handlebars buildQuery 不会像 Table plugin 那样把它并入 `query.metrics` 或追加 contribution post-processing。"
+      }
+    ],
+    "Query / Sorting & Limit": [
+      {
+        "field_name": "timeseries_limit_metric",
+        "description": "Orders the query result that generates the source data for this chart. If a series or row limit is reached, this determines what data are truncated. If undefined, defaults to the first metric (where appropriate).",
+        "data_type": "string | object | null",
+        "enum_source": "saved metrics + adhoc metrics",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "value"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(value)"
+        },
+        "required": false,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "仅 aggregate 模式可见；Handlebars buildQuery 依赖 `normalizeOrderBy()` 把它折成最终 `query.orderby`。"
+      },
+      {
+        "field_name": "order_by_cols",
+        "description": "Order results by selected columns",
+        "data_type": "array[string | array]",
+        "enum_source": "datasource.order_by_choices；若数据源无该属性则退化为 datasource columns",
+        "sample_data": [
+          "[\"num\", false]"
+        ],
+        "required": false,
+        "embedding": "否",
+        "default_value": [],
+        "notes": "仅 raw 模式可见；`extractQueryFields()` 会把它解析为 `query.orderby`。字符串选项会在运行时 `JSON.parse()`。"
+      },
+      {
+        "field_name": "order_desc",
+        "description": "Whether to sort descending or ascending",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true,
+        "notes": "仅 aggregate 模式且 `timeseries_limit_metric` 非空时可见；raw 模式排序直接用 `order_by_cols`。"
+      },
+      {
+        "field_name": "row_limit",
+        "runtime_alias": "rowLimit",
+        "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+        "data_type": "integer",
+        "enum_values": [
+          10,
+          50,
+          100,
+          250,
+          500,
+          1000,
+          5000,
+          10000,
+          50000
+        ],
+        "sample_data": 10000,
+        "required": false,
+        "embedding": "否",
+        "default_value": 10000
+      }
+    ],
+    "Query / Time & Filters": [
+      {
+        "field_name": "granularity_sqla",
+        "description": "The time column for the visualization. Note that you can define arbitrary expression that return a DATETIME column in the table. Also note that the filter below is applied against this column or expression",
+        "data_type": "string | object | null",
+        "enum_source": "datasource temporal columns；底层控件来自 `dndGranularitySqlaControl`",
+        "sample_data": "ds",
+        "required": false,
+        "embedding": "extra_form_data.override",
+        "default_value": null,
+        "notes": "`extractExtras()` 会把它映射为 `query.granularity`。若 Explore 初始化时 `include_time=true` 且该值存在，`hydrateExplore.ts` 可能把它并入 `groupby` 后再清空本字段。"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "description": "Select a time grain for the visualization. The grain is the time interval represented by a single point on the chart.",
+        "data_type": "string | null",
+        "enum_source": "datasource.time_grain_sqla",
+        "sample_data": "P1D",
+        "required": false,
+        "embedding": "extra_form_data.override",
+        "default_value": "P1D",
+        "notes": "共享控件对“新建且未保存”的图默认给 `P1D`；已保存图则保留已有值。`extractExtras()` 会把它写到 `query.extras.time_grain_sqla`。"
+      },
+      {
+        "field_name": "time_range",
+        "description": "This control filters the whole chart based on the selected time range. All relative times, e.g. \"Last month\", \"Last 7 days\", \"now\", etc. are evaluated on the server using the server's local time (sans timezone). All tooltips and placeholder times are expressed in UTC (sans timezone). The timestamps are then evaluated by the database using the engine's local timezone. Note one can explicitly set the timezone per the ISO 8601 format if specifying either the start and/or end time.",
+        "data_type": "string",
+        "sample_data": "No filter",
+        "required": false,
+        "embedding": "extra_form_data.override",
+        "default_value": "No filter"
+      },
+      {
+        "field_name": "include_time",
+        "description": "Whether to include the time granularity as defined in the time section",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false,
+        "notes": "仅 aggregate 模式可见。当前 Handlebars buildQuery 不直接读取它；它主要在 Explore hydrate 阶段参与 `granularity_sqla -> groupby` 的前端重写。"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "description": "字段标签为 Filters。",
+        "data_type": "array[object]",
+        "enum_source": "dataset columns + saved metrics + 当前 `metrics`/`metric`",
+        "sample_data": [],
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "default_value": []
+      }
+    ],
+    "Options / Template & Styling": [
+      {
+        "field_name": "handlebarsTemplate",
+        "description": "A handlebars template that is applied to the data",
+        "data_type": "string",
+        "sample_data": "<ul class=\"data-list\">\\n  {{#each data}}\\n    <li>{{stringify this}}</li>\\n  {{/each}}\\n</ul>",
+        "required": true,
+        "embedding": "否",
+        "default_value": "<ul class=\"data-list\">\\n  {{#each data}}\\n    <li>{{stringify this}}</li>\\n  {{/each}}\\n</ul>",
+        "notes": "`Handlebars.tsx` 会把它作为主模板源码；模板运行时接收到的数据顶层对象是 `{ data }`。"
+      },
+      {
+        "field_name": "styleTemplate",
+        "description": "CSS applied to the chart",
+        "data_type": "string",
+        "sample_data": "/*\\n  .data-list {\\n    background-color: yellow;\\n  }\\n*/",
+        "required": false,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "`Handlebars.tsx` 会把它包成 `<style>...</style>` 拼到模板末尾。当前 control 源码的 `mapStateToProps` 读的是 `handlebars_template`，但 `getFormDataFromControls()` 仍会按 control name `styleTemplate` 输出 root form_data。"
+      }
+    ],
+    "Query / Stored-but-Currently-Noop": [
+      {
+        "field_name": "show_totals",
+        "description": "Show total aggregations of selected metrics. Note that row limit does not apply to the result.",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false,
+        "notes": "当前 Handlebars buildQuery 没有像 Table plugin 那样追加 totals extra query，因此源码层面它只是被存进 form_data。"
+      }
+    ]
+  },
+  "runtime_only_or_removed_fields": [
+    {
+      "field_name": "query_context.queries[*].columns / metrics / orderby",
+      "reason": "这些字段由 `extractQueryFields()`、`buildQueryObject()` 和 `normalizeOrderBy()` 从 root form_data 编译生成，不是额外 root form_data 字段。"
+    },
+    {
+      "field_name": "handlebars_template / style_template",
+      "reason": "源码里没有证据表明 `getFormDataFromControls()` 会导出这些 snake_case 键；当前 canonical control name 是 `handlebarsTemplate` 和 `styleTemplate`。"
+    },
+    {
+      "field_name": "percent_metric_calculation / server_pagination / server_page_length / page_length / include_search / table_timestamp_format / column_config / allow_render_html",
+      "reason": "这些是 Table plugin 源码里的字段，不在 Handlebars controlPanel.tsx 中。不能把 Table 的字段集合直接套到 Handlebars。"
+    }
+  ]
+}

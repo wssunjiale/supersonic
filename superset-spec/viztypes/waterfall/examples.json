@@ -1,0 +1,273 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "waterfall",
+  "display_name": "Waterfall Chart",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "region",
+          "operator": "IN",
+          "comparator": [
+            "APAC"
+          ]
+        }
+      ]
+    ],
+    "currency_format": [
+      {
+        "symbol": "$",
+        "symbolPosition": "prefix"
+      }
+    ],
+    "decrease_color": [
+      {
+        "r": 224,
+        "g": 67,
+        "b": 85,
+        "a": 1
+      }
+    ],
+    "groupby": [
+      "region"
+    ],
+    "increase_color": [
+      {
+        "r": 90,
+        "g": 193,
+        "b": 137,
+        "a": 1
+      }
+    ],
+    "metric": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "sales"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(sales)"
+      }
+    ],
+    "row_limit": [
+      10000
+    ],
+    "show_legend": [
+      false
+    ],
+    "show_value": [
+      false
+    ],
+    "time_grain_sqla": [
+      "P1D"
+    ],
+    "total_color": [
+      {
+        "r": 102,
+        "g": 102,
+        "b": 102,
+        "a": 1
+      }
+    ],
+    "x_axis": [
+      "order_date"
+    ],
+    "x_axis_label": [
+      "Month"
+    ],
+    "x_axis_time_format": [
+      "smart_date"
+    ],
+    "x_ticks_layout": [
+      "auto"
+    ],
+    "y_axis_format": [
+      "SMART_NUMBER"
+    ],
+    "y_axis_label": [
+      "Revenue"
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "waterfall",
+      "x_axis": "order_date",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "sales"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(sales)"
+      },
+      "adhoc_filters": [],
+      "row_limit": 10000
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "waterfall",
+      "x_axis": "order_date",
+      "time_grain_sqla": "P1D",
+      "groupby": "region",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "sales"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(sales)"
+      },
+      "adhoc_filters": [],
+      "row_limit": 10000,
+      "show_value": false,
+      "show_legend": false,
+      "increase_color": {
+        "r": 90,
+        "g": 193,
+        "b": 137,
+        "a": 1
+      },
+      "decrease_color": {
+        "r": 224,
+        "g": 67,
+        "b": 85,
+        "a": 1
+      },
+      "total_color": {
+        "r": 102,
+        "g": 102,
+        "b": 102,
+        "a": 1
+      },
+      "x_axis_label": "Month",
+      "x_axis_time_format": "smart_date",
+      "x_ticks_layout": "auto",
+      "y_axis_label": "Revenue",
+      "y_axis_format": "SMART_NUMBER",
+      "currency_format": null
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "waterfall",
+      "x_axis": "<copied_from_saved_chart_if_present>",
+      "granularity_sqla": "<copied_from_saved_chart_if_present>",
+      "time_grain_sqla": "<copied_from_saved_chart_if_present>",
+      "groupby": "<copied_from_saved_chart_if_present>",
+      "metric": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "row_limit": "<copied_from_saved_chart>",
+      "show_value": "<copied_from_saved_chart>",
+      "show_legend": "<copied_from_saved_chart>",
+      "increase_color": "<copied_from_saved_chart>",
+      "decrease_color": "<copied_from_saved_chart>",
+      "total_color": "<copied_from_saved_chart>",
+      "x_axis_label": "<copied_from_saved_chart>",
+      "x_axis_time_format": "<copied_from_saved_chart>",
+      "x_ticks_layout": "<copied_from_saved_chart>",
+      "y_axis_label": "<copied_from_saved_chart>",
+      "y_axis_format": "<copied_from_saved_chart>",
+      "currency_format": "<copied_from_saved_chart>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "APAC"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "APAC"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_waterfall": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "APAC"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_waterfall": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "APAC"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_waterfall": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；Waterfall 默认不直接消费它。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_waterfall": false,
+        "recommended": false,
+        "sample_data": "Last 90 days",
+        "effect": "虽然 extra_form_data 支持 override 类时间字段，但 Waterfall guest 场景下不建议把时间范围当成常规动态入口。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "waterfall",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/waterfall-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/waterfall-form-data-schema.json",
+      "control-schema": "form-data-schema/waterfall-schema.json"
+    }
+  }
+}

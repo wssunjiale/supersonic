@@ -1,0 +1,151 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "mapbox",
+  "display_name": "MapBox",
+  "normalized_summary": {
+    "category": "geospatial",
+    "tags": [
+      "mapbox",
+      "geospatial",
+      "interactive",
+      "map"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "lat",
+        "required": true,
+        "description": "纬度字段，用于定义地理点位的纬度坐标。"
+      },
+      {
+        "key": "lon",
+        "required": true,
+        "description": "经度字段，用于定义地理点位的经度坐标。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于计算每个地理点位的数值（大小/颜色依据）。"
+      },
+      {
+        "key": "map_style",
+        "required": false,
+        "description": "MapBox样式ID，用于自定义地图底图样式。"
+      },
+      {
+        "key": "cluster",
+        "required": false,
+        "description": "是否聚类（true/false），控制高密度点位的聚类展示。"
+      },
+      {
+        "key": "zoom_level",
+        "required": false,
+        "description": "初始缩放级别，用于控制地图的初始展示范围。"
+      }
+    ],
+    "description_zh": "MapBox Chart integrates MapBox maps with custom geospatial data, supporting interactive zoom/pan and advanced spatial visualizations (e.g., clusters, heatmaps).",
+    "visual_shape_zh": "MapBox地图（高级地理空间）",
+    "use_cases_zh": [
+      "高精度地理空间分析（如经纬度级别的点位展示）",
+      "交互式地图探索（缩放/平移/聚类）",
+      "自定义地图样式与图层叠加"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "mapbox",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/mapbox-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/mapbox-form-data-schema.json",
+      "control-schema": "form-data-schema/mapbox-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "MapBox",
+    "viztype": "mapbox",
+    "详细描述": "MapBox Chart integrates MapBox maps with custom geospatial data, supporting interactive zoom/pan and advanced spatial visualizations (e.g., clusters, heatmaps).",
+    "表现形态": "MapBox地图（高级地理空间）",
+    "适用场景": [
+      "高精度地理空间分析（如经纬度级别的点位展示）",
+      "交互式地图探索（缩放/平移/聚类）",
+      "自定义地图样式与图层叠加"
+    ],
+    "vizKey": "MapBox",
+    "pluginCategory": "Geospatial",
+    "pluginTags": [],
+    "category": "geospatial",
+    "tags": [
+      "mapbox",
+      "geospatial",
+      "interactive",
+      "map"
+    ],
+    "关键字段": [
+      {
+        "key": "lat",
+        "required": true,
+        "description": "纬度字段，用于定义地理点位的纬度坐标。"
+      },
+      {
+        "key": "lon",
+        "required": true,
+        "description": "经度字段，用于定义地理点位的经度坐标。"
+      },
+      {
+        "key": "metrics",
+        "required": true,
+        "description": "聚合指标，用于计算每个地理点位的数值（大小/颜色依据）。"
+      },
+      {
+        "key": "map_style",
+        "required": false,
+        "description": "MapBox样式ID，用于自定义地图底图样式。"
+      },
+      {
+        "key": "cluster",
+        "required": false,
+        "description": "是否聚类（true/false），控制高密度点位的聚类展示。"
+      },
+      {
+        "key": "zoom_level",
+        "required": false,
+        "description": "初始缩放级别，用于控制地图的初始展示范围。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

@@ -5,12 +5,33 @@ import queryString from 'query-string';
 import React, { useEffect, useMemo, useRef } from 'react';
 import { fetchSupersetGuestToken } from '../service';
 
+type ApiEnvelope<T> = {
+  code?: number | string;
+  msg?: string;
+  data?: T;
+};
+
 const normalizeDomain = (domain?: string) => {
   if (!domain) {
     return undefined;
   }
   return domain.endsWith('/') ? domain.slice(0, -1) : domain;
 };
+
+function unwrapApiEnvelope<T>(payload: ApiEnvelope<T> | T | undefined): T | undefined {
+  if (payload == null) {
+    return undefined;
+  }
+  if (typeof payload === 'object' && 'code' in (payload as Record<string, unknown>)) {
+    const envelope = payload as ApiEnvelope<T>;
+    const code = Number(envelope.code);
+    if (Number.isFinite(code) && code !== 200 && code !== 0) {
+      throw new Error(envelope.msg || '请求失败');
+    }
+    return envelope.data;
+  }
+  return payload as T;
+}
 
 const SupersetDashboardEmbed: React.FC = () => {
   const location = useLocation();
@@ -28,8 +49,24 @@ const SupersetDashboardEmbed: React.FC = () => {
       return;
     }
     let cancelled = false;
+    const container = containerRef.current;
+    const syncIframeStyle = () => {
+      const iframe = container.querySelector('iframe');
+      if (iframe instanceof HTMLIFrameElement) {
+        iframe.style.display = 'block';
+        iframe.style.width = '100%';
+        iframe.style.height = '100%';
+        iframe.style.border = '0';
+      }
+    };
+    const observer = new MutationObserver(() => {
+      syncIframeStyle();
+    });
+    observer.observe(container, { childList: true, subtree: true });
     const fetchGuestToken = async () => {
-      const resp = await fetchSupersetGuestToken({ pluginId, embeddedId });
+      const resp = unwrapApiEnvelope<{ token?: string }>(
+        await fetchSupersetGuestToken({ pluginId, embeddedId })
+      );
       const token = resp?.token;
       if (!token) {
         throw new Error('guest token missing');
@@ -39,7 +76,7 @@ const SupersetDashboardEmbed: React.FC = () => {
     embedDashboard({
       id: embeddedId,
       supersetDomain,
-      mountPoint: containerRef.current,
+      mountPoint: container,
       iframeTitle: title,
       fetchGuestToken,
       dashboardUiConfig: {
@@ -48,16 +85,19 @@ const SupersetDashboardEmbed: React.FC = () => {
         hideChartControls: false,
         filters: { visible: false, expanded: false },
       },
-    }).catch(() => {
-      if (!cancelled) {
-        message.error('Superset 嵌入失败');
-      }
-    });
+    })
+      .then(() => {
+        syncIframeStyle();
+      })
+      .catch(() => {
+        if (!cancelled) {
+          message.error('Superset 嵌入失败');
+        }
+      });
     return () => {
       cancelled = true;
-      if (containerRef.current) {
-        containerRef.current.replaceChildren();
-      }
+      observer.disconnect();
+      container.replaceChildren();
     };
   }, [embeddedId, supersetDomain, pluginId, title]);
 

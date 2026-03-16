@@ -1,0 +1,300 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "sunburst_v2",
+  "display_name": "Sunburst Chart",
+  "source_kind": "schema_file",
+  "normalized_chart_form_data": {
+    "required_root_fields": [
+      "datasource",
+      "viz_type"
+    ],
+    "optional_root_fields": [
+      "cache_timeout",
+      "custom_params",
+      "slice_id",
+      "url_params"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "columns",
+      "datasource",
+      "metric",
+      "row_limit",
+      "sort_by_metric",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "color_scheme",
+      "columns",
+      "currency_format",
+      "datasource",
+      "date_format",
+      "label_type",
+      "linear_color_scheme",
+      "metric",
+      "number_format",
+      "row_limit",
+      "secondary_metric",
+      "show_labels",
+      "show_labels_threshold",
+      "show_total",
+      "sort_by_metric",
+      "viz_type"
+    ],
+    "fallback_template_seed": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "sunburst_v2",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "adhoc_filters": [],
+      "time_range": "No filter"
+    }
+  },
+  "original_chart_form_data_schema": {
+    "viz_type": "sunburst_v2",
+    "display_name": "Sunburst Chart",
+    "purpose": "用于调用 API 创建或保存 Sunburst Chart 时填写的 form_data 模板",
+    "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/sunburst_v2-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Sunburst/controlPanel.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Sunburst/index.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Sunburst/buildQuery.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Sunburst/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Sunburst/types.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/utils/treeBuilder.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/models/ChartProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryObject.ts"
+    ],
+    "notes": [
+      "API form_data 的键名必须保留源码中的原始 control name。Sunburst Chart 的根层字段既有 snake_case，也有多词下划线命名。",
+      "Explore 导出 form_data 时走 getFormDataFromControls()，它只会按 controlName 原样取 value，不会统一改名。",
+      "transformProps 中看到的 camelCase formData 来自 ChartProps.convertKeysToCamelCase(formData)，是运行时形态，不是构造 API form_data 时唯一可信来源。",
+      "datasource 和 viz_type 来自通用的 datasourceAndVizType section，不是 Sunburst 专属控件，但创建图表时必须提供。",
+      "Sunburst 图没有 Chart Title / Forecast / Advanced analytics / Annotation 这些根层字段；它的 form_data 主要集中在 hierarchy、metric、颜色和标签格式化。",
+      "secondary_metric 为 null 或等于 metric 时，运行时走 categorical color；当 secondary_metric 有值且不同于 metric 时，运行时走 linear color。",
+      "sort_by_metric=true 时，buildQuery.ts 会把 query_context 的 orderby 写成 [[metric,false]]。"
+    ],
+    "naming_and_pipeline": {
+      "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写成 form_data[name]",
+      "api_form_data_to_query_context": "Sunburst/buildQuery.ts 使用原始 form_data 构建 query context",
+      "api_form_data_to_runtime_form_data": "ChartProps.ts 会把 form_data 转成 camelCase 的 runtime formData，同时保留 rawFormData"
+    },
+    "global_required_fields": {
+      "datasource": {
+        "data_type": "string",
+        "required": true,
+        "sample_data": "<dataset_id>__table",
+        "source": "datasourceAndVizType section"
+      },
+      "viz_type": {
+        "data_type": "string",
+        "required": true,
+        "fixed_value": "sunburst_v2",
+        "source": "datasourceAndVizType section"
+      }
+    },
+    "global_optional_fields": {
+      "slice_id": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 0,
+        "source": "datasourceAndVizType hidden control",
+        "notes": "新建图表时通常省略；编辑已存在图表时由服务端或上层调用方提供。"
+      },
+      "cache_timeout": {
+        "data_type": "integer | null",
+        "required": false,
+        "sample_data": null,
+        "source": "datasourceAndVizType hidden control"
+      },
+      "url_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "datasourceAndVizType hidden control"
+      },
+      "custom_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "datasourceAndVizType hidden control"
+      }
+    },
+    "minimal_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "sunburst_v2",
+      "columns": [
+        "<hierarchy_column>"
+      ],
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "adhoc_filters": [],
+      "row_limit": 10000,
+      "sort_by_metric": false
+    },
+    "recommended_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "sunburst_v2",
+      "columns": [
+        "<level1_column>",
+        "<level2_column>"
+      ],
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "secondary_metric": null,
+      "adhoc_filters": [],
+      "row_limit": 10000,
+      "sort_by_metric": false,
+      "color_scheme": "<categoricalSchemeRegistry.defaultKey>",
+      "linear_color_scheme": "<sequentialSchemeRegistry.defaultKey>",
+      "show_labels": false,
+      "show_labels_threshold": 5,
+      "show_total": false,
+      "label_type": "key",
+      "number_format": "SMART_NUMBER",
+      "currency_format": null,
+      "date_format": "smart_date"
+    },
+    "conditional_blocks": {
+      "multi_level_hierarchy": {
+        "condition": "需要展示多层层级钻取关系时",
+        "fields": {
+          "columns": [
+            "<level1_column>",
+            "<level2_column>",
+            "<level3_column>"
+          ]
+        }
+      },
+      "secondary_metric_color": {
+        "condition": "需要按第二指标比值着色时",
+        "fields": {
+          "secondary_metric": {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<secondary_metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<secondary_metric_column>)"
+          },
+          "linear_color_scheme": "<sequentialSchemeRegistry.defaultKey>"
+        },
+        "notes": "当 secondary_metric 有值且不等于 metric 时，运行时走线性色带；否则走 color_scheme 的分类色。"
+      },
+      "sort_by_primary_metric": {
+        "condition": "需要按主指标降序排序查询结果时",
+        "fields": {
+          "sort_by_metric": true
+        },
+        "notes": "buildQuery.ts 会把 orderby 写成 [[metric,false]]。"
+      },
+      "show_labels": {
+        "condition": "需要显示标签时",
+        "fields": {
+          "show_labels": true,
+          "show_labels_threshold": 5,
+          "label_type": "key_value"
+        }
+      },
+      "show_total": {
+        "condition": "需要在中心展示总计时",
+        "fields": {
+          "show_total": true
+        }
+      },
+      "formatting": {
+        "condition": "需要定制数值和日期展示格式时",
+        "fields": {
+          "number_format": ",.2f",
+          "currency_format": {
+            "symbol": "$",
+            "symbolPosition": "prefix"
+          },
+          "date_format": "smart_date"
+        }
+      }
+    },
+    "runtime_only_or_non_template_fields": {
+      "standardized_or_viz_switch_only": [
+        {
+          "field_name": "groupby",
+          "reason": "formDataOverrides 在标准化表单转换时会从 columns 回填 groupby，但 Sunburst controlPanel 的直接 API 字段仍然是 columns。"
+        },
+        {
+          "field_name": "formDataOverrides(metric/secondary_metric/groupby remap)",
+          "reason": "只在 standardizedFormData.transform() 切换 viz_type 时触发，不是常规导出 Sunburst form_data 的必经步骤。"
+        }
+      ],
+      "runtime_aliases_only": [
+        {
+          "field_name": "secondaryMetric",
+          "reason": "这是 secondary_metric 的 camelCase 运行时别名，不是 API root form_data 键名。"
+        },
+        {
+          "field_name": "showLabels/showLabelsThreshold/showTotal/labelType/numberFormat/dateFormat/colorScheme/linearColorScheme",
+          "reason": "这些是运行时 camelCase 形态；API 调用时应使用原始 control name。"
+        }
+      ]
+    },
+    "api_usage_guidance": {
+      "high_confidence_required_fields": [
+        "datasource",
+        "viz_type",
+        "metric",
+        "columns"
+      ],
+      "recommended_always_set": [
+        "secondary_metric",
+        "adhoc_filters",
+        "row_limit",
+        "sort_by_metric",
+        "show_labels",
+        "label_type",
+        "number_format"
+      ],
+      "do_not_send_as_root_form_data": [
+        "groupby",
+        "secondaryMetric",
+        "showLabels",
+        "showLabelsThreshold",
+        "showTotal",
+        "labelType",
+        "numberFormat",
+        "dateFormat",
+        "colorScheme",
+        "linearColorScheme"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "sunburst_v2",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/sunburst_v2-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/sunburst_v2-form-data-schema.json",
+      "control-schema": "form-data-schema/sunburst_v2-schema.json"
+    }
+  }
+}

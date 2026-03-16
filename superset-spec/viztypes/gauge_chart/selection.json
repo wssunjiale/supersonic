@@ -1,0 +1,351 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "gauge_chart",
+  "display_name": "Gauge Chart",
+  "selection_summary": {
+    "category": "kpi",
+    "tags": [
+      "gauge",
+      "kpi",
+      "threshold",
+      "dial"
+    ],
+    "description_zh": "Gauge Chart displays a single metric value within a predefined range (e.g., 0-100) as a needle on a dial, ideal for KPI threshold monitoring.",
+    "visual_shape_zh": "仪表盘图（KPI阈值型）",
+    "use_cases_zh": [
+      "单指标阈值监控（如完成率、使用率、达标率）",
+      "KPI状态可视化（正常/警告/危险）",
+      "紧凑型关键指标展示"
+    ],
+    "required_slots": [
+      {
+        "field_name": "metric",
+        "required": true,
+        "slot_kind": "metric",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1",
+        "placeholder": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        },
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+        ]
+      },
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "核心指标，用于展示仪表盘的指针位置。"
+        ]
+      }
+    ],
+    "optional_slots": [
+      {
+        "field_name": "adhoc_filters",
+        "required": false,
+        "slot_kind": "filter_list",
+        "accepted_dataset_roles": [
+          "filter_context"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [],
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [
+          "extra_form_data.append"
+        ],
+        "descriptions": [
+          "源码未提供额外描述；字段标签为 Filters。"
+        ]
+      },
+      {
+        "field_name": "groupby",
+        "required": false,
+        "slot_kind": "dimension_list",
+        "accepted_dataset_roles": [
+          "dimension",
+          "category_dimension"
+        ],
+        "cardinality": "0..n",
+        "placeholder": [
+          "<dimension_column>"
+        ],
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Columns to group by"
+        ]
+      }
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "metric",
+      "saved_metric"
+    ],
+    "optional_dataset_roles": [
+      "category_dimension",
+      "dimension",
+      "filter_context"
+    ],
+    "dataset_role_inventory": {
+      "adhoc_metric": [
+        "metric",
+        "metrics"
+      ],
+      "category_dimension": [
+        "groupby"
+      ],
+      "dimension": [
+        "groupby"
+      ],
+      "filter_context": [
+        "adhoc_filters"
+      ],
+      "metric": [
+        "metric",
+        "metrics"
+      ],
+      "saved_metric": [
+        "metric",
+        "metrics"
+      ]
+    },
+    "non_binding_control_names": [
+      "animation",
+      "color_scheme",
+      "currency_format",
+      "end_angle",
+      "font_size",
+      "interval_color_indices",
+      "intervals",
+      "max_val",
+      "min_val",
+      "number_format",
+      "overlap",
+      "round_cap",
+      "row_limit",
+      "show_axis_tick",
+      "show_pointer",
+      "show_progress",
+      "show_split_line",
+      "sort_by_metric",
+      "split_number",
+      "start_angle",
+      "value_formatter"
+    ],
+    "embedding_runtime_field_names": [
+      "adhoc_filters",
+      "custom_form_data",
+      "filters",
+      "time_range"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "datasource",
+      "groupby",
+      "metric",
+      "row_limit",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "animation",
+      "color_scheme",
+      "currency_format",
+      "datasource",
+      "end_angle",
+      "font_size",
+      "groupby",
+      "interval_color_indices",
+      "intervals",
+      "max_val",
+      "metric",
+      "min_val",
+      "number_format",
+      "overlap",
+      "round_cap",
+      "row_limit",
+      "show_axis_tick",
+      "show_pointer",
+      "show_progress",
+      "show_split_line",
+      "sort_by_metric",
+      "split_number",
+      "start_angle",
+      "value_formatter",
+      "viz_type"
+    ],
+    "structural_flags": {
+      "time_series": false,
+      "kpi_like": true,
+      "table_like": false,
+      "map_like": false,
+      "flow_like": false,
+      "distribution_like": false,
+      "supports_breakdown": true,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": false,
+      "needs_dimension": false
+    },
+    "selection_hints": [
+      "优先用于单值 KPI、累计值或概览指标，不适合多行明细对比。",
+      "至少需要 1 个可聚合指标字段。",
+      "支持按维度拆分多序列或子组。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：单指标阈值监控（如完成率、使用率、达标率）；KPI状态可视化（正常/警告/危险）；紧凑型关键指标展示"
+    ]
+  },
+  "selection_prompt_card": {
+    "viz_type": "gauge_chart",
+    "display_name": "Gauge Chart",
+    "category": "kpi",
+    "description_zh": "Gauge Chart displays a single metric value within a predefined range (e.g., 0-100) as a needle on a dial, ideal for KPI threshold monitoring.",
+    "visual_shape_zh": "仪表盘图（KPI阈值型）",
+    "best_for": [
+      "单指标阈值监控（如完成率、使用率、达标率）",
+      "KPI状态可视化（正常/警告/危险）",
+      "紧凑型关键指标展示"
+    ],
+    "required_dataset_roles": [
+      "adhoc_metric",
+      "metric",
+      "saved_metric"
+    ],
+    "optional_dataset_roles": [
+      "category_dimension",
+      "dimension",
+      "filter_context"
+    ],
+    "required_slots": [
+      {
+        "field_name": "metric",
+        "required": true,
+        "slot_kind": "metric",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1",
+        "placeholder": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        },
+        "source_categories": [
+          "Query"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "Select a metric to display. You can use an aggregation function on a column or write custom SQL to create a metric."
+        ]
+      },
+      {
+        "field_name": "metrics",
+        "required": true,
+        "slot_kind": "metric_list",
+        "accepted_dataset_roles": [
+          "metric",
+          "saved_metric",
+          "adhoc_metric"
+        ],
+        "cardinality": "1..n",
+        "placeholder": [
+          {
+            "expressionType": "SIMPLE",
+            "column": {
+              "column_name": "<metric_column>"
+            },
+            "aggregate": "SUM",
+            "label": "SUM(<metric_column>)"
+          }
+        ],
+        "source_categories": [
+          "关键字段"
+        ],
+        "embedding_modes": [],
+        "descriptions": [
+          "核心指标，用于展示仪表盘的指针位置。"
+        ]
+      }
+    ],
+    "optional_slot_names": [
+      "adhoc_filters",
+      "groupby"
+    ],
+    "structural_flags": {
+      "time_series": false,
+      "kpi_like": true,
+      "table_like": false,
+      "map_like": false,
+      "flow_like": false,
+      "distribution_like": false,
+      "supports_breakdown": true,
+      "supports_filters": true,
+      "supports_runtime_filters": true,
+      "needs_metric": true,
+      "needs_time": false,
+      "needs_dimension": false
+    },
+    "selection_hints": [
+      "优先用于单值 KPI、累计值或概览指标，不适合多行明细对比。",
+      "至少需要 1 个可聚合指标字段。",
+      "支持按维度拆分多序列或子组。",
+      "支持在 embedding 运行时通过 form_data/extra_form_data 追加筛选。",
+      "典型场景：单指标阈值监控（如完成率、使用率、达标率）；KPI状态可视化（正常/警告/危险）；紧凑型关键指标展示"
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "gauge_chart",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/gauge_chart-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/gauge_chart-form-data-schema.json",
+      "control-schema": "form-data-schema/gauge_chart-schema.json"
+    }
+  }
+}

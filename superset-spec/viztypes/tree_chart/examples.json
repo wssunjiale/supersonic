@@ -1,0 +1,232 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "tree_chart",
+  "display_name": "Tree Chart",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "clause": "WHERE",
+          "subject": "region",
+          "operator": "IN",
+          "comparator": [
+            "APAC"
+          ]
+        }
+      ]
+    ],
+    "child_label_position": [
+      "bottom"
+    ],
+    "emphasis": [
+      "descendant"
+    ],
+    "id": [
+      "id_column"
+    ],
+    "layout": [
+      "orthogonal"
+    ],
+    "metric": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "count"
+        },
+        "aggregate": "COUNT",
+        "label": "COUNT(*)"
+      }
+    ],
+    "name": [
+      "name_column"
+    ],
+    "node_label_position": [
+      "left"
+    ],
+    "orient": [
+      "LR"
+    ],
+    "parent": [
+      "relation_column"
+    ],
+    "roam": [
+      true
+    ],
+    "root_node_id": [
+      "1"
+    ],
+    "row_limit": [
+      10000
+    ],
+    "symbol": [
+      "emptyCircle"
+    ],
+    "symbolSize": [
+      7
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "tree_chart",
+      "id": "<node_id_column>",
+      "parent": "<parent_id_column>",
+      "adhoc_filters": [],
+      "row_limit": 10000
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "tree_chart",
+      "id": "<node_id_column>",
+      "parent": "<parent_id_column>",
+      "name": "<node_name_column>",
+      "root_node_id": "",
+      "metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      },
+      "adhoc_filters": [],
+      "row_limit": 10000,
+      "layout": "orthogonal",
+      "orient": "LR",
+      "node_label_position": "left",
+      "child_label_position": "bottom",
+      "emphasis": "descendant",
+      "symbol": "emptyCircle",
+      "symbolSize": 7,
+      "roam": true
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "tree_chart",
+      "id": "<copied_from_saved_chart>",
+      "parent": "<copied_from_saved_chart>",
+      "name": "<copied_from_saved_chart>",
+      "root_node_id": "<copied_from_saved_chart>",
+      "metric": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "row_limit": "<copied_from_saved_chart>",
+      "layout": "<copied_from_saved_chart>",
+      "orient": "<copied_from_saved_chart>",
+      "node_label_position": "<copied_from_saved_chart>",
+      "child_label_position": "<copied_from_saved_chart>",
+      "emphasis": "<copied_from_saved_chart>",
+      "symbol": "<copied_from_saved_chart>",
+      "symbolSize": "<copied_from_saved_chart>",
+      "roam": "<copied_from_saved_chart>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "APAC"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "APAC"
+            ]
+          }
+        ],
+        "custom_form_data": {}
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_tree_chart": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "region",
+            "op": "IN",
+            "val": [
+              "APAC"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_tree_chart": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "region",
+            "operator": "IN",
+            "comparator": [
+              "APAC"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_tree_chart": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "传递非标准附加数据；Tree Chart 默认不直接消费它。",
+        "source": "QueryFormData.ts + superset/constants.py"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_tree_chart": false,
+        "recommended": false,
+        "sample_data": "Last 90 days",
+        "effect": "Tree Chart controlPanel 本身没有时间控件；guest 场景下不建议把它当成常规动态入口。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_tree_chart": false,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "Tree Chart 常规场景不直接消费它。",
+        "source": "QueryFormData.ts + query/constants.ts"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "tree_chart",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/tree_chart-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/tree_chart-form-data-schema.json",
+      "control-schema": "form-data-schema/tree_chart-schema.json"
+    }
+  }
+}

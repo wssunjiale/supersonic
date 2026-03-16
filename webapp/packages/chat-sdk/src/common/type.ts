@@ -79,6 +79,7 @@ export type SqlInfoType = {
   parsedS2SQL: string;
   correctedS2SQL: string;
   querySQL: string;
+  correctedQuerySQL?: string;
 };
 
 export type ChatContextType = {
@@ -126,28 +127,40 @@ export type SupersetChartResponseType = {
   fallback?: boolean;
   fallbackReason?: string;
   guestToken?: string;
-  chartId?: number;
-  chartUuid?: string;
+  dashboardId?: number;
+  dashboardTitle?: string;
   embeddedId?: string;
   supersetDomain?: string;
   vizType?: string;
   vizTypeCandidates?: SupersetVizTypeCandidate[];
-  dashboards?: SupersetDashboardType[];
 };
 
 export type SupersetVizTypeCandidate = {
   vizType: string;
   vizName?: string;
+  dashboardId?: number;
+  dashboardTitle?: string;
   chartId?: number;
   chartUuid?: string;
+  dashboardHeight?: number;
   guestToken?: string;
   embeddedId?: string;
   supersetDomain?: string;
 };
 
-export type SupersetDashboardType = {
+export type SupersetDashboardItem = {
   id: number;
-  title: string;
+  title?: string;
+  embeddedId?: string;
+  supersetDomain?: string;
+  editUrl?: string;
+  tags?: string[];
+};
+
+export type SupersetDashboardManageResp = {
+  pluginId?: number;
+  supersetDomain?: string;
+  dashboards?: SupersetDashboardItem[];
 };
 
 export type SupersetGuestTokenResp = {
@@ -264,6 +277,7 @@ export type HistoryMsgItemType = {
   parseTimeCost: ParseTimeCostType;
   queryResult: MsgDataType;
   chatId: number;
+  agentId?: number;
   createTime: string;
   feedback: string;
   score: number;

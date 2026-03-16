@@ -27,6 +27,7 @@ import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.GroupByElement;
 import net.sf.jsqlparser.statement.select.Limit;
+import net.sf.jsqlparser.statement.select.Offset;
 import net.sf.jsqlparser.statement.select.OrderByElement;
 import net.sf.jsqlparser.statement.select.ParenthesedSelect;
 import net.sf.jsqlparser.statement.select.PlainSelect;
@@ -36,8 +37,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Data
@@ -52,6 +55,7 @@ public class QueryStructReq extends SemanticQueryReq {
     private List<Filter> metricFilters = new ArrayList<>();
     private DateConf dateInfo;
     private long limit = Constants.DEFAULT_DETAIL_LIMIT;
+    private long offset;
     private QueryType queryType = QueryType.DETAIL;
     private boolean convertToSql = true;
 
@@ -170,15 +174,21 @@ public class QueryStructReq extends SemanticQueryReq {
         // 5. Set the limit clause
         plainSelect.setLimit(buildLimit(queryStructReq));
 
+        // 6. Set the offset clause
+        plainSelect.setOffset(buildOffset(queryStructReq));
+
+        // 7. Set the having clause
+        plainSelect.setHaving(buildHavingClause(queryStructReq));
+
         select.setSelect(plainSelect);
 
-        // 6. Set where clause
+        // 8. Set the where clause
         return addWhereClauses(select.toString(), queryStructReq, isBizName);
     }
 
     private List<SelectItem<?>> buildSelectItems(QueryStructReq queryStructReq) {
         List<SelectItem<?>> selectItems = new ArrayList<>();
-        List<String> groups = queryStructReq.getGroups();
+        Set<String> groups = new HashSet<>(queryStructReq.getGroups());
 
         if (!CollectionUtils.isEmpty(groups)) {
             for (String group : groups) {
@@ -238,8 +248,9 @@ public class QueryStructReq extends SemanticQueryReq {
     }
 
     private GroupByElement buildGroupByElement(QueryStructReq queryStructReq) {
-        List<String> groups = queryStructReq.getGroups();
-        if (!CollectionUtils.isEmpty(groups) && !queryStructReq.getAggregators().isEmpty()) {
+        Set<String> groups = new HashSet<>(queryStructReq.getGroups());
+        if ((!CollectionUtils.isEmpty(groups) && !queryStructReq.getAggregators().isEmpty())
+                || !queryStructReq.getMetricFilters().isEmpty()) {
             GroupByElement groupByElement = new GroupByElement();
             for (String group : groups) {
                 groupByElement.addGroupByExpression(new Column(group));
@@ -256,6 +267,15 @@ public class QueryStructReq extends SemanticQueryReq {
         Limit limit = new Limit();
         limit.setRowCount(new LongValue(queryStructReq.getLimit()));
         return limit;
+    }
+
+    private Offset buildOffset(QueryStructReq queryStructReq) {
+        if (Objects.isNull(queryStructReq.getOffset())) {
+            return null;
+        }
+        Offset offset = new Offset();
+        offset.setOffset(new LongValue(queryStructReq.getOffset()));
+        return offset;
     }
 
     private String addWhereClauses(String sql, QueryStructReq queryStructReq, boolean isBizName)
@@ -289,4 +309,23 @@ public class QueryStructReq extends SemanticQueryReq {
         }
         return Constants.TABLE_PREFIX + StringUtils.join(modelIds, "_");
     }
+
+    public Expression buildHavingClause(QueryStructReq queryStructReq) {
+        if (queryStructReq.getMetricFilters().isEmpty()) {
+            return null;
+        }
+
+        List<Filter> filters = queryStructReq.getMetricFilters();
+        SqlFilterUtils sqlFilterUtils = ContextUtils.getBean(SqlFilterUtils.class);
+        String havingClause = sqlFilterUtils.getWhereClause(filters, false);
+        if (StringUtils.isNotBlank(havingClause)) {
+            try {
+                return CCJSqlParserUtil.parseCondExpression(havingClause);
+            } catch (JSQLParserException e) {
+                log.error("Failed to parse having clause", e);
+            }
+        }
+        return null;
+    }
+
 }

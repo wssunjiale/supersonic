@@ -1,0 +1,532 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "deck_path",
+  "display_name": "deck.gl Path",
+  "source_kind": "schema_file",
+  "normalized_chart_form_data": {
+    "required_root_fields": [
+      "color_picker",
+      "datasource",
+      "line_column",
+      "line_type",
+      "viz_type"
+    ],
+    "optional_root_fields": [
+      "adhoc_filters",
+      "autozoom",
+      "cache_timeout",
+      "custom_params",
+      "extra_form_data",
+      "filter_nulls",
+      "granularity_sqla",
+      "js_columns",
+      "js_data_mutator",
+      "js_onclick_href",
+      "js_tooltip",
+      "line_width",
+      "line_width_unit",
+      "mapbox_style",
+      "reverse_long_lat",
+      "row_limit",
+      "slice_id",
+      "time_grain_sqla",
+      "time_range",
+      "url_params",
+      "viewport"
+    ],
+    "minimal_template_keys": [
+      "adhoc_filters",
+      "color_picker",
+      "datasource",
+      "line_column",
+      "line_type",
+      "line_width",
+      "line_width_unit",
+      "mapbox_style",
+      "viewport",
+      "viz_type"
+    ],
+    "recommended_template_keys": [
+      "adhoc_filters",
+      "autozoom",
+      "color_picker",
+      "datasource",
+      "filter_nulls",
+      "js_columns",
+      "js_data_mutator",
+      "js_onclick_href",
+      "js_tooltip",
+      "line_column",
+      "line_type",
+      "line_width",
+      "line_width_unit",
+      "mapbox_style",
+      "reverse_long_lat",
+      "row_limit",
+      "viewport",
+      "viz_type"
+    ],
+    "fallback_template_seed": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "deck_path",
+      "line_column": "<dimension_column_or_list>",
+      "line_type": null,
+      "adhoc_filters": [],
+      "time_range": "No filter"
+    }
+  },
+  "original_chart_form_data_schema": {
+    "viz_type": "deck_path",
+    "display_name": "deck.gl Path",
+    "purpose": "用于调用 API 创建或保存 deck.gl Path 时填写的 form_data 模板",
+    "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/deck_path-schema.json",
+    "source_files": [
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Path/controlPanel.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Path/index.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/Path/Path.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/factory.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/layers/common.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/transformProps.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/Shared_DeckGL.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utilities/sharedDndControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-preset-chart-deckgl/src/utils/crossFiltersDataMask.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-demo/storybook/stories/plugins/legacy-preset-chart-deckgl/Path/Path.stories.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-demo/storybook/stories/plugins/legacy-preset-chart-deckgl/Path/payload.js",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/types/QueryFormData.ts",
+      "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+      "D:/vsx/sources/superset-6.0.0/superset/views/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/utils/core.py",
+      "D:/vsx/sources/superset-6.0.0/superset/viz.py"
+    ],
+    "notes": [
+      "deck_path 是 legacy 图，metadata 明确声明 `useLegacyApi=true`，真实请求路径仍是 `/superset/explore_json/`。",
+      "Explore 导出 form_data 时走 `getFormDataFromControls()`，它按 control name 原样写入 root form_data。API 根层必须使用 `line_column`、`line_type`、`color_picker`、`line_width`、`line_width_unit` 等原始键名。",
+      "deck_path 没有专属前端 buildQuery。ChartClient.ts 对它会退回 `() => formData`，也就是说，API 层真正应该构造的是原始 root `form_data`，然后由 legacy `/superset/explore_json/` 包装成 `{ form_data: ... }`。",
+      "`line_column` 和 `line_type` 都会被后端用直接索引读取；`color_picker` 会被前端运行时直接解构。所以这三个字段不只是“推荐填写”，而是实用意义上的高置信必填。",
+      "当前 controlPanel 没有正式 metric 字段。规范创建模板应按列查询来构造，不要把 `deck_path` 误写成 `metric` / `metrics` 驱动的图；除非你明确在用 legacy 手工注入路径。",
+      "`filter_nulls=true` 时，后端会把 `line_column IS NOT NULL` 自动补到 `adhoc_filters`。如果你自己手写模板，显式带空数组 `adhoc_filters: []` 最稳妥。",
+      "storybook payload 证明当前图的 root form_data 常见形状还可能带 `granularity_sqla`、`time_grain_sqla`、`time_range` 这类隐藏时间字段；但它们不属于当前 controlPanel 正式字段。"
+    ],
+    "naming_and_pipeline": {
+      "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写成 form_data[name]，不会自动把 snake_case 改成 camelCase。",
+      "api_form_data_to_backend_request": "ChartClient.ts 在 `useLegacyApi=true` 时，把 `buildQuery(formData)` 包成 `{ form_data }` POST 到 `/superset/explore_json/`；deck_path 没有专属 buildQuery，因此等价于直接发送原始 form_data。",
+      "backend_form_data_normalization": "`explore_json()` 会先补 `datasource`，再执行 `convert_legacy_filters_into_adhoc(form_data)` 与 `merge_extra_filters(form_data)`。",
+      "backend_form_data_to_query_obj": "`BaseDeckGLViz.query_obj()` 会先按 `filter_nulls` 给 `line_column` 补空值过滤，再收集可选 `js_columns`。随后 `DeckPathViz.query_obj()` 会根据是否已有 legacy metrics，把 `line_column` 追加到 `columns` 或 `groupby`。",
+      "runtime_chart_props": "`transformProps.ts` 直接把 `rawFormData` 透传成 runtime `formData`，把 `queriesData[0]` 透传成 runtime `payload`，并把 `viewport` 与 `width`/`height` 合并。"
+    },
+    "global_required_fields": {
+      "datasource": {
+        "data_type": "string",
+        "required": true,
+        "sample_data": "<dataset_id>__table",
+        "source": "explore_json() + datasourceAndVizType hidden control"
+      },
+      "viz_type": {
+        "data_type": "string",
+        "required": true,
+        "fixed_value": "deck_path",
+        "source": "Path/index.ts + VizType.DeckPath"
+      },
+      "line_column": {
+        "data_type": "string | object",
+        "required": true,
+        "sample_data": "path_json",
+        "source": "dndLineColumn + DeckPathViz.query_obj() + DeckPathViz.get_properties()",
+        "notes": "字段来自 `dndEntityControl`，带 `validateNonEmpty`。"
+      },
+      "line_type": {
+        "data_type": "string",
+        "required": true,
+        "sample_data": "json",
+        "source": "Path Query section + DeckPathViz.deser_map",
+        "notes": "当前 controlPanel 的正式枚举值只有 `polyline` 和 `json`。"
+      },
+      "color_picker": {
+        "data_type": "object",
+        "required": true,
+        "sample_data": {
+          "r": 0,
+          "g": 122,
+          "b": 135,
+          "a": 1
+        },
+        "source": "Path.tsx direct property access",
+        "notes": "运行时会直接读取 `fd.color_picker.r/g/b/a`。"
+      }
+    },
+    "global_optional_fields": {
+      "row_limit": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 5000,
+        "source": "Query section"
+      },
+      "filter_nulls": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": true,
+        "source": "Query section",
+        "notes": "为 true 时，后端会自动补 `line_column IS NOT NULL` 过滤。"
+      },
+      "adhoc_filters": {
+        "data_type": "array[object]",
+        "required": false,
+        "sample_data": [],
+        "source": "Query section"
+      },
+      "mapbox_style": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+        "source": "Map section"
+      },
+      "viewport": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {
+          "longitude": 6.85236157047845,
+          "latitude": 31.222656842808707,
+          "zoom": 1,
+          "bearing": 0,
+          "pitch": 0
+        },
+        "source": "Map section"
+      },
+      "line_width": {
+        "data_type": "integer | string",
+        "required": false,
+        "sample_data": 1,
+        "source": "Map section"
+      },
+      "line_width_unit": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "pixels",
+        "source": "Map section"
+      },
+      "reverse_long_lat": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": false,
+        "source": "Map section"
+      },
+      "autozoom": {
+        "data_type": "boolean",
+        "required": false,
+        "sample_data": true,
+        "source": "Map section"
+      },
+      "js_columns": {
+        "data_type": "array[string | object]",
+        "required": false,
+        "sample_data": [],
+        "source": "Advanced section"
+      },
+      "js_data_mutator": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "data => data",
+        "source": "Advanced section"
+      },
+      "js_tooltip": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "o => `<div>${o.object.extraProps?.color}</div>`",
+        "source": "Advanced section"
+      },
+      "js_onclick_href": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "o => `https://example.com/?color=${o.object.extraProps?.color}`",
+        "source": "Advanced section"
+      },
+      "granularity_sqla": {
+        "data_type": "string | null",
+        "required": false,
+        "sample_data": "ds",
+        "source": "storybook payload + BaseViz hidden time form_data fields",
+        "notes": "当前 controlPanel 未正式暴露；若上层调用方手工传入，后端会沿 BaseViz 时间查询路径消费它。"
+      },
+      "time_grain_sqla": {
+        "data_type": "string | null",
+        "required": false,
+        "sample_data": "P1D",
+        "source": "DeckPathViz.query_obj()",
+        "notes": "当该字段有值时，`DeckPathViz.query_obj()` 会把 `self.is_timeseries` 置为 true。"
+      },
+      "time_range": {
+        "data_type": "string",
+        "required": false,
+        "sample_data": "Last 30 days",
+        "source": "storybook payload + BaseViz hidden time form_data fields"
+      },
+      "slice_id": {
+        "data_type": "integer",
+        "required": false,
+        "sample_data": 0,
+        "source": "datasourceAndVizType hidden control",
+        "notes": "新建图表时通常省略；编辑已存在图表时由服务端或上层调用方提供。"
+      },
+      "cache_timeout": {
+        "data_type": "integer | null",
+        "required": false,
+        "sample_data": null,
+        "source": "datasourceAndVizType hidden control"
+      },
+      "url_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "QueryFormData"
+      },
+      "custom_params": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "QueryFormData"
+      },
+      "extra_form_data": {
+        "data_type": "object",
+        "required": false,
+        "sample_data": {},
+        "source": "utils.merge_extra_form_data()",
+        "notes": "虽然不属于 deck_path controlPanel 正式字段，但 legacy explore_json 路径会消费它。"
+      }
+    },
+    "minimal_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "deck_path",
+      "line_column": "path_json",
+      "line_type": "json",
+      "adhoc_filters": [],
+      "mapbox_style": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+      "viewport": {
+        "longitude": 6.85236157047845,
+        "latitude": 31.222656842808707,
+        "zoom": 1,
+        "bearing": 0,
+        "pitch": 0
+      },
+      "color_picker": {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      },
+      "line_width": 1,
+      "line_width_unit": "pixels"
+    },
+    "recommended_form_data_template": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "deck_path",
+      "line_column": "path_json",
+      "line_type": "json",
+      "row_limit": 10000,
+      "filter_nulls": true,
+      "adhoc_filters": [],
+      "mapbox_style": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+      "viewport": {
+        "longitude": 6.85236157047845,
+        "latitude": 31.222656842808707,
+        "zoom": 1,
+        "bearing": 0,
+        "pitch": 0
+      },
+      "color_picker": {
+        "r": 0,
+        "g": 122,
+        "b": 135,
+        "a": 1
+      },
+      "line_width": 1,
+      "line_width_unit": "pixels",
+      "reverse_long_lat": false,
+      "autozoom": true,
+      "js_columns": [],
+      "js_data_mutator": "",
+      "js_tooltip": "",
+      "js_onclick_href": ""
+    },
+    "conditional_blocks": {
+      "polyline_encoded_paths": {
+        "condition": "路径列存储的是 polyline 编码字符串时",
+        "fields": {
+          "line_type": "polyline",
+          "line_column": "encoded_path"
+        }
+      },
+      "json_encoded_paths": {
+        "condition": "路径列存储的是 JSON 数组字符串时",
+        "fields": {
+          "line_type": "json",
+          "line_column": "path_json"
+        }
+      },
+      "reverse_coordinates": {
+        "condition": "原始路径坐标列按反向顺序编码时",
+        "fields": {
+          "reverse_long_lat": true
+        }
+      },
+      "line_width_in_meters": {
+        "condition": "需要用真实距离单位解释线宽时",
+        "fields": {
+          "line_width": 50,
+          "line_width_unit": "meters"
+        }
+      },
+      "extra_props_and_custom_js": {
+        "condition": "需要把额外列暴露给 JS、tooltip 或点击跳转时",
+        "fields": {
+          "js_columns": [
+            "color"
+          ],
+          "js_data_mutator": "data => data",
+          "js_tooltip": "o => `<div>${o.object.extraProps?.color}</div>`",
+          "js_onclick_href": "o => `https://example.com/?color=${o.object.extraProps?.color}`"
+        }
+      },
+      "hidden_timeseries_mode": {
+        "condition": "数据集含时间列且需要手工走隐藏的时间查询路径时",
+        "fields": {
+          "granularity_sqla": "ds",
+          "time_grain_sqla": "P1D",
+          "time_range": "Last 30 days"
+        },
+        "notes": "这不是当前 controlPanel 正式字段，但 `DeckPathViz.query_obj()` 明确会读取 `time_grain_sqla` 来切换 `is_timeseries`。"
+      }
+    },
+    "runtime_only_or_non_template_fields": {
+      "runtime_props_generated_by_transformProps": [
+        {
+          "field_name": "payload",
+          "reason": "这是运行时从 `queriesData[0]` 注入的对象，不是 API root form_data 字段。"
+        },
+        {
+          "field_name": "formData",
+          "reason": "这是 runtime 对 `rawFormData` 的整体透传容器，不是额外的 API root 字段。"
+        },
+        {
+          "field_name": "viewport.width",
+          "reason": "运行时由图表尺寸补入，不需要写到 root form_data。"
+        },
+        {
+          "field_name": "viewport.height",
+          "reason": "运行时由图表尺寸补入，不需要写到 root form_data。"
+        },
+        {
+          "field_name": "emitCrossFilters",
+          "reason": "这是 ChartProps/hook 层运行时能力，不是 API root 字段。"
+        },
+        {
+          "field_name": "filterState",
+          "reason": "这是 runtime 交互状态，不是 API root 字段。"
+        }
+      ],
+      "backend_response_only_fields": [
+        {
+          "field_name": "queriesData[0].data.features[*].path",
+          "reason": "这是后端 `DeckPathViz.get_properties()` 反序列化后的路径数组，不是 root form_data 字段。"
+        },
+        {
+          "field_name": "queriesData[0].data.features[*].__timestamp",
+          "reason": "这是后端补入的运行时时间戳字段，不是 root form_data 字段。"
+        },
+        {
+          "field_name": "queriesData[0].data.features[*].extraProps",
+          "reason": "这是后端根据 `js_columns` 生成的附加属性容器，不是 root form_data 字段。"
+        },
+        {
+          "field_name": "queriesData[0].data.mapboxApiKey",
+          "reason": "这是后端 payload 附带的运行时地图密钥，不是 root form_data 字段。"
+        },
+        {
+          "field_name": "queriesData[0].data.metricLabels",
+          "reason": "只有手工注入 legacy metric 时它才有意义；不是 root form_data 字段。"
+        }
+      ],
+      "legacy_or_generated_non_primary_fields": [
+        {
+          "field_name": "metric",
+          "reason": "当前 `deck_path` controlPanel 没有正式 metric 控件；只有手工走 legacy 路径时，后端才会改变查询形状并按指标聚合。"
+        },
+        {
+          "field_name": "metrics",
+          "reason": "与 `metric` 同理，不是当前 controlPanel 的正式创建字段。"
+        },
+        {
+          "field_name": "order_desc",
+          "reason": "只有手工注入 legacy metric 时，`BaseDeckGLViz.query_obj()` 才会消费它生成 `orderby`。"
+        },
+        {
+          "field_name": "filters",
+          "reason": "这不是当前 controlPanel 正式字段。它可能在旧保存态或 legacy 兼容处理中出现，但当前创建模板应优先使用 `adhoc_filters`。"
+        },
+        {
+          "field_name": "where",
+          "reason": "legacy 兼容字段，不是当前 deck_path controlPanel 正式字段。"
+        },
+        {
+          "field_name": "having",
+          "reason": "legacy 兼容字段，不是当前 deck_path controlPanel 正式字段。"
+        },
+        {
+          "field_name": "payload.form_data",
+          "reason": "这是 legacy `/superset/explore_json/` 请求的外层包裹字段，不是图表保存态内部的 root form_data 字段。"
+        }
+      ]
+    },
+    "api_usage_guidance": {
+      "high_confidence_required_fields": [
+        "datasource",
+        "viz_type",
+        "line_column",
+        "line_type",
+        "color_picker"
+      ],
+      "recommended_always_set": [
+        "adhoc_filters",
+        "filter_nulls",
+        "row_limit",
+        "mapbox_style",
+        "viewport",
+        "line_width",
+        "line_width_unit",
+        "reverse_long_lat",
+        "autozoom"
+      ],
+      "api_field_examples": [
+        "line_column",
+        "line_type",
+        "color_picker",
+        "line_width",
+        "line_width_unit",
+        "mapbox_style",
+        "viewport"
+      ],
+      "avoid_confusion": [
+        "不要把 deck_path 当成标准 chart data API 图表去套 `/api/v1/chart/data` 的 `query_context` 模板；当前图真实入口是 legacy `/superset/explore_json/`。",
+        "`line_column` 这里传的是列名，不是路径数组本身。",
+        "canonical 模板里的 `line_type` 只应写 `polyline` 或 `json`；不要因为后端仍保留 `geohash` 反序列化器就把它当成当前 UI 正式支持值。",
+        "当前图没有正式 metric 字段，不要把 `size`、`metric`、`metrics` 当成常规必填去构造。",
+        "`color_picker` 不是可有可无的装饰字段；运行时会直接读取它。",
+        "交互筛选应优先写进 `extra_form_data.filters`，其中 `col` 是 SQL expression 对象，不是普通列名。"
+      ]
+    }
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "deck_path",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/deck_path-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/deck_path-form-data-schema.json",
+      "control-schema": "form-data-schema/deck_path-schema.json"
+    }
+  }
+}

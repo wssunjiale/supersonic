@@ -1,0 +1,295 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "handlebars",
+  "display_name": "Handlebars",
+  "field_sample_inventory": {
+    "adhoc_filters": [
+      []
+    ],
+    "all_columns": [
+      [
+        "name",
+        "state"
+      ]
+    ],
+    "granularity_sqla": [
+      "ds"
+    ],
+    "groupby": [
+      [
+        "name"
+      ]
+    ],
+    "handlebarsTemplate": [
+      "<ul class=\"data-list\">\\n  {{#each data}}\\n    <li>{{stringify this}}</li>\\n  {{/each}}\\n</ul>"
+    ],
+    "include_time": [
+      false
+    ],
+    "metrics": [
+      [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "value"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(value)"
+        }
+      ]
+    ],
+    "order_by_cols": [
+      [
+        "[\"num\", false]"
+      ]
+    ],
+    "order_desc": [
+      true
+    ],
+    "percent_metrics": [
+      [
+        {
+          "expressionType": "SQL",
+          "sqlExpression": "SUM(value) / SUM(total)",
+          "column": null,
+          "aggregate": null,
+          "label": "ratio"
+        }
+      ]
+    ],
+    "query_mode": [
+      "aggregate"
+    ],
+    "row_limit": [
+      10000
+    ],
+    "show_totals": [
+      false
+    ],
+    "styleTemplate": [
+      "/*\\n  .data-list {\\n    background-color: yellow;\\n  }\\n*/"
+    ],
+    "time_grain_sqla": [
+      "P1D"
+    ],
+    "time_range": [
+      "No filter"
+    ],
+    "timeseries_limit_metric": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "value"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(value)"
+      }
+    ]
+  },
+  "chart_form_data_examples": {
+    "minimal": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "handlebars",
+      "query_mode": "aggregate",
+      "metrics": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "<metric_column>"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(<metric_column>)"
+        }
+      ],
+      "row_limit": 10000,
+      "adhoc_filters": [],
+      "time_range": "No filter",
+      "handlebarsTemplate": "<ul class=\"data-list\">\\n  {{#each data}}\\n    <li>{{stringify this}}</li>\\n  {{/each}}\\n</ul>"
+    },
+    "recommended": {
+      "datasource": "<dataset_id>__table",
+      "viz_type": "handlebars",
+      "query_mode": "aggregate",
+      "groupby": [
+        "name"
+      ],
+      "metrics": [
+        {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "value"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(value)"
+        }
+      ],
+      "percent_metrics": [],
+      "timeseries_limit_metric": {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "value"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(value)"
+      },
+      "order_desc": true,
+      "row_limit": 10000,
+      "time_range": "No filter",
+      "include_time": false,
+      "show_totals": false,
+      "adhoc_filters": [],
+      "handlebarsTemplate": "<ul class=\"data-list\">\\n  {{#each data}}\\n    <li>{{this.name}}: {{formatNumber this['SUM(value)']}}</li>\\n  {{/each}}\\n</ul>",
+      "styleTemplate": "/*\\n  .data-list {\\n    padding-left: 1rem;\\n  }\\n*/"
+    }
+  },
+  "embedding_examples": {
+    "safe_template": {
+      "slice_id": "<saved_chart_id>",
+      "dashboardId": "<dashboard_id>",
+      "datasource": "<copied_from_saved_chart>",
+      "viz_type": "handlebars",
+      "query_mode": "<copied_from_saved_chart>",
+      "groupby": "<copied_from_saved_chart>",
+      "all_columns": "<copied_from_saved_chart>",
+      "metrics": "<copied_from_saved_chart>",
+      "timeseries_limit_metric": "<copied_from_saved_chart>",
+      "order_by_cols": "<copied_from_saved_chart>",
+      "order_desc": "<copied_from_saved_chart>",
+      "row_limit": "<copied_from_saved_chart>",
+      "granularity_sqla": "<copied_from_saved_chart>",
+      "time_grain_sqla": "<copied_from_saved_chart>",
+      "time_range": "<copied_from_saved_chart>",
+      "adhoc_filters": "<copied_from_saved_chart>",
+      "handlebarsTemplate": "<copied_from_saved_chart>",
+      "styleTemplate": "<copied_from_saved_chart>",
+      "extra_form_data": {
+        "filters": [
+          {
+            "col": "state",
+            "op": "IN",
+            "val": [
+              "CA"
+            ]
+          }
+        ],
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "state",
+            "operator": "IN",
+            "comparator": [
+              "CA"
+            ]
+          }
+        ],
+        "time_range": "Last 30 days",
+        "time_grain_sqla": "P1D",
+        "custom_form_data": {}
+      }
+    },
+    "extra_form_data_schema": [
+      {
+        "field_name": "filters",
+        "data_type": "array[QueryObjectFilterClause]",
+        "behavior": "append",
+        "safe_for_handlebars": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "col": "state",
+            "op": "IN",
+            "val": [
+              "CA"
+            ]
+          }
+        ],
+        "effect": "追加 simple filters；后端会把它们并入额外过滤条件。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "data_type": "array[AdhocFilter]",
+        "behavior": "append",
+        "safe_for_handlebars": true,
+        "recommended": true,
+        "sample_data": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "state",
+            "operator": "IN",
+            "comparator": [
+              "CA"
+            ]
+          }
+        ],
+        "effect": "追加 adhoc filters；后端会标记为 isExtra 并并入查询。",
+        "source": "superset/constants.py + superset/utils/core.py"
+      },
+      {
+        "field_name": "time_range",
+        "data_type": "string",
+        "behavior": "override",
+        "safe_for_handlebars": true,
+        "recommended": true,
+        "sample_data": "Last 30 days",
+        "effect": "覆盖 query.time_range。",
+        "source": "superset/constants.py + superset-ui-core query/constants.ts"
+      },
+      {
+        "field_name": "time_grain_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_handlebars": true,
+        "recommended": false,
+        "sample_data": "P1D",
+        "effect": "覆盖 query.extras.time_grain_sqla；仅在图表本身使用时间维度时才有意义。",
+        "source": "superset/constants.py + superset-ui-core query/constants.ts"
+      },
+      {
+        "field_name": "granularity_sqla",
+        "data_type": "string | null",
+        "behavior": "override",
+        "safe_for_handlebars": true,
+        "recommended": false,
+        "sample_data": "ds",
+        "effect": "覆盖 query.granularity。",
+        "source": "superset/constants.py + superset-ui-core query/constants.ts"
+      },
+      {
+        "field_name": "custom_form_data",
+        "data_type": "object",
+        "behavior": "append",
+        "safe_for_handlebars": true,
+        "recommended": false,
+        "sample_data": {},
+        "effect": "可传非标准附加数据；Handlebars 默认 buildQuery/transformProps 不直接消费它。",
+        "source": "superset/constants.py + frontend QueryFormData.ts"
+      },
+      {
+        "field_name": "interactive_groupby",
+        "data_type": "array[string]",
+        "behavior": "append",
+        "safe_for_handlebars": false,
+        "recommended": false,
+        "sample_data": [
+          "state"
+        ],
+        "effect": "通用 ExtraFormData 字段；当前 Handlebars buildQuery 没有像 Table plugin 那样专门读取它。",
+        "source": "frontend QueryFormData.ts + query/constants.ts"
+      }
+    ]
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "handlebars",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/handlebars-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/handlebars-form-data-schema.json",
+      "control-schema": "form-data-schema/handlebars-schema.json"
+    }
+  }
+}

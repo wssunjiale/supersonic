@@ -1,0 +1,545 @@
+{
+  "viz_type": "bubble_v2",
+  "display_name": "Bubble Chart",
+  "control_panel_file": "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Bubble/controlPanel.tsx",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Bubble/controlPanel.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Bubble/index.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Bubble/buildQuery.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Bubble/transformProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Bubble/types.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/Bubble/constants.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/test/Bubble/buildQuery.test.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/test/Bubble/transformProps.test.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/controls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/constants.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/plugin-chart-echarts/src/defaults.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryContext.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/buildQueryObject.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/query/extractQueryFields.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/models/ChartProps.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/types/VizType.ts",
+    "D:/vsx/sources/superset-6.0.0/superset/migrations/shared/migrate_viz/processors.py",
+    "D:/vsx/sources/superset-6.0.0/superset/examples/configs/charts/Featured Charts/Bubble.yaml"
+  ],
+  "notes": [
+    "Bubble 插件源码目录是 plugin-chart-echarts/src/Bubble，metadata.name 明确写的是 Bubble Chart，metadata.description 说明该图通过 X 轴、Y 轴和 bubble size 三个维度展示数据，并可用颜色区分分组。",
+    "Superset 6.0.0 的正式 viz_type 是 bubble_v2。superset-ui-core/src/chart/types/VizType.ts 把 Bubble 注册成 bubble_v2，examples/configs/charts/Featured Charts/Bubble.yaml 也使用 bubble_v2；Bubble 单测里残留的 echarts_bubble 只是旧测试值，不应作为新模板主键名。",
+    "Bubble 没有单独的 formDataOverrides。最终 form_data 直接来自 getFormDataFromControls()，即 control name 原样写入 form_data。",
+    "x / y / size 并不是直接叫 metrics 的控件，但 extractQueryFields.ts 里把 x、y、size 预定义映射到 metrics；Bubble/buildQuery.test.ts 也明确断言 query.metrics = [x, y, size]。",
+    "entity 和 series 在 shared controls 体系里属于列类字段；Bubble/buildQuery.ts 又显式把 query.columns 覆盖为 [entity, series]，因此 Bubble 的查询主轴是 entity，series 仅用于颜色分组。",
+    "Bubble/controlPanel.tsx 对 log 轴默认值存在源码缺陷：它从 DEFAULT_FORM_DATA 解构的是 logAxis，但 Bubble/constants.ts 实际导出的是 logXAis 和 logYAxis。结果 controlPanel 层的 logXAxis / logYAxis 默认值都拿到 undefined；运行时 transformProps 省略时仍会按线性轴工作。",
+    "Bubble/types.ts 里写了 yAXisFormat 这个拼写错误，但 transformProps.ts 真实读取的是 ChartProps 转 camelCase 后的 yAxisFormat，对应的 API form_data 主键仍然是 y_axis_format。"
+  ],
+  "legacy_compatibility": {
+    "official_viz_type": "bubble_v2",
+    "legacy_test_only_viz_type": "echarts_bubble",
+    "legacy_migration": {
+      "source_viz_type": "bubble",
+      "target_viz_type": "bubble_v2",
+      "notes": "migrations/shared/migrate_viz/processors.py 中的 MigrateBubbleChart 会把老的 bubble 迁移到 bubble_v2，并重命名一批旧字段。"
+    }
+  },
+  "control_overrides": {
+    "order_desc": {
+      "based_on": "sharedControls.order_desc",
+      "override": "只有 orderby 有值时才显示",
+      "source": "Bubble/controlPanel.tsx"
+    },
+    "tooltipSizeFormat": {
+      "based_on": "sharedControls.y_axis_format",
+      "override": "label 改成 Bubble size number format",
+      "source": "Bubble/controlPanel.tsx"
+    },
+    "xAxisFormat": {
+      "based_on": "sharedControls.y_axis_format",
+      "override": "label 改成 X Axis Format",
+      "source": "Bubble/controlPanel.tsx"
+    },
+    "legend_fields": {
+      "based_on": "plugin-chart-echarts/src/controls.tsx legendSection",
+      "defaults": {
+        "show_legend": true,
+        "legendType": "scroll",
+        "legendOrientation": "top",
+        "legendMargin": null
+      }
+    },
+    "log_axis_defaults": {
+      "issue": "Bubble/controlPanel.tsx 解构的是 logAxis，但 Bubble/constants.ts 没有这个键",
+      "effective_behavior": "省略 logXAxis / logYAxis 时，transformProps 会按线性轴工作"
+    }
+  },
+  "query_compilation": {
+    "query_metrics": "buildQueryContext() 先调用 buildQueryObject()；buildQueryObject() 再调用 extractQueryFields()。extractQueryFields() 的预定义别名里包含 x -> metrics、y -> metrics、size -> metrics，所以最终 query.metrics 来自 x / y / size。",
+    "query_columns": "Bubble/buildQuery.ts 先取 ensureIsArray(formData.entity) + ensureIsArray(formData.series)，再把这个数组直接覆写到 query.columns。",
+    "query_orderby": "orderby 先由 buildQueryObject() 提取；Bubble/buildQuery.ts 再把它包装成 [[baseQueryObject.orderby[0], !baseQueryObject.order_desc]]。因此 root form_data 的 order_desc=true 会对应 query.orderby 的 descending=false。"
+  },
+  "field_categories": {
+    "Query": [
+      {
+        "field_name": "series",
+        "description": "Defines the grouping of entities. Each series is represented by a specific color in the chart.",
+        "data_type": "string | object | null",
+        "enum_source": "datasource columns",
+        "sample_data": "product_line",
+        "required": false,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "dndSeriesControl 是单选 Dimension。Bubble/buildQuery.ts 会把它追加进 query.columns。"
+      },
+      {
+        "field_name": "entity",
+        "description": "This defines the element to be plotted on the chart",
+        "data_type": "string | object",
+        "enum_source": "datasource columns",
+        "sample_data": "deal_size",
+        "required": true,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "dndEntityControl 带 validateNonEmpty 校验，是 Bubble 唯一强制的维度字段。"
+      },
+      {
+        "field_name": "x",
+        "description": "The dataset column/metric that returns the values on your chart's x-axis.",
+        "data_type": "string | object",
+        "enum_source": "saved metrics + adhoc metrics",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "quantity_ordered"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(quantity_ordered)"
+        },
+        "required": true,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "extractQueryFields.ts 会把 x 视作 metrics。"
+      },
+      {
+        "field_name": "y",
+        "description": "The dataset column/metric that returns the values on your chart's y-axis.",
+        "data_type": "string | object",
+        "enum_source": "saved metrics + adhoc metrics",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "country"
+          },
+          "aggregate": "COUNT_DISTINCT",
+          "label": "COUNT_DISTINCT(country)"
+        },
+        "required": true,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "extractQueryFields.ts 会把 y 视作 metrics。"
+      },
+      {
+        "field_name": "adhoc_filters",
+        "description": "字段标签为 Filters。可用于普通筛选，也可通过 TEMPORAL_RANGE 表达时间过滤。",
+        "data_type": "array[object]",
+        "enum_source": "dataset columns + saved metrics + 当前 x/y/size 指标",
+        "sample_data": [
+          {
+            "clause": "WHERE",
+            "subject": "order_date",
+            "operator": "TEMPORAL_RANGE",
+            "comparator": "No filter",
+            "expressionType": "SIMPLE"
+          }
+        ],
+        "required": false,
+        "embedding": "extra_form_data.append",
+        "default_value": []
+      },
+      {
+        "field_name": "size",
+        "description": "Metric used to calculate bubble size",
+        "data_type": "string | object",
+        "enum_source": "saved metrics + adhoc metrics",
+        "sample_data": "count",
+        "required": true,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "extractQueryFields.ts 会把 size 视作 metrics。"
+      },
+      {
+        "field_name": "orderby",
+        "description": "Orders the query result that generates the source data for this chart. If a series or row limit is reached, this determines what data are truncated. If undefined, defaults to the first metric (where appropriate).",
+        "data_type": "string | object | null",
+        "enum_source": "saved metrics + adhoc metrics",
+        "sample_data": {
+          "expressionType": "SIMPLE",
+          "column": {
+            "column_name": "quantity_ordered"
+          },
+          "aggregate": "SUM",
+          "label": "SUM(quantity_ordered)"
+        },
+        "required": false,
+        "embedding": "否",
+        "default_value": null,
+        "notes": "Bubble/buildQuery.ts 会把 query.orderby 重写成二维数组，并结合 order_desc 反转排序方向。"
+      },
+      {
+        "field_name": "order_desc",
+        "runtime_alias": "orderDesc",
+        "description": "If enabled, this control sorts the results/values descending, otherwise it sorts the results ascending.",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true,
+        "notes": "sharedControls.order_desc 的默认值是 true；Bubble/controlPanel.tsx 只在 orderby 有值时显示它。"
+      },
+      {
+        "field_name": "row_limit",
+        "runtime_alias": "rowLimit",
+        "description": "Limits the number of the rows that are computed in the query that is the source of the data used for this chart.",
+        "data_type": "integer",
+        "enum_values": [
+          10,
+          50,
+          100,
+          250,
+          500,
+          1000,
+          5000,
+          10000,
+          50000
+        ],
+        "sample_data": 10000,
+        "required": false,
+        "embedding": "否",
+        "default_value": 10000
+      }
+    ],
+    "Chart Options": [
+      {
+        "field_name": "color_scheme",
+        "runtime_alias": "colorScheme",
+        "description": "The color scheme for rendering chart",
+        "data_type": "string",
+        "enum_source": "categoricalSchemeRegistry.keys()",
+        "sample_data": "supersetColors",
+        "required": false,
+        "embedding": "否",
+        "default_value": "categoricalSchemeRegistry.getDefaultKey()",
+        "notes": "sharedControls.color_scheme 的默认值来自 categoricalSchemeRegistry.getDefaultKey()。官方 Bubble 示例保存态使用的是 supersetColors。"
+      },
+      {
+        "field_name": "show_legend",
+        "runtime_alias": "showLegend",
+        "description": "Whether to display a legend for the chart",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": true,
+        "required": false,
+        "embedding": "否",
+        "default_value": true
+      },
+      {
+        "field_name": "legendType",
+        "description": "Legend type",
+        "data_type": "string",
+        "enum_values": [
+          "scroll",
+          "plain"
+        ],
+        "sample_data": "scroll",
+        "required": false,
+        "embedding": "否",
+        "default_value": "scroll"
+      },
+      {
+        "field_name": "legendOrientation",
+        "description": "Legend Orientation",
+        "data_type": "string",
+        "enum_values": [
+          "top",
+          "bottom",
+          "left",
+          "right"
+        ],
+        "sample_data": "top",
+        "required": false,
+        "embedding": "否",
+        "default_value": "top"
+      },
+      {
+        "field_name": "legendMargin",
+        "description": "Additional padding for legend.",
+        "data_type": "integer | null",
+        "sample_data": 12,
+        "required": false,
+        "embedding": "否",
+        "default_value": null
+      },
+      {
+        "field_name": "max_bubble_size",
+        "runtime_alias": "maxBubbleSize",
+        "description": "Max Bubble Size",
+        "data_type": "string",
+        "enum_values": [
+          "5",
+          "10",
+          "15",
+          "25",
+          "50",
+          "75",
+          "100"
+        ],
+        "sample_data": "25",
+        "required": false,
+        "embedding": "否",
+        "default_value": "25",
+        "notes": "这个字段在 controlPanel 中是 SelectControl，但 choice 值全是字符串，不是 number。transformProps.ts 会把它作为 normalizeSymbolSize() 的上限。"
+      },
+      {
+        "field_name": "tooltipSizeFormat",
+        "description": "Bubble size number format",
+        "data_type": "string",
+        "enum_source": "D3_FORMAT_OPTIONS",
+        "sample_data": "SMART_NUMBER",
+        "required": false,
+        "embedding": "否",
+        "default_value": "SMART_NUMBER"
+      },
+      {
+        "field_name": "opacity",
+        "description": "Opacity of bubbles, 0 means completely transparent, 1 means opaque",
+        "data_type": "number",
+        "enum_source": "SliderControl min=0 max=1 step=0.1",
+        "sample_data": 0.6,
+        "required": false,
+        "embedding": "否",
+        "default_value": 0.6
+      }
+    ],
+    "X Axis": [
+      {
+        "field_name": "x_axis_label",
+        "runtime_alias": "xAxisLabel",
+        "description": "X Axis Title",
+        "data_type": "string",
+        "sample_data": "Quantity Ordered",
+        "required": false,
+        "embedding": "否",
+        "default_value": ""
+      },
+      {
+        "field_name": "xAxisLabelRotation",
+        "description": "Rotate x axis label",
+        "data_type": "integer | string",
+        "enum_values": [
+          0,
+          45,
+          90
+        ],
+        "sample_data": 45,
+        "required": false,
+        "embedding": "否",
+        "default_value": 0,
+        "notes": "控件允许 freeForm，自定义角度时也可能出现非预设整数。"
+      },
+      {
+        "field_name": "xAxisLabelInterval",
+        "description": "Choose how many X-Axis labels to show",
+        "data_type": "string",
+        "enum_values": [
+          "auto",
+          "0"
+        ],
+        "sample_data": "auto",
+        "required": false,
+        "embedding": "否",
+        "default_value": "auto"
+      },
+      {
+        "field_name": "x_axis_title_margin",
+        "runtime_alias": "xAxisTitleMargin",
+        "description": "X axis title margin",
+        "data_type": "integer | string",
+        "enum_values": [
+          15,
+          30,
+          50,
+          75,
+          100,
+          125,
+          150,
+          200
+        ],
+        "sample_data": 30,
+        "required": false,
+        "embedding": "否",
+        "default_value": 30
+      },
+      {
+        "field_name": "xAxisFormat",
+        "description": "X Axis Format",
+        "data_type": "string",
+        "enum_source": "D3_FORMAT_OPTIONS",
+        "sample_data": "SMART_NUMBER",
+        "required": false,
+        "embedding": "否",
+        "default_value": "SMART_NUMBER"
+      },
+      {
+        "field_name": "logXAxis",
+        "description": "Logarithmic x-axis",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": "源码缺陷：controlPanel 默认值取到 undefined；省略时运行时表现为线性轴",
+        "notes": "Bubble/constants.ts 把默认值误写成 logXAis，Bubble/controlPanel.tsx 又去解构 logAxis。"
+      }
+    ],
+    "Y Axis": [
+      {
+        "field_name": "y_axis_label",
+        "runtime_alias": "yAxisLabel",
+        "description": "Y Axis Title",
+        "data_type": "string",
+        "sample_data": "Distinct Countries",
+        "required": false,
+        "embedding": "否",
+        "default_value": ""
+      },
+      {
+        "field_name": "yAxisLabelRotation",
+        "description": "Rotate y axis label",
+        "data_type": "integer | string",
+        "enum_values": [
+          0,
+          45
+        ],
+        "sample_data": 45,
+        "required": false,
+        "embedding": "否",
+        "default_value": 0,
+        "notes": "控件允许 freeForm，自定义角度时也可能出现非预设整数。"
+      },
+      {
+        "field_name": "y_axis_title_margin",
+        "runtime_alias": "yAxisTitleMargin",
+        "description": "Y axis title margin",
+        "data_type": "integer | string",
+        "enum_values": [
+          15,
+          30,
+          50,
+          75,
+          100,
+          125,
+          150,
+          200
+        ],
+        "sample_data": 30,
+        "required": false,
+        "embedding": "否",
+        "default_value": 30
+      },
+      {
+        "field_name": "y_axis_format",
+        "runtime_alias": "yAxisFormat",
+        "description": "Y Axis Format",
+        "data_type": "string",
+        "enum_source": "D3_FORMAT_OPTIONS",
+        "sample_data": "SMART_NUMBER",
+        "required": false,
+        "embedding": "否",
+        "default_value": "SMART_NUMBER"
+      },
+      {
+        "field_name": "logYAxis",
+        "description": "Logarithmic y-axis",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": "源码缺陷：controlPanel 默认值取到 undefined；transformProps 省略时仍按 false 合并",
+        "notes": "Bubble/constants.ts 中虽然存在 logYAxis=false，但 Bubble/controlPanel.tsx 实际拿的是不存在的 logAxis。"
+      },
+      {
+        "field_name": "truncateXAxis",
+        "description": "Truncate X Axis. Can be overridden by specifying a min or max bound. Only applicable for numerical X axis.",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false,
+        "notes": "虽然逻辑上属于 X 轴，但 Bubble/controlPanel.tsx 把它放在 Y Axis section。"
+      },
+      {
+        "field_name": "xAxisBounds",
+        "description": "Bounds for numerical X axis. Not applicable for temporal or categorical axes. When left empty, the bounds are dynamically defined based on the min/max of the data. Note that this feature will only expand the axis range. It won't narrow the data's extent.",
+        "data_type": "array[number | null]",
+        "sample_data": [
+          0,
+          5000
+        ],
+        "required": false,
+        "embedding": "否",
+        "default_value": [
+          null,
+          null
+        ],
+        "notes": "只有 truncateXAxis=true 时才显示。control name 本身就是 camelCase。"
+      },
+      {
+        "field_name": "truncateYAxis",
+        "description": "Truncate Y Axis. Can be overridden by specifying a min or max bound.",
+        "data_type": "boolean",
+        "enum_values": [
+          true,
+          false
+        ],
+        "sample_data": false,
+        "required": false,
+        "embedding": "否",
+        "default_value": false
+      },
+      {
+        "field_name": "y_axis_bounds",
+        "runtime_alias": "yAxisBounds",
+        "description": "Bounds for the Y-axis. When left empty, the bounds are dynamically defined based on the min/max of the data. Note that this feature will only expand the axis range. It won't narrow the data's extent.",
+        "data_type": "array[number | null]",
+        "sample_data": [
+          0,
+          100
+        ],
+        "required": false,
+        "embedding": "否",
+        "default_value": [
+          null,
+          null
+        ],
+        "notes": "只有 truncateYAxis=true 时才显示。注意它的 API 主键是 y_axis_bounds，不是 yAxisBounds。"
+      }
+    ]
+  }
+}

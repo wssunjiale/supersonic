@@ -1,0 +1,151 @@
+{
+  "spec_version": "0.1.0",
+  "generated_at": "2026-03-14T02:11:55+08:00",
+  "viz_type": "paired_ttest",
+  "display_name": "Paired t-test Table",
+  "normalized_summary": {
+    "category": "statistics",
+    "tags": [
+      "statistics",
+      "t-test",
+      "paired",
+      "significance"
+    ],
+    "key_fields_zh": [
+      {
+        "key": "metric1",
+        "required": true,
+        "description": "第一个样本指标，用于配对检验的基础样本。"
+      },
+      {
+        "key": "metric2",
+        "required": true,
+        "description": "第二个样本指标，用于与基础样本对比。"
+      },
+      {
+        "key": "groupby",
+        "required": true,
+        "description": "分组字段，用于定义配对的样本组。"
+      },
+      {
+        "key": "alpha",
+        "required": false,
+        "description": "显著性水平（默认0.05），用于判断统计显著性。"
+      },
+      {
+        "key": "show_p_value",
+        "required": false,
+        "description": "是否展示P值（true/false），控制统计检验结果的显示。"
+      },
+      {
+        "key": "show_confidence_interval",
+        "required": false,
+        "description": "是否展示置信区间（true/false），控制置信区间的显示。"
+      }
+    ],
+    "description_zh": "Paired T-Test Chart displays the results of a paired t-test statistical analysis, comparing means of two related samples (e.g., before/after treatment).",
+    "visual_shape_zh": "配对T检验图（统计分析型）",
+    "use_cases_zh": [
+      "配对样本均值对比（如实验前后、对照组vs实验组）",
+      "统计显著性分析",
+      "假设检验结果可视化"
+    ],
+    "field_category_names": [
+      "Query",
+      "Advanced analytics",
+      "Annotations & Layers",
+      "Predictive Analytics（Forecast）",
+      "Chart Options",
+      "Chart Title",
+      "图表专属",
+      "通用图表选项"
+    ]
+  },
+  "capability": {
+    "selection": true,
+    "chartBuild": true,
+    "embedding": true,
+    "datasetBinding": true
+  },
+  "maturity": {
+    "summary": "ready",
+    "controlSchema": "ready",
+    "chartFormData": "ready",
+    "embeddingFormData": "ready",
+    "datasetBinding": "heuristic_seed",
+    "examples": "derived"
+  },
+  "source_refs": {
+    "catalog": "viztype-online.json",
+    "schema_dir": "form-data-schema",
+    "viz_type": "paired_ttest",
+    "schema_files": {
+      "embedding-form-data": "form-data-schema/paired_ttest-embedding-form-data-schema.json",
+      "chart-form-data": "form-data-schema/paired_ttest-form-data-schema.json",
+      "control-schema": "form-data-schema/paired_ttest-schema.json"
+    }
+  },
+  "original_online_entry": {
+    "name": "Paired t-test Table",
+    "viztype": "paired_ttest",
+    "详细描述": "Paired T-Test Chart displays the results of a paired t-test statistical analysis, comparing means of two related samples (e.g., before/after treatment).",
+    "表现形态": "配对T检验图（统计分析型）",
+    "适用场景": [
+      "配对样本均值对比（如实验前后、对照组vs实验组）",
+      "统计显著性分析",
+      "假设检验结果可视化"
+    ],
+    "vizKey": "PairedTTest",
+    "pluginCategory": "Statistics",
+    "pluginTags": [],
+    "category": "statistics",
+    "tags": [
+      "statistics",
+      "t-test",
+      "paired",
+      "significance"
+    ],
+    "关键字段": [
+      {
+        "key": "metric1",
+        "required": true,
+        "description": "第一个样本指标，用于配对检验的基础样本。"
+      },
+      {
+        "key": "metric2",
+        "required": true,
+        "description": "第二个样本指标，用于与基础样本对比。"
+      },
+      {
+        "key": "groupby",
+        "required": true,
+        "description": "分组字段，用于定义配对的样本组。"
+      },
+      {
+        "key": "alpha",
+        "required": false,
+        "description": "显著性水平（默认0.05），用于判断统计显著性。"
+      },
+      {
+        "key": "show_p_value",
+        "required": false,
+        "description": "是否展示P值（true/false），控制统计检验结果的显示。"
+      },
+      {
+        "key": "show_confidence_interval",
+        "required": false,
+        "description": "是否展示置信区间（true/false），控制置信区间的显示。"
+      }
+    ],
+    "field_categories": {
+      "Query": [],
+      "Advanced analytics": [],
+      "Annotations & Layers": [],
+      "Predictive Analytics（Forecast）": [],
+      "Chart Options": [],
+      "Chart Title": [],
+      "图表专属": [],
+      "通用图表选项": []
+    }
+  }
+}

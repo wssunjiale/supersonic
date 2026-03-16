@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 #### Set below DB configs to connect to your own database
+# Comment out below exports to config your DB connection
 # Supported DB_TYPE:  h2, mysql, postgres
 export S2_DB_TYPE=postgres
 export S2_DB_HOST=10.0.12.252

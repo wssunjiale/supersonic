@@ -1,0 +1,220 @@
+{
+  "viz_type": "paired_ttest",
+  "display_name": "Paired t-test Table",
+  "purpose": "用于调用 API 创建或保存 Paired t-test Table 时填写的 form_data 模板",
+  "base_schema_file": "D:/vsx/metrics/supersonic/form-data-schema/paired_ttest-schema.json",
+  "source_files": [
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-paired-t-test/src/controlPanel.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-paired-t-test/src/index.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-paired-t-test/src/transformProps.js",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/plugins/legacy-plugin-chart-paired-t-test/src/TTestTable.jsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/sharedControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-chart-controls/src/shared-controls/dndControls.tsx",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/src/explore/controlUtils/getFormDataFromControls.ts",
+    "D:/vsx/sources/superset-6.0.0/superset-frontend/packages/superset-ui-core/src/chart/clients/ChartClient.ts",
+    "D:/vsx/sources/superset-6.0.0/superset/viz.py"
+  ],
+  "notes": [
+    "paired_ttest 是 legacy 图，前端请求路径是 `/superset/explore_json/`。",
+    "保存态 root form_data 必须使用 controlPanel 的原始 snake_case 字段名，例如 `significance_level`、`pvalue_precision`、`liftvalue_precision`。",
+    "该图没有显式时间控件，但后端 `PairedTTestViz.get_data()` 仍按 DTTM_ALIAS 做时序 pivot；当前模板只写出 controlPanel 明确暴露的字段，不额外猜测隐藏时间字段。",
+    "groupby 对当前图是高置信必填：controlPanel 加了 validateNonEmpty，前端 TTestTable.jsx 在 groups 为空时会直接抛错。"
+  ],
+  "naming_and_pipeline": {
+    "control_to_api_form_data": "getFormDataFromControls() 直接把 controls[name].value 写成 form_data[name]。",
+    "api_form_data_to_backend_request": "ChartClient.ts 在 useLegacyApi=true 时，会把 root form_data 直接包装成 `{ form_data }` POST 到 `/superset/explore_json/`。",
+    "backend_form_data_to_query_obj": "Paired t-test 通过 BaseViz.query_obj() + PairedTTestViz.query_obj() 构造查询，并在 PairedTTestViz.get_data() 阶段重组成统计表所需的数据结构。"
+  },
+  "global_required_fields": {
+    "datasource": {
+      "data_type": "string",
+      "required": true,
+      "sample_data": "<dataset_id>__table",
+      "source": "explore_json() + datasourceAndVizType hidden control"
+    },
+    "viz_type": {
+      "data_type": "string",
+      "required": true,
+      "fixed_value": "paired_ttest",
+      "source": "PairedTTestViz.viz_type + plugin metadata"
+    }
+  },
+  "global_optional_fields": {
+    "slice_id": {
+      "data_type": "integer",
+      "required": false,
+      "sample_data": 0,
+      "source": "datasourceAndVizType hidden control"
+    },
+    "cache_timeout": {
+      "data_type": "integer | null",
+      "required": false,
+      "sample_data": null,
+      "source": "datasourceAndVizType hidden control"
+    },
+    "url_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "QueryFormData"
+    },
+    "custom_params": {
+      "data_type": "object",
+      "required": false,
+      "sample_data": {},
+      "source": "QueryFormData"
+    }
+  },
+  "minimal_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "paired_ttest",
+    "metrics": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      }
+    ],
+    "adhoc_filters": [],
+    "groupby": [
+      "<group_dimension>"
+    ]
+  },
+  "recommended_form_data_template": {
+    "datasource": "<dataset_id>__table",
+    "viz_type": "paired_ttest",
+    "metrics": [
+      {
+        "expressionType": "SIMPLE",
+        "column": {
+          "column_name": "<metric_column>"
+        },
+        "aggregate": "SUM",
+        "label": "SUM(<metric_column>)"
+      }
+    ],
+    "adhoc_filters": [],
+    "groupby": [
+      "<group_dimension>"
+    ],
+    "limit": null,
+    "timeseries_limit_metric": null,
+    "order_desc": true,
+    "contribution": false,
+    "row_limit": 10000,
+    "significance_level": 0.05,
+    "pvalue_precision": 6,
+    "liftvalue_precision": 4
+  },
+  "conditional_blocks": {
+    "multi_metric": {
+      "condition": "需要同时对多个指标做配对 t 检验时",
+      "fields": {
+        "metrics": [
+          "<metric_a>",
+          "<metric_b>"
+        ]
+      },
+      "notes": "后端返回的数据会按 metric 名称分桶；前端 PairedTTest.jsx 会为每个 metric 渲染一张表。"
+    },
+    "filtered_population": {
+      "condition": "需要只在某些实验组 / 维度子集上计算时",
+      "fields": {
+        "adhoc_filters": [
+          {
+            "expressionType": "SIMPLE",
+            "clause": "WHERE",
+            "subject": "<group_dimension>",
+            "operator": "IN",
+            "comparator": [
+              "A",
+              "B"
+            ]
+          }
+        ]
+      }
+    },
+    "series_limit": {
+      "condition": "需要限制进入统计表的分组数量时",
+      "fields": {
+        "limit": 10,
+        "timeseries_limit_metric": "<metric_or_adhoc_metric>",
+        "order_desc": true
+      }
+    },
+    "contribution_mode": {
+      "condition": "需要先把每个时间桶标准化为占比再做展示时",
+      "fields": {
+        "contribution": true
+      }
+    },
+    "display_precision": {
+      "condition": "需要调整显著性阈值或显示精度时",
+      "fields": {
+        "significance_level": 0.05,
+        "pvalue_precision": 6,
+        "liftvalue_precision": 4
+      }
+    }
+  },
+  "runtime_only_or_non_template_fields": {
+    "runtime_aliases_generated_by_transformProps": [
+      {
+        "field_name": "significanceLevel",
+        "reason": "由 raw form_data.significance_level 派生的运行时别名，不是 API root 键。"
+      },
+      {
+        "field_name": "pvaluePrecision",
+        "reason": "由 raw form_data.pvalue_precision 派生的运行时别名，不是 API root 键。"
+      },
+      {
+        "field_name": "liftvaluePrecision",
+        "reason": "由 raw form_data.liftvalue_precision 派生的运行时别名，不是 API root 键。"
+      }
+    ],
+    "backend_response_only_fields": [
+      {
+        "field_name": "queriesData[0].data",
+        "reason": "PairedTTestViz.get_data() 返回的是按 metric 分组的统计序列结构，不是 root form_data 字段。"
+      }
+    ],
+    "legacy_request_wrapper": [
+      {
+        "field_name": "payload.form_data",
+        "reason": "这是 legacy `/superset/explore_json/` 请求外层包裹字段，不是图表保存态内部的 root form_data 字段。"
+      }
+    ]
+  },
+  "api_usage_guidance": {
+    "high_confidence_required_fields": [
+      "datasource",
+      "viz_type",
+      "metrics",
+      "groupby"
+    ],
+    "recommended_always_set": [
+      "adhoc_filters",
+      "order_desc",
+      "contribution",
+      "row_limit",
+      "significance_level",
+      "pvalue_precision",
+      "liftvalue_precision"
+    ],
+    "api_field_examples": [
+      "timeseries_limit_metric",
+      "significance_level",
+      "pvalue_precision",
+      "liftvalue_precision"
+    ],
+    "avoid_confusion": [
+      "不要把 `paired_ttest` 当成标准 chart data API 图表去套 `/api/v1/chart/data` 的 `query_context` 模板。",
+      "不要把运行时 camelCase 名称 `significanceLevel`、`pvaluePrecision`、`liftvaluePrecision` 写回 root form_data。",
+      "不要传空的 groupby；前端统计表组件会直接抛错。",
+      "不要误以为 order_desc 一定会生效；它只有和 timeseries_limit_metric 一起出现时，后端才会真正写入 orderby。"
+    ]
+  }
+}

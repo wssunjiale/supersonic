@@ -189,7 +189,7 @@ final class SupersetQueryContextTemplates {
             if (!groupby.isEmpty()) {
                 query.put("series_columns", groupby);
             }
-            if (xAxis == null && formData.get("granularity_sqla") != null) {
+            if (xAxis != null || formData.get("granularity_sqla") != null) {
                 query.putIfAbsent("is_timeseries", true);
             }
             applyTimeOffsets(query, formData);
