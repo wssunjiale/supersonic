@@ -15,6 +15,7 @@ export { request } from './services/request';
 import { BASE_TITLE } from '@/common/constants';
 import { ROUTE_AUTH_CODES } from '../config/routes';
 import AppPage from './pages/index';
+import { getChatChildrenWrapperStyle, getChatContentStyle } from './pages/ChatPage/layout';
 
 const replaceRoute = '/';
 
@@ -136,7 +137,9 @@ export const layout: RunTimeLayoutConfig = (params) => {
         </div>
       </Space>
     ),
-    contentStyle: { ...(initialState?.contentStyle || {}) },
+    contentStyle: isChatRoute
+      ? getChatContentStyle(initialState?.contentStyle || {})
+      : { ...(initialState?.contentStyle || {}) },
     rightContentRender: () => <RightContent />,
     disableContentMargin: true,
     // menuHeaderRender: undefined,
@@ -145,16 +148,7 @@ export const layout: RunTimeLayoutConfig = (params) => {
         <ConfigProvider theme={configProviderTheme}>
           <div
             style={
-              isChatRoute
-                ? {
-                    display: 'flex',
-                    flexDirection: 'column',
-                    minWidth: 0,
-                    minHeight: 'calc(100vh - 56px)',
-                    height: 'calc(100dvh - 56px)',
-                    overflow: 'hidden',
-                  }
-                : undefined
+              isChatRoute ? getChatChildrenWrapperStyle() : undefined
             }
           >
             {/* <AppPage dom={dom} /> */}

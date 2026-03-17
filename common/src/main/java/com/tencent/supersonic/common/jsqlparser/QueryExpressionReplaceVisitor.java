@@ -82,8 +82,7 @@ public class QueryExpressionReplaceVisitor extends ExpressionVisitorAdapter {
         String toReplace = "";
         if (expression instanceof Function) {
             Function function = (Function) expression;
-            if (Objects.nonNull(function.getParameters())
-                    && !function.getParameters().isEmpty()
+            if (Objects.nonNull(function.getParameters()) && !function.getParameters().isEmpty()
                     && function.getParameters().getExpressions().get(0) instanceof Column) {
                 toReplace = getReplaceExpr((Function) expression, fieldExprMap);
             }

@@ -1,0 +1,702 @@
+{
+  "project": "supersonic",
+  "generated_at": "2026-03-17",
+  "status_summary": {
+    "effective": 19,
+    "implemented": 3,
+    "obsolete": 1,
+    "uncategorized_sessions": 15
+  },
+  "sources": {
+    "human_indexes": [
+      "supersonic/pr/00-项目基线.md",
+      "supersonic/pr/01-当前有效需求索引.md",
+      "supersonic/pr/02-已实现需求索引.md",
+      "supersonic/pr/03-已过时需求索引.md",
+      "supersonic/pr/04-问题与修复索引.md",
+      "supersonic/pr/05-补充信息.md",
+      "supersonic/pr/06-需求关系图.md",
+      "supersonic/pr/说明.md"
+    ],
+    "structured_source": null
+  },
+  "requirements": [
+    {
+      "id": "需求-01",
+      "title": "将默认数据库切换为 PostgreSQL",
+      "project": "supersonic",
+      "status": {
+        "bucket": "current",
+        "timeliness": "有效",
+        "implementation": "已落地"
+      },
+      "source": {
+        "index": "supersonic/pr/01-当前有效需求索引.md",
+        "detail": "supersonic/pr/需求/将默认数据库切换为PostgreSQL.md",
+        "structured": null
+      },
+      "related_paths": [
+        "supersonic/pr/需求/将默认数据库切换为PostgreSQL.md"
+      ],
+      "acceptance": [
+        "默认配置已经指向 PostgreSQL。",
+        "应用能够基于 PostgreSQL 正常启动并访问核心接口。",
+        "不再依赖旧的默认数据库配置才能完成基本运行。"
+      ],
+      "summary": "将当前二开仓库默认使用的 S2 数据库替换为用户给定的 PostgreSQL 实例，并验证核心接口可用。",
+      "first_proposed": "2026-01-27",
+      "last_confirmed": "2026-01-27",
+      "phase": null,
+      "notes": "当前仓库默认数据库切到 PostgreSQL"
+    },
+    {
+      "id": "需求-02",
+      "title": "明确构建、测试与独立运行入口",
+      "project": "supersonic",
+      "status": {
+        "bucket": "current",
+        "timeliness": "有效",
+        "implementation": "进行中"
+      },
+      "source": {
+        "index": "supersonic/pr/01-当前有效需求索引.md",
+        "detail": "supersonic/pr/需求/明确构建测试与独立运行入口.md",
+        "structured": null
+      },
+      "related_paths": [
+        "supersonic/pr/需求/明确构建测试与独立运行入口.md"
+      ],
+      "acceptance": [
+        "能给出根目录可执行的构建与测试命令。",
+        "IDE 能定位并运行 `StandaloneLauncher`。",
+        "能指出独立运行时需要关注的配置文件、环境变量和 JDK 版本。"
+      ],
+      "summary": "明确 Supersonic 二开仓库的正确构建命令、测试入口、IDE 运行入口，以及独立运行时的关键配置位置。",
+      "first_proposed": "2026-02-03",
+      "last_confirmed": "2026-03-02",
+      "phase": null,
+      "notes": "明确根目录构建、JDK 21、IDE 入口与独立运行姿势"
+    },
+    {
+      "id": "需求-03",
+      "title": "新增 Superset 图表生成能力",
+      "project": "supersonic",
+      "status": {
+        "bucket": "current",
+        "timeliness": "有效",
+        "implementation": "进行中"
+      },
+      "source": {
+        "index": "supersonic/pr/01-当前有效需求索引.md",
+        "detail": "supersonic/pr/需求/新增Superset图表生成能力.md",
+        "structured": null
+      },
+      "related_paths": [
+        "supersonic/pr/需求/新增Superset图表生成能力.md"
+      ],
+      "acceptance": [
+        "Superset 可用时，聊天链路能够优先走 Superset 图表生成。",
+        "Superset 不可用、报错或超时时，能自动回退到 ECharts。",
+        "接入方式能够继续扩展到更多 Superset 图表类型，而不是被写死在少数图表上。"
+      ],
+      "summary": "在保留现有 ECharts 能力的前提下，把 Superset 作为新增图表生成器接入聊天链路，并尽量使用完整的 Superset 图表生态。",
+      "first_proposed": "2026-01-22",
+      "last_confirmed": "2026-01-22",
+      "phase": null,
+      "notes": "在保留 ECharts 的前提下接入 Superset 图表能力"
+    },
+    {
+      "id": "需求-04",
+      "title": "建立 Superset 双认证连接策略",
+      "project": "supersonic",
+      "status": {
+        "bucket": "current",
+        "timeliness": "有效",
+        "implementation": "进行中"
+      },
+      "source": {
+        "index": "supersonic/pr/01-当前有效需求索引.md",
+        "detail": "supersonic/pr/需求/建立Superset双认证连接策略.md",
+        "structured": null
+      },
+      "related_paths": [
+        "supersonic/pr/需求/建立Superset双认证连接策略.md"
+      ],
+      "acceptance": [
+        "JWT 与 API Key 都可以配置。",
+        "首选认证失败时，系统会自动进入回退路径。",
+        "消息体内嵌与测试页嵌入都能基于正确认证稳定访问 Superset。"
+      ],
+      "summary": "Superset 接入同时支持 JWT 和 API Key 两条认证路径，并能按配置决定优先级，在首选路径失败时自动回退。",
+      "first_proposed": "2026-01-27",
+      "last_confirmed": "2026-02-04",
+      "phase": null,
+      "notes": "JWT 与 API Key 需要可配置优先级与失败回退"
+    },
+    {
+      "id": "需求-05",
+      "title": "完善嵌入式图表展示与交互",
+      "project": "supersonic",
+      "status": {
+        "bucket": "current",
+        "timeliness": "有效",
+        "implementation": "进行中"
+      },
+      "source": {
+        "index": "supersonic/pr/01-当前有效需求索引.md",
+        "detail": "supersonic/pr/需求/完善嵌入式图表展示与交互.md",
+        "structured": null
+      },
+      "related_paths": [
+        "supersonic/pr/需求/完善嵌入式图表展示与交互.md"
+      ],
+      "acceptance": [
+        "测试页可以自动获取 token 和嵌入所需信息。",
+        "消息体内能稳定显示嵌入内容，而不是只在测试页成功。",
+        "嵌入区域尺寸、自适应和基础交互体验符合真实聊天场景。"
+      ],
+      "summary": "修复 Superset dashboard / chart 在测试页和聊天消息中的嵌入展示问题，包括自动获取嵌入信息、尺寸、自适应和基础交互体验。",
+      "first_proposed": "2026-02-02",
+      "last_confirmed": "2026-02-07",
+      "phase": null,
+      "notes": "测试页和消息体中的嵌入体验、自适应与交互细节"
+    },
+    {
+      "id": "需求-06",
+      "title": "保证消息管理页面可用",
+      "project": "supersonic",
+      "status": {
+        "bucket": "current",
+        "timeliness": "有效",
+        "implementation": "已落地"
+      },
+      "source": {
+        "index": "supersonic/pr/01-当前有效需求索引.md",
+        "detail": "supersonic/pr/需求/保证消息管理页面可用.md",
+        "structured": null
+      },
+      "related_paths": [
+        "supersonic/pr/需求/保证消息管理页面可用.md"
+      ],
+      "acceptance": [
+        "后端已返回的数据能够在前端页面正确显示。",
+        "列表、详情和删除操作可用。",
+        "被删除的消息不再继续显示在页面中。"
+      ],
+      "summary": "修复“消息管理”页面已有后端数据但前端不显示的问题，并保证该页面能承担消息列表、详情和删除管理。",
+      "first_proposed": "2026-02-02",
+      "last_confirmed": "2026-02-02",
+      "phase": null,
+      "notes": "现有页面有后端数据但前端不显示"
+    },
+    {
+      "id": "需求-07",
+      "title": "将推送入口改为推送到看板",
+      "project": "supersonic",
+      "status": {
+        "bucket": "current",
+        "timeliness": "有效",
+        "implementation": "进行中"
+      },
+      "source": {
+        "index": "supersonic/pr/01-当前有效需求索引.md",
+        "detail": "supersonic/pr/需求/将推送入口改为推送到看板.md",
+        "structured": null
+      },
+      "related_paths": [
+        "supersonic/pr/需求/将推送入口改为推送到看板.md"
+      ],
+      "acceptance": [
+        "聊天消息中的入口文案已经改成“推送到看板”。",
+        "可选目标列表只包含人工维护的看板。",
+        "自动生成的单图临时看板不会混入目标列表。",
+        "无可选目标时，页面会明确提示。"
+      ],
+      "summary": "将聊天消息中的“推送到 Dashboard”统一改为“推送到看板”，并让目标列表只显示真正可推送的人工看板。",
+      "first_proposed": "2026-01-31",
+      "last_confirmed": "2026-02-09",
+      "phase": null,
+      "notes": "改名并过滤自动生成的单图临时看板"
+    },
+    {
+      "id": "需求-08",
+      "title": "完善图表类型选择与 form_data 生成规则",
+      "project": "supersonic",
+      "status": {
+        "bucket": "current",
+        "timeliness": "有效",
+        "implementation": "进行中"
+      },
+      "source": {
+        "index": "supersonic/pr/01-当前有效需求索引.md",
+        "detail": "supersonic/pr/需求/完善图表类型选择与form_data生成规则.md",
+        "structured": null
+      },
+      "related_paths": [
+        "supersonic/pr/需求/完善图表类型选择与form_data生成规则.md"
+      ],
+      "acceptance": [
+        "常见图表类型能够基于明确规则生成可用的 `form_data`。",
+        "`form_data` 中引用的字段与 dataset 列保持一致。",
+        "资产文件能解释每种 viztype 的关键字段、适用条件和失败边界。",
+        "能明确列出当前资产哪些足够、哪些仍不足。"
+      ],
+      "summary": "围绕 `SupersetVizTypeSelector`、`viztype-online.json`、`form-data-schema` 与 chart `form_data` 生成逻辑，建立一套可解释、可维护的选图与参数规则。",
+      "first_proposed": "2026-02-02",
+      "last_confirmed": "2026-03-11",
+      "phase": null,
+      "notes": "人工核定 `viztype-online.json` 与 `form-data-schema` 是否足够可用"
+    },
+    {
+      "id": "需求-09",
+      "title": "新增 Superset 数据集管理能力",
+      "project": "supersonic",
+      "status": {
+        "bucket": "current",
+        "timeliness": "有效",
+        "implementation": "进行中"
+      },
+      "source": {
+        "index": "supersonic/pr/01-当前有效需求索引.md",
+        "detail": "supersonic/pr/需求/新增Superset数据集管理能力.md",
+        "structured": null
+      },
+      "related_paths": [
+        "supersonic/pr/需求/新增Superset数据集管理能力.md"
+      ],
+      "acceptance": [
+        "管理页面已从语义数据集页中独立出来。",
+        "管理页面仅管理员可见。",
+        "页面能查看、查询和删除本地保存的 Superset 数据集定义。",
+        "页面行为与“同步治理链路”分工清晰。"
+      ],
+      "summary": "新增一个独立的 Superset 数据集管理页面，用于管理本地保存的 Superset 数据集定义，而不是继续把相关操作混在语义数据集页面里。",
+      "first_proposed": "2026-02-06",
+      "last_confirmed": "2026-02-06",
+      "phase": null,
+      "notes": "独立管理本地保存的 Superset 数据集定义"
+    },
+    {
+      "id": "需求-10",
+      "title": "新增 Superset 看板管理能力",
+      "project": "supersonic",
+      "status": {
+        "bucket": "current",
+        "timeliness": "有效",
+        "implementation": "进行中"
+      },
+      "source": {
+        "index": "supersonic/pr/01-当前有效需求索引.md",
+        "detail": "supersonic/pr/需求/新增Superset看板管理能力.md",
+        "structured": null
+      },
+      "related_paths": [
+        "supersonic/pr/需求/新增Superset看板管理能力.md"
+      ],
+      "acceptance": [
+        "顶级管理页可以列出手工看板。",
+        "新建、查看、删除、编辑链路都能打通到 Superset。",
+        "自动生成的单图临时看板不会出现在该页面的列表中。",
+        "权限边界清晰：管理员看全量，普通用户看自己的。"
+      ],
+      "summary": "新增一个顶级 Superset 看板管理页面，用于管理手工创建的看板，而不是聊天链路自动生成的单图临时看板。",
+      "first_proposed": "2026-02-10",
+      "last_confirmed": "2026-02-10",
+      "phase": null,
+      "notes": "顶级看板管理页，只管理手工看板"
+    },
+    {
+      "id": "需求-12",
+      "title": "按查询结果固化为 Superset 数据集",
+      "project": "supersonic",
+      "status": {
+        "bucket": "current",
+        "timeliness": "有效",
+        "implementation": "进行中"
+      },
+      "source": {
+        "index": "supersonic/pr/01-当前有效需求索引.md",
+        "detail": "supersonic/pr/需求/按查询结果固化为Superset数据集.md",
+        "structured": null
+      },
+      "related_paths": [
+        "supersonic/pr/需求/按查询结果固化为Superset数据集.md"
+      ],
+      "acceptance": [
+        "语义模型不再被直接等同为 Superset dataset。",
+        "dataset 的固化对象变成“最终 SQL + 最终输出列 + 查询组合”。",
+        "dataset 具备命名、说明、tag 和复用策略。",
+        "不同查询如可复用已有 dataset，不会重复创建。"
+      ],
+      "summary": "不再把 Supersonic 语义模型直接同步成 Superset dataset，而是把“一次查询生成的最终 SQL 与最终输出列”固化为 Superset dataset，并由 Supersonic 负责命名、说明、tag 与复用治理。",
+      "first_proposed": "2026-02-05",
+      "last_confirmed": "2026-03-05",
+      "phase": null,
+      "notes": "用“最终 SQL / 最终输出列”而不是“语义模型”理解 Superset 数据集"
+    },
+    {
+      "id": "需求-13",
+      "title": "建立 Superset 语义同步链路与离线验收运行器",
+      "project": "supersonic",
+      "status": {
+        "bucket": "current",
+        "timeliness": "有效",
+        "implementation": "进行中"
+      },
+      "source": {
+        "index": "supersonic/pr/01-当前有效需求索引.md",
+        "detail": "supersonic/pr/需求/建立Superset语义同步链路与离线验收runner.md",
+        "structured": null
+      },
+      "related_paths": [
+        "supersonic/pr/需求/建立Superset语义同步链路与离线验收runner.md"
+      ],
+      "acceptance": [
+        "错误 SQL 会在同步前被拦住。",
+        "同步失败有明确原因，并能区分是否自动重试。",
+        "管理页能手动触发同步并看到最近一次失败原因。",
+        "能说明同步入口、运行器入口和所需配置。"
+      ],
+      "summary": "建立一条可治理的 Superset 同步链路，包括数据集注册表、同步入口、失败重试、失败原因管理、手动同步入口，以及脱离完整 Web 启动的离线验收运行器。",
+      "first_proposed": "2026-03-05",
+      "last_confirmed": "2026-03-06",
+      "phase": null,
+      "notes": "同步治理、失败重试、手动同步、runner 与兼容问题归档"
+    },
+    {
+      "id": "需求-14",
+      "title": "梳理大模型选择与助手内部流程",
+      "project": "supersonic",
+      "status": {
+        "bucket": "current",
+        "timeliness": "有效",
+        "implementation": "已落地"
+      },
+      "source": {
+        "index": "supersonic/pr/01-当前有效需求索引.md",
+        "detail": "supersonic/pr/需求/梳理大模型选择与助手内部流程.md",
+        "structured": null
+      },
+      "related_paths": [
+        "supersonic/pr/需求/梳理大模型选择与助手内部流程.md"
+      ],
+      "acceptance": [
+        "能明确多模型配置下的选择逻辑。",
+        "能列出各助手链路中真正使用 LLM 的环节。",
+        "形成可复用的内部流程认知，而不是零散回答。"
+      ],
+      "summary": "梳理当前系统在“配置了多个大模型时怎么选模型”，以及各种智能助手内部流程中哪些步骤真正调用了大模型。",
+      "first_proposed": "2026-01-27",
+      "last_confirmed": "2026-01-27",
+      "phase": null,
+      "notes": "澄清多模型选择逻辑与各助手使用 LLM 的步骤"
+    },
+    {
+      "id": "需求-15",
+      "title": "重构 Text2SQL 的 Schema Mapping 与 few-shot 策略",
+      "project": "supersonic",
+      "status": {
+        "bucket": "current",
+        "timeliness": "有效",
+        "implementation": "进行中"
+      },
+      "source": {
+        "index": "supersonic/pr/01-当前有效需求索引.md",
+        "detail": "supersonic/pr/需求/重构Text2SQL的SchemaMapping与few-shot策略.md",
+        "structured": null
+      },
+      "related_paths": [
+        "supersonic/pr/需求/重构Text2SQL的SchemaMapping与few-shot策略.md"
+      ],
+      "acceptance": [
+        "候选字段更偏向用户真正需要的可读字段，而不是技术字段。",
+        "字段别名、展示名和物理列名在生成 SQL 时不再混乱。",
+        "few-shot exemplar 相关边界 bug 被修正。",
+        "错误 SQL 不再因为二次改写或错误聚合而进一步恶化。"
+      ],
+      "summary": "修正 Schema Mapping、字段候选暴露、few-shot exemplar 和相关 SQL 改写逻辑，避免 LLM 被技术字段名、错误别名和固定 SQL 模式误导。",
+      "first_proposed": "2026-03-01",
+      "last_confirmed": "2026-03-06",
+      "phase": null,
+      "notes": "避免字段候选过度技术化、few-shot 误导或越界"
+    },
+    {
+      "id": "需求-16",
+      "title": "梳理模型关联、字段命名与下钻语义规则",
+      "project": "supersonic",
+      "status": {
+        "bucket": "current",
+        "timeliness": "有效",
+        "implementation": "进行中"
+      },
+      "source": {
+        "index": "supersonic/pr/01-当前有效需求索引.md",
+        "detail": "supersonic/pr/需求/梳理模型关联字段命名与下钻语义规则.md",
+        "structured": null
+      },
+      "related_paths": [
+        "supersonic/pr/需求/梳理模型关联字段命名与下钻语义规则.md"
+      ],
+      "acceptance": [
+        "能说明模型间关系和默认 schema 的实际规则。",
+        "能解释下钻 / 上钻在当前链路里是如何设计和触发的。",
+        "字段命名层次更加清晰，不再反复混淆展示名、业务名和物理列名。"
+      ],
+      "summary": "围绕语义模型之间的关联、schema 默认规则、字段命名差异，以及维度下钻 / 上钻的实现语义，统一形成稳定认知。",
+      "first_proposed": "2026-02-28",
+      "last_confirmed": "2026-03-05",
+      "phase": null,
+      "notes": "统一模型关系、schema、字段命名和下钻认知"
+    },
+    {
+      "id": "需求-17",
+      "title": "提升语义查询链路稳定性",
+      "project": "supersonic",
+      "status": {
+        "bucket": "current",
+        "timeliness": "有效",
+        "implementation": "进行中"
+      },
+      "source": {
+        "index": "supersonic/pr/01-当前有效需求索引.md",
+        "detail": "supersonic/pr/需求/提升语义查询链路稳定性.md",
+        "structured": null
+      },
+      "related_paths": [
+        "supersonic/pr/需求/提升语义查询链路稳定性.md"
+      ],
+      "acceptance": [
+        "`parseInfo`、维度响应等关键对象缺失时，不再直接空指针。",
+        "特殊字段名、脏数据和错误请求体不会直接打爆主链路。",
+        "CLI 专用 Bean 不会误注入到 Web 服务里。",
+        "出错时能给出可解释的失败原因。"
+      ],
+      "summary": "修复语义查询链路中的空指针、脏数据、字段名解析失败、请求体反序列化失败，以及 CLI / Web Bean 串用等稳定性问题。",
+      "first_proposed": "2026-02-26",
+      "last_confirmed": "2026-03-10",
+      "phase": null,
+      "notes": "聚焦空指针、脏数据、字段名解析与 CLI Bean 串用"
+    },
+    {
+      "id": "需求-18",
+      "title": "改善查询空结果时的回答质量",
+      "project": "supersonic",
+      "status": {
+        "bucket": "current",
+        "timeliness": "有效",
+        "implementation": "未判定"
+      },
+      "source": {
+        "index": "supersonic/pr/01-当前有效需求索引.md",
+        "detail": "supersonic/pr/需求/改善查询空结果时的回答质量.md",
+        "structured": null
+      },
+      "related_paths": [
+        "supersonic/pr/需求/改善查询空结果时的回答质量.md"
+      ],
+      "acceptance": [
+        "空结果时不再输出占位符和伪造数据。",
+        "回答能明确说明“当前没有查到满足条件的数据”。",
+        "在不臆造数据的前提下，给出合理的解释或下一步建议。"
+      ],
+      "summary": "当查询结果为空时，不再输出带占位符、伪数据或模板残片的“假总结”，而是输出合理、诚实、可解释的空结果回答。",
+      "first_proposed": "2026-03-06",
+      "last_confirmed": "2026-03-06",
+      "phase": null,
+      "notes": "空结果不能输出带占位符的假总结"
+    },
+    {
+      "id": "需求-19",
+      "title": "定义语义层 JSON 映射与导入导出规范",
+      "project": "supersonic",
+      "status": {
+        "bucket": "current",
+        "timeliness": "有效",
+        "implementation": "未判定"
+      },
+      "source": {
+        "index": "supersonic/pr/01-当前有效需求索引.md",
+        "detail": "supersonic/pr/需求/定义语义层JSON映射与导入导出规范.md",
+        "structured": null
+      },
+      "related_paths": [
+        "supersonic/pr/需求/定义语义层JSON映射与导入导出规范.md"
+      ],
+      "acceptance": [
+        "JSON 格式覆盖语义层关键实体，且字段粒度控制在“业务必要字段”。",
+        "导入导出使用同一套格式。",
+        "合并规则明确为“按 `name` 匹配、导入覆盖”。",
+        "错误处理策略明确为“整体失败退出，不静默吞错”。"
+      ],
+      "summary": "设计一套“指标体系设计文档 -> JSON -> Supersonic Headless BI API”的语义层交换格式，同时支持从系统现有语义层反向导出同样格式的 JSON。",
+      "first_proposed": "2026-02-10",
+      "last_confirmed": "2026-02-10",
+      "phase": null,
+      "notes": "设计文档与 Headless 语义层之间的结构化交换格式"
+    },
+    {
+      "id": "需求-20",
+      "title": "调整前端品牌展示为 DSI Agentic BI 系统",
+      "project": "supersonic",
+      "status": {
+        "bucket": "current",
+        "timeliness": "有效",
+        "implementation": "未判定"
+      },
+      "source": {
+        "index": "supersonic/pr/01-当前有效需求索引.md",
+        "detail": "supersonic/pr/需求/调整前端品牌展示为DSIAgenticBI系统.md",
+        "structured": null
+      },
+      "related_paths": [
+        "supersonic/pr/需求/调整前端品牌展示为DSIAgenticBI系统.md"
+      ],
+      "acceptance": [
+        "前端展示层中原本对外暴露的 `Supersonic` 文案已替换为“DSI Agentic BI 系统”。",
+        "修改范围没有误伤到后端内部实现标识。"
+      ],
+      "summary": "将前端展示层中的 `Supersonic` 品牌文案统一调整为“DSI Agentic BI 系统”，但不扩展到后端内部命名和代码标识。",
+      "first_proposed": "2026-02-21",
+      "last_confirmed": "2026-02-21",
+      "phase": null,
+      "notes": "只改前端展示层，不改后端内部标识"
+    },
+    {
+      "id": "需求-21",
+      "title": "基于 Headless 数据集同步链路重构聊天绘图与 Superset 嵌入方案",
+      "project": "supersonic",
+      "status": {
+        "bucket": "current",
+        "timeliness": "有效",
+        "implementation": "进行中"
+      },
+      "source": {
+        "index": "supersonic/pr/01-当前有效需求索引.md",
+        "detail": "supersonic/pr/需求/基于headlessdataset同步链路重构聊天绘图与Superset嵌入方案.md",
+        "structured": null
+      },
+      "related_paths": [
+        "supersonic/pr/需求/基于headlessdataset同步链路重构聊天绘图与Superset嵌入方案.md"
+      ],
+      "acceptance": [
+        "能说明一条以 Headless 已同步 dataset 为底座的完整聊天绘图时序。",
+        "后端仍能为消息体生成可嵌入的 dashboard。",
+        "图表类型选择与参数配置仍然存在，并与新主路径兼容。",
+        "能说清 `viztype-online.json` / `form-data-schema` 哪些可以直接复用、哪些还需补造。"
+      ],
+      "summary": "以 Headless 已同步的数据集为唯一正确数据底座，重构聊天绘图链路、chart 创建链路和 Superset 嵌入方案；聊天结果仍由后端生成可嵌入 dashboard，前端只负责展示和交互。",
+      "first_proposed": "2026-03-11",
+      "last_confirmed": "2026-03-11",
+      "phase": null,
+      "notes": "以 Headless 已同步数据集作为聊天绘图唯一数据底座"
+    },
+    {
+      "id": "需求-01",
+      "title": "将默认数据库切换为 PostgreSQL",
+      "project": "supersonic",
+      "status": {
+        "bucket": "implemented",
+        "timeliness": "有效",
+        "implementation": "已落地"
+      },
+      "source": {
+        "index": "supersonic/pr/02-已实现需求索引.md",
+        "detail": "supersonic/pr/需求/将默认数据库切换为PostgreSQL.md",
+        "structured": null
+      },
+      "related_paths": [
+        "supersonic/pr/需求/将默认数据库切换为PostgreSQL.md"
+      ],
+      "acceptance": [
+        "默认配置已经指向 PostgreSQL。",
+        "应用能够基于 PostgreSQL 正常启动并访问核心接口。",
+        "不再依赖旧的默认数据库配置才能完成基本运行。"
+      ],
+      "summary": "将当前二开仓库默认使用的 S2 数据库替换为用户给定的 PostgreSQL 实例，并验证核心接口可用。",
+      "first_proposed": "2026-01-27",
+      "last_confirmed": "2026-01-27",
+      "phase": null,
+      "notes": null
+    },
+    {
+      "id": "需求-06",
+      "title": "保证消息管理页面可用",
+      "project": "supersonic",
+      "status": {
+        "bucket": "implemented",
+        "timeliness": "有效",
+        "implementation": "已落地"
+      },
+      "source": {
+        "index": "supersonic/pr/02-已实现需求索引.md",
+        "detail": "supersonic/pr/需求/保证消息管理页面可用.md",
+        "structured": null
+      },
+      "related_paths": [
+        "supersonic/pr/需求/保证消息管理页面可用.md"
+      ],
+      "acceptance": [
+        "后端已返回的数据能够在前端页面正确显示。",
+        "列表、详情和删除操作可用。",
+        "被删除的消息不再继续显示在页面中。"
+      ],
+      "summary": "修复“消息管理”页面已有后端数据但前端不显示的问题，并保证该页面能承担消息列表、详情和删除管理。",
+      "first_proposed": "2026-02-02",
+      "last_confirmed": "2026-02-02",
+      "phase": null,
+      "notes": null
+    },
+    {
+      "id": "需求-14",
+      "title": "梳理大模型选择与助手内部流程",
+      "project": "supersonic",
+      "status": {
+        "bucket": "implemented",
+        "timeliness": "有效",
+        "implementation": "已落地"
+      },
+      "source": {
+        "index": "supersonic/pr/02-已实现需求索引.md",
+        "detail": "supersonic/pr/需求/梳理大模型选择与助手内部流程.md",
+        "structured": null
+      },
+      "related_paths": [
+        "supersonic/pr/需求/梳理大模型选择与助手内部流程.md"
+      ],
+      "acceptance": [
+        "能明确多模型配置下的选择逻辑。",
+        "能列出各助手链路中真正使用 LLM 的环节。",
+        "形成可复用的内部流程认知，而不是零散回答。"
+      ],
+      "summary": "梳理当前系统在“配置了多个大模型时怎么选模型”，以及各种智能助手内部流程中哪些步骤真正调用了大模型。",
+      "first_proposed": "2026-01-27",
+      "last_confirmed": "2026-01-27",
+      "phase": null,
+      "notes": null
+    },
+    {
+      "id": "需求-11",
+      "title": "将语义模型直接同步为 Superset 数据集",
+      "project": "supersonic",
+      "status": {
+        "bucket": "obsolete",
+        "timeliness": "已过时",
+        "implementation": "已过时"
+      },
+      "source": {
+        "index": "supersonic/pr/03-已过时需求索引.md",
+        "detail": "supersonic/pr/需求/将语义模型直接同步为Superset数据集.md",
+        "structured": null
+      },
+      "related_paths": [
+        "supersonic/pr/需求/将语义模型直接同步为Superset数据集.md"
+      ],
+      "acceptance": [],
+      "summary": null,
+      "first_proposed": "2026-02-05",
+      "last_confirmed": "2026-02-05",
+      "phase": null,
+      "notes": "同一轮认知澄清里，用户已经从“语义模型直接映射 dataset”切换到“按查询结果 / 最终 SQL 固化 dataset”"
+    }
+  ]
+}

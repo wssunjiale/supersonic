@@ -45,13 +45,20 @@ import dev.langchain4j.model.input.PromptTemplate;
 import dev.langchain4j.model.output.Response;
 import dev.langchain4j.provider.ModelProvider;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.select.SelectItem;
+import net.sf.jsqlparser.statement.select.SetOperationList;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -64,6 +71,8 @@ public class SupersetChartProcessor implements ExecuteResultProcessor {
     public static final String QUERY_MODE = "SUPERSET";
     private static final int DEFAULT_SINGLE_CHART_HEIGHT = 260;
     private static final int LINE_CHART_HEIGHT = 300;
+    private static final String DEFAULT_CHART_ZH_NAME = "图表";
+    private static final Map<String, String> SUPERSET_VIZTYPE_ZH_LABELS = new HashMap<>();
     private static final String FORMDATA_LLM_PROMPT = ""
             + "#Role: You are a Superset formData key fields generator.\n"
             + "#Task: Given viz_type and dataset metadata, generate key fields for formData.\n"
@@ -78,6 +87,46 @@ public class SupersetChartProcessor implements ExecuteResultProcessor {
             + "#UserInstruction: {{instruction}}\n" + "#VizType: {{viz_type}}\n"
             + "#RequiredKeys: {{required_keys}}\n" + "#Columns: {{columns}}\n"
             + "#MetricsCandidates: {{metrics}}\n" + "#Response:";
+
+    static {
+        SUPERSET_VIZTYPE_ZH_LABELS.put("big_number", "指标卡");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("big_number_total", "累计指标卡");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("box_plot", "箱线图");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("bubble", "气泡图");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("bubble_v2", "气泡图");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("bullet", "子弹图");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("cal_heatmap", "日历热力图");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("chord", "弦图");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("compare", "百分比变化图");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("echarts_area", "面积图");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("echarts_timeseries", "时间序列图");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("echarts_timeseries_bar", "柱状图");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("echarts_timeseries_line", "折线图");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("echarts_timeseries_scatter", "散点图");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("echarts_timeseries_smooth", "平滑折线图");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("echarts_timeseries_step", "阶梯折线图");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("funnel", "漏斗图");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("gantt_chart", "甘特图");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("gauge_chart", "仪表盘");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("graph_chart", "关系图");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("heatmap_v2", "热力图");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("histogram_v2", "直方图");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("horizon", "地平线图");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("mapbox", "地图");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("mixed_timeseries", "混合时序图");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("para", "平行坐标图");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("pie", "饼图");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("pivot_table_v2", "透视表");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("radar", "雷达图");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("sankey_v2", "桑基图");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("sunburst_v2", "旭日图");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("table", "数据表");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("time_pivot", "时间透视表");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("time_table", "时间表");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("treemap_v2", "矩形树图");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("waterfall", "瀑布图");
+        SUPERSET_VIZTYPE_ZH_LABELS.put("word_cloud", "词云图");
+    }
 
     @Override
     public boolean accept(ExecuteContext executeContext) {
@@ -267,7 +316,7 @@ public class SupersetChartProcessor implements ExecuteResultProcessor {
         }
         SemanticParseInfo parseInfo = executeContext.getParseInfo();
         SupersetDatasetInfo persistentDataset =
-                resolvePersistentSupersetDataset(parseInfo, queryResult, syncService);
+                resolvePersistentSupersetDataset(parseInfo, queryResult, sql, syncService);
         if (persistentDataset != null) {
             return persistentDataset;
         }
@@ -305,7 +354,7 @@ public class SupersetChartProcessor implements ExecuteResultProcessor {
     }
 
     private SupersetDatasetInfo resolvePersistentSupersetDataset(SemanticParseInfo parseInfo,
-            QueryResult queryResult, SupersetSyncService syncService) {
+            QueryResult queryResult, String sql, SupersetSyncService syncService) {
         if (parseInfo == null || parseInfo.getDataSetId() == null || syncService == null) {
             return null;
         }
@@ -329,7 +378,7 @@ public class SupersetChartProcessor implements ExecuteResultProcessor {
                 continue;
             }
             List<String> missingFields =
-                    resolveMissingPersistentFields(parseInfo, queryResult, datasetInfo);
+                    resolveMissingPersistentFields(parseInfo, queryResult, datasetInfo, sql);
             if (missingFields.isEmpty()) {
                 log.debug(
                         "superset persistent dataset hit, dataSetId={}, registryId={}, sourceType={}, datasetType={}, supersetDatasetId={}",
@@ -372,7 +421,7 @@ public class SupersetChartProcessor implements ExecuteResultProcessor {
     }
 
     private List<String> resolveMissingPersistentFields(SemanticParseInfo parseInfo,
-            QueryResult queryResult, SupersetDatasetInfo datasetInfo) {
+            QueryResult queryResult, SupersetDatasetInfo datasetInfo, String sql) {
         if (datasetInfo == null) {
             return Collections.singletonList("datasetInfo");
         }
@@ -425,8 +474,142 @@ public class SupersetChartProcessor implements ExecuteResultProcessor {
                 missing.add(name);
             }
         }
+        missing.addAll(resolveIncompatiblePersistentMetricFields(parseInfo, datasetInfo, sql));
         return missing.stream().filter(StringUtils::isNotBlank).distinct()
                 .collect(Collectors.toList());
+    }
+
+    private List<String> resolveIncompatiblePersistentMetricFields(SemanticParseInfo parseInfo,
+            SupersetDatasetInfo datasetInfo, String sql) {
+        if (parseInfo == null || CollectionUtils.isEmpty(parseInfo.getMetrics())
+                || datasetInfo == null || CollectionUtils.isEmpty(datasetInfo.getMetrics())
+                || StringUtils.isBlank(sql)) {
+            return Collections.emptyList();
+        }
+        Map<String, Set<String>> queryMetricSources = resolveQueryMetricSources(parseInfo, sql);
+        Map<String, SupersetDatasetMetric> metricMap = toMetricMap(datasetInfo.getMetrics());
+        List<String> incompatible = new ArrayList<>();
+        for (SchemaElement metric : parseInfo.getMetrics()) {
+            String name = resolveSchemaElementName(metric);
+            if (StringUtils.isBlank(name)) {
+                continue;
+            }
+            SupersetDatasetMetric persistentMetric = metricMap.get(normalizeName(name));
+            if (persistentMetric == null) {
+                continue;
+            }
+            Set<String> requiredSources =
+                    resolveExpressionSourceFields(persistentMetric.getExpression());
+            if (requiredSources.isEmpty()) {
+                continue;
+            }
+            Set<String> querySources = queryMetricSources.get(normalizeName(name));
+            if (CollectionUtils.isEmpty(querySources) || !querySources.containsAll(requiredSources)) {
+                incompatible.add(name);
+            }
+        }
+        return incompatible;
+    }
+
+    private Map<String, Set<String>> resolveQueryMetricSources(SemanticParseInfo parseInfo,
+            String sql) {
+        if (parseInfo == null || CollectionUtils.isEmpty(parseInfo.getMetrics())
+                || StringUtils.isBlank(sql)) {
+            return Collections.emptyMap();
+        }
+        List<SelectItem<?>> selectItems = resolveTopLevelSelectItems(sql);
+        if (CollectionUtils.isEmpty(selectItems)) {
+            return Collections.emptyMap();
+        }
+        Map<String, Set<String>> metricSources = new HashMap<>();
+        for (SchemaElement metric : parseInfo.getMetrics()) {
+            String metricName = resolveSchemaElementName(metric);
+            if (StringUtils.isBlank(metricName)) {
+                continue;
+            }
+            String normalizedMetric = normalizeName(metricName);
+            for (SelectItem<?> selectItem : selectItems) {
+                if (selectItem == null || selectItem.getExpression() == null) {
+                    continue;
+                }
+                String outputName = resolveSelectOutputName(selectItem);
+                Set<String> sourceFields =
+                        resolveExpressionSourceFields(selectItem.getExpression());
+                if (!normalizedMetric.equals(normalizeName(outputName))
+                        && !sourceFields.contains(normalizedMetric)) {
+                    continue;
+                }
+                metricSources.put(normalizedMetric, sourceFields);
+                break;
+            }
+        }
+        return metricSources;
+    }
+
+    private List<SelectItem<?>> resolveTopLevelSelectItems(String sql) {
+        if (StringUtils.isBlank(sql)) {
+            return Collections.emptyList();
+        }
+        try {
+            Select select = SqlSelectHelper.getSelect(sql);
+            if (select instanceof PlainSelect) {
+                return ((PlainSelect) select).getSelectItems();
+            }
+            if (select instanceof SetOperationList) {
+                List<Select> selects = ((SetOperationList) select).getSelects();
+                if (!CollectionUtils.isEmpty(selects) && selects.get(0) instanceof PlainSelect) {
+                    return ((PlainSelect) selects.get(0)).getSelectItems();
+                }
+            }
+        } catch (Exception ex) {
+            log.debug("superset top level select resolve failed, sql={}", sql, ex);
+        }
+        return Collections.emptyList();
+    }
+
+    private String resolveSelectOutputName(SelectItem<?> selectItem) {
+        if (selectItem == null) {
+            return null;
+        }
+        if (selectItem.getAlias() != null && StringUtils.isNotBlank(selectItem.getAlias().getName())) {
+            return selectItem.getAlias().getName().replace("`", "");
+        }
+        if (selectItem.getExpression() == null) {
+            return null;
+        }
+        return StringUtils.trimToNull(selectItem.getExpression().toString().replace("`", ""));
+    }
+
+    private Set<String> resolveExpressionSourceFields(String expression) {
+        if (StringUtils.isBlank(expression)) {
+            return Collections.emptySet();
+        }
+        try {
+            Set<String> sourceFields = SqlSelectHelper.getFieldsFromExpr(expression);
+            if (CollectionUtils.isEmpty(sourceFields)) {
+                return Collections.emptySet();
+            }
+            return sourceFields.stream().filter(StringUtils::isNotBlank).map(this::normalizeName)
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
+        } catch (Exception ex) {
+            log.debug("superset metric source resolve failed, expression={}", expression, ex);
+            return Collections.emptySet();
+        }
+    }
+
+    private Set<String> resolveExpressionSourceFields(Expression expression) {
+        if (expression == null) {
+            return Collections.emptySet();
+        }
+        Set<String> sourceFields = new LinkedHashSet<>();
+        try {
+            SqlSelectHelper.getFieldsFromExpr(expression, sourceFields);
+        } catch (Exception ex) {
+            log.debug("superset expression source resolve failed, expression={}", expression, ex);
+            return Collections.emptySet();
+        }
+        return sourceFields.stream().filter(StringUtils::isNotBlank).map(this::normalizeName)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     private String resolveDatasetColumn(String name, Map<String, SupersetDatasetColumn> columnMap,
@@ -637,7 +820,12 @@ public class SupersetChartProcessor implements ExecuteResultProcessor {
         Long queryId = executeContext.getRequest().getQueryId();
         String suffix =
                 queryId == null ? String.valueOf(System.currentTimeMillis()) : queryId.toString();
-        return "supersonic_" + plugin.getName() + "_" + suffix;
+        String queryText = executeContext == null || executeContext.getRequest() == null ? null
+                : sanitizeChartName(executeContext.getRequest().getQueryText());
+        String readableName = StringUtils.defaultIfBlank(queryText,
+                StringUtils.defaultIfBlank(sanitizeChartName(plugin == null ? null : plugin.getName()),
+                        DEFAULT_CHART_ZH_NAME));
+        return readableName + "_" + suffix;
     }
 
     private String buildDashboardTitle(ExecuteContext executeContext, String fallback) {
@@ -676,8 +864,10 @@ public class SupersetChartProcessor implements ExecuteResultProcessor {
                 continue;
             }
             String vizType = candidate.getVizType();
+            String readableVizName =
+                    resolveReadableVizName(vizType, candidate.getLlmName(), candidate.getName());
             String candidateChartName =
-                    buildCandidateChartName(chartName, vizType, i, candidate.getLlmName());
+                    buildCandidateChartName(chartName, vizType, i, readableVizName);
             try {
                 Map<String, Object> formData = buildFormData(config, executeContext.getParseInfo(),
                         queryResult, datasetInfo, vizType, executeContext.getAgent(),
@@ -698,8 +888,7 @@ public class SupersetChartProcessor implements ExecuteResultProcessor {
                                         : executeContext.getParseInfo().getDimensions().size());
                 SupersetChartBuildRequest request = new SupersetChartBuildRequest();
                 request.setVizType(vizType);
-                request.setVizName(StringUtils.defaultIfBlank(candidate.getLlmName(),
-                        StringUtils.defaultIfBlank(candidate.getName(), vizType)));
+                request.setVizName(readableVizName);
                 request.setChartName(candidateChartName);
                 request.setDashboardHeight(resolveDashboardHeight(config, vizType));
                 request.setFormData(formData);
@@ -881,14 +1070,17 @@ public class SupersetChartProcessor implements ExecuteResultProcessor {
             merged.putAll(baseFormData);
         }
         if (customFormData == null || customFormData.isEmpty()) {
-            return applySemanticFormData(merged, context);
+            return applyPresentationFormData(applySemanticFormData(merged, context), profile,
+                    context, parseInfo, queryResult);
         }
         if (merged.isEmpty()) {
             merged.putAll(customFormData);
-            return applySemanticFormData(merged, context);
+            return applyPresentationFormData(applySemanticFormData(merged, context), profile,
+                    context, parseInfo, queryResult);
         }
         merged.putAll(customFormData);
-        return applySemanticFormData(merged, context);
+        return applyPresentationFormData(applySemanticFormData(merged, context), profile, context,
+                parseInfo, queryResult);
     }
 
     /**
@@ -1145,7 +1337,7 @@ public class SupersetChartProcessor implements ExecuteResultProcessor {
         if (payload == null) {
             throw new IllegalStateException("superset formdata llm response invalid");
         }
-        validateLlmFieldsAgainstDataset(payload, datasetInfo);
+        sanitizeLlmFieldsAgainstDataset(payload, datasetInfo, vizType, profile);
         return payload;
     }
 
@@ -1241,45 +1433,72 @@ public class SupersetChartProcessor implements ExecuteResultProcessor {
         formData.put(key, value);
     }
 
-    private void validateLlmFieldsAgainstDataset(JSONObject payload,
-            SupersetDatasetInfo datasetInfo) {
+    private void sanitizeLlmFieldsAgainstDataset(JSONObject payload,
+            SupersetDatasetInfo datasetInfo, String vizType, FormDataProfile profile) {
         if (payload == null || datasetInfo == null) {
             return;
         }
+        Set<String> strictKeys = resolveStrictLlmFieldKeys(vizType, profile);
         Set<String> metricNames = resolveFormDataMetricCandidates(datasetInfo).stream()
                 .map(String::valueOf).collect(Collectors.toSet());
         Set<String> columnNames = resolveDatasetColumns(datasetInfo).stream().map(String::valueOf)
                 .collect(Collectors.toSet());
-        validateFieldInSet(payload, "metric", metricNames);
-        validateFieldInSet(payload, "secondary_metric", metricNames);
-        validateFieldListInSet(payload, "metrics", metricNames);
-        validateFieldListInSet(payload, "metrics_b", metricNames);
-        validateFieldListInSet(payload, "tooltip_metrics", metricNames);
-        validateFieldListInSet(payload, "groupby", columnNames);
-        validateFieldListInSet(payload, "groupbyRows", columnNames);
-        validateFieldListInSet(payload, "groupbyColumns", columnNames);
-        validateFieldListInSet(payload, "columns", columnNames);
-        validateFieldListInSet(payload, "column_collection", columnNames);
-        validateFieldInSet(payload, "column", columnNames);
-        validateFieldListInSet(payload, "all_columns", columnNames);
-        validateFieldInSet(payload, "granularity_sqla", columnNames);
-        validateFieldInSet(payload, "x_axis", columnNames);
-        validateFieldInSet(payload, "y_axis", columnNames);
-        validateFieldInSet(payload, "source", columnNames);
-        validateFieldInSet(payload, "target", columnNames);
-        validateFieldInSet(payload, "entity", columnNames);
-        validateFieldInSet(payload, "latitude", columnNames);
-        validateFieldInSet(payload, "longitude", columnNames);
-        validateFieldInSet(payload, "start", columnNames);
-        validateFieldInSet(payload, "end", columnNames);
-        validateFieldInSet(payload, "x", columnNames);
-        validateFieldInSet(payload, "y", columnNames);
-        validateFieldInSet(payload, "size", columnNames);
-        validateFieldInSet(payload, "all_columns_x", columnNames);
-        validateFieldInSet(payload, "all_columns_y", columnNames);
+        sanitizeFieldInSet(payload, "metric", metricNames, strictKeys.contains("metric"));
+        sanitizeFieldInSet(payload, "secondary_metric", metricNames,
+                strictKeys.contains("secondary_metric"));
+        sanitizeFieldListInSet(payload, "metrics", metricNames, strictKeys.contains("metrics"));
+        sanitizeFieldListInSet(payload, "metrics_b", metricNames,
+                strictKeys.contains("metrics_b"));
+        sanitizeFieldListInSet(payload, "tooltip_metrics", metricNames,
+                strictKeys.contains("tooltip_metrics"));
+        sanitizeFieldListInSet(payload, "groupby", columnNames, strictKeys.contains("groupby"));
+        sanitizeFieldListInSet(payload, "groupbyRows", columnNames,
+                strictKeys.contains("groupbyRows"));
+        sanitizeFieldListInSet(payload, "groupbyColumns", columnNames,
+                strictKeys.contains("groupbyColumns"));
+        sanitizeFieldListInSet(payload, "columns", columnNames, strictKeys.contains("columns"));
+        sanitizeFieldListInSet(payload, "column_collection", columnNames,
+                strictKeys.contains("column_collection"));
+        sanitizeFieldInSet(payload, "column", columnNames, strictKeys.contains("column"));
+        sanitizeFieldListInSet(payload, "all_columns", columnNames,
+                strictKeys.contains("all_columns"));
+        sanitizeFieldInSet(payload, "granularity_sqla", columnNames,
+                strictKeys.contains("granularity_sqla"));
+        sanitizeFieldInSet(payload, "x_axis", columnNames, strictKeys.contains("x_axis"));
+        sanitizeFieldInSet(payload, "y_axis", columnNames, strictKeys.contains("y_axis"));
+        sanitizeFieldInSet(payload, "source", columnNames, strictKeys.contains("source"));
+        sanitizeFieldInSet(payload, "target", columnNames, strictKeys.contains("target"));
+        sanitizeFieldInSet(payload, "entity", columnNames, strictKeys.contains("entity"));
+        sanitizeFieldInSet(payload, "latitude", columnNames, strictKeys.contains("latitude"));
+        sanitizeFieldInSet(payload, "longitude", columnNames, strictKeys.contains("longitude"));
+        sanitizeFieldInSet(payload, "start", columnNames, strictKeys.contains("start"));
+        sanitizeFieldInSet(payload, "end", columnNames, strictKeys.contains("end"));
+        sanitizeFieldInSet(payload, "x", columnNames, strictKeys.contains("x"));
+        sanitizeFieldInSet(payload, "y", columnNames, strictKeys.contains("y"));
+        sanitizeFieldInSet(payload, "size", columnNames, strictKeys.contains("size"));
+        sanitizeFieldInSet(payload, "all_columns_x", columnNames,
+                strictKeys.contains("all_columns_x"));
+        sanitizeFieldInSet(payload, "all_columns_y", columnNames,
+                strictKeys.contains("all_columns_y"));
     }
 
-    private void validateFieldInSet(JSONObject payload, String key, Set<String> allowList) {
+    private Set<String> resolveStrictLlmFieldKeys(String vizType, FormDataProfile profile) {
+        RequiredKeyRules rules = resolveRequiredKeyRules(vizType, profile);
+        if (rules == null) {
+            return Collections.emptySet();
+        }
+        Set<String> strictKeys = new LinkedHashSet<>(rules.getRequired());
+        for (List<String> group : rules.getRequiredAnyOf()) {
+            if (CollectionUtils.isEmpty(group)) {
+                continue;
+            }
+            strictKeys.addAll(group);
+        }
+        return strictKeys;
+    }
+
+    private void sanitizeFieldInSet(JSONObject payload, String key, Set<String> allowList,
+            boolean strict) {
         if (payload == null || StringUtils.isBlank(key) || allowList == null
                 || allowList.isEmpty()) {
             return;
@@ -1289,11 +1508,15 @@ public class SupersetChartProcessor implements ExecuteResultProcessor {
             return;
         }
         if (!allowList.contains(value)) {
-            throw new IllegalStateException("llm formData field invalid: " + key);
+            if (strict) {
+                throw new IllegalStateException("llm formData field invalid: " + key);
+            }
+            payload.remove(key);
         }
     }
 
-    private void validateFieldListInSet(JSONObject payload, String key, Set<String> allowList) {
+    private void sanitizeFieldListInSet(JSONObject payload, String key, Set<String> allowList,
+            boolean strict) {
         if (payload == null || StringUtils.isBlank(key) || allowList == null
                 || allowList.isEmpty()) {
             return;
@@ -1302,20 +1525,31 @@ public class SupersetChartProcessor implements ExecuteResultProcessor {
         if (!(value instanceof List)) {
             if (value instanceof String && StringUtils.isNotBlank((String) value)) {
                 if (!allowList.contains(value)) {
-                    throw new IllegalStateException("llm formData field invalid: " + key);
+                    if (strict) {
+                        throw new IllegalStateException("llm formData field invalid: " + key);
+                    }
+                    payload.remove(key);
                 }
             }
             return;
         }
+        List<Object> sanitized = new ArrayList<>();
         for (Object item : (List<?>) value) {
             if (item == null) {
                 continue;
             }
             String name = String.valueOf(item);
-            if (!allowList.contains(name)) {
+            if (allowList.contains(name)) {
+                sanitized.add(item);
+            } else if (strict) {
                 throw new IllegalStateException("llm formData field invalid: " + key);
             }
         }
+        if (sanitized.isEmpty()) {
+            payload.remove(key);
+            return;
+        }
+        payload.put(key, sanitized);
     }
 
     private Map<String, Object> resolveRequiredKeys(String vizType, FormDataProfile profile) {
@@ -1528,6 +1762,200 @@ public class SupersetChartProcessor implements ExecuteResultProcessor {
             resolved.put("all_columns", context.selectedColumns);
         }
         return resolved;
+    }
+
+    private Map<String, Object> applyPresentationFormData(Map<String, Object> formData,
+            FormDataProfile profile, FormDataContext context, SemanticParseInfo parseInfo,
+            QueryResult queryResult) {
+        if (formData == null) {
+            return null;
+        }
+        formData.put("show_title", false);
+        formData.put("show_chart_title", false);
+        applyCartesianAxisTitles(formData, profile, context, parseInfo, queryResult);
+        return formData;
+    }
+
+    private void applyCartesianAxisTitles(Map<String, Object> formData, FormDataProfile profile,
+            FormDataContext context, SemanticParseInfo parseInfo, QueryResult queryResult) {
+        if (formData == null || context == null || !supportsCartesianAxisTitles(profile)) {
+            return;
+        }
+        Map<String, String> displayNameMap = buildDisplayNameMap(parseInfo, queryResult);
+        String xAxisTitle = resolveAxisDisplayName(resolveXAxisField(formData), displayNameMap);
+        if (StringUtils.isNotBlank(xAxisTitle)) {
+            formData.put("x_axis_title", xAxisTitle);
+        }
+        String yAxisTitle = resolveYAxisTitle(formData, parseInfo, displayNameMap);
+        if (StringUtils.isNotBlank(yAxisTitle)) {
+            formData.put("y_axis_title", yAxisTitle);
+        }
+    }
+
+    private boolean supportsCartesianAxisTitles(FormDataProfile profile) {
+        return FormDataProfile.TIME_SERIES.equals(profile)
+                || FormDataProfile.TIME_SERIES_MULTI.equals(profile)
+                || FormDataProfile.HEATMAP.equals(profile)
+                || FormDataProfile.HISTOGRAM.equals(profile)
+                || FormDataProfile.BUBBLE.equals(profile);
+    }
+
+    private String resolveXAxisField(Map<String, Object> formData) {
+        return firstNonBlankValue(toStringValue(formData.get("granularity_sqla")),
+                toStringValue(formData.get("x_axis")), toStringValue(formData.get("x")),
+                toStringValue(formData.get("all_columns_x")),
+                firstStringInList(formData.get("groupby")),
+                firstStringInList(formData.get("groupbyRows")));
+    }
+
+    private String resolveYAxisTitle(Map<String, Object> formData, SemanticParseInfo parseInfo,
+            Map<String, String> displayNameMap) {
+        String explicitAxisField = firstNonBlankValue(toStringValue(formData.get("y_axis")),
+                toStringValue(formData.get("y")), toStringValue(formData.get("all_columns_y")));
+        if (StringUtils.isNotBlank(explicitAxisField)) {
+            return resolveAxisDisplayName(explicitAxisField, displayNameMap);
+        }
+        if (parseInfo != null && !CollectionUtils.isEmpty(parseInfo.getMetrics())) {
+            List<String> labels = parseInfo.getMetrics().stream().map(this::resolveReadableElementName)
+                    .filter(StringUtils::isNotBlank).distinct().collect(Collectors.toList());
+            if (!labels.isEmpty()) {
+                return String.join(" / ", labels);
+            }
+        }
+        List<String> metricLabels = new ArrayList<>();
+        appendMetricLabels(metricLabels, formData.get("metric"), displayNameMap);
+        appendMetricLabels(metricLabels, formData.get("metrics"), displayNameMap);
+        appendMetricLabels(metricLabels, formData.get("metrics_b"), displayNameMap);
+        return metricLabels.stream().filter(StringUtils::isNotBlank).distinct()
+                .collect(Collectors.joining(" / "));
+    }
+
+    private void appendMetricLabels(List<String> labels, Object metricValue,
+            Map<String, String> displayNameMap) {
+        if (metricValue == null) {
+            return;
+        }
+        if (metricValue instanceof List) {
+            for (Object item : (List<?>) metricValue) {
+                appendMetricLabels(labels, item, displayNameMap);
+            }
+            return;
+        }
+        if (metricValue instanceof String) {
+            String label = resolveAxisDisplayName((String) metricValue, displayNameMap);
+            if (StringUtils.isNotBlank(label)) {
+                labels.add(label);
+            }
+            return;
+        }
+        if (metricValue instanceof Map) {
+            Map<?, ?> metric = (Map<?, ?>) metricValue;
+            Object column = metric.get("column");
+            if (column instanceof Map) {
+                String columnName = toStringValue(((Map<?, ?>) column).get("column_name"));
+                String label = resolveAxisDisplayName(columnName, displayNameMap);
+                if (StringUtils.isNotBlank(label)) {
+                    labels.add(label);
+                    return;
+                }
+            }
+            String label = resolveAxisDisplayName(toStringValue(metric.get("label")), displayNameMap);
+            if (StringUtils.isNotBlank(label)) {
+                labels.add(label);
+            }
+        }
+    }
+
+    private String resolveAxisDisplayName(String field, Map<String, String> displayNameMap) {
+        if (StringUtils.isBlank(field)) {
+            return null;
+        }
+        if (containsChineseText(field)) {
+            return field;
+        }
+        if (displayNameMap != null) {
+            String direct = displayNameMap.get(normalizeName(field));
+            if (StringUtils.isNotBlank(direct)) {
+                return direct;
+            }
+            String relaxed = displayNameMap.get(normalizeRelaxedName(field));
+            if (StringUtils.isNotBlank(relaxed)) {
+                return relaxed;
+            }
+        }
+        return field;
+    }
+
+    private Map<String, String> buildDisplayNameMap(SemanticParseInfo parseInfo,
+            QueryResult queryResult) {
+        Map<String, String> displayNameMap = new HashMap<>();
+        if (parseInfo != null) {
+            registerDisplayName(displayNameMap, parseInfo.getDateInfo() == null ? null
+                    : parseInfo.getDateInfo().getDateField(),
+                    parseInfo.getDateInfo() == null ? null : parseInfo.getDateInfo().getDateField());
+            registerDisplayNames(displayNameMap, parseInfo.getDimensions());
+            registerDisplayNames(displayNameMap, parseInfo.getMetrics());
+        }
+        if (queryResult != null && !CollectionUtils.isEmpty(queryResult.getQueryColumns())) {
+            for (QueryColumn queryColumn : queryResult.getQueryColumns()) {
+                if (queryColumn == null) {
+                    continue;
+                }
+                String readableName = firstNonBlankValue(queryColumn.getName(),
+                        queryColumn.getComment(), queryColumn.getBizName(),
+                        queryColumn.getNameEn());
+                registerDisplayName(displayNameMap, queryColumn.getBizName(), readableName);
+                registerDisplayName(displayNameMap, queryColumn.getNameEn(), readableName);
+                registerDisplayName(displayNameMap, queryColumn.getName(), readableName);
+            }
+        }
+        return displayNameMap;
+    }
+
+    private void registerDisplayNames(Map<String, String> displayNameMap,
+            Collection<SchemaElement> elements) {
+        if (displayNameMap == null || CollectionUtils.isEmpty(elements)) {
+            return;
+        }
+        for (SchemaElement element : elements) {
+            if (element == null) {
+                continue;
+            }
+            String readableName = resolveReadableElementName(element);
+            registerDisplayName(displayNameMap, element.getBizName(), readableName);
+            registerDisplayName(displayNameMap, element.getName(), readableName);
+            if (!CollectionUtils.isEmpty(element.getAlias())) {
+                for (String alias : element.getAlias()) {
+                    registerDisplayName(displayNameMap, alias, readableName);
+                }
+            }
+        }
+    }
+
+    private void registerDisplayName(Map<String, String> displayNameMap, String rawName,
+            String readableName) {
+        if (displayNameMap == null || StringUtils.isBlank(rawName) || StringUtils.isBlank(readableName)) {
+            return;
+        }
+        displayNameMap.putIfAbsent(normalizeName(rawName), readableName.trim());
+        displayNameMap.putIfAbsent(normalizeRelaxedName(rawName), readableName.trim());
+    }
+
+    private String resolveReadableElementName(SchemaElement element) {
+        if (element == null) {
+            return null;
+        }
+        if (StringUtils.isNotBlank(element.getName())) {
+            return element.getName().trim();
+        }
+        if (!CollectionUtils.isEmpty(element.getAlias())) {
+            String alias = element.getAlias().stream().filter(StringUtils::isNotBlank).findFirst()
+                    .orElse(null);
+            if (StringUtils.isNotBlank(alias)) {
+                return alias.trim();
+            }
+        }
+        return StringUtils.trimToNull(element.getBizName());
     }
 
     private boolean shouldApplyTimeContext(Map<String, Object> formData, FormDataContext context) {
@@ -2932,6 +3360,74 @@ public class SupersetChartProcessor implements ExecuteResultProcessor {
             return element.getBizName();
         }
         return element.getName();
+    }
+
+    private String resolveReadableVizName(String vizType, String llmName, String candidateName) {
+        String readable = resolveReadableTitle(llmName);
+        if (StringUtils.isNotBlank(readable)) {
+            return readable;
+        }
+        readable = resolveReadableTitle(candidateName);
+        if (StringUtils.isNotBlank(readable)) {
+            return readable;
+        }
+        String mapped = SUPERSET_VIZTYPE_ZH_LABELS.get(normalizeName(vizType));
+        if (StringUtils.isNotBlank(mapped)) {
+            return mapped;
+        }
+        return DEFAULT_CHART_ZH_NAME;
+    }
+
+    private String resolveReadableTitle(String value) {
+        String normalized = sanitizeChartName(value);
+        if (StringUtils.isBlank(normalized)) {
+            return null;
+        }
+        if (containsChineseText(normalized)) {
+            return normalized;
+        }
+        return null;
+    }
+
+    private boolean containsChineseText(String value) {
+        if (StringUtils.isBlank(value)) {
+            return false;
+        }
+        for (int i = 0; i < value.length(); i++) {
+            Character.UnicodeBlock unicodeBlock =
+                    Character.UnicodeBlock.of(value.charAt(i));
+            if (Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS.equals(unicodeBlock)
+                    || Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A.equals(unicodeBlock)
+                    || Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B.equals(unicodeBlock)
+                    || Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS.equals(unicodeBlock)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private String toStringValue(Object value) {
+        return value == null ? null : StringUtils.trimToNull(String.valueOf(value));
+    }
+
+    private String firstStringInList(Object value) {
+        if (!(value instanceof List) || ((List<?>) value).isEmpty()) {
+            return null;
+        }
+        Object first = ((List<?>) value).get(0);
+        return toStringValue(first);
+    }
+
+    private String firstNonBlankValue(String... values) {
+        if (values == null || values.length == 0) {
+            return null;
+        }
+        for (String value : values) {
+            if (StringUtils.isNotBlank(value)) {
+                return value;
+            }
+        }
+        return null;
     }
 
     private String resolveAggregate(SchemaElement element) {

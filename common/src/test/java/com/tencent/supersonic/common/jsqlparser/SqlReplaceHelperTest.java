@@ -400,8 +400,8 @@ class SqlReplaceHelperTest {
 
         String replaced = SqlReplaceHelper.replaceExpression(expr, replace);
 
-        Assert.assertEquals(
-                "ROW_NUMBER() OVER (PARTITION BY department ORDER BY count(1) DESC)", replaced);
+        Assert.assertEquals("ROW_NUMBER() OVER (PARTITION BY department ORDER BY count(1) DESC)",
+                replaced);
     }
 
     @Test

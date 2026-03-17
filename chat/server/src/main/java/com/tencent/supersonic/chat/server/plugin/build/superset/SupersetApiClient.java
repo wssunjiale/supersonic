@@ -800,9 +800,6 @@ public class SupersetApiClient {
             return;
         }
         query.put("time_range", timeRange);
-        if (extras != null) {
-            extras.put("time_range", timeRange);
-        }
     }
 
     private String resolveTimeRange(Map<String, Object> formData) {

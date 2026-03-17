@@ -1,5 +1,6 @@
 package com.tencent.supersonic.chat.server.processor.execute;
 
+import com.alibaba.fastjson.JSONObject;
 import com.tencent.supersonic.chat.api.pojo.request.ChatExecuteReq;
 import com.tencent.supersonic.chat.api.pojo.response.QueryResult;
 import com.tencent.supersonic.chat.server.plugin.build.ParamOption;
@@ -151,6 +152,9 @@ public class SupersetChartProcessorTest {
         SupersetChartProcessor processor = new SupersetChartProcessor();
         SupersetPluginConfig config = buildConfig();
         SemanticParseInfo parseInfo = new SemanticParseInfo();
+        parseInfo.getMetrics().add(SchemaElement.builder().bizName("amount").name("金额")
+                .defaultAgg("SUM").build());
+        parseInfo.getDimensions().add(SchemaElement.builder().bizName("ds").name("日期").build());
         parseInfo.getDimensions()
                 .add(SchemaElement.builder().bizName("category").name("品类").build());
         SupersetDatasetInfo datasetInfo = new SupersetDatasetInfo();
@@ -171,6 +175,33 @@ public class SupersetChartProcessorTest {
         Assertions.assertEquals("SUM", metric.get("aggregate"));
         Assertions.assertEquals("aggregate", formData.get("query_mode"));
         Assertions.assertEquals("ds", formData.get("granularity_sqla"));
+        Assertions.assertEquals("日期", formData.get("x_axis_title"));
+        Assertions.assertEquals("金额", formData.get("y_axis_title"));
+        Assertions.assertEquals(false, formData.get("show_title"));
+        Assertions.assertEquals(false, formData.get("show_chart_title"));
+    }
+
+    @Test
+    public void testBuildFormDataUsesQueryColumnDisplayNamesForCartesianAxes() {
+        SupersetChartProcessor processor = new SupersetChartProcessor();
+        SupersetPluginConfig config = buildConfig();
+        SemanticParseInfo parseInfo = new SemanticParseInfo();
+        parseInfo.getMetrics().add(SchemaElement.builder().bizName("pv").name("访问次数").build());
+        QueryResult queryResult = new QueryResult();
+        queryResult.setQueryColumns(Arrays.asList(new QueryColumn("数据日期", "DATE", "imp_date"),
+                new QueryColumn("访问次数", "BIGINT", "pv")));
+        SupersetDatasetInfo datasetInfo = new SupersetDatasetInfo();
+        datasetInfo.setColumns(Arrays.asList(buildColumn("imp_date", "DATE", false, true),
+                buildColumn("pv", "BIGINT", false, false)));
+        datasetInfo.setMetrics(Collections.singletonList(buildMetric("pv")));
+
+        Map<String, Object> formData = processor.buildFormData(config, parseInfo, queryResult,
+                datasetInfo, "echarts_timeseries_line", null, null);
+
+        Assertions.assertEquals("数据日期", formData.get("x_axis_title"));
+        Assertions.assertEquals("访问次数", formData.get("y_axis_title"));
+        Assertions.assertEquals(false, formData.get("show_title"));
+        Assertions.assertEquals(false, formData.get("show_chart_title"));
     }
 
     @Test
@@ -283,6 +314,23 @@ public class SupersetChartProcessorTest {
         Assertions.assertEquals("raw", formData.get("query_mode"));
         Assertions.assertEquals(Arrays.asList("ds", "region"), formData.get("columns"));
         Assertions.assertEquals(Arrays.asList("ds", "region"), formData.get("all_columns"));
+    }
+
+    @Test
+    public void testSanitizeLlmFieldsDropsInvalidOptionalTableKeys() throws Exception {
+        SupersetChartProcessor processor = new SupersetChartProcessor();
+        SupersetDatasetInfo datasetInfo = new SupersetDatasetInfo();
+        datasetInfo.setColumns(Arrays.asList(buildColumn("department", "STRING", true, false),
+                buildColumn("pv", "BIGINT", false, false)));
+        datasetInfo.setMetrics(Collections.singletonList(buildMetric("pv")));
+        JSONObject payload = new JSONObject();
+        payload.put("columns", Collections.singletonList("department"));
+        payload.put("all_columns_x", "not_exists");
+
+        invokeSanitizeLlmFields(processor, payload, datasetInfo, "table", "TABLE");
+
+        Assertions.assertEquals(Collections.singletonList("department"), payload.get("columns"));
+        Assertions.assertFalse(payload.containsKey("all_columns_x"));
     }
 
     @Test
@@ -532,6 +580,50 @@ public class SupersetChartProcessorTest {
     }
 
     @Test
+    public void testResolveSupersetDatasetShouldFallbackWhenTopLevelSqlNoLongerExposesMetricSource()
+            throws Exception {
+        SupersetChartProcessor processor = new SupersetChartProcessor();
+        SupersetSyncService syncService = Mockito.mock(SupersetSyncService.class);
+        SupersetDatasetRegistryService registryService =
+                Mockito.mock(SupersetDatasetRegistryService.class);
+        SupersetDatasetDO candidate = buildRegistryCandidate(14L, "SEMANTIC_DATASET", "VIRTUAL");
+        SupersetDatasetInfo persistentDataset = new SupersetDatasetInfo();
+        persistentDataset.setId(205L);
+        persistentDataset.setColumns(Arrays.asList(buildColumn("department", "STRING", true, false),
+                buildColumn("pv", "BIGINT", false, false)));
+        persistentDataset.setMetrics(Collections.singletonList(buildMetric("pv")));
+        SupersetDatasetInfo fallbackDataset = new SupersetDatasetInfo();
+        fallbackDataset.setId(305L);
+
+        ExecuteContext executeContext = buildPersistentExecuteContext(9L);
+        QueryResult queryResult = buildAliasedQueryResult("_总访问次数");
+        String sql = "WITH department_visits AS (SELECT department, count(1) AS _总访问次数 "
+                + "FROM demo GROUP BY department) SELECT department, _总访问次数, "
+                + "ROW_NUMBER() OVER (ORDER BY _总访问次数 DESC) AS _排名 FROM department_visits";
+
+        Mockito.when(registryService.listAvailablePersistentDatasets(9L))
+                .thenReturn(Collections.singletonList(candidate));
+        Mockito.when(syncService.resolveDatasetInfo(candidate)).thenReturn(persistentDataset);
+        Mockito.when(syncService.registerAndSyncDataset(executeContext.getParseInfo(), sql,
+                queryResult.getQueryColumns(), null)).thenReturn(fallbackDataset);
+
+        try (MockedStatic<ContextUtils> mocked = Mockito.mockStatic(ContextUtils.class)) {
+            mocked.when(() -> ContextUtils.getBean(SupersetSyncService.class))
+                    .thenReturn(syncService);
+            mocked.when(() -> ContextUtils.getBean(SupersetDatasetRegistryService.class))
+                    .thenReturn(registryService);
+
+            SupersetDatasetInfo resolved = invokeResolveSupersetDataset(processor, executeContext,
+                    sql, queryResult);
+
+            Assertions.assertSame(fallbackDataset, resolved);
+            Mockito.verify(syncService).resolveDatasetInfo(candidate);
+            Mockito.verify(syncService).registerAndSyncDataset(executeContext.getParseInfo(), sql,
+                    queryResult.getQueryColumns(), null);
+        }
+    }
+
+    @Test
     public void testBuildColumnsFromParseUsesMetricAndDate() throws Exception {
         SupersetChartProcessor processor = new SupersetChartProcessor();
         SemanticParseInfo parseInfo = new SemanticParseInfo();
@@ -626,7 +718,7 @@ public class SupersetChartProcessorTest {
         method.setAccessible(true);
         @SuppressWarnings("unchecked")
         List<Object> requests = (List<Object>) method.invoke(processor, candidates,
-                "supersonic_chart_9", config, executeContext, queryResult, datasetInfo);
+                "各品牌历年收入趋势_9", config, executeContext, queryResult, datasetInfo);
 
         Assertions.assertEquals(4, requests.size());
         Assertions.assertEquals("echarts_timeseries_line",
@@ -635,6 +727,12 @@ public class SupersetChartProcessorTest {
                 invokeGetter(requests.get(1), "getVizType"));
         Assertions.assertEquals("pie", invokeGetter(requests.get(2), "getVizType"));
         Assertions.assertEquals("table", invokeGetter(requests.get(3), "getVizType"));
+        Assertions.assertEquals("折线图", invokeGetter(requests.get(0), "getVizName"));
+        Assertions.assertEquals("柱状图", invokeGetter(requests.get(1), "getVizName"));
+        Assertions.assertEquals("饼图", invokeGetter(requests.get(2), "getVizName"));
+        Assertions.assertEquals("数据表", invokeGetter(requests.get(3), "getVizName"));
+        Assertions.assertTrue(String.valueOf(invokeGetter(requests.get(0), "getChartName"))
+                .startsWith("折线图_各品牌历年收入趋势"));
     }
 
     @Test
@@ -763,6 +861,27 @@ public class SupersetChartProcessorTest {
                 ExecuteContext.class, String.class, QueryResult.class);
         method.setAccessible(true);
         return (SupersetDatasetInfo) method.invoke(processor, executeContext, sql, queryResult);
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private void invokeSanitizeLlmFields(SupersetChartProcessor processor, JSONObject payload,
+            SupersetDatasetInfo datasetInfo, String vizType, String profileName) {
+        try {
+            Class<?> profileClass = Class.forName(
+                    "com.tencent.supersonic.chat.server.processor.execute.SupersetChartProcessor$FormDataProfile");
+            Object profile = Enum.valueOf((Class<? extends Enum>) profileClass, profileName);
+            Method method = SupersetChartProcessor.class.getDeclaredMethod(
+                    "sanitizeLlmFieldsAgainstDataset", JSONObject.class, SupersetDatasetInfo.class,
+                    String.class, profileClass);
+            method.setAccessible(true);
+            method.invoke(processor, payload, datasetInfo, vizType, profile);
+        } catch (ReflectiveOperationException ex) {
+            Throwable cause = ex.getCause();
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            }
+            throw new RuntimeException(ex);
+        }
     }
 
     private SupersetChartInfo buildChartInfo(Long chartId, String chartUuid) {

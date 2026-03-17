@@ -44,3 +44,5 @@ bin/
 .venv/
 .env
 .run/
+.symphony/
+.pnpm-home/

@@ -1,0 +1,87 @@
+schema_version: 1
+updated_at: 2026-03-17
+project: supersonic
+
+entry_points:
+  - path: launchers/standalone/src/main/java/com/tencent/supersonic/StandaloneLauncher.java
+    kind: runtime
+    role: 默认后端启动入口，统一装配 Chat BI 与 Headless BI
+  - path: launchers/chat/src/main/java/com/tencent/supersonic/ChatLauncher.java
+    kind: runtime
+    role: Chat BI 独立启动入口
+  - path: launchers/headless/src/main/java/com/tencent/supersonic/HeadlessLauncher.java
+    kind: runtime
+    role: Headless BI 独立启动入口
+  - path: assembly/bin/supersonic-daemon.sh
+    kind: script
+    role: 发布包启动脚本，本地与验收环境最常用入口
+  - path: assembly/bin/supersonic-build.sh
+    kind: build
+    role: standalone 发布包构建入口
+  - path: webapp/package.json
+    kind: frontend
+    role: 前端依赖、构建与测试命令入口
+
+core_services:
+  - name: chat_bi_flow
+    paths:
+      - chat/server
+      - headless/chat
+    responsibility: 自然语言问答、Schema Mapping、语义解析与图表生成主链路
+  - name: headless_bi_semantic_layer
+    paths:
+      - headless/core
+      - headless/server
+      - headless/api
+    responsibility: 语义模型、开放 API、查询执行与数据集能力
+  - name: launcher_wiring
+    paths:
+      - launchers/standalone
+      - launchers/chat
+      - launchers/headless
+    responsibility: Spring Boot 启动装配、模块组合与环境配置绑定
+  - name: frontend_app
+    paths:
+      - webapp
+    responsibility: Chat BI 与 Headless BI 前端界面、嵌入页和交互逻辑
+
+high_risk_paths:
+  - path: launchers
+    reason: 改动会影响服务启动方式、模块装配与运行配置
+  - path: chat/server
+    reason: 直接影响 Chat BI 主流程与接口行为
+  - path: headless/core
+    reason: 语义层核心逻辑，改动会同时波及 Chat 和 Headless 两端
+  - path: form-data-schema
+    reason: 直接影响 Superset 图表 form_data 生成与校验
+  - path: superset-spec
+    reason: 图表模板、selection 和 embedding 资产，误改容易让嵌入链路失真
+
+common_change_paths:
+  - path: headless/chat
+    reason: 聊天绘图、Schema 映射和语义查询稳定性主线常落在这里
+  - path: chat/server
+    reason: 问答流程、接口与调试链路常在这里调整
+  - path: webapp
+    reason: 聊天 UI、嵌入交互和前端适配改动集中
+  - path: form-data-schema
+    reason: 图表创建链路推进时常需要补 schema 资产
+
+avoid_auto_change_paths:
+  - path: launchers
+    reason: 没有明确启动或部署需求时，不要自动改装配层
+  - path: form-data-schema
+    reason: 需要和 Superset 实际 UI 与 schema 行为人工对照，不适合盲改
+  - path: superset-spec
+    reason: 需要人工核对模板资产与示例，不适合自动批量修改
+
+verification_entrypoints:
+  - command: bash scripts/doctor.sh
+    status: 已验证
+    note: 2026-03-17 当前环境执行通过
+  - command: bash scripts/smoke.sh
+    status: 已验证
+    note: 2026-03-17 当前环境执行通过
+  - command: bash scripts/smoke.sh frontend
+    status: 未验证
+    note: 前端改动后可追加

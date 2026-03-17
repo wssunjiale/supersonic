@@ -803,7 +803,7 @@ public class SupersetApiClientTest {
         Assertions.assertEquals(Boolean.TRUE, query.get("order_desc"));
         Assertions.assertEquals("2026-02-14 : 2026-03-15", query.get("time_range"));
         Map<?, ?> extras = (Map<?, ?>) query.get("extras");
-        Assertions.assertEquals("2026-02-14 : 2026-03-15", extras.get("time_range"));
+        Assertions.assertFalse(extras.containsKey("time_range"));
         List<?> filters = (List<?>) query.get("filters");
         Assertions.assertEquals(1, filters.size());
         Map<?, ?> filter = (Map<?, ?>) filters.get(0);

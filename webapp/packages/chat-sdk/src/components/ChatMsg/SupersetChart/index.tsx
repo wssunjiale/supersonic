@@ -35,8 +35,13 @@ type ApiEnvelope<T> = {
 
 const DEFAULT_HEIGHT = 800;
 const SUPERSET_IFRAME_TITLE = 'supersetIframe';
+const DEFAULT_THEME_MODE = 'default' as ThemeMode;
+const DARK_THEME_MODE = 'dark' as ThemeMode;
 
 type EmbedInstance = EmbeddedDashboard;
+type SupersetThemeConfig = {
+  token?: Record<string, string>;
+};
 
 const SUPERSET_VIZTYPE_ZH_LABELS: Record<string, string> = {
   big_number: '指标卡',
@@ -188,6 +193,161 @@ function unwrapApiEnvelope<T>(payload: ApiEnvelope<T> | T | null | undefined): T
     return envelope.data;
   }
   return payload as T;
+}
+
+function normalizeThemeModeHint(value?: string): ThemeMode | undefined {
+  const normalized = value?.trim().toLowerCase();
+  if (!normalized) {
+    return undefined;
+  }
+  if (normalized.includes('dark')) {
+    return DARK_THEME_MODE;
+  }
+  if (
+    normalized.includes('light') ||
+    normalized.includes('default') ||
+    normalized.includes('white')
+  ) {
+    return DEFAULT_THEME_MODE;
+  }
+  return undefined;
+}
+
+function parseBackgroundColor(value?: string): [number, number, number] | null {
+  const normalized = value?.trim().toLowerCase();
+  if (!normalized || normalized === 'transparent' || normalized === 'inherit') {
+    return null;
+  }
+
+  const hexMatch = normalized.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+  if (hexMatch) {
+    const hex = hexMatch[1];
+    if (hex.length === 3) {
+      return [
+        parseInt(`${hex[0]}${hex[0]}`, 16),
+        parseInt(`${hex[1]}${hex[1]}`, 16),
+        parseInt(`${hex[2]}${hex[2]}`, 16),
+      ];
+    }
+    return [
+      parseInt(hex.slice(0, 2), 16),
+      parseInt(hex.slice(2, 4), 16),
+      parseInt(hex.slice(4, 6), 16),
+    ];
+  }
+
+  const rgbMatch = normalized.match(/^rgba?\(([^)]+)\)$/);
+  if (!rgbMatch) {
+    return null;
+  }
+  const channels = rgbMatch[1]
+    .split(',')
+    .slice(0, 3)
+    .map(item => Number(item.trim()));
+  if (channels.length !== 3 || channels.some(channel => !Number.isFinite(channel))) {
+    return null;
+  }
+  return [channels[0], channels[1], channels[2]];
+}
+
+function inferThemeModeFromBackgroundColor(backgroundColor?: string): ThemeMode | undefined {
+  const channels = parseBackgroundColor(backgroundColor);
+  if (!channels) {
+    return undefined;
+  }
+  const [red, green, blue] = channels.map(channel => channel / 255);
+  const brightness = 0.299 * red + 0.587 * green + 0.114 * blue;
+  return brightness < 0.5 ? DARK_THEME_MODE : DEFAULT_THEME_MODE;
+}
+
+function resolveHostBackgroundColor(): string | undefined {
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
+    return undefined;
+  }
+  const rootStyle = window.getComputedStyle(document.documentElement);
+  const bodyStyle = document.body ? window.getComputedStyle(document.body) : undefined;
+  const candidates = [
+    rootStyle.getPropertyValue('--component-background'),
+    rootStyle.getPropertyValue('--body-background'),
+    rootStyle.getPropertyValue('--light-background'),
+    bodyStyle?.backgroundColor,
+    '#ffffff',
+  ];
+  const resolved = candidates.find(value => value && value.trim())?.trim();
+  return resolved || '#ffffff';
+}
+
+function readCssTokenValue(style: CSSStyleDeclaration | undefined, name: string): string | undefined {
+  const value = style?.getPropertyValue(name)?.trim();
+  return value || undefined;
+}
+
+function resolveHostThemeConfig(): SupersetThemeConfig | undefined {
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
+    return undefined;
+  }
+  const rootStyle = window.getComputedStyle(document.documentElement);
+  const bodyStyle = document.body ? window.getComputedStyle(document.body) : undefined;
+  const primaryColor =
+    readCssTokenValue(rootStyle, '--tme-primary-color') ||
+    readCssTokenValue(rootStyle, '--primary-color');
+  const backgroundColor =
+    readCssTokenValue(rootStyle, '--component-background') ||
+    readCssTokenValue(rootStyle, '--body-background') ||
+    bodyStyle?.backgroundColor?.trim() ||
+    '#ffffff';
+  const layoutBackground =
+    readCssTokenValue(rootStyle, '--body-background') ||
+    readCssTokenValue(rootStyle, '--light-background') ||
+    backgroundColor;
+  const textColor =
+    readCssTokenValue(rootStyle, '--text-color') ||
+    bodyStyle?.color?.trim();
+  const secondaryTextColor = readCssTokenValue(rootStyle, '--text-color-secondary');
+  const borderColor = readCssTokenValue(rootStyle, '--border-color-base');
+  const token = Object.fromEntries(
+    Object.entries({
+      colorPrimary: primaryColor,
+      colorBgBase: backgroundColor,
+      colorBgLayout: layoutBackground,
+      colorBgContainer: backgroundColor,
+      colorTextBase: textColor,
+      colorText: textColor,
+      colorTextSecondary: secondaryTextColor,
+      colorBorder: borderColor,
+    }).filter(([, value]) => Boolean(value))
+  ) as Record<string, string>;
+  if (Object.keys(token).length === 0) {
+    return undefined;
+  }
+  return { token };
+}
+
+function resolveHostThemeMode(): ThemeMode {
+  if (typeof document === 'undefined') {
+    return DEFAULT_THEME_MODE;
+  }
+  const docElement = document.documentElement;
+  const explicitMode =
+    normalizeThemeModeHint(docElement.getAttribute('data-theme') || undefined) ||
+    normalizeThemeModeHint(docElement.dataset.theme) ||
+    normalizeThemeModeHint(docElement.className) ||
+    normalizeThemeModeHint(document.body?.className);
+  if (explicitMode) {
+    return explicitMode;
+  }
+
+  const inferredMode = inferThemeModeFromBackgroundColor(resolveHostBackgroundColor());
+  if (inferredMode) {
+    return inferredMode;
+  }
+
+  if (typeof window !== 'undefined' && window.matchMedia) {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? DARK_THEME_MODE
+      : DEFAULT_THEME_MODE;
+  }
+  return DEFAULT_THEME_MODE;
 }
 
 const SupersetChart: React.FC<Props> = ({ id, data, triggerResize }) => {
@@ -363,55 +523,23 @@ const SupersetChart: React.FC<Props> = ({ id, data, triggerResize }) => {
     }
   }, [pushModalOpen]);
 
-  const resolveThemeMode = useCallback((): ThemeMode => {
-    if (typeof document === 'undefined') {
-      return 'light' as ThemeMode;
-    }
-    const docElement = document.documentElement;
-    const themeAttr = docElement.getAttribute('data-theme') || docElement.dataset.theme || '';
-    const normalized = themeAttr.toLowerCase();
-    if (normalized.includes('dark')) {
-      return 'dark' as ThemeMode;
-    }
-    if (normalized.includes('light')) {
-      return 'light' as ThemeMode;
-    }
-    const bodyClass = document.body?.className || '';
-    if (bodyClass.includes('dark')) {
-      return 'dark' as ThemeMode;
-    }
-    if (bodyClass.includes('light')) {
-      return 'light' as ThemeMode;
-    }
-    if (typeof window !== 'undefined' && window.matchMedia) {
-      return (window.matchMedia('(prefers-color-scheme: dark)').matches
-        ? 'dark'
-        : 'light') as ThemeMode;
-    }
-    return 'light' as ThemeMode;
+  const resolveBackgroundColor = useCallback(() => {
+    return resolveHostBackgroundColor();
   }, []);
 
-  const resolveBackgroundColor = useCallback(() => {
-    if (typeof window === 'undefined') {
-      return undefined;
-    }
-    const rootStyle = window.getComputedStyle(document.documentElement);
-    const bodyStyle = window.getComputedStyle(document.body);
-    const candidates = [
-      rootStyle.getPropertyValue('--component-background'),
-      rootStyle.getPropertyValue('--body-background'),
-      rootStyle.getPropertyValue('--light-background'),
-      bodyStyle.backgroundColor,
-      '#ffffff',
-    ];
-    const resolved = candidates.find(value => value && value.trim())?.trim();
-    return resolved || '#ffffff';
+  const resolveThemeMode = useCallback((): ThemeMode => {
+    return resolveHostThemeMode();
+  }, []);
+
+  const resolveThemeConfig = useCallback((): SupersetThemeConfig | undefined => {
+    return resolveHostThemeConfig();
   }, []);
 
   const syncTheme = useCallback(
     async (instance?: EmbedInstance | null) => {
       const mode = resolveThemeMode();
       const background = resolveBackgroundColor();
+      const themeConfig = resolveThemeConfig();
       backgroundColorRef.current = background;
       setBackgroundColor(background);
       const target = instance || embedInstanceRef.current;
@@ -422,12 +550,19 @@ const SupersetChart: React.FC<Props> = ({ id, data, triggerResize }) => {
           // ignore theme sync error to avoid blocking rendering
         }
       }
+      if (target?.setThemeConfig && themeConfig) {
+        try {
+          await target.setThemeConfig(themeConfig);
+        } catch (error) {
+          // ignore theme sync error to avoid blocking rendering
+        }
+      }
       const iframe = embedContainerRef.current?.querySelector('iframe');
       if (iframe && background) {
         iframe.style.backgroundColor = background;
       }
     },
-    [resolveBackgroundColor, resolveThemeMode]
+    [resolveBackgroundColor, resolveThemeConfig, resolveThemeMode]
   );
 
   const computeAvailableHeight = useCallback(() => {
@@ -697,6 +832,12 @@ const SupersetChart: React.FC<Props> = ({ id, data, triggerResize }) => {
       attributes: true,
       attributeFilter: ['data-theme', 'class', 'style'],
     });
+    if (document.body) {
+      observer.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['data-theme', 'class', 'style'],
+      });
+    }
     const media = window.matchMedia?.('(prefers-color-scheme: dark)');
     if (media) {
       const onMediaChange = () => handleThemeChange();
