@@ -85,14 +85,22 @@ export function chatExecute(
   agentId?: number,
   streamingResult?:boolean
 ) {
-  return axios.post<MsgDataType>(`${prefix}/chat/query/execute`, {
-    queryText,
-    agentId,
-    chatId: chatId || DEFAULT_CHAT_ID,
-    queryId: parseInfo.queryId,
-    parseId: parseInfo.id,
-    streamingResult:streamingResult
-  });
+  // AgentService executes external agent calls that may take a long time.
+  // Override axiosInstance default timeout (120s) to avoid frontend aborting the request.
+  const requestConfig =
+    parseInfo?.queryMode === 'AGENT_SERVICE' ? { timeout: 0 } : undefined;
+  return axios.post<MsgDataType>(
+    `${prefix}/chat/query/execute`,
+    {
+      queryText,
+      agentId,
+      chatId: chatId || DEFAULT_CHAT_ID,
+      queryId: parseInfo.queryId,
+      parseId: parseInfo.id,
+      streamingResult:streamingResult
+    },
+    requestConfig as any
+  );
 }
 
 export function getExecuteSummary(
