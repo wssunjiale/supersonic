@@ -95,7 +95,7 @@ public abstract class S2BaseDemo implements CommandLineRunner {
     @Autowired
     protected Environment environment;
 
-    @Value("${s2.demo.names:S2VisitsDemo}")
+    @Value("${s2.demo.names:S2VisitsDemo,S2MetricPlannerDemo,S2MetricQueryDemo}")
     protected List<String> demoList;
 
     @Value("${spring.datasource.driver-class-name}")

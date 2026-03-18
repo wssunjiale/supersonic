@@ -12,4 +12,8 @@ export S2_DB_DATABASE=supersonic
 
 export S2_AGENT_SERVICE_RESPONSE_TIMEOUT_MINUTES=10
 
+export S2_SUPERSET_BASE_URL=http://10.0.12.244:8088
+export S2_SUPERSET_AUTH_ENABLED=false
+export S2_SUPERSET_SYNC_ENABLED=false
+
 mvn spring-boot:run -pl launchers/standalone -Dspotless.skip=true

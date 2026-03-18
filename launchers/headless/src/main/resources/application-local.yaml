@@ -1,7 +1,7 @@
 server:
   servlet:
     context-path:
-  port: 9081
+  port: 9090
 
 spring:
   h2:

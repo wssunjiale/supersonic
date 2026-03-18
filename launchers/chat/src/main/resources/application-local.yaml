@@ -28,7 +28,7 @@ authentication:
 
 semantic:
   url:
-    prefix: http://127.0.0.1:9081
+    prefix: http://127.0.0.1:9090
 
 llm:
   parser:
